@@ -42,6 +42,8 @@ Duas formas de gerar o instalador:
 - **GitHub (recomendado):** suba esta pasta para um repositório **privado**. O arquivo `.github/workflows/gerar-instalador.yml` faz o GitHub montar o .exe num Windows na nuvem. Para gerar: aba *Actions* → *Gerar instalador* → *Run workflow*, e baixe em *Artifacts*. Ou crie uma tag `v0.9.0` e o instalador aparece em *Releases*. O `.gitignore` impede que `dados/`, `config.json` e `userdata.json` sejam enviados.
 - **No seu PC:** instale o Inno Setup 6 e rode `gerar_setup.bat`; o instalador sai em `output\`.
 
+**Atualização automática:** o Radar instalado consulta `api.github.com/repos/<atualizacao.repo>/releases/latest` ao abrir e a cada 24h. O repositório precisa ser **público** e o release precisa ter o `.exe` anexado (o workflow faz isso). Para publicar uma versão: suba os arquivos, mude `VERSAO` em `radar/__init__.py` e publique um release com a tag `vX.Y.Z` igual.
+
 Sem assinatura digital (paga), o Windows pode mostrar "editor desconhecido" na primeira execução: *Mais informações → Executar assim mesmo*.
 
 ## Primeiro uso

@@ -326,6 +326,10 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ---------- painel: extras ---------- */
+.rr{font-size:10.5px;padding:2px 7px;border-radius:2px;white-space:nowrap;font-weight:700;letter-spacing:.02em}
+.rr-comum{background:#3d4450;color:#c7d5e0}.rr-incomum{background:#4c6b22;color:#d9f99d}.rr-raro{background:#1f5fa8;color:#fff}
+.rr-ultrarraro{background:linear-gradient(90deg,#6a3fc0,#9b59ff);color:#fff;box-shadow:0 0 6px #9b59ff88}
+.rr-lendario{background:linear-gradient(90deg,#c9711a,#f5b83d,#c9711a);color:#1b1205;box-shadow:0 0 8px #f5b83daa;text-transform:uppercase}
 .tg{font-size:10.5px;padding:2px 6px;border-radius:2px;white-space:nowrap;font-weight:700}
 .tg-sempre{background:#d6492f;color:#fff}.tg-1a{background:#e2a635;color:#1b2838}.tg-9m{background:#c9b458;color:#1b2838}
 .tg-6m{background:#7fa650;color:#10200a}.tg-3m{background:#4f7f8f;color:#e9f6fb}.tg-perto{background:#3e76cb;color:#fff}
@@ -470,13 +474,14 @@ select.mini{padding:3px 6px;font-size:11.5px}
     <div class="shead"><h2>Destaques</h2><span class="aside" id="valeNote"></span></div>
     <div class="hero" id="hero"></div>
     <div class="shead"><h2>Todos que valem a pena</h2><div class="chips" id="cTagVale"></div></div>
+    <div class="hint" style="color:var(--dim);font-size:11.5px;margin:-4px 0 8px">Raridade = quanto tempo o jogo já passou neste preço ou menos: <span class="rr rr-lendario">★ Lendário</span> nunca esteve tão barato · <span class="rr rr-ultrarraro">Ultrarraro</span> quase nunca · <span class="rr rr-raro">Raro</span> menos de 8% do tempo · <span class="rr rr-incomum">Incomum</span> · <span class="rr rr-comum">Comum</span> promoção frequente</div>
     <div id="valeLista"></div>
   </section>
 
   <section id="tab-lista" class="wrap tabsec" hidden>
     <div class="subnav">
       <button class="lk" data-quick="vale">Vale a pena <b id="qVale"></b></button>
-      <button class="lk" data-quick="piso">Em algum piso <b id="qPiso"></b></button>
+      <button class="lk" data-quick="piso">Raro ou melhor <b id="qPiso"></b></button>
       <button class="lk" data-quick="dlc">DLCs dos seus jogos <b id="qDlc"></b></button>
       <button class="lk" data-quick="todos">Toda a lista <b id="qTodos"></b></button>
       <label class="search"><span class="sr">Buscar</span><input id="q" type="search" placeholder="buscar na lista de desejos" autocomplete="off"><span aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span></label>
@@ -488,6 +493,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
           <span class="count"><b id="cnt">0</b> resultados</span>
           <label>Ordenar por
             <select id="sort">
+              <option value="rar">Mais raro primeiro</option>
               <option value="score">Vale a pena (score)</option>
               <option value="disc">Maior desconto</option>
               <option value="price">Menor preço</option>
@@ -519,7 +525,8 @@ select.mini{padding:3px 6px;font-size:11.5px}
         <div class="blk"><h4>Análises de usuários</h4><div class="in"><div class="chips" id="cRev">
           <button data-v="0" aria-pressed="true">Todas</button><button data-v="70">70%+</button><button data-v="80">80%+</button><button data-v="90">90%+</button>
         </div></div></div>
-        <div class="blk"><h4>Menor preço</h4><div class="in"><div class="chips" id="cTagLista"></div></div></div>
+        <div class="blk"><h4>Raridade do preço</h4><div class="in"><div class="chips" id="cTagLista"></div>
+          <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">Quanto tempo o jogo já passou neste preço (ou menos) no histórico.</div></div></div>
         <div class="blk"><h4>Restringir por</h4><div class="in" id="ticks"></div></div>
       </aside>
     </div>
@@ -544,6 +551,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
       <button class="lk" id="carrOtim">Loja mais barata em tudo</button>
       <button class="lk" id="carrLimpa">Limpar</button>
     </div>
+    <div class="meta-col" id="ponteBox"></div>
     <div class="shead"><h2>Adicionar jogo</h2><span class="aside">nome, appid ou link da loja Steam</span></div>
     <div class="addbox"><label class="search" style="flex:1;margin:0"><span class="sr">Buscar jogo</span><input id="busca" type="search" placeholder="ex.: Hollow Knight, 367520 ou https://store.steampowered.com/app/..." autocomplete="off"></label>
       <button class="btn-imp" id="buscaBtn" type="button">Buscar</button></div>
@@ -619,6 +627,10 @@ function priceBlock(o,lg){
 const ksBarata=o=>o.keyshop!=null&&o.preco!=null&&o.keyshop<o.preco*0.6;
 const ORDEM={sempre:5,'1a':4,'9m':3,'6m':2,'3m':1,perto:0};
 const TAGTXT={sempre:'Menor de sempre','1a':'Menor em 1 ano','9m':'Menor em 9 meses','6m':'Menor em 6 meses','3m':'Menor em 3 meses',perto:'Perto do menor',completo:'Completo no menor',keyshop:'Keyshop barata'};
+const RARS=['comum','incomum','raro','ultrarraro','lendario'];
+const RARTXT={comum:'Comum',incomum:'Incomum',raro:'Raro',ultrarraro:'Ultrarraro',lendario:'Lendário'};
+const rarIdx=r=>RARS.indexOf(r);
+function rarPill(o){if(!o.raridade)return '';return `<span class="rr rr-${o.raridade}" title="${esc(o.raridade_texto||'')}">${o.raridade==='lendario'?'★ ':''}${RARTXT[o.raridade]}</span>`;}
 function tagPill(o){if(!o.tag)return '';const extra=o.tag==='perto'&&o.acima!=null?` +${brl(o.acima)}`:'';return `<span class="tg tg-${o.tag}" title="${esc(o.tag_texto||'')}">${TAGTXT[o.tag]||o.tag}${extra}</span>`;}
 function fimTxt(t){if(!t)return '';const h=(t*1000-Date.now())/36e5;if(h<=0||h>72)return '';return h<1?'termina em minutos':h<24?`termina em ${Math.round(h)}h`:`termina em ${Math.round(h/24)}d`;}
 function flags(o){
@@ -627,7 +639,7 @@ function flags(o){
   const ft=fimTxt(o.fim);if(ft)f.push(`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${ft}</span>`);
   if(o.mudo)f.push('<span class="flag own">🔕 sem alertas</span>');
   if(o.novo)f.push('<span class="pill-novo">NOVO</span>');
-  if(o.tag)f.push(tagPill(o));
+  if(o.raridade)f.push(rarPill(o));
   if(o.vale)f.push('<span class="flag alert">Vale a pena</span>');
   if(o.modo==='completo')f.push('<span class="flag cmp">Modo completo</span>');
   if(o.base_tenho)f.push('<span class="flag own">Você tem o jogo base</span>');
@@ -641,14 +653,14 @@ function thumb(o){const rc=revClass(o.rpos,o.rcount);const c={'rv-pos':'#66c0f4'
 function revText(o){return o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo||o.rpos+'%')}</span> <span style="color:var(--dim)">(${fmtK(o.rcount)})</span>`:'<span class="rv-non">Sem análises</span>';}
 function rowHTML(o){return `<a class="srow" href="#" data-open="${o.appid}" data-hv="${o.appid}">
   ${art(o.appid,o.nome,o.capa,{small:true})}
-  <span class="tt"><div>${esc(o.nome)}</div><span class="flags">${flags(o)}</span>${o.tag_texto?`<div class="motivo">${esc(o.tag_texto)} · ${esc(o.loja)}${o.tag!=='sempre'&&o.piso!=null?` · menor de sempre ${brl(o.piso)}`:''}</div>`:''}</span>
+  <span class="tt"><div>${esc(o.nome)}</div><span class="flags">${flags(o)}</span>${o.raridade_texto?`<div class="motivo">${esc(o.raridade_texto)} · ${esc(o.loja)}${o.tag&&o.tag_texto?' · '+esc(o.tag_texto):''}${o.piso!=null&&o.preco>o.piso?` · menor de sempre ${brl(o.piso)}`:''}</div>`:''}</span>
   <span class="rel">${o.lancamento?fmtUnix(o.lancamento):''}</span>${thumb(o)}<span style="display:flex;gap:6px;align-items:center;justify-self:end">${cartBtn(o.appid)}${priceBlock(o)}</span></a>`;}
 function cartBtnB(id){const on=CARR.some(c=>c.bundle===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cartb="${id}" title="${on?'Tirar o bundle do carrinho':'Pôr o bundle no carrinho'}">${on?'✓':'+'}</span>`;}
 function cartBtn(id){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}" title="${on?'Tirar do carrinho':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
 function capCard(o){return `<a class="cap" href="#" data-open="${o.appid}" data-hv="${o.appid}">${art(o.appid,o.nome,o.capa)}
   <div class="meta"><div class="nm">${esc(o.nome)}</div><div class="row"><span class="rvs">${revText(o)}</span><span style="display:flex;gap:5px;align-items:center">${cartBtn(o.appid)}${priceBlock(o)}</span></div></div></a>`;}
-function compactHTML(list){return `<div class="ctab-wrap"><table class="ctab tnum"><thead><tr><th>Jogo</th><th>Loja</th><th class="n">Desc.</th><th class="n">Agora</th><th>Piso</th><th class="n">Menor de sempre</th><th class="n">Keyshop</th><th class="n">Análises</th><th class="n">Score</th><th></th></tr></thead><tbody>
-  ${list.map(o=>`<tr data-open="${o.appid}" data-hv="${o.appid}" style="cursor:pointer"><td class="t">${o.vale?'● ':''}${esc(o.nome)}</td><td>${esc(o.loja)}</td><td class="n">${o.corte>0?`<span class="pctx">-${o.corte}%</span>`:''}</td><td class="n">${brl(o.preco)}</td><td>${tagPill(o)}</td><td class="n">${brl(o.piso)}</td><td class="n">${o.keyshop!=null?brl(o.keyshop):''}</td><td class="n ${revClass(o.rpos,o.rcount)}">${o.rcount?o.rpos+'%':'—'}</td><td class="n">${o.score?Math.round(o.score):''}</td><td>${cartBtn(o.appid)}</td></tr>`).join('')}
+function compactHTML(list){return `<div class="ctab-wrap"><table class="ctab tnum"><thead><tr><th>Jogo</th><th>Loja</th><th class="n">Desc.</th><th class="n">Agora</th><th>Raridade</th><th class="n">Menor de sempre</th><th class="n">Keyshop</th><th class="n">Análises</th><th class="n">Score</th><th></th></tr></thead><tbody>
+  ${list.map(o=>`<tr data-open="${o.appid}" data-hv="${o.appid}" style="cursor:pointer"><td class="t">${o.vale?'● ':''}${esc(o.nome)}</td><td>${esc(o.loja)}</td><td class="n">${o.corte>0?`<span class="pctx">-${o.corte}%</span>`:''}</td><td class="n">${brl(o.preco)}</td><td>${rarPill(o)}</td><td class="n">${brl(o.piso)}</td><td class="n">${o.keyshop!=null?brl(o.keyshop):''}</td><td class="n ${revClass(o.rpos,o.rcount)}">${o.rcount?o.rpos+'%':'—'}</td><td class="n">${o.score?Math.round(o.score):''}</td><td>${cartBtn(o.appid)}</td></tr>`).join('')}
   </tbody></table></div>`;}
 
 /* ================= hover ================= */
@@ -662,7 +674,7 @@ function hvHTML(id){const o=IDX.get(+id);if(!o)return '';
     <div class="revl">Análises: ${o.rcount?`<b class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</b> · ${o.rpos}% de ${fmtN(o.rcount)}`:'<b>sem análises</b>'}</div>
     <div class="kv tnum">${o.preco!=null?`<span>Melhor preço (${esc(o.loja)})</span><b>${brl(o.preco)}</b>`:''}
       ${o.corte>0?`<span>Preço cheio</span><b>${brl(o.cheio)}</b>`:''}
-      ${o.tag?`<span>Piso</span><b>${esc(TAGTXT[o.tag])}</b>`:''}<span>Menor de sempre</span><b>${brl(o.piso)}</b>
+      ${o.raridade?`<span>Raridade</span><b>${RARTXT[o.raridade]}</b>`:''}<span>Menor de sempre</span><b>${brl(o.piso)}</b>
       ${o.keyshop!=null?`<span>Keyshop (GG.deals)</span><b>${brl(o.keyshop)}</b>`:''}
       ${o.score?`<span>Score</span><b>${Math.round(o.score)} / 100</b>`:''}</div>
     ${tags.length?`<div class="tags">${tags.join('')}</div>`:''}<div class="note">Clique para ver histórico, lojas e caminhos de compra</div>`;}
@@ -692,10 +704,10 @@ $$('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.got
 
 /* ================= vale a pena ================= */
 let heroI=0;
-function valeItens(){return L.filter(o=>o.vale).sort((a,b)=>b.score-a.score);}
+function valeItens(){return L.filter(o=>o.vale).sort((a,b)=>rarIdx(b.raridade)-rarIdx(a.raridade)||b.score-a.score);}
 S.tagVale=S.tagVale||'';
-function filtroTag(o,t){if(!t)return true;if(t==='perto')return o.tag==='perto';return o.tag&&o.tag!=='perto'&&ORDEM[o.tag]>=ORDEM[t];}
-function chipsTag(sel,atual,base){const opts=[['','Todos'],['sempre','De sempre'],['1a','1 ano+'],['9m','9 meses+'],['6m','6 meses+'],['3m','3 meses+'],['perto','Perto do menor']];
+function filtroTag(o,t){if(!t)return true;return !!o.raridade&&rarIdx(o.raridade)>=rarIdx(t);}
+function chipsTag(sel,atual,base){const opts=[['','Todos'],['lendario','★ Lendário'],['ultrarraro','Ultrarraro+'],['raro','Raro+'],['incomum','Incomum+']];
   $(sel).innerHTML=opts.map(([v,t])=>`<button data-tag="${v}" aria-pressed="${atual===v}">${t} <span style="opacity:.6">${base.filter(o=>filtroTag(o,v)).length}</span></button>`).join('');}
 function renderVale(){
   const it=valeItens();$('#valeNote').textContent=`${it.length} jogo(s) · checado ${fmtISO(RES.atualizado)}`;
@@ -706,7 +718,7 @@ function renderVale(){
     <div class="hero-info"><h3><a href="#" data-open="${o.appid}">${esc(o.nome)}</a></h3><div class="flags">${flags(o)}</div>
       <div class="hero-why tnum"><span>Análises</span><b>${o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</span> · ${o.rpos}%`:'Sem análises'}</b>
         <span>Score</span><span class="meter"><i style="width:${Math.min(100,o.score)}%"></i></span>
-        <span>Loja</span><b>${esc(o.loja)}</b><span>Por quê</span><b>${esc(o.motivo||'')}</b></div>
+        <span>Loja</span><b>${esc(o.loja)}</b><span>Raridade</span><b>${rarPill(o)} ${esc(o.raridade_texto||'')}</b></div>
       <div class="hero-next">${[1,2,3,4].map(k=>{const n=top[(heroI+k)%top.length];return `<button type="button" data-heroi="${(heroI+k)%top.length}" title="${esc(n.nome)}">${art(n.appid,n.nome,n.capa,{small:true})}</button>`;}).join('')}</div>
       <div class="hero-foot"><span style="display:flex;gap:8px;align-items:center"><a class="btn-go green" href="${esc(o.url||storeUrl(o.appid))}" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13px">Abrir oferta</a>${cartBtn(o.appid)}</span>${priceBlock(o,true)}</div></div></div>
     <button class="arrow l" aria-label="Anterior" data-hero="-1"><svg viewBox="0 0 12 22"><path d="M11 1 1 11l10 10" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
@@ -737,7 +749,7 @@ function filtrar(){
     if(max!==Infinity&&(o.preco==null||o.preco>max))return false;
     if(S.q&&!o.nome.toLowerCase().includes(S.q))return false; return true;});
   const gap=o=>o.preco!=null&&o.piso?o.preco/o.piso:big;
-  const cmp={score:(a,b)=>b.score-a.score||b.corte-a.corte,disc:(a,b)=>b.corte-a.corte||b.score-a.score,price:(a,b)=>(a.preco??big)-(b.preco??big),
+  const cmp={rar:(a,b)=>rarIdx(b.raridade)-rarIdx(a.raridade)||b.score-a.score,score:(a,b)=>b.score-a.score||b.corte-a.corte,disc:(a,b)=>b.corte-a.corte||b.score-a.score,price:(a,b)=>(a.preco??big)-(b.preco??big),
     rating:(a,b)=>b.rpos-a.rpos||b.rcount-a.rcount,gap:(a,b)=>gap(a)-gap(b),save:(a,b)=>((b.cheio||0)-(b.preco||0))-((a.cheio||0)-(a.preco||0)),
     name:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR'),rel:(a,b)=>(b.lancamento||0)-(a.lancamento||0),prio:(a,b)=>(a.prioridade??1e9)-(b.prioridade??1e9)}[S.sort];
   return r.sort(cmp);
@@ -753,7 +765,7 @@ function renderLista(){
   $$('.views [data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
   $('#sort').value=S.sort;$('#price').value=S.price;$('#priceV').textContent=PRICE_LBL[S.price];
   [['#cDisc','disc'],['#cRev','rev']].forEach(([id,k])=>$$(id+' button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===S[k])));
-  $('#qVale').textContent=L.filter(o=>o.vale).length;$('#qPiso').textContent=L.filter(o=>o.tag&&o.tag!=='perto').length;
+  $('#qVale').textContent=L.filter(o=>o.vale).length;$('#qPiso').textContent=L.filter(o=>o.raridade&&rarIdx(o.raridade)>=2).length;
   $('#qDlc').textContent=L.filter(o=>o.base_tenho).length;$('#qTodos').textContent=fmtN(L.length);
   $('#listaNote').textContent=`${fmtN(L.filter(o=>o.corte>0).length)} em promoção de ${fmtN(L.length)}`;
 }
@@ -764,7 +776,7 @@ $('#price').addEventListener('input',e=>{S.price=+e.target.value;S.shown=50;save
 [['#cDisc','disc'],['#cRev','rev']].forEach(([id,k])=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[k]=+b.dataset.v;S.shown=50;save();renderLista();}));
 $$('.views [data-view]').forEach(b=>b.addEventListener('click',()=>{S.view=b.dataset.view;save();renderLista();}));
 $$('[data-quick]').forEach(b=>b.addEventListener('click',()=>{const q=b.dataset.quick;
-  Object.keys(S.t).forEach(k=>S.t[k]=false);S.tagLista='';if(q==='vale')S.t.vale=true;if(q==='piso')S.tagLista='3m';if(q==='dlc')S.t.onlyBase=true;
+  Object.keys(S.t).forEach(k=>S.t[k]=false);S.tagLista='';if(q==='vale')S.t.vale=true;if(q==='piso')S.tagLista='raro';if(q==='dlc')S.t.onlyBase=true;
   S.shown=50;save();renderTicks();renderLista();}));
 
 /* ================= modal do jogo ================= */
@@ -799,7 +811,7 @@ function renderModal(){
     <div><h2>${esc(j.nome)}</h2><div class="flags" style="margin-bottom:10px">${flags(o)}</div>
       <div class="kvs"><span>Análises</span><b>${j.rcount?`<span class="${revClass(j.rpos,j.rcount)}">${esc(j.rotulo)}</span> · ${j.rpos}% de ${fmtN(j.rcount)}`:'—'}</b>
         ${j.lancamento?`<span>Lançamento</span><b>${fmtUnix(j.lancamento)}</b>`:''}
-        <span>Melhor preço</span><b>${brl(o.preco)} ${o.loja?'na '+esc(o.loja):''}</b><span>Piso</span><b>${o.tag?tagPill(o)+' ':''}menor de sempre ${brl(o.piso)}${o.piso_geral!=null&&o.piso_geral<o.piso?` (${brl(o.piso_geral)} em lojas que não alertam)`:''}</b>
+        <span>Melhor preço</span><b>${brl(o.preco)} ${o.loja?'na '+esc(o.loja):''}</b><span>Raridade</span><b>${o.raridade?rarPill(o)+' '+esc(o.raridade_texto||''):'—'}</b><span>Piso</span><b>${o.tag?tagPill(o)+' ':''}menor de sempre ${brl(o.piso)}${o.piso_geral!=null&&o.piso_geral<o.piso?` (${brl(o.piso_geral)} em lojas que não alertam)`:''}</b>
         ${g&&g.keyshop!=null?`<span>Keyshop</span><b>${brl(g.keyshop)} (menor ${brl(g.hist_keyshop)}) · <a href="${esc(g.url)}" target="_blank" rel="noopener">GG.deals</a></b>`:''}
         ${o.score?`<span>Score</span><b>${Math.round(o.score)}</b>`:''}</div>
       <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
@@ -808,6 +820,9 @@ function renderModal(){
         ${o.extra?`<button class="btn-ghost" data-desmonitorar="${j.appid}" style="padding:8px 12px">Parar de monitorar</button>`:''}
         <button class="btn-ghost" data-tenho="1" style="padding:8px 12px">${MJ.tenho_manual?'Desfazer "já tenho"':(MJ.tenho?'Está na sua biblioteca':'Já tenho')}</button>
         <button class="btn-ghost" data-mudo="${MJ.mudo?0:1}" style="padding:8px 12px">${MJ.mudo?'Voltar a avisar':'Não avisar deste jogo'}</button>
+        ${(()=>{const naSteam=MJ.na_lista&&!o.extra;if(MJ.tenho)return '';
+          if(MJ.fila)return `<button class="btn-ghost" data-ls="cancelar" style="padding:8px 12px" title="A ponte aplica na próxima página da Steam que você abrir">${MJ.fila==='add'?'Entrando na lista da Steam…':'Saindo da lista da Steam…'} (cancelar)</button>`;
+          return `<button class="btn-ghost" data-ls="${naSteam?'remove':'add'}" style="padding:8px 12px">${naSteam?'Tirar da lista de desejos da Steam':'Pôr na lista de desejos da Steam'}</button>`;})()}
         ${MJ.dlcs.length?`<span class="seg" role="group" aria-label="Alertar por"><button data-modo="base" aria-pressed="${MJ.modo!=='completo'}">Alertar pelo base</button><button data-modo="completo" aria-pressed="${MJ.modo==='completo'}">Pelo completo</button></span>`:''}
       </div></div></div>
     <div class="msec">${o.pisos?`<h4>Menor preço nas lojas que alertam</h4><div class="pisos tnum">${[['3m','3 meses'],['6m','6 meses'],['9m','9 meses'],['1a','1 ano'],['sempre','De sempre']].map(([k,t])=>`<div class="${o.preco!=null&&o.pisos[k]!=null&&o.preco<=o.pisos[k]?'on':''}">${t}<b>${brl(o.pisos[k])}</b></div>`).join('')}</div>`:''}
@@ -825,6 +840,9 @@ $('#mbody').addEventListener('click',async e=>{
     toast(novo?'Marcado como seu: sai dos alertas e do carrinho':'Desmarcado');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();BD=null;return;}
   const mu=e.target.closest('[data-mudo]');if(mu){await post('/api/silenciar',{appid:MJ.jogo.appid,mudo:mu.dataset.mudo==='1'});toast(mu.dataset.mudo==='1'?'Sem alertas para este jogo':'Alertas de volta');
     MJ.mudo=mu.dataset.mudo==='1';const it=IDX.get(MJ.jogo.appid);if(it)it.mudo=MJ.mudo;renderModal();return;}
+  const ls_=e.target.closest('[data-ls]');if(ls_){await post('/api/lista_steam',{appid:MJ.jogo.appid,acao:ls_.dataset.ls});
+    toast(ls_.dataset.ls==='cancelar'?'Cancelado':(MJ.ponte_vista?'Feito na próxima página da Steam que você abrir (pela ponte)':'Precisa da ponte: veja na aba Carrinho como instalar'));
+    MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();return;}
   const mc=e.target.closest('[data-mcart]');if(mc){await alternarCarr(+mc.dataset.mcart);renderModal();return;}
   const dm=e.target.closest('[data-desmonitorar]');if(dm){await post('/api/extra',{appid:+dm.dataset.desmonitorar,remover:true});toast('Não é mais monitorado (sai da lista na próxima checagem)');return;}
   const m=e.target.closest('[data-modo]');if(m){await post('/api/modo',{appid:MJ.jogo.appid,modo:m.dataset.modo});toast('Modo salvo: vale a partir da próxima checagem');MJ.modo=m.dataset.modo;
@@ -935,7 +953,7 @@ async function renderCarr(){
   $('#carrNote').textContent=(it.length||CD.bundles.length)?`${it.length} item(ns)${CD.bundles.length?` + ${CD.bundles.length} bundle(s)`:''}`:'';
   $('#carrLista').innerHTML=it.length?it.map(c=>{const sel=c.lojas.find(l=>l.loja===c.loja)||c.lojas[0]||{};
     return `<div class="crow">${art(c.appid,c.nome,c.capa,{small:true})}
-      <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(c.fim)}</span>`:''}${c.tag?tagPill(c):''}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
+      <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(c.fim)}</span>`:''}${c.raridade?rarPill(c):''}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
       <select class="mini lojsel" data-cloja="${c.appid}">${c.lojas.map(l=>`<option value="${esc(l.loja)}"${l.loja===sel.loja?' selected':''}>${esc(l.loja)} · ${brl(l.preco)}${l.corte?' (-'+l.corte+'%)':''}</option>`).join('')||'<option>sem preço</option>'}</select>
       ${priceBlock({preco:sel.preco,cheio:sel.cheio,corte:sel.corte||0})}
       <button class="xbtn" data-cart="${c.appid}" title="Tirar do carrinho">×</button></div>`;}).join(''):
@@ -966,6 +984,19 @@ async function renderCarr(){
       <div class="motivo">${b.diferenca<0?`<b style="color:var(--disc-fg)">economiza ${brl(-b.diferenca)}</b>`:`custa ${brl(b.diferenca)} a mais`} que os ${b.comuns.length} separados (${brl(b.separado)})</div></span>
       ${priceBlock({preco:b.preco,cheio:b.separado,corte:b.diferenca<0?Math.round(100*(1-b.preco/b.separado)):0})}
       <span style="display:flex;flex-direction:column;gap:4px"><button class="btn-imp" data-trocar="${b.bundle}|${b.comuns_ids.join(',')}" style="font-size:11.5px;padding:5px 8px">Trocar pelos itens</button><button class="btn-ghost" data-cartb="${b.bundle}" style="font-size:11.5px">Só adicionar</button></span></div>`).join('')}</div>`:'';
+  const pv=CD.ponte_vista;const steamN=CD.itens.filter(c=>!c.loja||c.loja==='Steam').length+CD.bundles.length;
+  $('#ponteBox').innerHTML=`<div class="l"><span><b>Levar para o carrinho da Steam</b> · ${steamN} item(ns) da Steam no carrinho${CD.itens.length+CD.bundles.length>steamN?' (os de outras lojas abrem pelo link de cada oferta)':''}</span>
+      <span>${pv?`<span style="color:#a1cd44">ponte instalada ✓</span> · vista ${fmtISO(pv)}`:'<span style="color:#e2a635">ponte ainda não instalada</span>'}</span></div>
+    ${(CD.ponte_falhas||[]).length?`<div class="hint" style="color:#ff9b8a;font-size:11.5px;margin-top:6px">No último envio não entraram: ${CD.ponte_falhas.map(f=>`<b>${esc(f.nome||f.appid)}</b> (${esc(f.motivo||'?')})`).join(' · ')}</div>`:''}
+    ${CD.sem_pacote&&CD.sem_pacote.length?`<div class="hint" style="color:#e2a635;font-size:11.5px;margin-top:4px">Sem pacote conhecido (vão pela aba da página): ${CD.sem_pacote.map(esc).join(', ')}. "Atualizar tudo" em Configurações resolve.</div>`:''}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      ${pv?'':`<a class="btn-imp" href="/kurokami/ponte.user.js" target="_blank" style="text-decoration:none;padding:7px 12px">1. Instalar a ponte</a>`}
+      <a class="btn-imp" href="https://store.steampowered.com/" target="_blank" rel="noopener" style="text-decoration:none;padding:7px 12px;${pv?'':'background:#3d4450'}">${pv?'':'2. '}Abrir a Steam e enviar</a>
+      <button class="btn-ghost" id="abrirAbas" type="button">Ou abrir as páginas em abas</button></div>
+    <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">${pv?'Na loja da Steam aparece o botão verde "Trazer o carrinho do Kurokami Radar" no canto da tela.':
+      'A ponte precisa da extensão <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> (grátis). Instale a extensão, clique em "Instalar a ponte" e confirme. Ela roda só nas páginas da Steam, usa o seu login de lá e não manda nada para fora do seu PC.'}</div>`;
+  $('#abrirAbas').onclick=()=>{const urls=CD.itens.filter(c=>!c.loja||c.loja==='Steam').map(c=>storeUrl(c.appid)).concat(CD.bundles.map(b=>`https://store.steampowered.com/bundle/${b.bundle}/`));
+    let bloqueou=false;urls.forEach(u=>{if(!window.open(u,'_blank'))bloqueou=true;});if(bloqueou)toast('O navegador bloqueou algumas abas: permita pop-ups para localhost.');};
   $('#carrSteam').style.display=(CD.steam||[]).length?'':'none';$('#carrSteam').textContent=`Trazer o carrinho da Steam (${(CD.steam||[]).length})`;
 }
 $('#carrBundles').addEventListener('click',async e=>{const t=e.target.closest('[data-trocar]');if(!t)return;const [bid,ids]=t.dataset.trocar.split('|');const rem=new Set(ids.split(',').map(Number));
@@ -1015,11 +1046,8 @@ async function renderCfg(){
      <label class="f">Score mínimo (0–100) ${num('alerta.score_minimo',a.score_minimo,1,0,100)}</label>
      <label class="f">Desconto mínimo (%) ${num('alerta.desconto_minimo',a.desconto_minimo,5,0,100)}</label>
      <label class="f">Análises positivas mínimas (%) ${num('alerta.avaliacao_minima',a.avaliacao_minima,5,0,100)}</label>
-     <label class="f">Vale a partir do menor preço em <select data-k="alerta.janela_dias" data-num="1">${[[90,'3 meses'],[180,'6 meses'],[270,'9 meses'],[365,'1 ano'],[0,'todos os tempos']].map(([v,t])=>`<option value="${v}"${(a.janela_dias??0)==v?' selected':''}>${t}</option>`).join('')}</select></label>
-     ${chk('alerta.perto.ativo',(a.perto||{}).ativo!==false,'Também vale se estiver perto do menor de sempre')}
-     <label class="f">…até % do preço cheio ${num('alerta.perto.pct_do_cheio',(a.perto||{}).pct_do_cheio??10,1,0,50)}</label>
-     <label class="f">…ou até (R$) ${num('alerta.perto.reais',(a.perto||{}).reais??3,0.5,0)}</label>
-     <div class="hint">"Perto" mede a diferença contra o preço cheio: HL Miami 2 a R$ 7,04 com piso de R$ 4,99 num jogo de R$ 46,99 está a 4%. R$ 50 contra R$ 30 num jogo de R$ 250 está a 8%.</div>
+     <label class="f">Avisar a partir de <select data-k="alerta.raridade_minima">${[['incomum','Incomum'],['raro','Raro'],['ultrarraro','Ultrarraro'],['lendario','Lendário']].map(([v,t])=>`<option value="${v}"${(a.raridade_minima||'raro')===v?' selected':''}>${t}</option>`).join('')}</select></label>
+     <div class="hint">Raridade = quanto tempo o jogo já passou nesse preço ou menos. Lendário: nunca esteve tão barato. Ultrarraro: quase nunca (menos de 2% do tempo ou 1 vez em anos). Raro: menos de 8%. Incomum: menos de 20%.</div>
      <label class="f">Tolerância acima do menor histórico (%) ${num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50)}</label>
      <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label>
      ${chk('alerta.ignorar_sem_avaliacoes',a.ignorar_sem_avaliacoes,'Ignorar jogos sem análises')}
@@ -1080,13 +1108,17 @@ async function salvarCfg(){
 }
 
 /* ================= status / ações ================= */
-const VERSAO_PAGINA='0.9.1';
+const VERSAO_PAGINA='0.12.0';
 async function carregarResumo(){
   RES=await api('/api/resumo');$('#ver').textContent=RES.versao;
   if(RES.userdata_dias!=null&&RES.userdata_dias>30&&!$('#aviso-ud')){const d=document.createElement('div');d.id='aviso-ud';
     d.style.cssText='background:#3e76cb;color:#fff;padding:8px 16px;text-align:center;font-size:12.5px';
     d.innerHTML=`Seu <b>userdata.json</b> tem ${RES.userdata_dias} dias: DLCs compradas depois disso não aparecem como suas. Atualize-o (store.steampowered.com/dynamicstore/userdata/, salvar como) ou use "Já tenho" no jogo.`;
     document.body.prepend(d);}
+  const at=RES.atualizacao;if(at&&at.tem_nova&&!$('#aviso-att')){const d=document.createElement('div');d.id='aviso-att';
+    d.style.cssText='background:#4c6b22;color:#fff;padding:8px 16px;text-align:center;font-size:13px';
+    d.innerHTML=`Versão nova do Kurokami Radar: <b>${esc(at.nova)}</b> (você tem a ${esc(at.atual)}). <button id="btnAtt" style="margin-left:10px;background:#beee11;color:#1b2838;border:0;padding:4px 10px;cursor:pointer;font-weight:bold">Atualizar agora</button> <a href="${esc(at.pagina)}" target="_blank" rel="noopener" style="color:#d9f99d;margin-left:8px">novidades</a>`;
+    document.body.prepend(d);$('#btnAtt').onclick=async()=>{await post('/api/atualizar_app');toast('Abrindo a janela de atualização…');};}
   if(RES.versao!==VERSAO_PAGINA&&!$('#aviso-versao')){const d=document.createElement('div');d.id='aviso-versao';
     d.style.cssText='background:#d6492f;color:#fff;padding:10px 16px;text-align:center;font-size:13px';
     d.innerHTML=`O Radar que está rodando é a versão <b>${esc(RES.versao)}</b>, mas os arquivos são da <b>${VERSAO_PAGINA}</b>. Clique com o direito no ícone da bandeja → <b>Sair</b> e abra de novo (ou "Reiniciar", nas versões novas).`;

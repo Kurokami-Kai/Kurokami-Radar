@@ -39,6 +39,7 @@ Source: "dist\KurokamiRadar\*"; DestDir: "{app}"; Flags: recursesubdirs createal
 [Icons]
 Name: "{group}\Kurokami Radar"; Filename: "{app}\KurokamiRadar.exe"; Parameters: "bandeja --abrir"
 Name: "{group}\Perfil e chaves do Kurokami Radar"; Filename: "{app}\KurokamiRadar.exe"; Parameters: "chaves"
+Name: "{group}\Kurokami Radar (Atualizar)"; Filename: "{app}\KurokamiRadar.exe"; Parameters: "atualizar-app"
 Name: "{group}\Desinstalar o Kurokami Radar"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\Kurokami Radar"; Filename: "{app}\KurokamiRadar.exe"; Parameters: "bandeja --abrir"; Tasks: desktopicon
 
@@ -47,6 +48,8 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 
 [Run]
 Filename: "{app}\KurokamiRadar.exe"; Parameters: "bandeja --esperar --abrir"; Description: "Abrir o Kurokami Radar agora"; Flags: nowait postinstall skipifsilent
+; atualizacao automatica (instalacao silenciosa): reabre o Radar sozinho
+Filename: "{app}\KurokamiRadar.exe"; Parameters: "bandeja --esperar"; Flags: nowait; Check: WizardSilent
 
 [UninstallRun]
 Filename: "{cmd}"; Parameters: "/c taskkill /f /im KurokamiRadar.exe"; Flags: runhidden; RunOnceId: "FecharRadar"

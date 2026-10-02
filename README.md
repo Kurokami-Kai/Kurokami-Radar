@@ -82,7 +82,7 @@ Repita de vez em quando: o painel avisa quando o arquivo tiver mais de 30 dias. 
 
 ### Abas do painel
 
-- **Vale a pena:** o que bateu os seus filtros, com etiquetas (*Menor de sempre*, *Menor em 1 ano*, *…3 meses*, *Perto do menor*).
+- **Vale a pena:** o que bateu os seus filtros, com a **raridade do preço**: ★ *Lendário* (nunca esteve tão barato), *Ultrarraro* (quase nunca), *Raro* (menos de 8% do tempo), *Incomum* e *Comum* (promoção frequente). Por padrão o Radar só avisa a partir de *Raro*.
 - **Lista de desejos:** tudo, com filtros, ordenação e três visualizações. Clique num jogo para ver o histórico em gráfico, as lojas, as formas de comprar e as DLCs.
 - **Biblioteca:** valor da sua coleção, quanto falta para completar cada jogo com as DLCs, séries e coleção.
 - **Carrinho:** simule uma compra (jogos e bundles), escolha a loja de cada item e veja o total.
@@ -104,7 +104,13 @@ Em **Configurações → Acesso pelo celular**, ligue a opção. Aparece um ende
 | O painel não abre | Clique com o direito no ícone → **Reiniciar**. Se não houver ícone, abra o *Kurokami Radar* pelo menu Iniciar. |
 | Quero ver o que aconteceu | Ícone → **Ver log**. |
 
-## 6. Desinstalar
+## 6. Atualizar
+
+O Radar procura versão nova **sempre que abre** e uma vez por dia enquanto fica aberto. Quando tem, chega uma notificação e aparece uma faixa verde no painel com **Atualizar agora**: ele baixa, instala por cima e abre de novo sozinho. Seus dados e chaves ficam.
+
+Se preferir na mão: menu Iniciar → **Kurokami Radar (Atualizar)**, ou ícone → **Procurar atualização…**
+
+## 7. Desinstalar
 
 *Configurações do Windows → Aplicativos → Aplicativos instalados → Kurokami Radar → Desinstalar*. Os seus dados ficam em `%LOCALAPPDATA%\Kurokami Radar`; apague essa pasta se quiser remover tudo. As chaves ficam em *Gerenciador de Credenciais → Credenciais do Windows → Kurokami Radar*.
 

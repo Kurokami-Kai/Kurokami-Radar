@@ -140,11 +140,32 @@ def main(esperar=False, abrir=False):
         pystray.MenuItem("Abrir pasta dos dados", lambda *_: abrir(caminhos.RAIZ_DADOS)),
         pystray.MenuItem("Ver log", lambda *_: abrir(caminhos.ARQ_LOG)),
         pystray.Menu.SEPARATOR,
-        pystray.MenuItem("Reiniciar (depois de atualizar)", reiniciar),
+        pystray.MenuItem("Procurar atualização…", lambda *_: __import__("radar.atualizador", fromlist=["x"]).abrir_janela_separada()),
+        pystray.MenuItem("Reiniciar", reiniciar),
         pystray.MenuItem("Sair", sair),
     )
     tray = pystray.Icon("KurokamiRadar", icone, "Kurokami Radar", menu)
+    def checar_versao():
+        import time
+        from . import atualizador, config as cfgm
+        while not serv.parar:
+            if (cfgm.carregar().get("atualizacao") or {}).get("verificar", True):
+                d = atualizador.verificar()
+                painel.CONTROLE["atualizacao"] = d
+                if d.get("tem_nova") and painel.CONTROLE.get("avisado") != d["nova"]:
+                    painel.CONTROLE["avisado"] = d["nova"]
+                    notificar.mostrar("Kurokami Radar %s disponível" % d["nova"],
+                                      "Você tem a %s. Clique para atualizar (seus dados ficam)." % d["atual"],
+                                      clique=painel.url() + "/acao?atualizar=1",
+                                      botoes=[("Atualizar agora", painel.url() + "/acao?atualizar=1"), ("Ver novidades", d["pagina"])])
+                    log("Versao nova disponivel: %s" % d["nova"])
+            for _ in range(24 * 60):  # de novo daqui a 1 dia (o Radar costuma ficar aberto)
+                if serv.parar:
+                    return
+                time.sleep(60)
+
     log("Bandeja iniciada")
     serv.start()
+    __import__("threading").Thread(target=checar_versao, daemon=True).start()
     tray.run(setup=lambda t: (setattr(t, "visible", True), atualizar_titulo()))
     log("Bandeja encerrada")

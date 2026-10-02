@@ -368,6 +368,7 @@ def main():
     s = sub.add_parser("dlcs"); s.add_argument("jogo", nargs="+")
     s = sub.add_parser("classificar"); s.add_argument("jogo"); s.add_argument("trecho"); s.add_argument("classe")
     s = sub.add_parser("conteudo"); s.add_argument("jogo"); s.add_argument("edicao"); s.add_argument("dlcs")
+    sub.add_parser("atualizar-app", help="procura e instala a versao nova do Radar")
     s = sub.add_parser("bandeja"); s.add_argument("--esperar", action="store_true", help=argparse.SUPPRESS)
     s.add_argument("--abrir", action="store_true", help="abre o painel no navegador ao iniciar")
     sub.add_parser("painel")
@@ -401,6 +402,10 @@ def main():
         return
     if args.cmd == "testar":
         cmd_testar(cfg, args)
+        return
+    if args.cmd == "atualizar-app":
+        from radar import atualizador
+        atualizador.janela()
         return
     if args.cmd == "painel":
         from radar import painel

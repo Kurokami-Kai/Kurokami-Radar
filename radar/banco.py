@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS meta(chave TEXT PRIMARY KEY, valor TEXT);
 CREATE TABLE IF NOT EXISTS oferta_atual(
   appid INTEGER, loja TEXT, preco INTEGER, cheio INTEGER, corte INTEGER, url TEXT,
   drm_steam INTEGER, flag TEXT, quando TEXT, PRIMARY KEY(appid, loja));
+CREATE TABLE IF NOT EXISTS fila_lista(appid INTEGER PRIMARY KEY, acao TEXT, quando TEXT);
 CREATE TABLE IF NOT EXISTS tenho_manual(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS silenciado(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS consulta_lenta(tipo TEXT, id INTEGER, quando TEXT, PRIMARY KEY(tipo, id));
@@ -74,7 +75,8 @@ class Banco:
                     "ALTER TABLE jogo ADD COLUMN capa_v TEXT",
                     "ALTER TABLE jogo ADD COLUMN fim_desconto INTEGER",
                     "ALTER TABLE jogo ADD COLUMN prioridade INTEGER",
-                    "ALTER TABLE oferta_atual ADD COLUMN expira TEXT"):
+                    "ALTER TABLE oferta_atual ADD COLUMN expira TEXT",
+                    "ALTER TABLE jogo ADD COLUMN pacote INTEGER"):
             try:
                 self.con.execute(sql)
             except sqlite3.OperationalError:
@@ -120,7 +122,7 @@ class Banco:
     # ---------------- jogos
     def salvar_jogo(self, j):
         cols = ["appid", "nome", "tipo", "pai", "capa", "rpos", "rcount", "rotulo", "lancamento",
-                "em_breve", "gratis", "preco_steam", "cheio_steam", "desconto_steam", "franquia", "capa_v"]
+                "em_breve", "gratis", "preco_steam", "cheio_steam", "desconto_steam", "franquia", "capa_v", "pacote"]
         # fim do desconto: substitui mesmo quando vem vazio (promocao acabou)
         if "fim_desconto" in j:
             self.con.execute("INSERT INTO jogo(appid) VALUES(?) ON CONFLICT(appid) DO NOTHING", (j["appid"],))
@@ -217,16 +219,22 @@ class Banco:
         r = self.um("SELECT MIN(preco) m FROM preco WHERE appid=?%s" % filtro, *args)
         return r["m"] if r else None
 
-    def pisos_lote(self, lojas, janelas=(90, 180, 270, 365)):
-        """Igual a pisos(), para todos os jogos da lista de uma vez."""
+    def linhas_lote(self, lojas, appids=None):
+        """{appid: [registros de preco em ordem]} das lojas dadas, para a lista inteira (ou os appids dados)."""
         if not lojas:
             return {}
-        rows = self.q("SELECT appid, loja, preco, quando FROM preco WHERE loja IN (%s) AND appid IN "
-                      "(SELECT appid FROM jogo WHERE na_lista=1) ORDER BY appid, quando" % ",".join("?" * len(lojas)), *lojas)
+        filtro = ("(SELECT appid FROM jogo WHERE na_lista=1)" if appids is None
+                  else "(%s)" % ",".join(str(int(a)) for a in appids))
+        rows = self.q("SELECT appid, loja, preco, corte, quando FROM preco WHERE loja IN (%s) AND appid IN %s ORDER BY appid, quando"
+                      % (",".join("?" * len(lojas)), filtro), *lojas)
         por = {}
         for r in rows:
             por.setdefault(r["appid"], []).append(r)
-        return {a: self._pisos_de(rs, janelas) for a, rs in por.items()}
+        return por
+
+    def pisos_lote(self, lojas, janelas=(90, 180, 270, 365)):
+        """Igual a pisos(), para todos os jogos da lista de uma vez."""
+        return {a: self._pisos_de(rs, janelas) for a, rs in self.linhas_lote(lojas).items()}
 
     @staticmethod
     def _pisos_de(rows, janelas):

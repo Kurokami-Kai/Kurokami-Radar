@@ -1,2 +1,2 @@
 """Kurokami Radar - monitor de promocoes da wishlist Steam."""
-VERSAO = "0.9.1"
+VERSAO = "0.12.0"

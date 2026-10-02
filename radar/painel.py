@@ -110,7 +110,7 @@ def api_resumo(_q):
          "vale_a_pena": len(ult.get("itens") or []), "atualizado": ult.get("quando"),
          "pausado": bool(b.meta("pausado")), "na_bandeja": bool(s),
          "proxima": s.proxima.isoformat() if s else None, "estado": s.estado if s else None,
-         "userdata_dias": _idade_userdata()}
+         "userdata_dias": _idade_userdata(), "atualizacao": CONTROLE.get("atualizacao")}
     b.con.close()
     return r
 
@@ -127,7 +127,8 @@ def api_lista(_q):
     lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")} if l.lower() in marc]
     if "steam" in marc:
         lojas_m.append("Steam (direto)")
-    pisos = b.pisos_lote(lojas_m)
+    linhas = b.linhas_lote(lojas_m)
+    pisos = {a_: b._pisos_de(rs, (90, 180, 270, 365)) for a_, rs in linhas.items()}
     extras = {int(x) for x in (cfg.get("extras") or [])}
     mudos = {r["appid"] for r in b.q("SELECT appid FROM silenciado")}
     ult = b.meta("ultimos_alertas") or {}
@@ -156,6 +157,7 @@ def api_lista(_q):
         ps = pisos.get(a) or {}
         tag, texto, acima = (analise.etiqueta(melhor["preco"], melhor.get("cheio"), ps, cfg["alerta"])
                              if melhor and melhor["corte"] else (None, None, None))
+        rar = analise.raridade(linhas.get(a, []), melhor["preco"]) if melhor and melhor["corte"] else None
         preco = melhor["preco"] if melhor else j.get("preco_steam")
         cheio = (melhor or {}).get("cheio") or j.get("cheio_steam")
         g = gg.get(a) or {}
@@ -169,7 +171,8 @@ def api_lista(_q):
             "piso": ps.get(0, piso_marc), "piso_geral": piso_geral,
             "pisos": {"3m": ps.get(90), "6m": ps.get(180), "9m": ps.get(270), "1a": ps.get(365), "sempre": ps.get(0)},
             "tag": tag, "tag_texto": texto, "acima": acima,
-            "no_piso": tag is not None,
+            "raridade": rar["nivel"] if rar else None, "raridade_texto": rar["texto"] if rar else None,
+            "no_piso": bool(rar and analise.raridade_ok(rar["nivel"], "raro")),
             "score": analise.score(corte, j.get("rpos"), j.get("rcount")) if corte else 0,
             "keyshop": g.get("keyshop"), "hist_keyshop": g.get("hist_keyshop"), "gg_url": g.get("url"),
             "vale": a in vale, "novo": a in novos, "motivo": (vale.get(a) or {}).get("motivo"),
@@ -219,7 +222,9 @@ def api_jogo(q):
          "historico": hist, "lojas": lojas, "dlcs": dl, "caminhos": cam, "combo": combo,
          "gg": dict(gg) if gg else None, "modo": config.modo_do_jogo(cfg, a), "classes": dlcmod.CLASSES,
          "tenho": a in ctx.possuidos, "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
-         "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a))}
+         "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a)),
+         "na_lista": a in ctx.lista, "fila": (lambda r: r["acao"] if r else None)(b.um("SELECT acao FROM fila_lista WHERE appid=?", a)),
+         "ponte_vista": b.meta("ponte_vista")}
     b.con.close()
     return r
 
@@ -251,8 +256,9 @@ def api_carrinho(_q):
     apps = [int(i["appid"]) for i in itens if i.get("appid")]
     bids = [int(i["bundle"]) for i in itens if i.get("bundle")]
     if not itens:
+        r0 = {"itens": [], "bundles": [], "sugestoes": [], "steam": b.meta("carrinho") or [], "ponte_vista": b.meta("ponte_vista")}
         b.con.close()
-        return {"itens": [], "bundles": [], "sugestoes": [], "steam": b.meta("carrinho") or []}
+        return r0
     ctx = analise.Contexto(b, cfg)
     marc = _marcadas(cfg)
     lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")} if l.lower() in marc]
@@ -284,10 +290,13 @@ def api_carrinho(_q):
         escolhida = next((o for o in ofs if o["loja"] == it.get("loja")), ofs[0] if ofs else None)
         tag, texto, acima = analise.etiqueta(escolhida["preco"], escolhida.get("cheio"), ps, cfg["alerta"]) \
             if escolhida and escolhida.get("corte") else (None, None, None)
+        rar = analise.raridade(b.linhas_lote(lojas_m, [a]).get(a, []), escolhida["preco"]) \
+            if escolhida and escolhida.get("corte") and lojas_m else None
         out.append({"appid": a, "nome": j.get("nome") or str(a), "capa": j.get("capa"), "tipo": j.get("tipo"),
                     "possuido": a in ctx.possuidos, "lojas": [{k: o.get(k) for k in ("loja", "preco", "cheio", "corte", "url")} for o in ofs],
                     "loja": escolhida["loja"] if escolhida else None, "piso": ps.get(0), "fim": _fim(escolhida, j),
                     "tag": tag, "tag_texto": texto, "acima": acima, "em_bundle": cobertos.get(a, []),
+                    "raridade": rar["nivel"] if rar else None, "raridade_texto": rar["texto"] if rar else None,
                     "rpos": j.get("rpos") or 0, "rcount": j.get("rcount") or 0})
     # sugestoes: bundles da Steam com pelo menos 1 item do carrinho
     preco_esc = {x["appid"]: next((l["preco"] for l in x["lojas"] if l["loja"] == x["loja"]), None) for x in out}
@@ -306,7 +315,10 @@ def api_carrinho(_q):
                     "extras": [nome(a) for a in extras],
                     "extras_valor": sum((ctx.jogos.get(a) or {}).get("cheio_steam") or 0 for a in extras)})
     sug.sort(key=lambda x: (x["diferenca"] > 0, x["diferenca"], -len(x["comuns"])))
-    r = {"itens": out, "bundles": bl, "sugestoes": sug[:10], "steam": b.meta("carrinho") or []}
+    ult = b.meta("ponte_ultimo_envio") or {}
+    sem_pacote = [x["nome"] for x in out if (not x["loja"] or x["loja"] == "Steam") and not (ctx.jogos.get(x["appid"]) or {}).get("pacote")]
+    r = {"itens": out, "bundles": bl, "sugestoes": sug[:10], "steam": b.meta("carrinho") or [], "ponte_vista": b.meta("ponte_vista"),
+         "ponte_falhas": ult.get("itens_falhos") or [], "sem_pacote": sem_pacote}
     b.con.close()
     return r
 
@@ -535,6 +547,84 @@ def post_atualizar_tudo(_d):
     return {"ok": True}
 
 
+def api_ponte(_q):
+    """Para a ponte (Tampermonkey) nas paginas da Steam: o que mandar para o carrinho e a fila da lista de desejos."""
+    cfg = config.carregar()
+    b = Banco()
+    # quem ainda nao tem o pacote (subid) conhecido: pergunta a Steam agora, numa consulta so
+    carr = _ler_carrinho()
+    faltam = [int(i["appid"]) for i in carr if i.get("appid") and (i.get("loja") in (None, "", "Steam"))
+              and not (b.um("SELECT pacote FROM jogo WHERE appid=?", int(i["appid"])) or {"pacote": None})["pacote"]]
+    if faltam:
+        try:
+            for j in (steam.normalizar_app(x) for x in steam.get_items([{"appid": a} for a in faltam], cfg["pais"])):
+                if j.get("pacote"):
+                    b.con.execute("UPDATE jogo SET pacote=? WHERE appid=?", (j["pacote"], j["appid"]))
+            b.commit()
+        except Exception as e:
+            _log_erro("/api/ponte (pacotes)", e)
+    itens = []
+    for it in carr:
+        if it.get("bundle"):
+            o = b.um("SELECT nome FROM opcao WHERE id=?", "bundle:%d" % int(it["bundle"]))
+            itens.append({"tipo": "bundle", "bundleid": int(it["bundle"]), "nome": o["nome"] if o else str(it["bundle"]),
+                          "url": "https://store.steampowered.com/bundle/%d/" % int(it["bundle"])})
+        elif it.get("appid") and (it.get("loja") in (None, "", "Steam")):
+            j = b.um("SELECT nome, pacote, possuido FROM jogo WHERE appid=?", int(it["appid"]))
+            if j and j["possuido"]:
+                continue
+            itens.append({"tipo": "app", "appid": int(it["appid"]), "subid": j["pacote"] if j else None,
+                          "nome": j["nome"] if j else str(it["appid"]),
+                          "url": "https://store.steampowered.com/app/%d/" % int(it["appid"])})
+    fila = [dict(r) for r in b.q("SELECT appid, acao FROM fila_lista ORDER BY quando")]
+    b.con.close()
+    return {"ok": True, "versao": VERSAO, "carrinho": itens, "fila": fila}
+
+
+def post_ponte_feito(d):
+    b = Banco()
+    for f in d.get("lista") or []:
+        if f.get("ok"):
+            b.con.execute("DELETE FROM fila_lista WHERE appid=? AND acao=?", (int(f["appid"]), f.get("acao")))
+            if f.get("acao") == "remove":
+                b.con.execute("UPDATE jogo SET na_lista=0 WHERE appid=?", (int(f["appid"]),))
+            else:
+                b.con.execute("UPDATE jogo SET na_lista=1 WHERE appid=?", (int(f["appid"]),))
+    c = d.get("carrinho")
+    if c:
+        b.meta("ponte_ultimo_envio", {"quando": datetime.now(timezone.utc).isoformat(), **c})
+    b.meta("ponte_vista", datetime.now(timezone.utc).isoformat())
+    b.commit()
+    b.con.close()
+    return {"ok": True}
+
+
+def post_lista_steam(d):
+    """Enfileira adicionar/tirar da lista de desejos da Steam (a ponte executa na proxima pagina da Steam)."""
+    a, acao = int(d["appid"]), d.get("acao")
+    b = Banco()
+    if acao == "cancelar":
+        b.con.execute("DELETE FROM fila_lista WHERE appid=?", (a,))
+    elif acao in ("add", "remove"):
+        b.con.execute("INSERT OR REPLACE INTO fila_lista VALUES(?,?,?)", (a, acao, datetime.now(timezone.utc).isoformat()))
+        if acao == "add":  # passa a monitorar ja, sem esperar a Steam
+            cfg = config.carregar()
+            ex = [int(x) for x in (cfg.get("extras") or [])]
+            if a not in ex:
+                ex.append(a)
+                cfg["extras"] = ex
+                config.salvar(cfg)
+    b.commit()
+    b.con.close()
+    return {"ok": True}
+
+
+def post_atualizar_app(_d):
+    from . import atualizador
+    atualizador.abrir_janela_separada()
+    return {"ok": True}
+
+
 def post_sair(_d):
     s = CONTROLE.get("ao_sair")
     if not s:
@@ -616,11 +706,12 @@ def post_pausar(_d):
 
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
-       "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso}
+       "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso, "/api/ponte": api_ponte}
 POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
-        "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo}
+        "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,
+        "/api/ponte/feito": post_ponte_feito, "/api/lista_steam": post_lista_steam, "/api/atualizar_app": post_atualizar_app}
 
 
 def _log_erro(rota, e):
@@ -703,10 +794,30 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Location", CAMINHO)
             self.end_headers()
             return
+        if u.path in (CAMINHO + "/ponte.user.js", "/ponte.user.js"):
+            with open(os.path.join(os.path.dirname(HTML), "ponte.user.js"), "rb") as f:
+                dados = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/javascript; charset=utf-8")
+            self.send_header("Content-Length", str(len(dados)))
+            self.end_headers()
+            self.wfile.write(dados)
+            return
         if u.path == CAMINHO + "/acao":
             q = parse_qs(u.query)
-            if not self._local() or "silenciar" not in q:
+            if not self._local() or not ("silenciar" in q or "atualizar" in q):
                 return self._json({"erro": "acao invalida"}, 400)
+            if "atualizar" in q:
+                from . import atualizador
+                atualizador.abrir_janela_separada()
+                dados = ("<!doctype html><meta charset=utf-8><body style='background:#1b2838;color:#c7d5e0;font:15px Arial;padding:30px'>"
+                         "<h3 style='color:#fff'>Abrindo a atualização do Kurokami Radar…</h3><p>Pode fechar esta aba.</p>").encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(dados)))
+                self.end_headers()
+                self.wfile.write(dados)
+                return
             post_silenciar({"appid": int(q["silenciar"][0])})
             dados = ("<!doctype html><meta charset=utf-8><body style='background:#1b2838;color:#c7d5e0;font:15px Arial;padding:30px'>"
                      "<h3 style='color:#fff'>Pronto: o Radar não avisa mais desse jogo.</h3>"
@@ -740,7 +851,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._entrar()
         # so aceita chamadas do proprio painel (protege contra sites tentando mexer no seu config)
         origem = self.headers.get("Origin") or ""
-        if origem and origem != "http://%s" % (self.headers.get("Host") or ""):
+        ponte = urlparse(self.path).path == "/api/ponte/feito" and self._local()
+        if origem and origem != "http://%s" % (self.headers.get("Host") or "") and not ponte:
             return self._json({"erro": "origem recusada"}, 403)
         if not self._local():
             t = token()

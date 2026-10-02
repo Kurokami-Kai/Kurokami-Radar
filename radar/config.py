@@ -19,7 +19,10 @@ PADRAO = {
         # menor_historico: so dispara no piso (com tolerancia) das lojas marcadas
         "modo": "menor_historico",
         "tolerancia_pct": 0,          # 5 = aceita ate 5% acima do menor historico
-        # Piso minimo para valer: 90 (3 meses), 180, 270, 365 (1 ano) ou 0 (so o de todos os tempos).
+        # Raridade minima para avisar: comum, incomum, raro, ultrarraro, lendario.
+        # Mede quanto tempo o jogo ja passou nesse preco (ou menos) no historico das lojas que alertam.
+        "raridade_minima": "raro",
+        # (informativo) piso por janela: 90 (3 meses), 180, 270, 365 (1 ano) ou 0 (so o de todos os tempos).
         # Cada jogo ganha a etiqueta do maior piso que atinge (sempre > 1 ano > 9m > 6m > 3m).
         "janela_dias": 90,
         # "Perto do menor de sempre": vale mesmo sem bater piso nenhum se a diferenca for pequena
@@ -70,6 +73,9 @@ PADRAO = {
         "mostrar_parciais": True,
         "cobertura_minima_pct": 50    # bundle so aparece se cobrir ao menos isso do conteudo relevante
     },
+
+    # de onde vem as versoes novas (GitHub Releases, repositorio publico)
+    "atualizacao": {"repo": "Kurokami-Kai/Kurokami-Radar", "verificar": True},
 
     # rede_local: deixa abrir o painel pelo celular/outro PC da mesma rede (com codigo de acesso)
     "painel": {"rede_local": False},

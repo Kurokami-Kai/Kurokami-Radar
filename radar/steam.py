@@ -180,6 +180,7 @@ def normalizar_app(it):
         "pai": int(pai) if pai else None, "capa": url_asset(it, "header", "main_capsule"),
         "capa_v": url_asset(it, "library_capsule_2x", "library_capsule"),
         "fim_desconto": fim,
+        "pacote": base.get("packageid"),
         "rpos": rv.get("percent_positive"), "rcount": rv.get("review_count"), "rotulo": rv.get("review_score_label"),
         "lancamento": rel.get("steam_release_date") or rel.get("original_release_date"),
         "em_breve": 1 if rel.get("is_coming_soon") else 0, "gratis": 1 if gratis else 0,
