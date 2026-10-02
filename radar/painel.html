@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kurokami Radar</title><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='29' fill='%23171a21' stroke='%23c7d5e0' stroke-width='4'/><circle cx='32' cy='32' r='7' fill='%2366c0f4'/></svg>">
+<style>
+/* Visual: Steam store chrome (topbar #171a21, page #1b2838, blue subnav, green discount block),
+   Steam library chrome on the Biblioteca tab. Dark by design: the brief is Valve's palette. */
+:root{
+  --top:#171a21; --bg:#1b2838; --bg-deep:#0e141b; --bg-row:#16202d; --panel:#213145; --panel-hi:#2a475e;
+  --line:#2a3f5a; --text:#c7d5e0; --white:#ffffff; --muted:#8f98a0; --dim:#56707f; --blue:#66c0f4; --blue-dk:#417a9b;
+  --disc-bg:#4c6b22; --disc-fg:#beee11; --price-bg:#344654; --orig:#738895;
+  --go1:#75b022; --go2:#588a1b; --pos:#66c0f4; --mix:#b9a074; --neg:#a34c25;
+  --hover-a:#e3eaef; --hover-b:#c7d5e0; --hover-ink:#222d3d; --hover-sub:#556772;
+  --lib-side:#23262e; --lib-sel:#3d4450; --lib-bg:#1f2126;
+  --font:"Motiva Sans",Arial,Helvetica,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --top:#171a21; --bg:#1b2838; --bg-deep:#0e141b; --bg-row:#16202d; --panel:#213145; --panel-hi:#2a475e;
+  --line:#2a3f5a; --text:#c7d5e0; --white:#ffffff; --muted:#8f98a0; --dim:#56707f; --blue:#66c0f4;
+}}
+:root[data-theme="dark"]{
+  --top:#171a21; --bg:#1b2838; --bg-deep:#0e141b; --bg-row:#16202d; --panel:#213145; --panel-hi:#2a475e;
+  --line:#2a3f5a; --text:#c7d5e0; --white:#ffffff; --muted:#8f98a0; --dim:#56707f; --blue:#66c0f4;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 520px at 50% 0,#2a4a6b55,transparent 70%),var(--bg)}
+a{color:var(--blue);text-decoration:none}
+a:hover{color:var(--white)}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.wrap{max-width:1060px;margin:0 auto;padding-inline:14px}
+.tnum{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--top)}
+.topbar .wrap{display:flex;align-items:center;gap:18px;min-height:64px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;color:var(--white);font-weight:700;letter-spacing:.06em;font-size:19px}
+.logo svg{flex:0 0 auto}
+.logo small{display:block;font-size:9.5px;letter-spacing:.24em;color:var(--muted);font-weight:400;margin-top:1px}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav button{background:none;border:0;color:#dcdedf;font-size:14px;letter-spacing:.04em;text-transform:uppercase;padding:20px 8px 16px;cursor:pointer;border-bottom:3px solid transparent}
+.nav button:hover{color:var(--white)}
+.nav button[aria-current="page"]{color:#1a9fff;border-bottom-color:#1a9fff}
+.who{position:relative;margin-left:auto;display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+.who b{color:#b8b6b4;font-weight:400}
+.btn-imp{background:linear-gradient(90deg,#06bfff 0%,#2d73ff 100%);border:0;color:#fff;border-radius:2px;padding:7px 12px;font-size:12px;cursor:pointer}
+.btn-imp:hover{filter:brightness(1.12)}
+.btn-ghost{background:rgba(103,193,245,.2);color:var(--blue);border:0;border-radius:2px;padding:6px 11px;font-size:12px;cursor:pointer}
+.btn-ghost:hover{background:var(--blue);color:#fff}
+
+/* ---------- store subnav ---------- */
+.subnav{margin-top:14px;background:linear-gradient(90deg,rgba(62,103,150,.92) 11.38%,rgba(58,120,177,.8) 25.23%,rgb(15,33,110) 100%);box-shadow:0 0 3px rgba(0,0,0,.4);display:flex;align-items:center;gap:6px;padding:5px;flex-wrap:wrap}
+.subnav .lk{color:#e5e5e5;font-size:13px;padding:6px 10px;border-radius:2px;background:none;border:0;cursor:pointer}
+.subnav .lk:hover{background:linear-gradient(90deg,#fff 0%,#a2c4e1 100%);color:#111}
+.subnav .lk b{font-weight:400;color:#a9d4f1}
+.subnav .lk:hover b{color:#174d79}
+.search{margin-left:auto;display:flex;align-items:center;background:#316282;border-radius:3px;box-shadow:inset 1px 1px 0 #0003;min-width:min(260px,100%);flex:0 1 260px}
+.search input{flex:1;min-width:0;background:none;border:0;color:#fff;font-size:13px;padding:7px 9px;outline:none;font-family:inherit}
+.search input::placeholder{color:#0e1c25;font-style:italic;opacity:.9}
+.search span{padding:0 9px;color:#fff;display:flex}
+
+/* ---------- section headers (Steam home shelves) ---------- */
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:34px 0 10px}
+.shead h2{margin:0;font-size:14px;font-weight:400;letter-spacing:.04em;text-transform:uppercase;color:var(--white)}
+.shead .aside{color:var(--muted);font-size:12px}
+
+/* ---------- capsule art ---------- */
+.art{position:relative;display:block;aspect-ratio:460/215;overflow:hidden;background:#0b141e}
+.art img{display:block;width:100%;height:100%;object-fit:cover}
+.ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:9% 8%;
+  background:radial-gradient(120% 90% at 85% 0%,hsl(var(--h) 55% 34% / .9),transparent 60%),linear-gradient(160deg,hsl(var(--h) 38% 22%),hsl(calc(var(--h) + 40) 45% 9%))}
+.ph::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 14px,rgba(255,255,255,.025) 14px 15px)}
+.ph span{position:relative;color:#fff;font-weight:700;line-height:1.08;text-shadow:0 2px 6px rgba(0,0,0,.7);font-size:var(--fs,15px);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:.01em}
+.ph.sm span{font-size:10px;-webkit-line-clamp:2}
+
+/* ---------- price block (Steam discount_block) ---------- */
+.pb{display:inline-flex;align-items:stretch;height:30px;font-size:13px;flex:0 0 auto}
+.pb .pct{background:var(--disc-bg);color:var(--disc-fg);font-size:17px;font-weight:600;padding:0 6px;display:flex;align-items:center;letter-spacing:-.02em}
+.pb .prs{background:var(--price-bg);padding:0 7px;min-width:74px;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;line-height:1.05}
+.pb .o{color:var(--orig);font-size:11px;text-decoration:line-through}
+.pb .f{color:var(--disc-fg);font-size:13.5px}
+.pb.full .prs{background:rgba(0,0,0,.2)}
+.pb.full .f{color:var(--text)}
+.pb.tba .prs{background:rgba(0,0,0,.2)}
+.pb.tba .f{color:var(--muted);font-size:12px}
+.pb.lg{height:38px}.pb.lg .pct{font-size:24px;padding:0 9px}.pb.lg .f{font-size:16px}.pb.lg .o{font-size:12px}
+
+/* small flags */
+.flags{display:flex;gap:4px;flex-wrap:wrap}
+.flag{font-size:10.5px;padding:2px 6px;border-radius:2px;background:rgba(103,193,245,.16);color:var(--blue);white-space:nowrap}
+.flag.top{background:#a3cf06;color:#1b2838;font-weight:700}
+.flag.cart{background:rgba(190,238,17,.14);color:var(--disc-fg)}
+.flag.own{background:rgba(255,255,255,.08);color:#d2d2d2}
+.flag.low{background:#c5262633;color:#ff8f7f}
+.flag.bun{background:#8a5cf633;color:#c7b3ff}
+
+/* review word colors (Steam) */
+.rv-pos{color:var(--pos)}.rv-mix{color:var(--mix)}.rv-neg{color:#c35c2c}.rv-non{color:var(--dim)}
+
+/* ---------- hero carousel ---------- */
+.hero{position:relative}
+.hero-stage{display:grid;grid-template-columns:1.72fr 1fr;box-shadow:0 0 7px rgba(0,0,0,.6);min-height:300px}
+.hero-art{display:block;min-width:0}
+.hero-stage .hero-art .art{aspect-ratio:auto;height:100%;min-height:300px}
+.hero-info h3 a{color:#fff}
+.hero-info{background:linear-gradient(180deg,#0f1922 0%,#16273a 100%);padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.hero-info h3{margin:0;color:#fff;font-size:23px;font-weight:400;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero-why{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12px;color:var(--muted)}
+.hero-why b{color:var(--text);font-weight:400}
+.meter{height:6px;background:#0b141e;border-radius:1px;overflow:hidden;align-self:center}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--blue-dk),var(--blue))}
+.hero-next{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:auto}
+.hero-next button{padding:0;border:0;background:none;cursor:pointer;opacity:.6;box-shadow:0 0 4px #000}
+.hero-next button:hover,.hero-next button:focus-visible{opacity:1}
+.hero-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hero-foot .avail{color:#fff;font-size:15px}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:84px;border:0;cursor:pointer;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,rgba(0,0,0,.3) 5%,rgba(0,0,0,0) 95%);opacity:.75;z-index:2}
+.arrow:hover{opacity:1;background:linear-gradient(90deg,rgba(171,218,244,.3) 5%,rgba(171,218,244,0) 95%)}
+.arrow.r{right:-40px;background:linear-gradient(270deg,rgba(0,0,0,.3) 5%,rgba(0,0,0,0) 95%)}
+.arrow.r:hover{background:linear-gradient(270deg,rgba(171,218,244,.3) 5%,rgba(171,218,244,0) 95%)}
+.arrow.l{left:-40px}
+.arrow svg{width:12px;height:22px}
+.dots{display:flex;justify-content:center;gap:4px;margin-top:10px}
+.dots button{width:15px;height:9px;border:0;border-radius:2px;background:hsla(202,60%,100%,.2);cursor:pointer;padding:0}
+.dots button[aria-current="true"]{background:hsla(202,60%,100%,.4)}
+
+/* ---------- shelves ---------- */
+.shelf{position:relative}
+.shelf-track{display:grid;gap:10px;grid-template-columns:repeat(var(--per,4),minmax(0,1fr))}
+.cap{display:block;background:var(--bg-row);color:var(--text);box-shadow:0 0 5px rgba(0,0,0,.35);min-width:0;transition:none}
+.cap:hover{color:#fff;background:#203348}
+.cap .meta{padding:7px 8px 8px;display:flex;flex-direction:column;gap:6px}
+.cap .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:#e5e5e5}
+.cap .row{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0}
+.cap .rvs{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- browse (search page) ---------- */
+.browse{display:grid;grid-template-columns:minmax(0,1fr) 246px;gap:16px;align-items:start;margin-bottom:40px}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(0,0,0,.2);padding:8px 10px;margin-bottom:6px}
+.toolbar .count{color:var(--muted);font-size:12px}
+.toolbar .count b{color:#fff;font-weight:400}
+.toolbar label{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:6px}
+select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;font-family:inherit;font-size:12px;cursor:pointer}
+.views{margin-left:auto;display:flex;gap:2px}
+.views button{background:rgba(0,0,0,.25);border:0;color:var(--muted);width:30px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px}
+.views button:hover{color:#fff}
+.views button[aria-pressed="true"]{background:var(--blue);color:#0b2235}
+.sum{color:var(--muted);font-size:12px;padding:2px 2px 8px}
+.sum b{color:var(--disc-fg);font-weight:400}
+
+/* list rows (search_result_row) */
+.rows{display:flex;flex-direction:column;gap:2px}
+.srow{display:grid;grid-template-columns:120px minmax(0,1fr) 92px 30px 176px;align-items:center;gap:12px;background:rgba(0,0,0,.2);padding:4px 8px 4px 4px;color:var(--text);min-height:53px}
+.srow:hover{background:linear-gradient(90deg,rgba(103,193,245,.17),rgba(0,0,0,.2))}
+.srow .art{width:120px}
+.srow .tt{min-width:0}
+.srow .tt div{color:#c7d5e0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow:hover .tt div{color:#fff}
+.srow .tt .flags{margin-top:4px}
+.srow .rel{color:var(--muted);font-size:11px;text-align:right}
+.thumb{width:18px;height:18px;display:block}
+.srow .pb{justify-self:end}
+
+/* compact table */
+.ctab{width:100%;border-collapse:collapse;font-size:12px}
+.ctab th{position:sticky;top:0;background:#16202d;color:var(--muted);font-weight:400;text-align:left;padding:6px 8px;z-index:1;white-space:nowrap}
+.ctab th.n,.ctab td.n{text-align:right}
+.ctab td{padding:5px 8px;border-top:1px solid #ffffff0d;white-space:nowrap}
+.ctab tr:hover td{background:#203348;color:#fff}
+.ctab td.t{max-width:340px;overflow:hidden;text-overflow:ellipsis}
+.ctab td .pctx{color:var(--disc-fg)}
+.ctab-wrap{overflow-x:auto}
+
+/* grid view */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px}
+
+.more{display:block;width:100%;margin-top:10px;background:rgba(103,193,245,.12);color:var(--blue);border:0;padding:11px;cursor:pointer;font-size:13px;border-radius:2px}
+.more:hover{background:var(--blue);color:#fff}
+.empty{padding:40px 16px;text-align:center;color:var(--muted);background:rgba(0,0,0,.2)}
+
+/* sidebar filter blocks (search page) */
+.side{display:flex;flex-direction:column;gap:12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 10px)}
+.blk{background:rgba(0,0,0,.2)}
+.blk h4{margin:0;background:linear-gradient(90deg,#3b6e8c,#2a475e 70%);color:#fff;font-weight:400;font-size:12px;padding:7px 10px;letter-spacing:.02em}
+.blk .in{padding:10px}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chips button{background:rgba(103,193,245,.12);color:var(--blue);border:0;border-radius:2px;padding:5px 8px;font-size:12px;cursor:pointer}
+.chips button:hover{color:#fff}
+.chips button[aria-pressed="true"]{background:var(--blue);color:#0b2235}
+.tick{display:flex;align-items:center;gap:8px;padding:5px 2px;cursor:pointer;color:var(--text);font-size:12.5px;user-select:none}
+.tick input{appearance:none;width:15px;height:15px;border-radius:2px;background:#0e141b;box-shadow:inset 0 0 0 1px #2f4d64;margin:0;flex:0 0 auto;display:grid;place-items:center;cursor:pointer}
+.tick input:checked{background:var(--blue)}
+.tick input:checked::after{content:"";width:8px;height:4px;border:2px solid #0b2235;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.tick .c{margin-left:auto;color:var(--dim);font-size:11px}
+.tick.off{opacity:.4;pointer-events:none}
+.range{width:100%;accent-color:var(--blue)}
+.rangev{color:#fff;font-size:12px;margin-bottom:6px}
+
+/* ---------- hover card (Steam game_hover) ---------- */
+#hv{position:fixed;z-index:50;width:310px;pointer-events:none;opacity:0;transform:translateY(3px);transition:opacity .12s,transform .12s;
+  background:linear-gradient(180deg,var(--hover-a) 5%,var(--hover-b) 95%);color:var(--hover-ink);box-shadow:0 0 12px #000;padding:11px 12px 12px;font-size:12px}
+#hv.on{opacity:1;transform:none}
+#hv h4{margin:0 0 2px;font-size:15px;font-weight:400;color:#222d3d;line-height:1.2}
+#hv .rel{color:#2f89bc;font-size:11px;margin-bottom:8px}
+#hv .art{margin:0 0 9px;box-shadow:0 0 3px #0005}
+#hv .kv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 8px;background:rgba(0,0,0,.06);margin-bottom:7px}
+#hv .kv span{color:var(--hover-sub)}
+#hv .kv b{font-weight:600;color:#1f2b3a;text-align:right}
+#hv .revl{margin-bottom:7px;color:var(--hover-sub)}
+#hv .revl b{font-weight:600}
+#hv .revl .rv-pos{color:#1a73a8}#hv .revl .rv-mix{color:#8a6f2d}#hv .revl .rv-neg{color:#a34c25}
+#hv .tags{display:flex;gap:3px;flex-wrap:wrap}
+#hv .tags span{background:#96a3ae;color:#e3eaef;padding:2px 6px;font-size:11px;border-radius:2px}
+#hv .tags span.g{background:#5c7e10}
+#hv .tags span.r{background:#b4532f}
+#hv .tags span.v{background:#6b56b8}
+#hv .note{margin-top:8px;color:var(--hover-sub);font-size:11px}
+#hv .dl{max-height:150px;overflow:hidden;font-size:11px;margin-top:4px}
+#hv .dl div{display:flex;justify-content:space-between;gap:8px;padding:1px 0}
+#hv .dl div span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (hover:none){#hv{display:none}}
+
+/* ---------- library (Steam client) ---------- */
+.libtop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:20px;background:#0b0e12}
+.libtop>div{background:linear-gradient(180deg,#2a2e36,#22252c);padding:12px 14px}
+.libtop .k{color:#8b929a;font-size:11.5px}
+.libtop .v{color:#fff;font-size:21px;margin-top:2px}
+.libtop .d{color:#8b929a;font-size:11px;margin-top:1px}
+.libtop .v.g{color:#a1cd44}
+.libbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
+.libbar .search{margin-left:0;background:#33373f;flex:1 1 220px}
+.libbar .search input::placeholder{color:#8b929a}
+.shelfwin{display:grid;grid-template-columns:300px minmax(0,1fr);background:var(--lib-bg);box-shadow:0 0 8px #000a;height:min(78vh,760px);margin-bottom:40px}
+.llist{background:var(--lib-side);overflow-y:auto;border-right:1px solid #0006}
+.llist .grp{position:sticky;top:0;background:#23262e;color:#8b929a;font-size:11px;padding:7px 12px;letter-spacing:.04em;z-index:1;border-bottom:1px solid #0004}
+.lit{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:8px;padding:3px 10px 3px 12px;color:#b8bcbf;cursor:pointer;width:100%;background:none;border:0;text-align:left;font-size:12.5px}
+.lit:hover{background:#3d4450;color:#fff}
+.lit[aria-selected="true"]{background:#3e76cb;color:#fff}
+.lit .art{width:32px;aspect-ratio:1/1}
+.lit .art img{object-fit:cover}
+.lit .ph span{display:none}
+.lit .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lit .v{color:#8b929a;font-size:11px}
+.lit[aria-selected="true"] .v{color:#dce7f7}
+.ldet{overflow-y:auto;position:relative}
+.lhero{position:relative;height:250px;overflow:hidden}
+.lhero .bgi{position:absolute;inset:-30px;filter:blur(22px) brightness(.55) saturate(1.2)}
+.lhero .bgi .art{width:100%;height:100%;aspect-ratio:auto}
+.lhero .fg{position:absolute;left:24px;bottom:22px;width:min(320px,55%);box-shadow:0 6px 24px #000c}
+.lhero::after{content:"";position:absolute;inset:auto 0 0 0;height:90px;background:linear-gradient(180deg,transparent,var(--lib-bg))}
+.lhead{display:flex;align-items:center;gap:16px;padding:6px 24px 14px;flex-wrap:wrap}
+.lhead h3{margin:0;color:#fff;font-size:26px;font-weight:400;flex:1 1 260px;line-height:1.15}
+.btn-go{background:linear-gradient(90deg,#47bfff 0%,#1a44c2 100%);color:#fff;border-radius:2px;padding:11px 22px;font-size:15px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:8px}
+.btn-go.green{background:linear-gradient(90deg,var(--go1) 5%,var(--go2) 95%)}
+.btn-go:hover{filter:brightness(1.15);color:#fff}
+.lstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;margin:0 24px;background:#0003}
+.lstats>div{background:#2a2e36;padding:10px 12px}
+.lstats .k{color:#8b929a;font-size:11px}
+.lstats .v{color:#fff;font-size:17px;margin-top:2px}
+.lstats .v.g{color:#a1cd44}
+.ldl{margin:20px 24px 28px}
+.ldl h5{margin:0 0 6px;color:#fff;font-size:12px;font-weight:400;letter-spacing:.04em;text-transform:uppercase}
+.ldl .ctab td{border-top-color:#ffffff10}
+.ldl .ctab th{background:#22252c}
+.lempty{color:#8b929a;padding:24px}
+.colgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:40px}
+.colcard{background:none;border:0;padding:0;cursor:pointer;text-align:left;color:#b8bcbf;font-size:12px}
+.colcard .art{box-shadow:0 4px 12px #0009;transition:transform .12s}
+.colcard:hover .art{transform:scale(1.03);box-shadow:0 8px 20px #000c}
+.colcard .nm{margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#dfe3e6}
+.colcard .v{color:#8b929a}
+
+/* ---------- bundles ---------- */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;margin-bottom:40px}
+.bcard{background:linear-gradient(180deg,#203448,#16202d);box-shadow:0 0 5px #0007;display:flex;flex-direction:column}
+.bcard .mos{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#000}
+.bcard .mos .art:first-child{grid-column:span 3}
+.bcard .bd{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.bcard h3{margin:0;color:#fff;font-size:15px;font-weight:400}
+.bcard .src{color:var(--muted);font-size:11px}
+.bcard ul{list-style:none;margin:0;padding:0;font-size:12px;max-height:150px;overflow:auto}
+.bcard li{display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid #ffffff08}
+.bcard li span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcard li.w span:first-child{color:var(--disc-fg)}
+.bcard li.o span:first-child{color:var(--dim);text-decoration:line-through}
+.bcard li em{font-style:normal;font-size:10.5px;color:var(--muted);flex:0 0 auto}
+.bcard .bf{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.howto{background:rgba(0,0,0,.25);padding:22px 24px;max-width:760px;margin:24px 0 40px;line-height:1.6;font-size:13.5px}
+.howto h3{margin:0 0 8px;color:#fff;font-weight:400;font-size:19px}
+.howto ol{padding-left:20px;margin:10px 0}
+.howto code{background:#0e141b;padding:1px 6px;border-radius:2px;color:#a9d4f1;font-size:12.5px}
+.howto p{margin:8px 0;max-width:70ch}
+
+#impMenu{position:absolute;right:0;top:calc(100% + 4px);background:#3d4450;box-shadow:0 6px 18px #000b;z-index:40;display:flex;flex-direction:column;min-width:210px}
+#impMenu[hidden]{display:none}
+#impMenu button{background:none;border:0;color:#dcdedf;text-align:left;padding:9px 12px;font-size:12.5px;cursor:pointer}
+#impMenu button:hover{background:#dcdedf;color:#171a21}
+/* toast */
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:#3d4450;color:#fff;padding:10px 16px;box-shadow:0 4px 18px #000a;opacity:0;transition:.2s;z-index:60;font-size:13px;max-width:90vw;pointer-events:none}
+#toast.on{opacity:1;transform:translateX(-50%)}
+.foot{color:var(--dim);font-size:11.5px;text-align:center;padding:10px 0 34px}
+
+@media (max-width:900px){
+  .arrow.l{left:0}.arrow.r{right:0}
+  .browse{grid-template-columns:1fr}
+  .side{position:static;order:-1}
+  .libtop{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .libtop div:first-child{grid-column:span 2}
+}
+@media (max-width:720px){
+  .hero-stage{grid-template-columns:1fr}
+  .hero-stage .hero-art .art{min-height:0;aspect-ratio:460/215;height:auto}
+  .srow{grid-template-columns:96px minmax(0,1fr) auto;gap:8px}
+  .srow .art{width:96px}
+  .srow .rel,.srow .thumb{display:none}
+  .shelfwin{grid-template-columns:1fr;height:auto}
+  .llist{max-height:44vh}
+  .lstats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nav button{padding:12px 8px;font-size:13px}
+  .who{margin-left:0;width:100%;padding-bottom:10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ---------- painel: extras ---------- */
+.tg{font-size:10.5px;padding:2px 6px;border-radius:2px;white-space:nowrap;font-weight:700}
+.tg-sempre{background:#d6492f;color:#fff}.tg-1a{background:#e2a635;color:#1b2838}.tg-9m{background:#c9b458;color:#1b2838}
+.tg-6m{background:#7fa650;color:#10200a}.tg-3m{background:#4f7f8f;color:#e9f6fb}.tg-perto{background:#3e76cb;color:#fff}
+.tg-completo{background:#6b56b8;color:#fff}.tg-keyshop{background:#8a6d2b;color:#fff}
+.pisos{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:10px}
+.pisos div{background:rgba(0,0,0,.25);padding:6px 8px;font-size:11.5px;color:var(--muted)}
+.pisos b{display:block;color:#fff;font-weight:400;font-size:14px}
+.pisos div.on{box-shadow:inset 0 -3px 0 var(--disc-fg)}
+
+.status{color:var(--muted);font-size:12px;text-align:right;line-height:1.35}
+.status b{color:#b8b6b4;font-weight:400}
+.status .err{color:#e2a635}
+.tabsec[hidden]{display:none}
+.pill-novo{background:#beee11;color:#1b2838;font-weight:700;font-size:10px;padding:2px 6px;border-radius:2px}
+.flag.alert{background:#a3cf06;color:#1b2838;font-weight:700}
+.flag.piso{background:#c5262633;color:#ff8f7f}
+.flag.ks{background:#e2a63533;color:#f0c674}
+.flag.cmp{background:#3e76cb55;color:#cfe0ff}
+.motivo{color:var(--muted);font-size:11.5px;margin-top:3px}
+/* modal */
+#modal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.72);display:flex;align-items:flex-start;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 24px) 12px 24px;overflow-y:auto}
+#modal[hidden]{display:none}
+.mbox{background:linear-gradient(180deg,#1f3349 0,#1b2838 260px);width:min(980px,100%);box-shadow:0 10px 50px #000;position:relative}
+.mclose{position:absolute;right:10px;top:10px;background:rgba(0,0,0,.5);border:0;color:#fff;width:34px;height:34px;font-size:20px;cursor:pointer;z-index:2}
+.mclose:hover{background:var(--blue);color:#0b2235}
+.mhead{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;padding:18px}
+.mhead h2{margin:0 0 6px;color:#fff;font-weight:400;font-size:24px;line-height:1.15}
+.mhead .art{box-shadow:0 0 10px #000a}
+.msec{padding:4px 18px 18px}
+.msec h4{margin:14px 0 8px;color:#fff;font-weight:400;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.kvs{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:12.5px}
+.kvs span{color:var(--muted)}
+.kvs b{color:var(--text);font-weight:400}
+.seg{display:inline-flex;background:rgba(0,0,0,.3);border-radius:2px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--muted);padding:6px 12px;cursor:pointer;font-size:12px}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#0b2235}
+.chart{position:relative;background:rgba(0,0,0,.25);padding:8px}
+.chart svg{display:block;width:100%;height:240px}
+.chart .tip{position:absolute;pointer-events:none;background:#e3eaef;color:#222d3d;font-size:11.5px;padding:6px 8px;box-shadow:0 0 8px #000;white-space:nowrap;display:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.legend button{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.25);border:0;color:var(--text);font-size:11.5px;padding:4px 8px;cursor:pointer;border-radius:2px}
+.legend button[aria-pressed="false"]{opacity:.4}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+select.mini{padding:3px 6px;font-size:11.5px}
+.ctab .tag{font-size:10.5px;padding:1px 5px;border-radius:2px;background:rgba(255,255,255,.08);color:#d2d2d2;margin-left:6px}
+.ctab tr.marc td:first-child{color:#fff}
+.combo{background:rgba(103,193,245,.08);padding:10px 12px;margin-top:10px}
+.combo b{color:var(--disc-fg);font-weight:400;font-size:16px}
+.combo ul{margin:6px 0 0;padding-left:18px;font-size:12px}
+/* config */
+.cfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin:20px 0 40px}
+.cfg .blk .in{display:flex;flex-direction:column;gap:8px}
+.cfg label.f{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px}
+.cfg input[type=number],.cfg input[type=time]{width:92px;background:#0e141b;border:0;color:#fff;padding:6px 8px;border-radius:2px;font-family:inherit;box-shadow:inset 0 0 0 1px #2f4d64}
+.cfg .hint{color:var(--dim);font-size:11px;line-height:1.4}
+.lojas{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;max-height:300px;overflow:auto}
+.savebar{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;justify-content:flex-end;gap:10px;align-items:center}
+.btn-go2{background:linear-gradient(90deg,var(--go1) 5%,var(--go2) 95%);color:#fff;border:0;border-radius:2px;padding:10px 20px;font-size:14px;cursor:pointer}
+.btn-go2:hover{filter:brightness(1.15)}
+.nrow{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto;gap:12px;align-items:center;background:rgba(0,0,0,.2);padding:4px 10px 4px 4px;margin-bottom:2px;cursor:pointer}
+.nrow:hover{background:#203348}
+.nrow .q{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.off{opacity:.5}
+.addbox{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.brow{background:rgba(0,0,0,.2);margin-bottom:2px}
+.brow .h{display:grid;grid-template-columns:120px minmax(0,1fr) 190px auto;gap:12px;align-items:center;padding:4px 10px 4px 4px;cursor:pointer}
+.brow .h:hover{background:#203348}
+.brow .nm{color:#fff;font-size:14px}
+.prog{height:6px;background:#0e141b;border-radius:1px;overflow:hidden;margin-top:5px}.prog i{display:block;height:100%;background:linear-gradient(90deg,#4c6b22,#a1cd44)}
+.brow .val{text-align:right;font-size:12px;color:var(--muted)}.brow .val b{display:block;color:var(--disc-fg);font-size:15px;font-weight:400}
+.brow .det{padding:4px 10px 10px 136px}
+.brow .det table{width:100%}
+.art.vert{aspect-ratio:2/3}
+.colgrid.vert{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.mbar{display:flex;height:14px;background:#0e141b;border-radius:2px;overflow:hidden;margin:6px 0}
+.mbar i{display:block;height:100%}.mbar .t{background:linear-gradient(90deg,#4c6b22,#a1cd44)}.mbar .p{background:repeating-linear-gradient(45deg,#3e76cb 0 6px,#5a8fe0 6px 12px)}
+.mbar.fino{height:6px;margin:5px 0 0}
+.meta-col{background:rgba(0,0,0,.25);padding:12px 14px;margin:2px 0 14px}
+.meta-col .l{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.meta-col .l b{color:#fff;font-weight:400}
+.leg{display:inline-flex;align-items:center;gap:5px;margin-right:12px}.leg i{width:10px;height:10px;display:inline-block;border-radius:2px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:40px}
+.fcard{background:linear-gradient(180deg,#203448,#16202d);padding:12px;box-shadow:0 0 5px #0007}
+.fcard h3{margin:0 0 4px;color:#fff;font-weight:400;font-size:16px}
+.fcard .sub{color:var(--muted);font-size:12px;margin-bottom:8px}
+.fcard ul{list-style:none;margin:0;padding:0;font-size:12px;max-height:180px;overflow:auto}
+.fcard li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #ffffff08;align-items:center}
+.fcard li.w span:first-child{color:var(--disc-fg)}
+.fcard li span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qr{background:#fff;padding:8px;display:inline-block;margin-top:6px}
+.lnk{word-break:break-all;font-size:11.5px;background:#0e141b;padding:6px 8px;border-radius:2px;color:#a9d4f1}
+@media (max-width:720px){.brow .h{grid-template-columns:90px 1fr}.brow .val{grid-column:2;text-align:left}.brow .det{padding-left:10px}}
+.carr-grid{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:16px;align-items:start;margin-bottom:40px}
+.crow{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto 28px;gap:12px;align-items:center;background:rgba(0,0,0,.2);padding:4px 8px 4px 4px;margin-bottom:2px}
+.crow .nm{color:#fff;font-size:14px;cursor:pointer}
+.crow .nm:hover{color:var(--blue)}
+.xbtn{background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;width:28px;height:28px}
+.xbtn:hover{color:#ff8f7f}
+.res{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:4px;margin-bottom:14px}
+.ritem{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:10px;align-items:center;background:rgba(0,0,0,.25);padding:4px 8px 4px 4px}
+.ritem .acts{display:flex;flex-direction:column;gap:4px}
+.ritem .acts button{font-size:11.5px;padding:4px 8px}
+.tot{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0}
+.tot b{color:#fff;font-weight:400}
+.tot.big b{font-size:20px;color:var(--disc-fg)}
+.bar{height:8px;background:#0e141b;border-radius:2px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--go1),var(--go2))}
+.bar.over i{background:#d6492f}
+.cartbtn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:2px;background:rgba(103,193,245,.15);color:var(--blue);font-size:14px;cursor:pointer;flex:0 0 auto}
+.cartbtn:hover,.cartbtn.on{background:var(--disc-bg);color:var(--disc-fg)}
+@media (max-width:900px){.carr-grid{grid-template-columns:1fr}.crow{grid-template-columns:90px 1fr auto 28px}.crow .lojsel{grid-column:2}}
+@media (max-width:720px){.mhead{grid-template-columns:1fr}.nrow{grid-template-columns:90px 1fr auto}.nrow .q{display:none}}
+</style></head><body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo">
+      <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#171a21" stroke="#c7d5e0" stroke-width="4"/><path d="M14 40a20 20 0 0 1 36 0" stroke="#66c0f4" stroke-width="3" fill="none" opacity=".7"/><path d="M22 38a11 11 0 0 1 20 0" stroke="#66c0f4" stroke-width="3" fill="none"/><path d="M32 32 50 16" stroke="#c7d5e0" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="#66c0f4"/></svg>
+      <div>KUROKAMI<small>RADAR</small></div>
+    </div>
+    <nav class="nav" aria-label="Seções">
+      <button data-tab="vale" aria-current="page">Vale a pena</button>
+      <button data-tab="lista">Lista de desejos</button>
+      <button data-tab="bib">Biblioteca</button>
+      <button data-tab="carr">Carrinho <span id="carrN" style="color:var(--disc-fg)"></span></button>
+      <button data-tab="notif">Notificações</button>
+      <button data-tab="cfg">Configurações</button>
+    </nav>
+    <div class="who">
+      <div class="status" id="status">carregando…</div>
+      <button class="btn-ghost" id="btnPausa" type="button">Pausar</button>
+      <button class="btn-imp" id="btnVerif" type="button">Verificar agora</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="tab-vale" class="wrap tabsec">
+    <div class="subnav">
+      <span class="lk" style="cursor:default">Jogos da sua lista no <b>menor histórico</b>, com os seus filtros</span>
+      <button class="lk" data-goto="lista">Ver a lista inteira</button>
+    </div>
+    <div class="shead"><h2>Destaques</h2><span class="aside" id="valeNote"></span></div>
+    <div class="hero" id="hero"></div>
+    <div class="shead"><h2>Todos que valem a pena</h2><div class="chips" id="cTagVale"></div></div>
+    <div id="valeLista"></div>
+  </section>
+
+  <section id="tab-lista" class="wrap tabsec" hidden>
+    <div class="subnav">
+      <button class="lk" data-quick="vale">Vale a pena <b id="qVale"></b></button>
+      <button class="lk" data-quick="piso">Em algum piso <b id="qPiso"></b></button>
+      <button class="lk" data-quick="dlc">DLCs dos seus jogos <b id="qDlc"></b></button>
+      <button class="lk" data-quick="todos">Toda a lista <b id="qTodos"></b></button>
+      <label class="search"><span class="sr">Buscar</span><input id="q" type="search" placeholder="buscar na lista de desejos" autocomplete="off"><span aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span></label>
+    </div>
+    <div class="shead"><h2>Lista de desejos</h2><span class="aside" id="listaNote"></span></div>
+    <div class="browse">
+      <div>
+        <div class="toolbar">
+          <span class="count"><b id="cnt">0</b> resultados</span>
+          <label>Ordenar por
+            <select id="sort">
+              <option value="score">Vale a pena (score)</option>
+              <option value="disc">Maior desconto</option>
+              <option value="price">Menor preço</option>
+              <option value="rating">Melhor avaliação</option>
+              <option value="gap">Mais perto do menor histórico</option>
+              <option value="save">Maior economia</option>
+              <option value="name">Nome</option>
+              <option value="rel">Lançamento</option>
+              <option value="prio">Ordem da sua lista na Steam</option>
+            </select>
+          </label>
+          <div class="views" role="group" aria-label="Visualização">
+            <button data-view="list" title="Lista" aria-pressed="true"><svg width="15" height="13" viewBox="0 0 15 13" fill="currentColor"><rect width="4" height="3"/><rect x="5" width="10" height="3"/><rect y="5" width="4" height="3"/><rect x="5" y="5" width="10" height="3"/><rect y="10" width="4" height="3"/><rect x="5" y="10" width="10" height="3"/></svg></button>
+            <button data-view="grid" title="Grade"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6"/><rect x="8" width="6" height="6"/><rect y="8" width="6" height="6"/><rect x="8" y="8" width="6" height="6"/></svg></button>
+            <button data-view="compact" title="Compacta"><svg width="15" height="13" viewBox="0 0 15 13" fill="currentColor"><rect width="15" height="2"/><rect y="3.6" width="15" height="2"/><rect y="7.2" width="15" height="2"/><rect y="10.8" width="15" height="2"/></svg></button>
+          </div>
+        </div>
+        <div class="sum" id="sum"></div>
+        <div id="results"></div>
+      </div>
+      <aside class="side" aria-label="Filtros">
+        <div class="blk"><h4>Restringir por preço</h4><div class="in">
+          <div class="rangev" id="priceV">Qualquer preço</div>
+          <input class="range" id="price" type="range" min="0" max="8" step="1" value="8" aria-label="Preço máximo">
+        </div></div>
+        <div class="blk"><h4>Desconto mínimo</h4><div class="in"><div class="chips" id="cDisc">
+          <button data-v="0" aria-pressed="true">Qualquer</button><button data-v="50">50%+</button><button data-v="75">75%+</button><button data-v="90">90%</button>
+        </div></div></div>
+        <div class="blk"><h4>Análises de usuários</h4><div class="in"><div class="chips" id="cRev">
+          <button data-v="0" aria-pressed="true">Todas</button><button data-v="70">70%+</button><button data-v="80">80%+</button><button data-v="90">90%+</button>
+        </div></div></div>
+        <div class="blk"><h4>Menor preço</h4><div class="in"><div class="chips" id="cTagLista"></div></div></div>
+        <div class="blk"><h4>Restringir por</h4><div class="in" id="ticks"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="tab-bib" class="wrap tabsec" hidden>
+    <div class="libtop" id="bibTop"></div>
+    <div class="libbar">
+      <span class="seg" id="bibSeg"><button data-bseg="completar" aria-pressed="true">Completar</button><button data-bseg="franquias">Franquias</button><button data-bseg="colecao">Coleção</button></span>
+      <label class="search"><span class="sr">Buscar na biblioteca</span><input id="bq" type="search" placeholder="Buscar na biblioteca" autocomplete="off"></label>
+      <select id="bsort"></select>
+    </div>
+    <div class="meta-col" id="bibMeta"></div>
+    <div id="bibNote" class="sum"></div>
+    <div id="bibView"></div>
+  </section>
+
+  <section id="tab-carr" class="wrap tabsec" hidden>
+    <div class="subnav">
+      <span class="lk" style="cursor:default">Simule a compra: escolha a loja de cada jogo, veja o total e se algum bundle sai mais barato</span>
+      <button class="lk" id="carrSteam">Trazer o carrinho da Steam</button>
+      <button class="lk" id="carrOtim">Loja mais barata em tudo</button>
+      <button class="lk" id="carrLimpa">Limpar</button>
+    </div>
+    <div class="shead"><h2>Adicionar jogo</h2><span class="aside">nome, appid ou link da loja Steam</span></div>
+    <div class="addbox"><label class="search" style="flex:1;margin:0"><span class="sr">Buscar jogo</span><input id="busca" type="search" placeholder="ex.: Hollow Knight, 367520 ou https://store.steampowered.com/app/..." autocomplete="off"></label>
+      <button class="btn-imp" id="buscaBtn" type="button">Buscar</button></div>
+    <div id="buscaRes"></div>
+    <div class="carr-grid">
+      <div><div class="shead"><h2>No carrinho</h2><span class="aside" id="carrNote"></span></div><div id="carrLista"></div><div id="carrBundles"></div></div>
+      <aside class="side"><div class="blk"><h4>Resumo</h4><div class="in" id="carrResumo"></div></div>
+        <div class="blk"><h4>Orçamento</h4><div class="in"><label class="f" style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px">Quanto quero gastar (R$)
+          <input type="number" id="orc" min="0" step="10" style="width:90px;background:#0e141b;border:0;color:#fff;padding:6px 8px;border-radius:2px;box-shadow:inset 0 0 0 1px #2f4d64"></label>
+          <div id="orcBar"></div></div></div></aside>
+    </div>
+  </section>
+
+  <section id="tab-notif" class="wrap tabsec" hidden>
+    <div class="shead"><h2>Notificações enviadas</h2><span class="aside">as 200 mais recentes</span></div>
+    <div id="notifLista"></div>
+  </section>
+
+  <section id="tab-cfg" class="wrap tabsec" hidden>
+    <div class="shead"><h2>Configurações</h2><span class="aside">gravadas no config.json; valem a partir da próxima checagem</span></div>
+    <div id="cfgForm"></div>
+  </section>
+
+  <div class="foot wrap">Preços via <a href="https://isthereanydeal.com" target="_blank" rel="noopener">IsThereAnyDeal</a>, <a href="https://gg.deals" target="_blank" rel="noopener">GG.deals</a> e Steam · Kurokami Radar <span id="ver"></span></div>
+</main>
+
+<div id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-label="Detalhes do jogo"><button class="mclose" aria-label="Fechar">×</button><div id="mbody"></div></div></div>
+<div id="hv" role="tooltip" aria-hidden="true"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl=c=>c==null?'—':(c===0?'Grátis':'R$ '+(c/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}));
+const brl0=c=>'R$ '+Math.round((c||0)/100).toLocaleString('pt-BR');
+const fmtK=n=>n>=1000?(n/1000).toFixed(n>=10000?0:1).replace('.',',')+' mil':String(n);
+const fmtN=n=>(n||0).toLocaleString('pt-BR');
+const fmtUnix=t=>t?new Date(t*1000).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}).replace('.',''):'';
+const fmtISO=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+const hue=id=>((id*2654435761)>>>0)%360;
+const storeUrl=id=>`https://store.steampowered.com/app/${id}/`;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3500);}
+const ls={get(k,d){try{const v=localStorage.getItem('kr:'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem('kr:'+k,JSON.stringify(v));}catch(e){}}};
+async function api(p){const r=await fetch(p);if(!r.ok){const e=(await r.json().catch(()=>({}))).erro||r.status;toast('Erro: '+e);throw new Error(e);}return r.json();}
+async function post(p,d){let r;try{r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d||{})});}
+  catch(e){toast('O Radar não respondeu. Ele está aberto na bandeja?');return {ok:false,erro:String(e)};}
+  const j=await r.json().catch(()=>({ok:false,erro:'resposta inválida'}));if(!r.ok||j.ok===false){toast('Não deu certo: '+(j.erro||r.status));if(j.ok===undefined)j.ok=false;}return j;}
+function ph(name,id,small){return `<span class="ph${small?' sm':''}" style="--h:${hue(id)}"><span>${esc(name)}</span></span>`;}
+function art(id,name,url,o={}){
+  const src=url||o.alt;const alt=url&&o.alt?` data-alt="${esc(o.alt)}"`:'';
+  const inner=src?`<img src="${esc(src)}" alt="" loading="lazy" decoding="async" data-ph="${esc(name)}" data-id="${id}"${alt}>`:ph(name,id,o.small);
+  return `<span class="art${o.v?' vert':''}"${o.style?` style="${o.style}"`:''}>${inner}</span>`;
+}
+document.addEventListener('error',e=>{const im=e.target;if(im.tagName!=='IMG'||im.dataset.ph==null)return;
+  if(im.dataset.alt){const a=im.dataset.alt;im.removeAttribute('data-alt');im.parentElement.classList.remove('vert');im.src=a;return;}
+  im.outerHTML=ph(im.dataset.ph,+im.dataset.id);},true);
+function revClass(p,n){return !n?'rv-non':(p>=70?'rv-pos':(p>=40?'rv-mix':'rv-neg'));}
+
+/* ================= estado ================= */
+let L=[], IDX=new Map(), RES={};
+const S=Object.assign({tab:'vale',sort:'score',disc:0,rev:0,price:8,view:'list',
+  t:{sale:true,piso:false,vale:false,hideDlc:false,onlyBase:false,bun:false,cmp:false,ks:false}},ls.get('s',{}),{q:'',shown:50});
+const save=()=>{const {q,shown,...r}=S;ls.set('s',r);};
+const PRICE_STEPS=[500,1000,2000,3000,5000,7500,10000,20000,Infinity];
+const PRICE_LBL=['Até R$ 5','Até R$ 10','Até R$ 20','Até R$ 30','Até R$ 50','Até R$ 75','Até R$ 100','Até R$ 200','Qualquer preço'];
+
+/* ================= blocos ================= */
+function priceBlock(o,lg){
+  if(o.preco==null)return `<span class="pb tba${lg?' lg':''}"><span class="prs"><span class="f">${o.em_breve?'Em breve':'Sem preço'}</span></span></span>`;
+  if(o.corte>0)return `<span class="pb${lg?' lg':''}"><span class="pct">-${o.corte}%</span><span class="prs tnum"><span class="o">${brl(o.cheio)}</span><span class="f">${brl(o.preco)}</span></span></span>`;
+  return `<span class="pb full${lg?' lg':''}"><span class="prs tnum"><span class="f">${brl(o.preco)}</span></span></span>`;
+}
+const ksBarata=o=>o.keyshop!=null&&o.preco!=null&&o.keyshop<o.preco*0.6;
+const ORDEM={sempre:5,'1a':4,'9m':3,'6m':2,'3m':1,perto:0};
+const TAGTXT={sempre:'Menor de sempre','1a':'Menor em 1 ano','9m':'Menor em 9 meses','6m':'Menor em 6 meses','3m':'Menor em 3 meses',perto:'Perto do menor',completo:'Completo no menor',keyshop:'Keyshop barata'};
+function tagPill(o){if(!o.tag)return '';const extra=o.tag==='perto'&&o.acima!=null?` +${brl(o.acima)}`:'';return `<span class="tg tg-${o.tag}" title="${esc(o.tag_texto||'')}">${TAGTXT[o.tag]||o.tag}${extra}</span>`;}
+function fimTxt(t){if(!t)return '';const h=(t*1000-Date.now())/36e5;if(h<=0||h>72)return '';return h<1?'termina em minutos':h<24?`termina em ${Math.round(h)}h`:`termina em ${Math.round(h/24)}d`;}
+function flags(o){
+  const f=[];
+  if(o.favorito)f.push('<span class="flag" style="background:#e2a63533;color:#f0c674">★ favorito</span>');
+  const ft=fimTxt(o.fim);if(ft)f.push(`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${ft}</span>`);
+  if(o.mudo)f.push('<span class="flag own">🔕 sem alertas</span>');
+  if(o.novo)f.push('<span class="pill-novo">NOVO</span>');
+  if(o.tag)f.push(tagPill(o));
+  if(o.vale)f.push('<span class="flag alert">Vale a pena</span>');
+  if(o.modo==='completo')f.push('<span class="flag cmp">Modo completo</span>');
+  if(o.base_tenho)f.push('<span class="flag own">Você tem o jogo base</span>');
+  if(o.bundles)f.push(`<span class="flag bun">Em ${o.bundles} bundle${o.bundles>1?'s':''}</span>`);
+  if(o.extra)f.push('<span class="flag">Adicionado por você</span>');
+  if(ksBarata(o))f.push(`<span class="flag ks">Keyshop ${brl(o.keyshop)}</span>`);
+  return f.join('');
+}
+function thumb(o){const rc=revClass(o.rpos,o.rcount);const c={'rv-pos':'#66c0f4','rv-mix':'#b9a074','rv-neg':'#a34c25','rv-non':'#3d4b58'}[rc];
+  return `<svg class="thumb" viewBox="0 0 18 18"><rect width="18" height="18" rx="2" fill="${c}" opacity=".9"/><path d="M5 8h2v6H5zM8 14V8l2.5-4c.9 0 1.4.6 1.2 1.6L11.3 7.5H14c.7 0 1.1.6 1 1.2l-.9 4.4c-.1.5-.6.9-1.1.9z" fill="#0e1c25"/></svg>`;}
+function revText(o){return o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo||o.rpos+'%')}</span> <span style="color:var(--dim)">(${fmtK(o.rcount)})</span>`:'<span class="rv-non">Sem análises</span>';}
+function rowHTML(o){return `<a class="srow" href="#" data-open="${o.appid}" data-hv="${o.appid}">
+  ${art(o.appid,o.nome,o.capa,{small:true})}
+  <span class="tt"><div>${esc(o.nome)}</div><span class="flags">${flags(o)}</span>${o.tag_texto?`<div class="motivo">${esc(o.tag_texto)} · ${esc(o.loja)}${o.tag!=='sempre'&&o.piso!=null?` · menor de sempre ${brl(o.piso)}`:''}</div>`:''}</span>
+  <span class="rel">${o.lancamento?fmtUnix(o.lancamento):''}</span>${thumb(o)}<span style="display:flex;gap:6px;align-items:center;justify-self:end">${cartBtn(o.appid)}${priceBlock(o)}</span></a>`;}
+function cartBtnB(id){const on=CARR.some(c=>c.bundle===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cartb="${id}" title="${on?'Tirar o bundle do carrinho':'Pôr o bundle no carrinho'}">${on?'✓':'+'}</span>`;}
+function cartBtn(id){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}" title="${on?'Tirar do carrinho':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
+function capCard(o){return `<a class="cap" href="#" data-open="${o.appid}" data-hv="${o.appid}">${art(o.appid,o.nome,o.capa)}
+  <div class="meta"><div class="nm">${esc(o.nome)}</div><div class="row"><span class="rvs">${revText(o)}</span><span style="display:flex;gap:5px;align-items:center">${cartBtn(o.appid)}${priceBlock(o)}</span></div></div></a>`;}
+function compactHTML(list){return `<div class="ctab-wrap"><table class="ctab tnum"><thead><tr><th>Jogo</th><th>Loja</th><th class="n">Desc.</th><th class="n">Agora</th><th>Piso</th><th class="n">Menor de sempre</th><th class="n">Keyshop</th><th class="n">Análises</th><th class="n">Score</th><th></th></tr></thead><tbody>
+  ${list.map(o=>`<tr data-open="${o.appid}" data-hv="${o.appid}" style="cursor:pointer"><td class="t">${o.vale?'● ':''}${esc(o.nome)}</td><td>${esc(o.loja)}</td><td class="n">${o.corte>0?`<span class="pctx">-${o.corte}%</span>`:''}</td><td class="n">${brl(o.preco)}</td><td>${tagPill(o)}</td><td class="n">${brl(o.piso)}</td><td class="n">${o.keyshop!=null?brl(o.keyshop):''}</td><td class="n ${revClass(o.rpos,o.rcount)}">${o.rcount?o.rpos+'%':'—'}</td><td class="n">${o.score?Math.round(o.score):''}</td><td>${cartBtn(o.appid)}</td></tr>`).join('')}
+  </tbody></table></div>`;}
+
+/* ================= hover ================= */
+const HV=$('#hv');let hvT=null,hvEl=null;
+function hvHTML(id){const o=IDX.get(+id);if(!o)return '';
+  const tags=[];if(o.vale)tags.push('<span class="g">Vale a pena</span>');if(o.no_piso&&!o.vale)tags.push('<span class="r">Menor histórico</span>');
+  if(o.base_tenho)tags.push('<span>Você tem o jogo base</span>');if(o.modo==='completo')tags.push('<span class="v">Modo completo</span>');
+  if(o.bundles)tags.push(`<span class="v">Em ${o.bundles} bundle(s)</span>`);
+  return `<h4>${esc(o.nome)}</h4><div class="rel">${o.lancamento?'Lançamento: '+fmtUnix(o.lancamento):'Na sua lista de desejos'}</div>
+    ${art(o.appid,o.nome,o.capa)}
+    <div class="revl">Análises: ${o.rcount?`<b class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</b> · ${o.rpos}% de ${fmtN(o.rcount)}`:'<b>sem análises</b>'}</div>
+    <div class="kv tnum">${o.preco!=null?`<span>Melhor preço (${esc(o.loja)})</span><b>${brl(o.preco)}</b>`:''}
+      ${o.corte>0?`<span>Preço cheio</span><b>${brl(o.cheio)}</b>`:''}
+      ${o.tag?`<span>Piso</span><b>${esc(TAGTXT[o.tag])}</b>`:''}<span>Menor de sempre</span><b>${brl(o.piso)}</b>
+      ${o.keyshop!=null?`<span>Keyshop (GG.deals)</span><b>${brl(o.keyshop)}</b>`:''}
+      ${o.score?`<span>Score</span><b>${Math.round(o.score)} / 100</b>`:''}</div>
+    ${tags.length?`<div class="tags">${tags.join('')}</div>`:''}<div class="note">Clique para ver histórico, lojas e caminhos de compra</div>`;}
+document.addEventListener('mouseover',e=>{const el=e.target.closest('[data-hv]');if(el===hvEl)return;clearTimeout(hvT);HV.classList.remove('on');hvEl=el;if(!el)return;
+  hvT=setTimeout(()=>{const h=hvHTML(el.dataset.hv);if(!h)return;HV.innerHTML=h;const r=el.getBoundingClientRect(),w=310,hh=HV.offsetHeight;
+    let x=r.right+10;if(x+w>innerWidth-8)x=r.left-w-10;if(x<8)x=Math.min(innerWidth-w-8,Math.max(8,r.left));let y=r.top;if(y+hh>innerHeight-8)y=innerHeight-hh-8;if(y<8)y=8;
+    HV.style.left=x+'px';HV.style.top=y+'px';HV.classList.add('on');},260);});
+addEventListener('scroll',()=>{clearTimeout(hvT);HV.classList.remove('on');hvEl=null;},{passive:true});
+let CARR=[];
+async function salvarCarr(){await post('/api/carrinho',{itens:CARR});$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}
+async function alternarCarr(id,forcar){const i=CARR.findIndex(c=>c.appid===id);
+  if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}else if(i<0){CARR.push({appid:id,loja:null});toast('No carrinho');}
+  await salvarCarr();$$(`[data-cart="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.appid===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
+  if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-cart]');if(!c)return;e.preventDefault();e.stopPropagation();alternarCarr(+c.dataset.cart);},true);
+async function alternarBundle(id){const i=CARR.findIndex(c=>c.bundle===id);if(i>=0){CARR.splice(i,1);toast('Bundle saiu do carrinho');}else{CARR.push({bundle:id});toast('Bundle no carrinho');}
+  await salvarCarr();$$(`[data-cartb="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.bundle===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
+  if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-cartb]');if(!c)return;e.preventDefault();e.stopPropagation();alternarBundle(+c.dataset.cartb);},true);
+document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(!o)return;e.preventDefault();HV.classList.remove('on');abrirJogo(+o.dataset.open);});
+
+/* ================= abas ================= */
+function setTab(t){S.tab=t;save();$$('.nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
+  ['vale','lista','bib','carr','notif','cfg'].forEach(x=>$('#tab-'+x).hidden=x!==t);render();}
+$$('.nav button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+$$('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
+
+/* ================= vale a pena ================= */
+let heroI=0;
+function valeItens(){return L.filter(o=>o.vale).sort((a,b)=>b.score-a.score);}
+S.tagVale=S.tagVale||'';
+function filtroTag(o,t){if(!t)return true;if(t==='perto')return o.tag==='perto';return o.tag&&o.tag!=='perto'&&ORDEM[o.tag]>=ORDEM[t];}
+function chipsTag(sel,atual,base){const opts=[['','Todos'],['sempre','De sempre'],['1a','1 ano+'],['9m','9 meses+'],['6m','6 meses+'],['3m','3 meses+'],['perto','Perto do menor']];
+  $(sel).innerHTML=opts.map(([v,t])=>`<button data-tag="${v}" aria-pressed="${atual===v}">${t} <span style="opacity:.6">${base.filter(o=>filtroTag(o,v)).length}</span></button>`).join('');}
+function renderVale(){
+  const it=valeItens();$('#valeNote').textContent=`${it.length} jogo(s) · checado ${fmtISO(RES.atualizado)}`;
+  if(!it.length){$('#hero').innerHTML='<div class="empty">Nada no menor histórico com os seus filtros agora. Ajuste em Configurações ou veja a lista inteira.</div>';$('#valeLista').innerHTML='';return;}
+  const top=it.slice(0,10);heroI=(heroI+top.length)%top.length;const o=top[heroI];
+  $('#hero').innerHTML=`<div class="hero-stage">
+    <a class="hero-art" href="#" data-open="${o.appid}">${art(o.appid,o.nome,o.capa,{style:'--fs:30px'})}</a>
+    <div class="hero-info"><h3><a href="#" data-open="${o.appid}">${esc(o.nome)}</a></h3><div class="flags">${flags(o)}</div>
+      <div class="hero-why tnum"><span>Análises</span><b>${o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</span> · ${o.rpos}%`:'Sem análises'}</b>
+        <span>Score</span><span class="meter"><i style="width:${Math.min(100,o.score)}%"></i></span>
+        <span>Loja</span><b>${esc(o.loja)}</b><span>Por quê</span><b>${esc(o.motivo||'')}</b></div>
+      <div class="hero-next">${[1,2,3,4].map(k=>{const n=top[(heroI+k)%top.length];return `<button type="button" data-heroi="${(heroI+k)%top.length}" title="${esc(n.nome)}">${art(n.appid,n.nome,n.capa,{small:true})}</button>`;}).join('')}</div>
+      <div class="hero-foot"><span style="display:flex;gap:8px;align-items:center"><a class="btn-go green" href="${esc(o.url||storeUrl(o.appid))}" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13px">Abrir oferta</a>${cartBtn(o.appid)}</span>${priceBlock(o,true)}</div></div></div>
+    <button class="arrow l" aria-label="Anterior" data-hero="-1"><svg viewBox="0 0 12 22"><path d="M11 1 1 11l10 10" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
+    <button class="arrow r" aria-label="Próximo" data-hero="1"><svg viewBox="0 0 12 22"><path d="m1 1 10 10L1 21" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
+    <div class="dots">${top.map((_,i)=>`<button aria-label="Destaque ${i+1}" data-heroi="${i}" aria-current="${i===heroI}"></button>`).join('')}</div>`;
+  chipsTag('#cTagVale',S.tagVale,it);
+  const fl=it.filter(o=>filtroTag(o,S.tagVale));
+  $('#valeLista').innerHTML=fl.length?`<div class="rows">${fl.map(rowHTML).join('')}</div>`:'<div class="empty">Nenhum com essa etiqueta.</div>';
+}
+$('#tab-vale').addEventListener('click',e=>{const b=e.target.closest('#cTagVale [data-tag]');if(!b)return;S.tagVale=b.dataset.tag;save();renderVale();});
+$('#hero').addEventListener('click',e=>{const a=e.target.closest('[data-hero]'),d=e.target.closest('[data-heroi]');
+  if(a){heroI+=+a.dataset.hero;renderVale();}else if(d){heroI=+d.dataset.heroi;renderVale();}});
+
+/* ================= lista ================= */
+const TICKS=[['sale','Só em promoção',o=>o.corte>0],['vale','Vale a pena (filtros do alerta)',o=>o.vale],
+  ['hideDlc','Ocultar DLCs',o=>o.tipo==='dlc'],['onlyBase','Só DLCs de jogos que tenho',o=>o.base_tenho],['bun','Faz parte de bundle',o=>o.bundles>0],
+  ['cmp','Modo completo',o=>o.modo==='completo'],['ks','Keyshop bem mais barata',ksBarata]];
+function renderTicks(){chipsTag('#cTagLista',S.tagLista||'',L);$('#ticks').innerHTML=TICKS.map(([k,l,f])=>`<label class="tick"><input type="checkbox" data-tick="${k}" ${S.t[k]?'checked':''}>${l}<span class="c">${L.filter(f).length}</span></label>`).join('');}
+$('#cTagLista').addEventListener('click',e=>{const b=e.target.closest('[data-tag]');if(!b)return;S.tagLista=b.dataset.tag;S.shown=50;save();renderTicks();renderLista();});
+$('#ticks').addEventListener('change',e=>{const k=e.target.dataset.tick;if(!k)return;S.t[k]=e.target.checked;S.shown=50;save();renderLista();});
+function filtrar(){
+  const max=PRICE_STEPS[S.price], big=1e12;
+  const r=L.filter(o=>{
+    if(S.t.sale&&!(o.corte>0))return false; if(!filtroTag(o,S.tagLista||''))return false; if(S.t.vale&&!o.vale)return false;
+    if(S.t.hideDlc&&o.tipo==='dlc')return false; if(S.t.onlyBase&&!o.base_tenho)return false; if(S.t.bun&&!o.bundles)return false;
+    if(S.t.cmp&&o.modo!=='completo')return false; if(S.t.ks&&!ksBarata(o))return false;
+    if(o.corte<S.disc)return false; if(S.rev&&(!o.rcount||o.rpos<S.rev))return false;
+    if(max!==Infinity&&(o.preco==null||o.preco>max))return false;
+    if(S.q&&!o.nome.toLowerCase().includes(S.q))return false; return true;});
+  const gap=o=>o.preco!=null&&o.piso?o.preco/o.piso:big;
+  const cmp={score:(a,b)=>b.score-a.score||b.corte-a.corte,disc:(a,b)=>b.corte-a.corte||b.score-a.score,price:(a,b)=>(a.preco??big)-(b.preco??big),
+    rating:(a,b)=>b.rpos-a.rpos||b.rcount-a.rcount,gap:(a,b)=>gap(a)-gap(b),save:(a,b)=>((b.cheio||0)-(b.preco||0))-((a.cheio||0)-(a.preco||0)),
+    name:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR'),rel:(a,b)=>(b.lancamento||0)-(a.lancamento||0),prio:(a,b)=>(a.prioridade??1e9)-(b.prioridade??1e9)}[S.sort];
+  return r.sort(cmp);
+}
+function renderLista(){
+  const r=filtrar(),sl=r.slice(0,S.shown),box=$('#results');
+  $('#cnt').textContent=fmtN(r.length);
+  const sv=r.reduce((s,o)=>s+(o.corte>0?(o.cheio||0)-(o.preco||0):0),0),now=r.reduce((s,o)=>s+(o.preco||0),0);
+  $('#sum').innerHTML=r.length?`Levar tudo isso custaria ${brl0(now)}, economia de <b>${brl0(sv)}</b> sobre o preço cheio.`:'';
+  if(!r.length){box.innerHTML='<div class="empty">Nenhum jogo com esses filtros.</div>';}
+  else{const more=r.length>S.shown?`<button class="more" id="moreBtn">Mostrar mais ${Math.min(50,r.length-S.shown)} de ${fmtN(r.length-S.shown)}</button>`:'';
+    box.innerHTML=(S.view==='grid'?`<div class="cgrid">${sl.map(capCard).join('')}</div>`:S.view==='compact'?compactHTML(sl):`<div class="rows">${sl.map(rowHTML).join('')}</div>`)+more;}
+  $$('.views [data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
+  $('#sort').value=S.sort;$('#price').value=S.price;$('#priceV').textContent=PRICE_LBL[S.price];
+  [['#cDisc','disc'],['#cRev','rev']].forEach(([id,k])=>$$(id+' button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===S[k])));
+  $('#qVale').textContent=L.filter(o=>o.vale).length;$('#qPiso').textContent=L.filter(o=>o.tag&&o.tag!=='perto').length;
+  $('#qDlc').textContent=L.filter(o=>o.base_tenho).length;$('#qTodos').textContent=fmtN(L.length);
+  $('#listaNote').textContent=`${fmtN(L.filter(o=>o.corte>0).length)} em promoção de ${fmtN(L.length)}`;
+}
+$('#results').addEventListener('click',e=>{if(e.target.id==='moreBtn'){S.shown+=50;renderLista();}});
+$('#q').addEventListener('input',e=>{S.q=e.target.value.trim().toLowerCase();S.shown=50;renderLista();});
+$('#sort').addEventListener('change',e=>{S.sort=e.target.value;S.shown=50;save();renderLista();});
+$('#price').addEventListener('input',e=>{S.price=+e.target.value;S.shown=50;save();renderLista();});
+[['#cDisc','disc'],['#cRev','rev']].forEach(([id,k])=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[k]=+b.dataset.v;S.shown=50;save();renderLista();}));
+$$('.views [data-view]').forEach(b=>b.addEventListener('click',()=>{S.view=b.dataset.view;save();renderLista();}));
+$$('[data-quick]').forEach(b=>b.addEventListener('click',()=>{const q=b.dataset.quick;
+  Object.keys(S.t).forEach(k=>S.t[k]=false);S.tagLista='';if(q==='vale')S.t.vale=true;if(q==='piso')S.tagLista='3m';if(q==='dlc')S.t.onlyBase=true;
+  S.shown=50;save();renderTicks();renderLista();}));
+
+/* ================= modal do jogo ================= */
+const CORES=['#66c0f4','#a1cd44','#e2a635','#ef6f6a','#c7b3ff','#4fd1c5','#f472b6','#facc15','#94a3b8','#fb923c'];
+let MJ=null, MVIS=new Set(), MRANGE=365;
+async function abrirJogo(appid){
+  $('#modal').hidden=false;document.body.style.overflow='hidden';$('#mbody').innerHTML='<div class="empty">carregando…</div>';
+  try{MJ=await api('/api/jogo?appid='+appid);}catch(e){$('#mbody').innerHTML=`<div class="empty">Erro: ${esc(e.message)}</div>`;return;}
+  const marc=new Set(MJ.lojas.filter(l=>l.marcada).map(l=>l.loja));
+  MVIS=new Set(Object.keys(MJ.historico).filter(l=>marc.has(l)||l==='Completo (Steam)'||l==='GG.deals keyshop'));
+  if(!MVIS.size)MVIS=new Set(Object.keys(MJ.historico).slice(0,3));
+  renderModal();
+}
+function fecharModal(){$('#modal').hidden=true;document.body.style.overflow='';}
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.closest('.mclose'))fecharModal();});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)fecharModal();});
+function renderModal(){
+  const j=MJ.jogo,o=IDX.get(j.appid)||{};const g=MJ.gg;
+  const lojas=MJ.lojas.map(l=>`<tr class="${l.marcada?'marc':''}"><td>${esc(l.loja)}${l.marcada?'<span class="tag">alerta</span>':''}</td>
+    <td class="n">${l.vende?(l.corte>0?`<span class="pctx">-${l.corte}%</span> `:'')+brl(l.atual):'<span style="color:var(--dim)">não vende agora</span>'}</td><td class="n">${brl(l.menor)}</td>
+    <td class="n">${l.url?`<a href="${esc(l.url)}" target="_blank" rel="noopener">abrir</a>`:''}</td></tr>`).join('');
+  const cam=MJ.caminhos.length?`<h4>Formas de comprar</h4><div class="ctab-wrap"><table class="ctab tnum"><thead><tr><th>Opção</th><th class="n">Seu preço</th><th class="n">Cobre</th><th class="n">p/ completar</th></tr></thead><tbody>
+    ${MJ.caminhos.map(c=>`<tr title="${esc((c.itens||[]).map(i=>i.nome+(i.tenho?' (tenho)':'')).join('\n'))}"><td class="t">${esc(c.nome)}${c.tipo==='parcial'?'<span class="tag">parcial</span>':''}${c.extras_lista&&c.extras_lista.length?`<span class="tag">+${c.extras_lista.length} da lista</span>`:''}</td>
+      <td class="n">${brl(c.preco)}</td><td class="n">${c.cobertura}%${c.estimada?'~':''}</td><td class="n">${brl(c.custo_completo)}</td></tr>`).join('')}</tbody></table></div>
+    ${MJ.combo?`<div class="combo">Jeito mais barato de ter tudo: <b>${brl(MJ.combo.custo_completo)}</b><ul>${MJ.combo.partes.map(p=>`<li>${esc(p[0])} — ${brl(p[1])}</li>`).join('')}${MJ.combo.avulsos.map(a=>`<li>${esc(a.nome)} (avulso) — ${brl(a.preco)}</li>`).join('')}</ul></div>`:''}`:'';
+  const opts=k=>Object.entries(MJ.classes).map(([v,t])=>`<option value="${v}"${v===k?' selected':''}>${esc(t)}</option>`).join('');
+  const dlcs=MJ.dlcs.length?`<h4>DLCs (${MJ.dlcs.length})</h4><div class="ctab-wrap"><table class="ctab tnum"><thead><tr><th>DLC</th><th>Classe</th><th class="n">Preço</th></tr></thead><tbody>
+    ${MJ.dlcs.map(d=>`<tr class="${d.conta?'':'off'}"><td class="t">${esc(d.nome||d.appid)}${d.tenho?'<span class="tag">tenho</span>':''}${d.origem==='usuario'?'<span class="tag">você marcou</span>':''}</td>
+      <td><select class="mini" data-dlc="${d.appid}">${opts(d.classe)}</select></td><td class="n">${brl(d.preco)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">Itens apagados não entram no custo completo (veja as opções de DLC em Configurações).</div>`:'';
+  $('#mbody').innerHTML=`<div class="mhead">${art(j.appid,j.nome,j.capa,{style:'--fs:26px'})}
+    <div><h2>${esc(j.nome)}</h2><div class="flags" style="margin-bottom:10px">${flags(o)}</div>
+      <div class="kvs"><span>Análises</span><b>${j.rcount?`<span class="${revClass(j.rpos,j.rcount)}">${esc(j.rotulo)}</span> · ${j.rpos}% de ${fmtN(j.rcount)}`:'—'}</b>
+        ${j.lancamento?`<span>Lançamento</span><b>${fmtUnix(j.lancamento)}</b>`:''}
+        <span>Melhor preço</span><b>${brl(o.preco)} ${o.loja?'na '+esc(o.loja):''}</b><span>Piso</span><b>${o.tag?tagPill(o)+' ':''}menor de sempre ${brl(o.piso)}${o.piso_geral!=null&&o.piso_geral<o.piso?` (${brl(o.piso_geral)} em lojas que não alertam)`:''}</b>
+        ${g&&g.keyshop!=null?`<span>Keyshop</span><b>${brl(g.keyshop)} (menor ${brl(g.hist_keyshop)}) · <a href="${esc(g.url)}" target="_blank" rel="noopener">GG.deals</a></b>`:''}
+        ${o.score?`<span>Score</span><b>${Math.round(o.score)}</b>`:''}</div>
+      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <a class="btn-go green" href="${storeUrl(j.appid)}" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13px">Página na Steam</a>
+        <button class="btn-ghost" data-mcart="${j.appid}" style="padding:8px 12px">${CARR.some(c=>c.appid===j.appid)?'Tirar do carrinho':'Pôr no carrinho'}</button>
+        ${o.extra?`<button class="btn-ghost" data-desmonitorar="${j.appid}" style="padding:8px 12px">Parar de monitorar</button>`:''}
+        <button class="btn-ghost" data-tenho="1" style="padding:8px 12px">${MJ.tenho_manual?'Desfazer "já tenho"':(MJ.tenho?'Está na sua biblioteca':'Já tenho')}</button>
+        <button class="btn-ghost" data-mudo="${MJ.mudo?0:1}" style="padding:8px 12px">${MJ.mudo?'Voltar a avisar':'Não avisar deste jogo'}</button>
+        ${MJ.dlcs.length?`<span class="seg" role="group" aria-label="Alertar por"><button data-modo="base" aria-pressed="${MJ.modo!=='completo'}">Alertar pelo base</button><button data-modo="completo" aria-pressed="${MJ.modo==='completo'}">Pelo completo</button></span>`:''}
+      </div></div></div>
+    <div class="msec">${o.pisos?`<h4>Menor preço nas lojas que alertam</h4><div class="pisos tnum">${[['3m','3 meses'],['6m','6 meses'],['9m','9 meses'],['1a','1 ano'],['sempre','De sempre']].map(([k,t])=>`<div class="${o.preco!=null&&o.pisos[k]!=null&&o.preco<=o.pisos[k]?'on':''}">${t}<b>${brl(o.pisos[k])}</b></div>`).join('')}</div>`:''}
+      <h4>Histórico de preços</h4>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:6px"><span class="seg">${[[90,'3 meses'],[365,'1 ano'],[1095,'3 anos'],[99999,'Tudo']].map(([d,t])=>`<button data-range="${d}" aria-pressed="${MRANGE===d}">${t}</button>`).join('')}</span></div>
+      <div class="chart" id="chart"></div><div class="legend" id="legend"></div>
+      <h4>Lojas agora</h4><div class="ctab-wrap"><table class="ctab tnum"><thead><tr><th>Loja</th><th class="n">Agora</th><th class="n">Menor</th><th></th></tr></thead><tbody>${lojas}</tbody></table></div>
+      ${cam}${dlcs}</div>`;
+  desenharGrafico();
+}
+$('#mbody').addEventListener('click',async e=>{
+  const r=e.target.closest('[data-range]');if(r){MRANGE=+r.dataset.range;renderModal();return;}
+  const l=e.target.closest('[data-serie]');if(l){const s=l.dataset.serie;MVIS.has(s)?MVIS.delete(s):MVIS.add(s);desenharGrafico();return;}
+  const th=e.target.closest('[data-tenho]');if(th){if(MJ.tenho&&!MJ.tenho_manual){toast('Já está na sua biblioteca da Steam');return;}const novo=!MJ.tenho_manual;await post('/api/tenho',{appid:MJ.jogo.appid,tenho:novo});
+    toast(novo?'Marcado como seu: sai dos alertas e do carrinho':'Desmarcado');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();BD=null;return;}
+  const mu=e.target.closest('[data-mudo]');if(mu){await post('/api/silenciar',{appid:MJ.jogo.appid,mudo:mu.dataset.mudo==='1'});toast(mu.dataset.mudo==='1'?'Sem alertas para este jogo':'Alertas de volta');
+    MJ.mudo=mu.dataset.mudo==='1';const it=IDX.get(MJ.jogo.appid);if(it)it.mudo=MJ.mudo;renderModal();return;}
+  const mc=e.target.closest('[data-mcart]');if(mc){await alternarCarr(+mc.dataset.mcart);renderModal();return;}
+  const dm=e.target.closest('[data-desmonitorar]');if(dm){await post('/api/extra',{appid:+dm.dataset.desmonitorar,remover:true});toast('Não é mais monitorado (sai da lista na próxima checagem)');return;}
+  const m=e.target.closest('[data-modo]');if(m){await post('/api/modo',{appid:MJ.jogo.appid,modo:m.dataset.modo});toast('Modo salvo: vale a partir da próxima checagem');MJ.modo=m.dataset.modo;
+    const it=IDX.get(MJ.jogo.appid);if(it)it.modo=m.dataset.modo;renderModal();}
+});
+$('#mbody').addEventListener('change',async e=>{const s=e.target.closest('[data-dlc]');if(!s)return;
+  await post('/api/dlc',{appid:+s.dataset.dlc,classe:s.value});toast('Classificação salva');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();});
+function desenharGrafico(){
+  const box=$('#chart'),leg=$('#legend');const series=Object.entries(MJ.historico);
+  const cor={};series.forEach(([n],i)=>cor[n]=CORES[i%CORES.length]);
+  leg.innerHTML=series.map(([n,p])=>`<button data-serie="${esc(n)}" aria-pressed="${MVIS.has(n)}"><i style="background:${cor[n]}"></i>${esc(n)}</button>`).join('');
+  const agora=Date.now(),t0=MRANGE>=99999?Math.min(...series.flatMap(([,p])=>p.map(x=>Date.parse(x[0])))):agora-MRANGE*864e5;
+  const vis=series.filter(([n])=>MVIS.has(n)).map(([n,p])=>{
+    const pts=p.map(x=>[Date.parse(x[0]),x[1]]).sort((a,b)=>a[0]-b[0]);
+    const antes=pts.filter(x=>x[0]<t0).pop();const dentro=pts.filter(x=>x[0]>=t0);
+    return [n,(antes?[[t0,antes[1]]]:[]).concat(dentro)];}).filter(([,p])=>p.length);
+  if(!vis.length){box.innerHTML='<div class="empty" style="padding:30px">Sem dados no período. Marque lojas na legenda.</div>';return;}
+  const W=900,H=240,PL=58,PR=10,PT=10,PB=24;
+  const maxY=Math.max(...vis.flatMap(([,p])=>p.map(x=>x[1])))*1.08||100;
+  const X=t=>PL+(t-t0)/(agora-t0)*(W-PL-PR), Y=v=>PT+(1-v/maxY)*(H-PT-PB);
+  let g='';for(let i=0;i<=4;i++){const v=maxY*i/4;g+=`<line x1="${PL}" x2="${W-PR}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${PL-6}" y="${Y(v)+4}" fill="#8f98a0" font-size="11" text-anchor="end">${brl0(v)}</text>`;}
+  for(let i=0;i<=4;i++){const t=t0+(agora-t0)*i/4;g+=`<text x="${X(t)}" y="${H-6}" fill="#8f98a0" font-size="11" text-anchor="${i===0?'start':i===4?'end':'middle'}">${new Date(t).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','')}</text>`;}
+  const paths=vis.map(([n,p])=>{let d='';p.forEach((x,i)=>{d+=i?`H${X(x[0]).toFixed(1)}V${Y(x[1]).toFixed(1)}`:`M${X(x[0]).toFixed(1)},${Y(x[1]).toFixed(1)}`;});
+    d+=`H${X(agora).toFixed(1)}`;return `<path d="${d}" fill="none" stroke="${cor[n]}" stroke-width="2"/>`;}).join('');
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${g}${paths}<line id="cur" y1="${PT}" y2="${H-PB}" stroke="rgba(255,255,255,.4)" visibility="hidden"/><rect x="${PL}" y="0" width="${W-PL-PR}" height="${H}" fill="transparent" id="ov"/></svg><div class="tip" id="tip"></div>`;
+  const svg=box.querySelector('svg'),tip=$('#tip'),cur=box.querySelector('#cur');
+  svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*W;if(x<PL){tip.style.display='none';return;}
+    const t=t0+(x-PL)/(W-PL-PR)*(agora-t0);cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.setAttribute('visibility','visible');
+    const linhas=vis.map(([n,p])=>{const v=p.filter(q=>q[0]<=t).pop();return v?`<div><span style="color:${cor[n]}">■</span> ${esc(n)}: <b>${brl(v[1])}</b></div>`:'';}).join('');
+    tip.innerHTML=`<div style="margin-bottom:3px"><b>${new Date(t).toLocaleDateString('pt-BR')}</b></div>${linhas}`;tip.style.display='block';
+    const px=e.clientX-box.getBoundingClientRect().left;tip.style.left=Math.min(px+12,box.clientWidth-tip.offsetWidth-4)+'px';tip.style.top='12px';});
+  svg.addEventListener('mouseleave',()=>{tip.style.display='none';cur.setAttribute('visibility','hidden');});
+}
+
+/* ================= biblioteca ================= */
+let BD=null;S.bseg=S.bseg||'completar';S.bsort=S.bsort||'perto';S.bq='';const ABERTOS=new Set();
+const BSORTS={completar:[['perto','Mais perto de completar'],['barato','Mais barato para completar'],['promo','DLCs faltantes em promoção'],['caro','Mais caro para completar'],['nome','Nome']],
+  franquias:[['tenho','Mais jogos que tenho'],['falta','Mais coisas faltando'],['nome','Nome']],
+  colecao:[['valor','Maior valor'],['nome','Nome'],['aval','Melhor avaliados']]};
+async function renderBib(){
+  if(!BD){$('#bibView').innerHTML='<div class="empty">carregando a biblioteca…</div>';BD=await api('/api/biblioteca');}
+  const t=BD.total;
+  $('#bibTop').innerHTML=`<div><div class="k">Sua biblioteca</div><div class="v tnum">${fmtN(BD.n_jogos)} jogos</div><div class="d">${fmtN(t.dlcs_tenho)} DLCs</div></div>
+    <div><div class="k">Valor pelo preço cheio</div><div class="v tnum">${brl0(t.cheio)}</div><div class="d">tudo sem desconto</div></div>
+    <div><div class="k">Valor hoje na Steam</div><div class="v tnum">${brl0(t.hoje)}</div><div class="d">${t.cheio?Math.round(100*(1-t.hoje/t.cheio)):0}% abaixo do cheio</div></div>
+    <div><div class="k">No menor histórico</div><div class="v g tnum">${brl0(t.menor)}</div><div class="d">o piso de cada item</div></div>
+    <div><div class="k">Para completar tudo</div><div class="v tnum">${brl0(t.falta_hoje)}</div><div class="d">${fmtN(t.dlcs_faltam)} DLCs · ${brl0(t.falta_menor)} nos pisos</div></div>`;
+  $$('#bibSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bseg===S.bseg));
+  const opts=BSORTS[S.bseg];if(!opts.some(o=>o[0]===S.bsort))S.bsort=opts[0][0];
+  $('#bsort').innerHTML=opts.map(([v,l])=>`<option value="${v}"${v===S.bsort?' selected':''}>${l}</option>`).join('');
+  const cset=new Set(CARR.map(c=>c.appid));
+  const planC=BD.jogos.reduce((s,g)=>s+g.falta.filter(d=>cset.has(d.appid)).reduce((x,d)=>x+(d.cheio||d.preco||0),0),0);
+  const planH=BD.jogos.reduce((s,g)=>s+g.falta.filter(d=>cset.has(d.appid)).reduce((x,d)=>x+(d.preco||0),0),0);
+  const univ=t.cheio+t.falta_cheio, pt=univ?100*t.cheio/univ:100, pp=univ?100*planC/univ:0;
+  $('#bibMeta').innerHTML=`<div class="l"><span>Progresso da coleção, pelo preço cheio (seus jogos + DLCs que contam)</span><span><b>${pt.toFixed(1)}%</b>${planC?` → <b style="color:#8fb8ff">${(pt+pp).toFixed(1)}%</b> com o carrinho`:''}</span></div>
+    <div class="mbar"><i class="t" style="width:${pt}%"></i><i class="p" style="width:${pp}%"></i></div>
+    <div class="l"><span><span class="leg"><i style="background:#a1cd44"></i>tenho ${brl0(t.cheio)}</span><span class="leg"><i style="background:#5a8fe0"></i>no carrinho ${brl0(planC)} (custa ${brl0(planH)} hoje)</span><span class="leg"><i style="background:#0e141b;box-shadow:inset 0 0 0 1px #2f4d64"></i>falta ${brl0(t.falta_cheio-planC)}</span></span>
+      <span>para completar: <b>${brl0(t.falta_hoje-planH)}</b> hoje${planH?' depois do carrinho':''}</span></div>`;
+  const notas=[];if(BD.sem_lista_dlc)notas.push(`${BD.sem_lista_dlc} jogos ainda sem lista de DLCs (o Radar completa em segundo plano)`);
+  if(BD.sem_dados)notas.push(`${BD.sem_dados} itens sem página na loja (removidos ou ocultos; não entram na conta)`);if(!BD.atualizado)notas.push('a primeira leitura completa da biblioteca acontece na próxima checagem');
+  $('#bibNote').textContent=notas.join(' · ');
+  const q=S.bq;const J=BD.jogos.filter(g=>!q||g.nome.toLowerCase().includes(q));
+  if(S.bseg==='completar'){
+    let l=J.filter(g=>g.falta.length);
+    const pct=g=>g.dlc_total?g.dlc_tenho/g.dlc_total:1;
+    const c={perto:(a,b)=>pct(b)-pct(a)||a.falta_hoje-b.falta_hoje,barato:(a,b)=>a.falta_hoje-b.falta_hoje,caro:(a,b)=>b.falta_hoje-a.falta_hoje,
+      promo:(a,b)=>b.falta.filter(d=>d.corte>0).length-a.falta.filter(d=>d.corte>0).length,nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[S.bsort];
+    l.sort(c);
+    $('#bibView').innerHTML=l.length?l.slice(0,200).map(g=>{const p=Math.round(100*pct(g));const promo=g.falta.filter(d=>d.corte>0).length;
+      return `<div class="brow"><div class="h" data-bopen="${g.appid}">${art(g.appid,g.nome,g.capa,{small:true})}
+        <div><div class="nm">${esc(g.nome)}</div><div class="motivo">tem ${g.dlc_tenho} de ${g.dlc_total} DLCs que contam${g.franquia?' · '+esc(g.franquia.split('|')[0]):''}${promo?` · <span style="color:var(--disc-fg)">${promo} em promoção</span>`:''}</div>${(()=>{const n=g.falta.filter(d=>cset.has(d.appid)).length;const pc=g.dlc_total?100*n/g.dlc_total:0;return `<div class="mbar fino"><i class="t" style="width:${p}%"></i><i class="p" style="width:${pc}%"></i></div>`;})()}</div>
+        <div class="val">faltam<b>${brl(g.falta_hoje)}</b>${g.falta_menor<g.falta_hoje?`${brl(g.falta_menor)} nos pisos`:''}</div><span style="color:var(--muted)">${ABERTOS.has(g.appid)?'▴':'▾'}</span></div>
+        ${ABERTOS.has(g.appid)?`<div class="det"><table class="ctab tnum"><thead><tr><th>Falta</th><th>Tipo</th><th class="n">Hoje</th><th class="n">Menor</th><th></th></tr></thead><tbody>
+          ${g.falta.sort((x,y)=>(y.corte>0)-(x.corte>0)||x.preco-y.preco).map(d=>`<tr><td class="t">${esc(d.nome)}</td><td>${esc((CLASSES[d.classe])||d.classe)}</td>
+          <td class="n">${d.corte>0?`<span class="pctx">-${d.corte}%</span> `:''}${brl(d.preco)}</td><td class="n">${brl(d.menor)}</td><td>${cartBtn(d.appid)}</td></tr>`).join('')}</tbody></table>
+          ${g.bundles&&g.bundles.length?`<div class="motivo" style="margin-top:8px">Bundles da Steam com DLCs que faltam:</div>${g.bundles.map(b=>`<div class="tot"><span>📦 ${esc(b.nome)} · cobre ${b.cobre} · ${b.economia>0?`<b style="color:var(--disc-fg)">economiza ${brl(b.economia)}</b>`:`avulsas sai ${brl(-b.economia)} mais barato`}</span><span style="display:flex;gap:6px;align-items:center">${brl(b.preco)} ${cartBtnB(b.bundle)}</span></div>`).join('')}`:''}
+          <div style="text-align:right;margin-top:6px"><button class="btn-ghost" data-todos="${g.falta.map(d=>d.appid).join(',')}">Pôr todas no carrinho</button></div></div>`:''}</div>`;}).join(''):
+      '<div class="empty">Nenhum jogo com DLC faltando (ou as listas de DLC ainda estão sendo montadas).</div>';
+  }else if(S.bseg==='franquias'){
+    let f=BD.franquias.filter(x=>!q||x.nome.toLowerCase().includes(q)||x.tenho.some(g=>g.nome.toLowerCase().includes(q)));
+    f.sort({tenho:(a,b)=>b.tenho.length-a.tenho.length,falta:(a,b)=>(b.lista.length+b.dlc_faltam)-(a.lista.length+a.dlc_faltam),nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[S.bsort]);
+    $('#bibView').innerHTML=f.length?`<div class="fgrid">${f.slice(0,150).map(x=>`<div class="fcard"><h3>${esc(x.nome)}</h3>
+      <div class="sub">você tem ${x.tenho.length} jogo(s)${x.lista.length?` · ${x.lista.length} na lista de desejos (${brl(x.custo_lista)})`:''}${x.dlc_faltam?` · ${x.dlc_faltam} DLCs faltando (${brl(x.falta_dlc_hoje)})`:''}</div>
+      ${(()=>{const u=x.valor_tenho+x.valor_falta;if(!u)return '';const pl=x.lista.filter(g=>cset.has(g.appid)).reduce((s,g)=>s+(g.cheio||g.preco||0),0);
+        return `<div class="mbar fino"><i class="t" style="width:${100*x.valor_tenho/u}%"></i><i class="p" style="width:${100*pl/u}%"></i></div><div class="sub" style="margin:4px 0 8px">${Math.round(100*x.valor_tenho/u)}% da série pelo preço cheio${pl?` · ${Math.round(100*(x.valor_tenho+pl)/u)}% com o carrinho`:''}</div>`;})()}
+      <ul>${x.lista.map(g=>`<li class="w"><span>${esc(g.nome)}</span><span style="display:flex;gap:6px;align-items:center">${g.corte?`<span class="pctx">-${g.corte}%</span>`:''}${brl(g.preco)} ${cartBtn(g.appid)}</span></li>`).join('')}
+      ${x.tenho.map(g=>`<li><span>${esc(g.nome)}</span><span style="color:var(--dim)">${g.dlc_faltam?g.dlc_faltam+' DLC faltando':'✓ tenho'}</span></li>`).join('')}</ul></div>`).join('')}</div>
+      <div class="hint" style="color:var(--dim);font-size:11px;margin-bottom:30px">Os jogos "faltando" de uma franquia são os que estão na sua lista de desejos: a Steam não informa a franquia inteira.</div>`:
+      '<div class="empty">Sem franquias ainda: a informação chega na leitura da biblioteca.</div>';
+  }else{
+    let l=[...J];l.sort({valor:(a,b)=>b.valor_cheio-a.valor_cheio,nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR'),aval:(a,b)=>b.rpos-a.rpos||b.rcount-a.rcount}[S.bsort]);
+    $('#bibView').innerHTML=`<div class="colgrid vert">${l.slice(0,300).map(g=>`<button class="colcard" data-open="${g.appid}">${art(g.appid,g.nome,g.capa_v,{alt:g.capa,v:!!g.capa_v})}<div class="nm">${esc(g.nome)}</div><div class="v tnum">${brl0(g.valor_cheio)} cheio${g.dlc_tenho_todas?' · '+g.dlc_tenho_todas+' DLCs':''}</div></button>`).join('')}</div>`;
+  }
+}
+let CLASSES={historia:'História',conteudo:'Conteúdo',cosmetico:'Cosmético',atalho:'Atalho',extra:'Extra',pacote:'Pacote'};
+$('#bibSeg').addEventListener('click',e=>{const b=e.target.closest('[data-bseg]');if(!b)return;S.bseg=b.dataset.bseg;save();renderBib();});
+$('#bsort').addEventListener('change',e=>{S.bsort=e.target.value;save();renderBib();});
+$('#bq').addEventListener('input',e=>{S.bq=e.target.value.trim().toLowerCase();renderBib();});
+$('#bibView').addEventListener('click',async e=>{const td=e.target.closest('[data-todos]');if(td){e.stopPropagation();let n=0;
+    td.dataset.todos.split(',').map(Number).forEach(id=>{if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,loja:null});n++;}});await salvarCarr();toast(n+' no carrinho');renderBib();return;}
+  if(e.target.closest('[data-cart]')||e.target.closest('[data-cartb]'))return;const h=e.target.closest('[data-bopen]');if(!h)return;const id=+h.dataset.bopen;ABERTOS.has(id)?ABERTOS.delete(id):ABERTOS.add(id);renderBib();});
+
+/* ================= carrinho ================= */
+let CD=null;
+async function renderCarr(){
+  CD=await api('/api/carrinho');CARR=CD.itens.map(i=>({appid:i.appid,loja:i.loja})).concat(CD.bundles.map(b=>({bundle:b.bundle})));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';
+  const it=CD.itens;
+  $('#carrNote').textContent=(it.length||CD.bundles.length)?`${it.length} item(ns)${CD.bundles.length?` + ${CD.bundles.length} bundle(s)`:''}`:'';
+  $('#carrLista').innerHTML=it.length?it.map(c=>{const sel=c.lojas.find(l=>l.loja===c.loja)||c.lojas[0]||{};
+    return `<div class="crow">${art(c.appid,c.nome,c.capa,{small:true})}
+      <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(c.fim)}</span>`:''}${c.tag?tagPill(c):''}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
+      <select class="mini lojsel" data-cloja="${c.appid}">${c.lojas.map(l=>`<option value="${esc(l.loja)}"${l.loja===sel.loja?' selected':''}>${esc(l.loja)} · ${brl(l.preco)}${l.corte?' (-'+l.corte+'%)':''}</option>`).join('')||'<option>sem preço</option>'}</select>
+      ${priceBlock({preco:sel.preco,cheio:sel.cheio,corte:sel.corte||0})}
+      <button class="xbtn" data-cart="${c.appid}" title="Tirar do carrinho">×</button></div>`;}).join(''):
+    (CD.bundles.length?'':'<div class="empty">Carrinho vazio. Use o + nas listas, o botão na ficha do jogo, a busca acima ou "Trazer o carrinho da Steam".</div>');
+  $('#carrLista').insertAdjacentHTML('beforeend',CD.bundles.map(b=>`<div class="crow">${art(b.bundle,b.nome,b.capa,{small:true})}
+      <div><div class="nm"><a href="https://store.steampowered.com/bundle/${b.bundle}/" target="_blank" rel="noopener" style="color:#fff">📦 ${esc(b.nome)}</a></div>
+        <div class="motivo">${b.itens.length} itens${b.itens.some(i=>i.tenho)?` · você já tem ${b.itens.filter(i=>i.tenho).length} (descontado)`:''}${b.itens.some(i=>i.no_carrinho)?` · <span style="color:#ff9b8a">${b.itens.filter(i=>i.no_carrinho).length} também avulso no carrinho</span>`:''}</div>
+        <div class="motivo" title="${esc(b.itens.map(i=>i.nome).join(', '))}">${esc(b.itens.slice(0,4).map(i=>i.nome).join(', '))}${b.itens.length>4?'…':''}</div></div>
+      <span class="motivo">bundle da Steam</span>${priceBlock({preco:b.preco,cheio:b.cheio||b.preco,corte:b.cheio&&b.preco<b.cheio?Math.round(100*(1-b.preco/b.cheio)):0})}
+      <button class="xbtn" data-cartb="${b.bundle}" title="Tirar do carrinho">×</button></div>`).join(''));
+  let total=0,cheio=0,pisoTot=0,semPreco=0;
+  CD.bundles.forEach(b=>{if(b.preco==null){semPreco++;return;}total+=b.preco;cheio+=b.cheio||b.preco;pisoTot+=b.preco;});
+  it.forEach(c=>{const sel=c.lojas.find(l=>l.loja===c.loja)||c.lojas[0];if(!sel||sel.preco==null){semPreco++;return;}
+    total+=sel.preco;cheio+=sel.cheio||sel.preco;pisoTot+=Math.min(sel.preco,c.piso??sel.preco);});
+  $('#carrResumo').innerHTML=`<div class="tot big"><span>Total</span><b>${brl(total)}</b></div>
+    <div class="tot"><span>Preço cheio</span><b>${brl(cheio)}</b></div>
+    <div class="tot"><span>Você economiza</span><b style="color:var(--disc-fg)">${brl(cheio-total)}${cheio?` (${Math.round(100*(1-total/cheio))}%)`:''}</b></div>
+    <div class="tot"><span>Se cada um estivesse no menor de sempre</span><b>${brl(pisoTot)}</b></div>
+    <div class="tot"><span>Diferença para os pisos</span><b>${brl(total-pisoTot)}</b></div>
+    ${semPreco?`<div class="hint" style="color:var(--dim);font-size:11px">${semPreco} jogo(s) sem preço ainda (chega na próxima checagem).</div>`:''}
+    ${CD.sugestoes.some(x=>x.diferenca<0)?`<div class="hint" style="color:var(--disc-fg);font-size:11.5px;margin-top:6px">Há bundle mais barato para parte do carrinho ↓</div>`:''}`;
+  const orc=ls.get('orc',0);$('#orc').value=orc||'';
+  $('#orcBar').innerHTML=orc?`<div class="tot"><span>${total>orc*100?'Passou':'Sobra'}</span><b>${brl(Math.abs(orc*100-total))}</b></div><div class="bar${total>orc*100?' over':''}"><i style="width:${Math.min(100,total/(orc*100)*100)}%"></i></div>`:'<div class="hint" style="color:var(--dim);font-size:11px">Defina um valor para ver quanto sobra.</div>';
+  $('#carrBundles').innerHTML=CD.sugestoes.length?`<div class="shead"><h2>Bundles com itens do seu carrinho</h2><span class="aside">preço já descontando o que você tem</span></div>
+    <div class="rows">${CD.sugestoes.map(b=>`<div class="srow" style="grid-template-columns:minmax(0,1fr) auto auto">
+      <span class="tt"><div><a href="https://store.steampowered.com/bundle/${b.bundle}/" target="_blank" rel="noopener" style="color:inherit">📦 ${esc(b.nome)}</a></div>
+      <div class="motivo">cobre ${b.comuns.length} do carrinho: ${esc(b.comuns.join(', '))}${b.extras.length?` · traz também ${b.extras.length}: ${esc(b.extras.slice(0,3).join(', '))}${b.extras.length>3?'…':''} (${brl0(b.extras_valor)} cheio)`:''}</div>
+      <div class="motivo">${b.diferenca<0?`<b style="color:var(--disc-fg)">economiza ${brl(-b.diferenca)}</b>`:`custa ${brl(b.diferenca)} a mais`} que os ${b.comuns.length} separados (${brl(b.separado)})</div></span>
+      ${priceBlock({preco:b.preco,cheio:b.separado,corte:b.diferenca<0?Math.round(100*(1-b.preco/b.separado)):0})}
+      <span style="display:flex;flex-direction:column;gap:4px"><button class="btn-imp" data-trocar="${b.bundle}|${b.comuns_ids.join(',')}" style="font-size:11.5px;padding:5px 8px">Trocar pelos itens</button><button class="btn-ghost" data-cartb="${b.bundle}" style="font-size:11.5px">Só adicionar</button></span></div>`).join('')}</div>`:'';
+  $('#carrSteam').style.display=(CD.steam||[]).length?'':'none';$('#carrSteam').textContent=`Trazer o carrinho da Steam (${(CD.steam||[]).length})`;
+}
+$('#carrBundles').addEventListener('click',async e=>{const t=e.target.closest('[data-trocar]');if(!t)return;const [bid,ids]=t.dataset.trocar.split('|');const rem=new Set(ids.split(',').map(Number));
+  CARR=CARR.filter(c=>!(c.appid&&rem.has(c.appid)));if(!CARR.some(c=>c.bundle===+bid))CARR.push({bundle:+bid});await salvarCarr();toast('Trocado pelo bundle');renderCarr();});
+$('#carrLista').addEventListener('change',async e=>{const s=e.target.closest('[data-cloja]');if(!s)return;const c=CARR.find(x=>x.appid===+s.dataset.cloja);if(c)c.loja=s.value;await salvarCarr();renderCarr();});
+$('#orc').addEventListener('change',e=>{ls.set('orc',+e.target.value||0);renderCarr();});
+$('#carrLimpa').addEventListener('click',async()=>{CARR=[];await salvarCarr();renderCarr();});
+$('#carrOtim').addEventListener('click',async()=>{CARR=CARR.map(c=>({appid:c.appid,loja:null}));await salvarCarr();renderCarr();toast('Cada jogo na loja mais barata');});
+$('#carrSteam').addEventListener('click',async()=>{const ids=(CD&&CD.steam)||[];let n=0;ids.forEach(id=>{if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,loja:null});n++;}});
+  await salvarCarr();renderCarr();toast(n?`${n} jogo(s) do carrinho da Steam`:'Já estavam todos aqui');});
+async function buscar(){const q=$('#busca').value.trim();if(!q)return;$('#buscaRes').innerHTML='<div class="empty" style="padding:14px">buscando…</div>';
+  let d;try{d=await api('/api/buscar?q='+encodeURIComponent(q));}catch(e){$('#buscaRes').innerHTML=`<div class="empty">Erro: ${esc(e.message)}</div>`;return;}
+  $('#buscaRes').innerHTML=d.itens.length?`<div class="res">${d.itens.map(i=>`<div class="ritem">${art(i.appid,i.nome,i.capa,{small:true})}
+    <div><div style="color:#fff">${esc(i.nome)}</div><div class="motivo">${i.possuido?'você já tem · ':''}${i.na_lista?'já monitorado · ':''}${i.preco!=null?brl(i.preco)+(i.corte?' (-'+i.corte+'%)':''):''}</div></div>
+    <div class="acts"><button class="btn-imp" data-addcarr="${i.appid}" data-mon="${i.na_lista?0:1}">Carrinho</button>${i.na_lista?'':`<button class="btn-ghost" data-addmon="${i.appid}">Só monitorar</button>`}</div></div>`).join('')}</div>`:
+    '<div class="empty" style="padding:14px">Nada encontrado.</div>';}
+$('#buscaBtn').addEventListener('click',buscar);$('#busca').addEventListener('keydown',e=>{if(e.key==='Enter')buscar();});
+$('#buscaRes').addEventListener('click',async e=>{const a=e.target.closest('[data-addcarr]'),m=e.target.closest('[data-addmon]');
+  if(m){await post('/api/extra',{appid:+m.dataset.addmon});toast('Monitorando: os preços das outras lojas chegam na próxima checagem');m.remove();await carregarLista();return;}
+  if(a){if(a.dataset.mon==='1'){await post('/api/extra',{appid:+a.dataset.addcarr});await carregarLista();}
+    if(!CARR.some(c=>c.appid===+a.dataset.addcarr)){CARR.push({appid:+a.dataset.addcarr,loja:null});await salvarCarr();}toast('No carrinho (e monitorado)');renderCarr();}});
+
+/* ================= notificações ================= */
+async function renderNotif(){
+  const d=await api('/api/notificacoes');
+  $('#notifLista').innerHTML=d.itens.length?d.itens.map(n=>`<div class="nrow" data-open="${n.appid}">${art(n.appid,n.nome||n.appid,n.capa,{small:true})}
+    <div><div style="color:#fff">${esc(n.nome||n.appid)}</div><div class="motivo">${esc(n.motivo||'')} · ${esc(n.loja||'')}</div></div>
+    <span class="q">${fmtISO(n.quando)}</span><span class="pb full"><span class="prs tnum"><span class="f">${brl(n.preco)}</span></span></span></div>`).join(''):
+    '<div class="empty">Nenhuma notificação ainda. A primeira checagem só registra o que já está em promoção; daí em diante, as novidades aparecem aqui.</div>';
+}
+
+/* ================= configurações ================= */
+let CFG=null;
+async function renderCfg(){
+  const d=await api('/api/config');CFG=d.config;const c=CFG;
+  const lojas=[...new Set([...(d.lojas_itad||[]),...c.lojas])].sort((a,b)=>a.localeCompare(b));
+  const marc=new Set(c.lojas.map(x=>x.toLowerCase()));
+  const num=(p,v,step,min,max)=>`<input type="number" data-k="${p}" value="${v}" step="${step||1}" min="${min??0}"${max!=null?` max="${max}"`:''}>`;
+  const chk=(p,v,l)=>`<label class="tick"><input type="checkbox" data-k="${p}" ${v?'checked':''}>${l}</label>`;
+  const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos;
+  $('#cfgForm').innerHTML=`<div class="cfg">
+   <div class="blk"><h4>Lojas que podem alertar</h4><div class="in">
+     <div class="lojas">${lojas.map(l=>`<label class="tick"><input type="checkbox" data-loja="${esc(l)}" ${marc.has(l.toLowerCase())?'checked':''}>${esc(l)}</label>`).join('')}</div>
+     ${chk('somente_drm_steam',c.somente_drm_steam,'Só chave ativável na Steam (DRM Steam)')}
+     <div class="hint">O Radar coleta todas as lojas; isto só decide de onde pode vir um alerta.</div></div></div>
+   <div class="blk"><h4>O que vale a pena</h4><div class="in">
+     <label class="f">Score mínimo (0–100) ${num('alerta.score_minimo',a.score_minimo,1,0,100)}</label>
+     <label class="f">Desconto mínimo (%) ${num('alerta.desconto_minimo',a.desconto_minimo,5,0,100)}</label>
+     <label class="f">Análises positivas mínimas (%) ${num('alerta.avaliacao_minima',a.avaliacao_minima,5,0,100)}</label>
+     <label class="f">Vale a partir do menor preço em <select data-k="alerta.janela_dias" data-num="1">${[[90,'3 meses'],[180,'6 meses'],[270,'9 meses'],[365,'1 ano'],[0,'todos os tempos']].map(([v,t])=>`<option value="${v}"${(a.janela_dias??0)==v?' selected':''}>${t}</option>`).join('')}</select></label>
+     ${chk('alerta.perto.ativo',(a.perto||{}).ativo!==false,'Também vale se estiver perto do menor de sempre')}
+     <label class="f">…até % do preço cheio ${num('alerta.perto.pct_do_cheio',(a.perto||{}).pct_do_cheio??10,1,0,50)}</label>
+     <label class="f">…ou até (R$) ${num('alerta.perto.reais',(a.perto||{}).reais??3,0.5,0)}</label>
+     <div class="hint">"Perto" mede a diferença contra o preço cheio: HL Miami 2 a R$ 7,04 com piso de R$ 4,99 num jogo de R$ 46,99 está a 4%. R$ 50 contra R$ 30 num jogo de R$ 250 está a 8%.</div>
+     <label class="f">Tolerância acima do menor histórico (%) ${num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50)}</label>
+     <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label>
+     ${chk('alerta.ignorar_sem_avaliacoes',a.ignorar_sem_avaliacoes,'Ignorar jogos sem análises')}
+     <label class="f">Favoritos: os primeiros da sua lista ${num('alerta.favoritos_top',a.favoritos_top??10,1,0,200)}</label>
+     <div class="hint">Os N primeiros da ordem que você deu na lista de desejos da Steam só precisam bater o piso (sem score, desconto ou análise mínimos).</div>
+     <div class="hint">Score = desconto × qualidade das análises. 60 equivale a ~70% off com 86% positivas.</div></div></div>
+   <div class="blk"><h4>Keyshops (via GG.deals)</h4><div class="in">
+     ${chk('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata')}
+     <label class="f">Abaixo de (R$) ${num('keyshops.preco_maximo',k.preco_maximo,1,0)}</label>
+     <label class="f">ou abaixo de % do menor oficial ${num('keyshops.pct_do_menor_oficial',k.pct_do_menor_oficial,5,0,100)}</label></div></div>
+   <div class="blk"><h4>DLCs no custo completo</h4><div class="in">
+     ${chk('dlc.ignorar_cosmeticos',dl.ignorar_cosmeticos,'Ignorar cosméticos')}
+     ${chk('dlc.ignorar_extras',dl.ignorar_extras,'Ignorar extras (trilha, artbook)')}
+     ${chk('dlc.ignorar_atalhos',dl.ignorar_atalhos,'Ignorar atalhos e moedas')}
+     ${chk('dlc.ignorar_pacotes',dl.ignorar_pacotes,'Ignorar pacotes que juntam outras DLCs')}
+     ${chk('dlc.ignorar_gratis',dl.ignorar_gratis,'Ignorar DLCs gratuitas')}
+     <div class="hint">Cada DLC pode ser reclassificada na janela do jogo.</div></div></div>
+   <div class="blk"><h4>Notificações</h4><div class="in">
+     ${chk('notificacoes.ativas',n.ativas!==false,'Notificar no Windows')}
+     <label class="f">Máximo por checagem ${num('notificacoes.max_por_rodada',n.max_por_rodada??5,1,1,20)}</label>
+     <label class="f">Avisar de novo se cair (R$) ${num('notificacoes.melhora_minima_reais',n.melhora_minima_reais??0.5,0.5,0)}</label>
+     <label class="f">Avisar quando faltar (horas) para acabar ${num('notificacoes.termina_em_breve_horas',n.termina_em_breve_horas??24,1,0,168)}</label>
+     <div class="hint">Vale para o que está no carrinho ou "vale a pena". 0 desliga.</div>
+     ${chk('notificacoes.silencio.ativo',si.ativo,'Horário de silêncio')}
+     <label class="f">De <input type="time" data-k="notificacoes.silencio.de" value="${esc(si.de||'23:00')}"></label>
+     <label class="f">Até <input type="time" data-k="notificacoes.silencio.ate" value="${esc(si.ate||'08:00')}"></label></div></div>
+   <div class="blk"><h4>Frequência (minutos)</h4><div class="in">
+     <label class="f">Preços nas lojas (ITAD) ${num('intervalos_minutos.itad',iv.itad,5,10)}</label>
+     <label class="f">Keyshops (GG.deals) ${num('intervalos_minutos.ggdeals',iv.ggdeals,10,60)}</label>
+     <label class="f">Catálogo da Steam ${num('intervalos_minutos.steam',iv.steam,30,60)}</label>
+     <div class="hint">A GG.deals só atualiza de hora em hora; menos que 60 não ajuda.</div>
+     <button class="btn-ghost" id="btnTudo" type="button">Atualizar tudo agora (demorado)</button>
+     <div class="hint">Relê catálogo, biblioteca e DLCs sem limite de ritmo. Pode levar uns 15 minutos; o Radar continua funcionando.</div></div></div>
+   <div class="blk"><h4>Acesso pelo celular / outros PCs</h4><div class="in" id="acesso">carregando…</div></div>
+  </div><div class="savebar"><button class="btn-go2" id="cfgSave">Salvar configurações</button></div>`;
+  $('#cfgSave').addEventListener('click',salvarCfg);renderAcesso();
+  $('#btnTudo').addEventListener('click',async()=>{const r=await post('/api/atualizar_tudo');if(r.ok)toast('Atualização completa começou. Acompanhe pelo status no topo.');});
+}
+async function renderAcesso(){
+  let a;try{a=await api('/api/acesso');}catch(e){$('#acesso').innerHTML='<div class="hint">Só dá para configurar pelo próprio PC.</div>';return;}
+  $('#acesso').innerHTML=`<label class="tick"><input type="checkbox" id="rl" ${a.rede_local?'checked':''}>Permitir abrir o painel por outros aparelhos da mesma rede Wi-Fi</label>
+    ${a.rede_local?(a.links.length?`<div class="hint">No celular (mesmo Wi-Fi), abra o endereço ou leia o QR e digite o PIN uma vez. O aparelho fica lembrado.</div>
+      <div class="lnk" style="font-size:15px">${esc(a.links[0])}</div><div class="tot"><span>PIN</span><b style="font-size:22px;letter-spacing:.2em;color:#fff">${esc(a.pin)}</b></div>
+      <div class="qr" id="qr"></div>${a.links.length>1?`<div class="hint">Outros endereços deste PC: ${a.links.slice(1).map(esc).join(' · ')}</div>`:''}
+      <button class="btn-ghost" id="novoCod" type="button">Trocar o PIN (desconecta os aparelhos liberados)</button>`:'<div class="hint">Não achei o endereço deste PC na rede.</div>'):
+      '<div class="hint">Desligado: o painel só abre neste PC. Ao ligar, o Windows pode pedir permissão do firewall para o Python: escolha "Redes privadas".</div>'}`;
+  $('#rl').addEventListener('change',async e=>{await post('/api/acesso',{rede_local:e.target.checked});toast(e.target.checked?'Liberado na rede local':'Só neste PC');setTimeout(renderAcesso,1500);});
+  if($('#novoCod'))$('#novoCod').addEventListener('click',async()=>{await post('/api/acesso',{novo_codigo:true});toast('Código novo gerado');renderAcesso();});
+  if(a.rede_local&&a.links.length&&$('#qr')){const desenhar=()=>{try{new QRCode($('#qr'),{text:a.links[0],width:160,height:160});}catch(e){}};
+    if(window.QRCode)desenhar();else{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.onload=desenhar;document.head.appendChild(sc);}}
+}
+function setPath(o,p,v){const k=p.split('.');let x=o;k.slice(0,-1).forEach(s=>{x[s]=x[s]||{};x=x[s];});x[k[k.length-1]]=v;}
+async function salvarCfg(){
+  const c=JSON.parse(JSON.stringify(CFG));
+  $$('#cfgForm [data-k]').forEach(el=>{const v=el.type==='checkbox'?el.checked:(el.type==='number'||el.dataset.num)?(el.value===''?0:+el.value):el.value;setPath(c,el.dataset.k,v);});
+  c.lojas=$$('#cfgForm [data-loja]').filter(el=>el.checked).map(el=>el.dataset.loja);
+  const r=await post('/api/config',{config:c});toast(r.ok?'Salvo. Vale a partir da próxima checagem (use "Verificar agora").':'Erro: '+(r.erro||'?'));
+}
+
+/* ================= status / ações ================= */
+const VERSAO_PAGINA='0.9.1';
+async function carregarResumo(){
+  RES=await api('/api/resumo');$('#ver').textContent=RES.versao;
+  if(RES.userdata_dias!=null&&RES.userdata_dias>30&&!$('#aviso-ud')){const d=document.createElement('div');d.id='aviso-ud';
+    d.style.cssText='background:#3e76cb;color:#fff;padding:8px 16px;text-align:center;font-size:12.5px';
+    d.innerHTML=`Seu <b>userdata.json</b> tem ${RES.userdata_dias} dias: DLCs compradas depois disso não aparecem como suas. Atualize-o (store.steampowered.com/dynamicstore/userdata/, salvar como) ou use "Já tenho" no jogo.`;
+    document.body.prepend(d);}
+  if(RES.versao!==VERSAO_PAGINA&&!$('#aviso-versao')){const d=document.createElement('div');d.id='aviso-versao';
+    d.style.cssText='background:#d6492f;color:#fff;padding:10px 16px;text-align:center;font-size:13px';
+    d.innerHTML=`O Radar que está rodando é a versão <b>${esc(RES.versao)}</b>, mas os arquivos são da <b>${VERSAO_PAGINA}</b>. Clique com o direito no ícone da bandeja → <b>Sair</b> e abra de novo (ou "Reiniciar", nas versões novas).`;
+    document.body.prepend(d);}
+  let t=`<b>${RES.vale_a_pena}</b> valem a pena · ${fmtN(RES.na_lista)} na lista`;
+  if(RES.na_bandeja)t+=`<br>${RES.estado==='verificando'?'verificando agora…':(RES.estado==='erro'?'<span class="err">erro na última checagem</span> · ':'')+(RES.estado!=='verificando'?'próxima: '+fmtISO(RES.proxima):'')}`;
+  else t+='<br>checado '+fmtISO(RES.atualizado);
+  $('#status').innerHTML=t;$('#btnPausa').textContent=RES.pausado?'Retomar alertas':'Pausar alertas';
+  $('#btnVerif').style.display=RES.na_bandeja?'':'none';
+}
+$('#btnPausa').addEventListener('click',async()=>{const r=await post('/api/pausar');toast(r.pausado?'Notificações pausadas':'Notificações retomadas');carregarResumo();});
+$('#btnVerif').addEventListener('click',async()=>{const r=await post('/api/verificar');if(!r.ok){toast(r.erro);return;}toast('Checando…');
+  const t0=Date.now();const poll=setInterval(async()=>{await carregarResumo();if(RES.estado!=='verificando'&&Date.now()-t0>4000){clearInterval(poll);await carregarLista();toast('Checagem concluída');}},3000);});
+async function carregarLista(){const d=await api('/api/lista');L=d.itens;IDX=new Map(L.map(o=>[o.appid,o]));render();}
+function render(){if(S.tab==='vale')renderVale();else if(S.tab==='lista'){renderTicks();renderLista();}else if(S.tab==='bib')renderBib();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else renderCfg();}
+
+(async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,loja:i.loja}));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
+  setTab(['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();setInterval(carregarResumo,30000);})();
+
+</script>
+</body></html>
