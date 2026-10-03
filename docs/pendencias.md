@@ -2,8 +2,10 @@
 
 ## Especificações prontas para implementar
 - [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica](specs/01-selo-kurokami-e-raridade.md)
-- [02 — DLCs não aparecem (feito em v0.13.0)](specs/02-dlcs-nao-aparecem.md)
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
+
+## Feitas
+- [02 — DLCs não aparecem (feito em v0.13.0)](specs/02-dlcs-nao-aparecem.md)
 
 ## Ideias
 

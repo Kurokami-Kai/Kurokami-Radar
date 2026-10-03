@@ -32,7 +32,7 @@ Arquivos novos que o `.exe` precisa ler (como `painel.html`, `ponte.user.js`) de
 ## Exportar a documentação para o Projeto do claude.ai
 O Projeto "Kurokami Radar" no claude.ai usa os docs como contexto. Para atualizá-lo:
 1. Dois cliques em `tools\exportar_docs.bat` (ou `py tools/exportar_docs.py`).
-2. Ele copia `CLAUDE.md`, `README.md`, `docs/*.md` (menos `referencia.md`) e `docs/specs/*.md` para `Área de Trabalho\kurokami-docs	odos`. Só o que é **novo ou mudou** desde a última exportação vai para `...\enviar`. Os nomes ficam achatados, como `docs-decisoes.md` e `spec-02-....md`.
+2. Ele copia `CLAUDE.md`, `README.md`, `docs/*.md` (menos `referencia.md`) e `docs/specs/*.md` para `Área de Trabalho\kurokami-docs\todos`. Só o que é **novo ou mudou** desde a última exportação vai para `...\enviar`. Os nomes ficam achatados, como `docs-decisoes.md` e `spec-02-....md`.
 3. A tela lista os arquivos NOVOS, ALTERADOS e APAGADOS. No Projeto, remova as versões antigas dos alterados e apagados e envie a pasta `enviar`.
 4. Digite **S** para registrar a exportação (em `kurokami-docs\.ultima_exportacao.json`). Sem o S, nada é registrado e a próxima exportação mostra as mesmas mudanças.
 
