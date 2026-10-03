@@ -34,7 +34,7 @@ Kurokami Radar/
 │   ├── gerar_icone.py       # assets/radar.ico para o .exe/instalador
 │   ├── gerar_referencia.py  # regenera docs/referencia.md
 │   ├── mapa.py              # mapa de seções/funções com linhas (ler só o trecho)
-│   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais)
+│   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais, .gitignore)
 ├── docs/                    # esta documentação
 ├── .github/workflows/gerar-instalador.yml   # build do Setup.exe em Releases
 ├── installer.iss            # Inno Setup (instalação por usuário, sem admin)

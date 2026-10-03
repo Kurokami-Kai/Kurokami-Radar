@@ -59,6 +59,27 @@ padrao = open("radar/config.py", encoding="utf-8").read()
 if re.search(r'"perfil_steam":\s*"[^"]+"', padrao):
     falhas.append("config.PADRAO tem perfil_steam preenchido")
 
+# 6. arquivos pessoais fora do Git: .gitignore com as entradas e nada rastreado
+PESSOAIS = {"config.json": ("config.json", "/config.json"), "userdata.json": ("userdata.json", "/userdata.json"),
+            "dados/": ("dados", "dados/", "/dados", "/dados/", "dados/*", "dados/**")}
+if not os.path.isfile(".gitignore"):
+    falhas.append(".gitignore nao existe")
+else:
+    linhas = {l.strip() for l in open(".gitignore", encoding="utf-8")}
+    for entrada, formas in PESSOAIS.items():
+        if not linhas.intersection(formas):
+            falhas.append(".gitignore sem a entrada %s" % entrada)
+git = shutil.which("git")
+if git:
+    r = subprocess.run([git, "ls-files", "--", "config.json", "userdata.json", "dados"],
+                       capture_output=True, text=True, encoding="utf-8")
+    if r.returncode:
+        falhas.append("git ls-files falhou: %s" % (r.stderr.strip()[:160] or "?"))
+    for f in r.stdout.splitlines():
+        falhas.append("arquivo pessoal rastreado pelo Git: %s (git rm --cached)" % f)
+else:
+    avisos.append("git nao encontrado: arquivos rastreados nao verificados")
+
 print("versao %s" % v)
 for a in avisos:
     print("aviso: " + a)
@@ -67,4 +88,4 @@ if falhas:
     for f in falhas:
         print("  - " + f)
     sys.exit(1)
-print("ok: sintaxe, JS, versao, --add-data e dados pessoais")
+print("ok: sintaxe, JS, versao, --add-data, dados pessoais e .gitignore")
