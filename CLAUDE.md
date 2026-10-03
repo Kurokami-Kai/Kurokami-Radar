@@ -31,4 +31,4 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Nada pessoal no repositório: `config.json`, `userdata.json` e `dados/` estão no `.gitignore`. Chaves só no keyring.
 - Arquivo novo que o `.exe` precise ler → adicionar ao `--add-data` do workflow e do `gerar_setup.bat`.
 - Visual do painel segue a loja da Steam (ver `docs/decisoes.md`, "Produto").
-- Depois de mudar comportamento: atualizar `README.md` (usuário) e o doc correspondente em `docs/`.
+- Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança.
