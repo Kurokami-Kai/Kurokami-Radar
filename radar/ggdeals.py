@@ -14,8 +14,11 @@ class ChaveRecusada(Exception):
 
 
 def precos(chave, appids, regiao="br", log=print):
+    from . import progresso
     saida = {}
+    tot = len(set(appids))
     for n, lote in enumerate(lotes(sorted(set(appids)), 100), 1):
+        progresso.passo(min(n * 100, tot), tot)
         url = API + "?" + urllib.parse.urlencode({"ids": ",".join(map(str, lote)), "key": chave, "region": regiao})
         try:
             r = http_json(url, ritmo=RITMO["gg"]) or {}

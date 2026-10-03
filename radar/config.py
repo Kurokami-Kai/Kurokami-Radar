@@ -84,6 +84,8 @@ PADRAO = {
     "extras": [],
 
     "intervalos_minutos": {"itad": 30, "ggdeals": 60, "steam": 180},
+    # verificacao completa (tudo, sem limite de ritmo): a 1a sempre; depois a cada N dias (0 = so manual)
+    "verificacao_completa_dias": 7,
     # A loja da Steam so responde ~200 chamadas a cada 5 min. O que depende dela (conteudo de edicoes,
     # lista de DLCs) vai sendo completado aos poucos, sem atrasar a checagem de precos.
     "chamadas_lentas_por_rodada": 120,

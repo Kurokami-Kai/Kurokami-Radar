@@ -3,10 +3,10 @@ import logging
 import threading
 import time
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
 
-from . import analise, caminhos, coleta, config, relatorio
+from . import analise, caminhos, coleta, config, progresso, relatorio
 from .banco import Banco
 from .notificador import Notificador
 
@@ -59,12 +59,19 @@ def candidatos_fim(b, alertas, cfg):
 
 
 def ciclo(log=print, forcar=False, sem_limite=False):
-    """Uma rodada completa. Devolve (alertas, novos)."""
+    """Uma rodada. forcar+sem_limite = verificacao completa. Devolve (alertas, novos)."""
     cfg = config.carregar()
     b = Banco()
+    log_ = log
+
+    def log(msg):
+        progresso.linha(msg)
+        log_(msg)
+    progresso.iniciar("completa" if (forcar and sem_limite) else "rapida")
     try:
         ofertas, gg, marcadas = coleta.atualizar(cfg, b, forcar=forcar, sem_limite=sem_limite, log=log)
         ctx = analise.Contexto(b, cfg)
+        log("Avaliando ofertas e notificando")
         alertas = analise.avaliar(ctx, ofertas, gg, marcadas)
         notif = Notificador(b, cfg, log)
         novos = notif.processar(alertas)
@@ -77,8 +84,15 @@ def ciclo(log=print, forcar=False, sem_limite=False):
         b.commit()
         capas = {a["appid"]: (ctx.jogos.get(a["appid"]) or {}).get("capa") for a in alertas}
         relatorio.gerar(alertas, capas, {a["appid"] for a in novos})
-        log("Ciclo ok: %d no menor historico, %d notificado(s)" % (len(alertas), len(novos)))
+        log("Ciclo ok: %d valem a pena, %d notificado(s)" % (len(alertas), len(novos)))
+        if forcar and sem_limite:
+            b.meta("ult_completa", __import__("radar.banco", fromlist=["agora"]).agora())
+            b.commit()
+        progresso.fim(True, "%d valem a pena, %d notificado(s)" % (len(alertas), len(novos)))
         return alertas, novos
+    except Exception as e:
+        progresso.fim(False, str(e))
+        raise
     finally:
         b.con.close()
 
@@ -92,6 +106,18 @@ class Servico(threading.Thread):
         self.proxima = datetime.now()
         self.estado = "iniciando"
         self.ultimo = None
+
+    def _precisa_completa(self):
+        """1a checagem e sempre completa; depois, a cada N dias (config verificacao_completa_dias)."""
+        b = Banco()
+        try:
+            ult = b.meta("ult_completa")
+        finally:
+            b.con.close()
+        if not ult:
+            return True
+        dias = config.carregar().get("verificacao_completa_dias", 7) or 0
+        return bool(dias) and (datetime.now(timezone.utc) - datetime.fromisoformat(ult)).days >= dias
 
     def agora(self, completo=False):
         self.completo = completo or getattr(self, "completo", False)
@@ -110,6 +136,7 @@ class Servico(threading.Thread):
             self.ao_mudar()
             try:
                 completo, self.completo = getattr(self, "completo", False), False
+                completo = completo or self._precisa_completa()
                 alertas, novos = ciclo(self.log, forcar=completo, sem_limite=completo)
                 self.ultimo = (datetime.now(), len(alertas), len(novos))
                 falhas = 0

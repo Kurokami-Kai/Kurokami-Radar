@@ -80,8 +80,10 @@ def _drm_steam(deal):
 def precos(chave, pais, gids, shop_ids, log=print):
     """{gid: {"ofertas": [...], "hist_all": centavos, "hist_y1": ..}} com TODAS as lojas pedidas,
     inclusive as que nao estao em promocao (nondeals) - assim sabemos quando a promo acaba."""
+    from . import progresso
     saida = {}
     for n, lote in enumerate(lotes(gids, 200), 1):
+        progresso.passo(min(n * 200, len(gids)), len(gids))
         try:
             r = _post("games/prices/v3", chave, lote, country=pais, shops=",".join(map(str, shop_ids)),
                       nondeals="true", vouchers="false") or []

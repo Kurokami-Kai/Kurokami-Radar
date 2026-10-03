@@ -131,7 +131,10 @@ def get_items(ids, pais, extra=None, chave=None, por_lote=50, log=print):
     req = {"include_basic_info": True, "include_all_purchase_options": True, "include_release": True,
            "include_assets": True, "include_reviews": True}
     req.update(extra or {})
+    from . import progresso
+    total = len(ids)
     for n, lote in enumerate(lotes(ids, por_lote), 1):
+        progresso.passo(min(n * por_lote, total), total)
         entrada = {"ids": lote, "context": {"language": "brazilian", "country_code": pais, "steam_realm": 1},
                    "data_request": req}
         try:

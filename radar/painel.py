@@ -110,7 +110,9 @@ def api_resumo(_q):
          "vale_a_pena": len(ult.get("itens") or []), "atualizado": ult.get("quando"),
          "pausado": bool(b.meta("pausado")), "na_bandeja": bool(s),
          "proxima": s.proxima.isoformat() if s else None, "estado": s.estado if s else None,
-         "userdata_dias": _idade_userdata(), "atualizacao": CONTROLE.get("atualizacao")}
+         "userdata_dias": _idade_userdata(), "atualizacao": CONTROLE.get("atualizacao"),
+         "progresso": __import__("radar.progresso", fromlist=["x"]).foto(), "ult_completa": b.meta("ult_completa"),
+         "completa_dias": config.carregar().get("verificacao_completa_dias", 7)}
     b.con.close()
     return r
 
@@ -659,7 +661,8 @@ def api_config(_q):
 def post_config(dados):
     cfg = config.carregar()
     novo = dados.get("config") or {}
-    for k in ("lojas", "somente_drm_steam", "alerta", "keyshops", "dlc", "notificacoes", "intervalos_minutos", "completo", "extras"):
+    for k in ("lojas", "somente_drm_steam", "alerta", "keyshops", "dlc", "notificacoes", "intervalos_minutos", "completo", "extras",
+              "verificacao_completa_dias"):
         if k in novo:
             cfg[k] = novo[k]
     config.salvar(cfg)

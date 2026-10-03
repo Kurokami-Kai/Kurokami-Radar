@@ -1,0 +1,34 @@
+# Kurokami Radar — instruções para o Claude Code
+
+App local de Windows (Python 3.12) que monitora a lista de desejos da Steam em várias lojas, guarda histórico em SQLite, notifica no Windows e serve um painel em `http://localhost/kurokami`. Usuários: o dono do repositório e amigos, via instalador do GitHub Releases. Responda e escreva mensagens/UI em **português**.
+
+## Leia antes de mexer
+
+Leia só o que a tarefa pede, nesta ordem de utilidade:
+
+- `docs/decisoes.md` — **sempre leia antes de mexer em coleta, preços, avaliação ou instalador.** Lista armadilhas que já foram bugs reais (preço "atual", fusos, pacote base, GG.deals, versão da página etc.) e as preferências de produto.
+- `docs/estrutura.md` — o que cada arquivo e pasta contém e onde ficam os dados. Consulte para achar onde ler, editar ou criar algo.
+- `docs/arquitetura.md` — como as peças conversam: threads, ciclo de coleta, fontes de dados e seus limites, avaliação, notificação, painel, ponte, distribuição e atualização.
+- `docs/api.md` — rotas HTTP do painel (GET/POST), campos e regras de acesso. Consulte ao mexer em `painel.py` ou `painel.html`.
+- `docs/dados.md` — tabelas SQLite, chaves de `meta`, `config.json` e onde ficam os segredos.
+- `docs/referencia.md` — assinaturas e docstrings de todas as funções (gerado; rode `py tools/gerar_referencia.py` depois de mudar funções).
+- `docs/processo.md` — rodar, testar e publicar versão; convenções de código.
+- `docs/pendencias.md` — ideias combinadas e ainda não feitas; aponta para `docs/specs/`.
+- `docs/specs/NN-*.md` — especificação de cada funcionalidade pedida (problema, dados reais, proposta, critérios de aceite). **Ao implementar uma, leia só a spec dela.** Ao terminar, marque o Status como "feito em vX.Y.Z".
+
+## Ferramentas e skills
+
+- Comece tarefas de código pela skill **`kurokami-code`** (ela diz qual outra skill abrir; não carrega todas).
+- `py tools/mapa.py <arquivo> [termo]` → seções/funções com linhas; leia só o intervalo. Nunca abra `radar/painel.html` inteiro.
+- `py tools/checar.py` → checagens finais (sintaxe, JS, versão, `--add-data`, dados pessoais). Precisa dar `ok`.
+- Skills em `.claude/skills/`: `kurokami-code`, `economia-de-contexto`, `editar-painel`, `coleta-e-apis`, `banco-e-migracao`, `depurar`, `testar-sem-rede`, `revisar-mudanca`, `publicar-versao`.
+
+## Regras do projeto
+
+- Versão: `VERSAO` em `radar/__init__.py` e `VERSAO_PAGINA` em `radar/painel.html` mudam **juntas**.
+- "Preço de agora" vem de `oferta_atual`/`Banco.ofertas_atuais()`, nunca do último registro de `preco`.
+- Dinheiro em centavos; datas em UTC ISO.
+- Nada pessoal no repositório: `config.json`, `userdata.json` e `dados/` estão no `.gitignore`. Chaves só no keyring.
+- Arquivo novo que o `.exe` precise ler → adicionar ao `--add-data` do workflow e do `gerar_setup.bat`.
+- Visual do painel segue a loja da Steam (ver `docs/decisoes.md`, "Produto").
+- Depois de mudar comportamento: atualizar `README.md` (usuário) e o doc correspondente em `docs/`.

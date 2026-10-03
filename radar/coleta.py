@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime, timezone
 
-from . import analise, caminhos, credenciais, dlc as dlcmod, ggdeals, itad, steam
+from . import analise, caminhos, credenciais, dlc as dlcmod, ggdeals, itad, progresso, steam
 from .banco import agora
 from .config import modo_do_jogo
 
@@ -176,6 +176,7 @@ def catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento=None)
                     banco.con.execute("UPDATE opcao SET itens=? WHERE id=?", (json.dumps(cont[pid]), oid))
                 banco.marcar_consulta("pacote", pid)
             banco.commit()
+            progresso.passo(min(i + 40, len(pend)), len(pend))
             log("   %d/%d" % (min(i + 40, len(pend)), len(pend)))
 
     # ---- DLCs dos jogos da lista
@@ -205,6 +206,7 @@ def catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento=None)
         if faltam:
             log("   usando a loja (plano B): %d jogos, ~%d min" % (len(faltam), len(faltam) * 1.6 / 60 + 1))
         for i, a in enumerate(faltam, 1):
+            progresso.passo(i, len(faltam))
             try:
                 for d in steam.dlcs_pela_loja(a, pais):
                     mapa[d] = a
@@ -328,6 +330,7 @@ def coletar_itad(cfg, banco, wl, chave, importar_hist, log):
             log("ITAD: importando historico de %d jogos (so na primeira vez)..." % len(novos))
             seguidas = 0
             for i, a in enumerate(novos, 1):
+                progresso.passo(i, len(novos))
                 try:
                     regs = itad.historico(chave, pais, mapa[a], shop_ids, cfg["historico"]["importar_dias"])
                     banco.importar_historico(a, regs)

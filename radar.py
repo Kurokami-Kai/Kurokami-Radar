@@ -1,5 +1,5 @@
 """
-KUROKAMI RADAR - etapa 1 (nucleo)
+KUROKAMI RADAR - linha de comando (o app instalado usa os mesmos comandos: KurokamiRadar.exe <comando>)
 Uso:
   py radar.py bandeja             abre o Radar na bandeja: checa sozinho, notifica e serve o painel (pyw = sem janela)
   py radar.py painel              so o painel no navegador, sem a bandeja (http://127.0.0.1:8787)

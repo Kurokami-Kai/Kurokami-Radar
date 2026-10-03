@@ -90,7 +90,11 @@ def main(esperar=False, abrir=False):
         if not tray:
             return
         if serv.estado == "verificando":
-            txt = "verificando agora…"
+            from . import progresso
+            pr = progresso.foto()
+            pct = (" %d%%" % (100 * pr["atual"] / pr["total"])) if pr.get("total") else ""
+            txt = "verificando (%s): %s%s" % ("completa" if pr.get("modo") == "completa" else "rápida",
+                                             (pr.get("etapa") or "")[:60], pct)
         else:
             txt = "próxima checagem %s" % serv.proxima.strftime("%H:%M")
             if serv.ultimo:
@@ -164,8 +168,19 @@ def main(esperar=False, abrir=False):
                     return
                 time.sleep(60)
 
+    def tooltip_vivo():
+        import time
+        while not serv.parar:
+            if serv.estado == "verificando":
+                try:
+                    atualizar_titulo()
+                except Exception:
+                    pass
+            time.sleep(3)
+
     log("Bandeja iniciada")
     serv.start()
+    __import__("threading").Thread(target=tooltip_vivo, daemon=True).start()
     __import__("threading").Thread(target=checar_versao, daemon=True).start()
     tray.run(setup=lambda t: (setattr(t, "visible", True), atualizar_titulo()))
     log("Bandeja encerrada")

@@ -394,6 +394,13 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .nrow:hover{background:#203348}
 .nrow .q{color:var(--muted);font-size:11.5px;white-space:nowrap}
 .off{opacity:.5}
+#progTopo{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#66c0f4,#a1cd44);z-index:80;transition:width .4s}
+.status{cursor:pointer}
+#progBox{position:fixed;right:14px;top:70px;width:min(460px,92vw);background:#171a21;box-shadow:0 8px 30px #000c;z-index:75;padding:12px 14px;font-size:12px}
+#progBox[hidden]{display:none}
+#progBox h5{margin:0 0 6px;color:#fff;font-size:13px;font-weight:400}
+#progBox .bar{height:8px}
+#progBox pre{margin:8px 0 0;max-height:260px;overflow:auto;background:#0e141b;color:#8f98a0;padding:8px;font-size:11px;white-space:pre-wrap}
 .addbox{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .brow{background:rgba(0,0,0,.2);margin-bottom:2px}
 .brow .h{display:grid;grid-template-columns:120px minmax(0,1fr) 190px auto;gap:12px;align-items:center;padding:4px 10px 4px 4px;cursor:pointer}
@@ -460,7 +467,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
     <div class="who">
       <div class="status" id="status">carregando…</div>
       <button class="btn-ghost" id="btnPausa" type="button">Pausar</button>
-      <button class="btn-imp" id="btnVerif" type="button">Verificar agora</button>
+      <button class="btn-imp" id="btnVerif" type="button" title="Verificação rápida: preços em todas as lojas. A completa fica em Configurações.">Verificar agora</button>
     </div>
   </div>
 </header>
@@ -468,7 +475,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 <main>
   <section id="tab-vale" class="wrap tabsec">
     <div class="subnav">
-      <span class="lk" style="cursor:default">Jogos da sua lista no <b>menor histórico</b>, com os seus filtros</span>
+      <span class="lk" style="cursor:default">Promoções <b>raras</b> da sua lista, pelos seus filtros</span>
       <button class="lk" data-goto="lista">Ver a lista inteira</button>
     </div>
     <div class="shead"><h2>Destaques</h2><span class="aside" id="valeNote"></span></div>
@@ -581,6 +588,8 @@ select.mini{padding:3px 6px;font-size:11.5px}
 <div id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-label="Detalhes do jogo"><button class="mclose" aria-label="Fechar">×</button><div id="mbody"></div></div></div>
 <div id="hv" role="tooltip" aria-hidden="true"></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="progTopo" style="width:0"></div>
+<div id="progBox" hidden></div>
 <script>
 /* ================= helpers ================= */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -1079,8 +1088,9 @@ async function renderCfg(){
      <label class="f">Keyshops (GG.deals) ${num('intervalos_minutos.ggdeals',iv.ggdeals,10,60)}</label>
      <label class="f">Catálogo da Steam ${num('intervalos_minutos.steam',iv.steam,30,60)}</label>
      <div class="hint">A GG.deals só atualiza de hora em hora; menos que 60 não ajuda.</div>
-     <button class="btn-ghost" id="btnTudo" type="button">Atualizar tudo agora (demorado)</button>
-     <div class="hint">Relê catálogo, biblioteca e DLCs sem limite de ritmo. Pode levar uns 15 minutos; o Radar continua funcionando.</div></div></div>
+     <label class="f">Verificação completa a cada (dias) ${num('verificacao_completa_dias',c.verificacao_completa_dias??7,1,0,90)}</label>
+     <button class="btn-ghost" id="btnTudo" type="button">Fazer a verificação completa agora</button>
+     <div class="hint">Rápida (a cada ${iv.itad} min e no "Verificar agora"): preços em todas as lojas. Completa: também catálogo da Steam, biblioteca, listas de DLC, edições, bundles e histórico, sem limite de ritmo. A primeira é sempre completa. 0 = completa só quando você pedir.</div></div></div>
    <div class="blk"><h4>Acesso pelo celular / outros PCs</h4><div class="in" id="acesso">carregando…</div></div>
   </div><div class="savebar"><button class="btn-go2" id="cfgSave">Salvar configurações</button></div>`;
   $('#cfgSave').addEventListener('click',salvarCfg);renderAcesso();
@@ -1108,7 +1118,7 @@ async function salvarCfg(){
 }
 
 /* ================= status / ações ================= */
-const VERSAO_PAGINA='0.12.0';
+const VERSAO_PAGINA='0.13.0';
 async function carregarResumo(){
   RES=await api('/api/resumo');$('#ver').textContent=RES.versao;
   if(RES.userdata_dias!=null&&RES.userdata_dias>30&&!$('#aviso-ud')){const d=document.createElement('div');d.id='aviso-ud';
@@ -1123,20 +1133,38 @@ async function carregarResumo(){
     d.style.cssText='background:#d6492f;color:#fff;padding:10px 16px;text-align:center;font-size:13px';
     d.innerHTML=`O Radar que está rodando é a versão <b>${esc(RES.versao)}</b>, mas os arquivos são da <b>${VERSAO_PAGINA}</b>. Clique com o direito no ícone da bandeja → <b>Sair</b> e abra de novo (ou "Reiniciar", nas versões novas).`;
     document.body.prepend(d);}
+  const P=RES.progresso||{};const pct=P.total?Math.round(100*P.atual/P.total):null;
   let t=`<b>${RES.vale_a_pena}</b> valem a pena · ${fmtN(RES.na_lista)} na lista`;
-  if(RES.na_bandeja)t+=`<br>${RES.estado==='verificando'?'verificando agora…':(RES.estado==='erro'?'<span class="err">erro na última checagem</span> · ':'')+(RES.estado!=='verificando'?'próxima: '+fmtISO(RES.proxima):'')}`;
+  if(P.ativo)t+=`<br><span style="color:#66c0f4">verificação ${P.modo==='completa'?'completa':'rápida'}: ${esc((P.etapa||'').slice(0,42))}${pct!=null?' '+pct+'%':''}</span> ▾`;
+  else if(RES.na_bandeja)t+=`<br>${RES.estado==='erro'?'<span class="err">erro na última checagem</span> · ':''}próxima: ${fmtISO(RES.proxima)} ▾`;
   else t+='<br>checado '+fmtISO(RES.atualizado);
-  $('#status').innerHTML=t;$('#btnPausa').textContent=RES.pausado?'Retomar alertas':'Pausar alertas';
+  $('#status').innerHTML=t;
+  $('#progTopo').style.width=P.ativo?(pct!=null?Math.max(3,pct):35)+'%':'0';
+  if(!$('#progBox').hidden)renderProg();$('#btnPausa').textContent=RES.pausado?'Retomar alertas':'Pausar alertas';
   $('#btnVerif').style.display=RES.na_bandeja?'':'none';
 }
+function renderProg(){const P=RES.progresso||{};const u=P.ultima;const min=s=>s>=90?Math.round(s/60)+' min':s+' s';
+  $('#progBox').innerHTML=P.ativo?`<h5>Verificação ${P.modo==='completa'?'completa':'rápida'} em andamento · ${min(P.decorrido||0)}</h5>
+      <div>${esc(P.etapa||'')}${P.total?` — ${fmtN(P.atual)} de ${fmtN(P.total)}`:''}</div>
+      ${P.total?`<div class="bar"><i style="width:${100*P.atual/P.total}%"></i></div>`:''}<pre>${esc((P.log||[]).join('\n'))}</pre>`:
+    `<h5>Nenhuma verificação rodando agora</h5>
+     ${u?`<div>Última: ${u.modo==='completa'?'completa':'rápida'}, ${u.ok?'ok':'<span style="color:#ef6f6a">com erro</span>'} em ${min(u.duracao)} · ${esc(u.resumo||'')}</div>`:''}
+     <div style="margin-top:6px;color:#8f98a0">Próxima rápida: ${fmtISO(RES.proxima)||'—'} · Última completa: ${fmtISO(RES.ult_completa)||'nunca'}${RES.completa_dias?` · completa a cada ${RES.completa_dias} dias`:''}</div>
+     <div style="margin-top:6px;color:#8f98a0">Rápida: preços nas lojas (a cada 30 min). Completa: também catálogo, biblioteca, DLCs, edições e histórico, sem limite de ritmo.</div>
+     ${(P.log||[]).length?`<pre>${esc(P.log.join('\n'))}</pre>`:''}`;}
+$('#status').addEventListener('click',()=>{$('#progBox').hidden=!$('#progBox').hidden;if(!$('#progBox').hidden)renderProg();});
+document.addEventListener('click',e=>{if(!e.target.closest('#progBox')&&!e.target.closest('#status'))$('#progBox').hidden=true;});
 $('#btnPausa').addEventListener('click',async()=>{const r=await post('/api/pausar');toast(r.pausado?'Notificações pausadas':'Notificações retomadas');carregarResumo();});
 $('#btnVerif').addEventListener('click',async()=>{const r=await post('/api/verificar');if(!r.ok){toast(r.erro);return;}toast('Checando…');
-  const t0=Date.now();const poll=setInterval(async()=>{await carregarResumo();if(RES.estado!=='verificando'&&Date.now()-t0>4000){clearInterval(poll);await carregarLista();toast('Checagem concluída');}},3000);});
+  pollResumo.ativo=true;setTimeout(()=>carregarResumo().catch(()=>{}),1500);});
 async function carregarLista(){const d=await api('/api/lista');L=d.itens;IDX=new Map(L.map(o=>[o.appid,o]));render();}
 function render(){if(S.tab==='vale')renderVale();else if(S.tab==='lista'){renderTicks();renderLista();}else if(S.tab==='bib')renderBib();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else renderCfg();}
 
+async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&RES.progresso)||{};
+  if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;await carregarLista();toast('Verificação concluída');}
+  if(P.ativo)pollResumo.ativo=true;setTimeout(pollResumo,P.ativo?3000:30000);}
 (async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,loja:i.loja}));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
-  setTab(['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();setInterval(carregarResumo,30000);})();
+  setTab(['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();setTimeout(pollResumo,3000);})();
 
 </script>
 </body></html>
