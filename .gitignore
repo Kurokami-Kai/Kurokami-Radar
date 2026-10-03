@@ -1,0 +1,12 @@
+# dados pessoais: nunca vao para o GitHub
+dados/
+config.json
+userdata.json
+# gerados
+build/
+dist/
+output/
+assets/
+*.spec
+__pycache__/
+*.pyc
