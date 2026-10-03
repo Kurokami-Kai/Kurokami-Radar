@@ -2,8 +2,8 @@ name: Gerar instalador
 
 on:
   push:
-    tags: ["v*"]
-  workflow_dispatch:
+    tags: ["v*"]          # criar uma tag v0.9.0 gera e publica o instalador em Releases
+  workflow_dispatch:      # ou rode na mao: aba Actions -> Gerar instalador -> Run workflow
 
 permissions:
   contents: write
@@ -35,7 +35,7 @@ jobs:
         run: >
           pyinstaller --noconfirm --clean --onedir --windowed --name KurokamiRadar
           --icon assets/radar.ico
-          --add-data "radar/painel.html;radar"
+          --add-data "radar/painel.html;radar" --add-data "radar/ponte.user.js;radar"
           --collect-submodules radar --collect-submodules keyring --collect-submodules pystray
           --hidden-import win32ctypes.core --hidden-import win32ctypes.pywin32
           radar.py
