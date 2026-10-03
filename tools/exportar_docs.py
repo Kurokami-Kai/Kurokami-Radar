@@ -1,6 +1,8 @@
 """Junta a documentacao do projeto numa pasta da Area de Trabalho para enviar ao Projeto do claude.ai.
 
 Uso: dois cliques em tools\\exportar_docs.bat (ou: py tools/exportar_docs.py)
+     py tools/exportar_docs.py --listar   -> so mostra o que mudou desde a ultima exportacao
+                                            confirmada (nao copia, nao pergunta, nao registra)
 
 O que faz:
 - copia CLAUDE.md, README.md, docs/*.md (menos referencia.md) e docs/specs/*.md para
@@ -66,18 +68,45 @@ def limpar(pasta):
     os.makedirs(pasta)
 
 
-def main():
+def ultima_exportacao(manifesto):
+    """{nome: hash} da ultima exportacao confirmada ({} se nunca houve)."""
+    try:
+        with open(manifesto, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def listar(antes, atual):
+    """Modo --listar: so leitura. Uma linha por grupo (NOVOS, ALTERADOS, APAGADOS)."""
+    if not atual:
+        print("Nao achei a documentacao. Rode a partir da pasta do projeto.")
+        return 1
+    agora = {nome: hash_de(origem) for nome, origem in atual.items()}
+    if not antes:
+        print("Nenhuma exportacao confirmada ainda: todos os %d arquivos (%s)" % (len(agora), ", ".join(agora)))
+        return 0
+    novos = [n for n in agora if n not in antes]
+    mudados = [n for n in agora if n in antes and antes[n] != agora[n]]
+    apagados = sorted(set(antes) - set(agora))
+    if not (novos or mudados or apagados):
+        print("Nada mudou desde a ultima exportacao confirmada.")
+    for rotulo, lista in (("NOVOS", novos), ("ALTERADOS", mudados), ("APAGADOS", apagados)):
+        if lista:
+            print("%s: %s" % (rotulo, ", ".join(lista)))
+    return 0
+
+
+def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
     base = os.path.join(area_de_trabalho(), "kurokami-docs")
     todos, enviar = os.path.join(base, "todos"), os.path.join(base, "enviar")
     manifesto = os.path.join(base, ".ultima_exportacao.json")
-    os.makedirs(base, exist_ok=True)
-    try:
-        with open(manifesto, encoding="utf-8") as f:
-            antes = json.load(f)
-    except (OSError, ValueError):
-        antes = {}
-
+    antes = ultima_exportacao(manifesto)
     atual = arquivos()
+    if "--listar" in argv:
+        return listar(antes, atual)
+    os.makedirs(base, exist_ok=True)
     if not atual:
         print("Nao achei a documentacao. Rode a partir da pasta do projeto.")
         return 1

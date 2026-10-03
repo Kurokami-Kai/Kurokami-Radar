@@ -36,6 +36,8 @@ O Projeto "Kurokami Radar" no claude.ai usa os docs como contexto. Para atualiz�
 3. A tela lista os arquivos NOVOS, ALTERADOS e APAGADOS. No Projeto, remova as versões antigas dos alterados e apagados e envie a pasta `enviar`.
 4. Digite **S** para registrar a exportação (em `kurokami-docs\.ultima_exportacao.json`). Sem o S, nada é registrado e a próxima exportação mostra as mesmas mudanças.
 
+`py tools/exportar_docs.py --listar` só lê: mostra o que mudou desde a última exportação **confirmada**, sem copiar, perguntar nem registrar. O Claude Code roda esse comando no fim de cada tarefa e avisa "Docs para atualizar no Projeto: …".
+
 ## Convenções de código
 - Python 3.12, só stdlib + keyring/pystray/Pillow. Sem frameworks.
 - Português em nomes, comentários e mensagens (sem acentos em identificadores).
