@@ -21,7 +21,7 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 |---|---|
 | `/api/resumo` | `versao, na_lista, possuidos, vale_a_pena, atualizado, pausado, na_bandeja, proxima, estado, userdata_dias, atualizacao, progresso{ativo,modo,etapa,atual,total,decorrido,log[],ultima}, ult_completa, completa_dias` |
 | `/api/lista` | `itens[]`: `appid, nome, tipo, capa, rpos, rcount, rotulo, lancamento, preco, cheio, corte, loja, url, piso, piso_geral, pisos{3m,6m,9m,1a,sempre}, tag, tag_texto, acima, raridade, raridade_texto, no_piso, score, keyshop, hist_keyshop, gg_url, vale, novo, motivo, base_tenho, bundles, n_dlcs, modo, extra, fim, prioridade, mudo, favorito` |
-| `/api/jogo?appid=` | `jogo{}, historico{loja:[[iso,preco]]}, lojas[{loja,atual,cheio,corte,url,menor,marcada,vende}], dlcs[], caminhos[], combo, gg, modo, classes, tenho, tenho_manual, mudo, na_lista, fila, ponte_vista` |
+| `/api/jogo?appid=` | `jogo{}, historico{loja:[[iso,preco]]}, lojas[{loja,atual,cheio,corte,url,menor,marcada,vende}], dlcs[], dlcs_estado (só sem DLCs: `{motivo: pendente\|sem_dlcs\|falhou, quando?, fila?{atual,total}}`), caminhos[], combo, gg, modo, classes, tenho, tenho_manual, mudo, na_lista, fila, ponte_vista` |
 | `/api/alertas` | último resultado de `avaliar` (`quando, itens[], novos[]`) |
 | `/api/notificacoes` | `itens[]` da tabela `alerta` (200 mais recentes) |
 | `/api/config` | `config, lojas_itad[], classes` |

@@ -12,4 +12,4 @@ description: Prepara uma versão nova do Kurokami Radar para o GitHub Releases (
 5. README/docs coerentes com o que mudou.
 6. Commit e push (`git add -A && git commit -m "vX.Y.Z: resumo" && git push`).
 7. Diga ao usuário: **Releases → Draft a new release → tag `vX.Y.Z` → Publish**. O workflow gera o `Setup.exe` e anexa; os Radars instalados avisam ao abrir ou em até 24 h.
-8. Entregue 3 a 6 linhas de novidades para a descrição do release (aparecem na janela de atualização).
+8. Entregue 3 a 6 linhas de novidades (parta de `docs/novidades.md`) para a descrição do release (aparecem na janela de atualização).

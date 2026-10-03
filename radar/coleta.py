@@ -211,7 +211,10 @@ def catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento=None)
                 for d in steam.dlcs_pela_loja(a, pais):
                     mapa[d] = a
                 banco.marcar_consulta("dlcs", a)
+                banco.limpar_consulta("dlcs_falha", a)
             except Exception as e:
+                # tipo separado: "dlcs_falha" nao conta como consultado, o jogo volta na proxima rodada
+                banco.marcar_consulta("dlcs_falha", a)
                 log("   DLCs de %s falharam (%s)" % (a, e))
             if i % 50 == 0:
                 banco.commit()

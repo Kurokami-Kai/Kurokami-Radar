@@ -187,6 +187,20 @@ def api_lista(_q):
     return {"itens": out, "lojas": cfg["lojas"]}
 
 
+def _estado_dlcs(b, a, j):
+    """Por que a ficha nao tem DLCs: falhou, a Steam nao informou ou ainda nao consultada (com a fila, se rodando)."""
+    if j.get("tipo") != "jogo":
+        return None
+    ok, falha = b.ultima_consulta("dlcs", a), b.ultima_consulta("dlcs_falha", a)
+    if falha and (not ok or falha > ok):
+        return {"motivo": "falhou", "quando": falha}
+    if ok:
+        return {"motivo": "sem_dlcs", "quando": ok}
+    p = __import__("radar.progresso", fromlist=["x"]).foto()
+    rodando = p["ativo"] and (p["etapa"] or "").startswith("Steam: procurando DLCs") and p["total"]
+    return {"motivo": "pendente", "fila": {"atual": p["atual"], "total": p["total"]} if rodando else None}
+
+
 def api_jogo(q):
     a = int(q["appid"][0])
     cfg = config.carregar()
@@ -221,7 +235,8 @@ def api_jogo(q):
         gg = None
     r = {"jogo": {k: j.get(k) for k in ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento",
                                          "preco_steam", "cheio_steam", "desconto_steam", "pai")},
-         "historico": hist, "lojas": lojas, "dlcs": dl, "caminhos": cam, "combo": combo,
+         "historico": hist, "lojas": lojas, "dlcs": dl, "dlcs_estado": None if dl else _estado_dlcs(b, a, j),
+         "caminhos": cam, "combo": combo,
          "gg": dict(gg) if gg else None, "modo": config.modo_do_jogo(cfg, a), "classes": dlcmod.CLASSES,
          "tenho": a in ctx.possuidos, "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
          "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a)),

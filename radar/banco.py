@@ -176,6 +176,13 @@ class Banco:
     def marcar_consulta(self, tipo, ident):
         self.con.execute("INSERT OR REPLACE INTO consulta_lenta VALUES(?,?,?)", (tipo, ident, agora()))
 
+    def ultima_consulta(self, tipo, ident):
+        r = self.um("SELECT quando FROM consulta_lenta WHERE tipo=? AND id=?", tipo, ident)
+        return r["quando"] if r else None
+
+    def limpar_consulta(self, tipo, ident):
+        self.con.execute("DELETE FROM consulta_lenta WHERE tipo=? AND id=?", (tipo, ident))
+
     def ligar_opcao(self, appid, oid):
         self.con.execute("INSERT OR IGNORE INTO jogo_opcao VALUES(?,?)", (appid, oid))
 

@@ -14,7 +14,7 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `oferta_atual` | snapshot das ofertas vigentes (última resposta da ITAD) com `drm_steam`, `flag` (H/N/S), `expira`. **Usar esta tabela para "preço de agora"**, nunca o último registro do histórico |
 | `gg` | última leitura da GG.deals |
 | `historico_importado` | jogos cujo histórico da ITAD já foi importado (`escopo='todas'`) |
-| `consulta_lenta` | cache das consultas lentas da loja (`pacote`, `dlcs`) com data |
+| `consulta_lenta` | cache das consultas lentas da loja (`pacote`, `dlcs`; `dlcs_falha` = última falha do plano B, não conta como consultado) com data |
 | `alerta` | notificações enviadas |
 | `notificado` | estado por jogo para não repetir aviso (preço avisado, ativo) |
 | `tenho_manual`, `silenciado`, `fila_lista` | ações do usuário no painel |

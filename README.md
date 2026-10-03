@@ -83,7 +83,7 @@ Repita de vez em quando: o painel avisa quando o arquivo tiver mais de 30 dias. 
 ### Abas do painel
 
 - **Vale a pena:** o que bateu os seus filtros, com a **raridade do preço**: ★ *Lendário* (nunca esteve tão barato), *Ultrarraro* (quase nunca), *Raro* (menos de 8% do tempo), *Incomum* e *Comum* (promoção frequente). Por padrão o Radar só avisa a partir de *Raro*.
-- **Lista de desejos:** tudo, com filtros, ordenação e três visualizações. Clique num jogo para ver o histórico em gráfico, as lojas, as formas de comprar e as DLCs.
+- **Lista de desejos:** tudo, com filtros, ordenação e três visualizações. Clique num jogo para ver o histórico em gráfico, as lojas, as formas de comprar e as DLCs (se não houver, a ficha diz por quê: lista ainda na fila, a Steam não informou ou a consulta falhou).
 - **Biblioteca:** valor da sua coleção, quanto falta para completar cada jogo com as DLCs, séries e coleção.
 - **Carrinho:** simule uma compra (jogos e bundles), escolha a loja de cada item e veja o total.
 - **Configurações:** lojas, filtros, keyshops, tipos de DLC, notificações e acesso pelo celular.

@@ -79,6 +79,8 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
   - `itens_opcao(oid)`
   - `consultado(tipo, ident, dias)`
   - `marcar_consulta(tipo, ident)`
+  - `ultima_consulta(tipo, ident)`
+  - `limpar_consulta(tipo, ident)`
   - `ligar_opcao(appid, oid)`
   - `registrar_preco(appid, loja, preco, cheio, corte, fonte, url, quando)` — Grava so se mudou desde o ultimo registro dessa loja.
   - `importar_historico(appid, registros)` — registros: [(loja, preco, cheio, corte, quando)] vindos da ITAD.
@@ -209,6 +211,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_idade_userdata()`
 - `api_resumo(_q)`
 - `api_lista(_q)`
+- `_estado_dlcs(b, a, j)` — Por que a ficha nao tem DLCs: falhou, a Steam nao informou ou ainda nao consultada (com a fila, se rodando).
 - `api_jogo(q)`
 - `_ler_carrinho()`
 - `_gravar_carrinho(itens)`

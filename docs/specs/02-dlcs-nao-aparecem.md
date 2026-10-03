@@ -1,6 +1,6 @@
 # Spec 02 — DLCs não aparecem (ex.: Civilization)
 
-Status: **investigar** · Skill: `depurar` (+ `systematic-debugging`)
+Status: **feito em v0.13.0** · Skill: `depurar` (+ `systematic-debugging`)
 
 ## Sintoma (dono, 02/10, depois da instalação limpa)
 "O Civilization não mostrou DLCs. Nada mostrou DLCs direito."
@@ -20,3 +20,7 @@ Status: **investigar** · Skill: `depurar` (+ `systematic-debugging`)
 ## Saída esperada
 - Causa raiz com evidência, correção mínima e **diagnóstico permanente**: na ficha do jogo, quando não houver DLCs, mostrar o motivo ("lista ainda não consultada — fila em X/Y", "a Steam não informou DLCs", "consulta falhou em <data>").
 - Registrar em `docs/decisoes.md`.
+
+## Resultado
+- Causa: a 0.12 limitava a 1ª verificação a 120 consultas de DLC por rodada; no banco do dono só 120 de 1256 jogos tinham lista às 19:56 de 02/10 e o resto só foi consultado entre 20:49 e 21:20 (Civ VII às 20:53, Civ VI às 21:09). Hipóteses 2 a 5 descartadas com o banco e o log.
+- Correção: 1ª verificação completa (0.13); motivo na ficha (`dlcs_estado`); falha gravada como `dlcs_falha` sem contar como consultado.

@@ -13,6 +13,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - `docs/dados.md` — tabelas SQLite, chaves de `meta`, `config.json` e onde ficam os segredos.
 - `docs/referencia.md` — assinaturas e docstrings de todas as funções (gerado; rode `py tools/gerar_referencia.py` depois de mudar funções).
 - `docs/processo.md` — rodar, testar e publicar versão; convenções de código.
+- `docs/novidades.md` — novidades da próxima versão (texto do release); acrescente ao mudar algo visível.
 - `docs/pendencias.md` — ideias combinadas e ainda não feitas; aponta para `docs/specs/`.
 - `docs/specs/NN-*.md` — especificação de cada funcionalidade pedida (problema, dados reais, proposta, critérios de aceite). **Ao implementar uma, leia só a spec dela.** Ao terminar, marque o Status como "feito em vX.Y.Z".
 
