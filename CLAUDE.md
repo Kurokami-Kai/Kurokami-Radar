@@ -22,6 +22,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Comece tarefas de código pela skill **`kurokami-code`** (ela diz qual outra skill abrir; não carrega todas).
 - `py tools/mapa.py <arquivo> [termo]` → seções/funções com linhas; leia só o intervalo. Nunca abra `radar/painel.html` inteiro.
 - `py tools/checar.py` → checagens finais (sintaxe, JS, versão, `--add-data`, dados pessoais e `.gitignore`: falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`). Precisa dar `ok`.
+- `tools\exportar_docs.bat` (ou `py tools/exportar_docs.py`) → copia os docs para `Área de Trabalho\kurokami-docs`, separa o que mudou desde a última exportação e só registra depois que o usuário confirma o envio ao Projeto do claude.ai (ver `docs/processo.md`). Arquivo novo em `docs/` entra sozinho; `referencia.md` fica de fora.
 - Skills em `.claude/skills/`: `kurokami-code`, `economia-de-contexto`, `editar-painel`, `coleta-e-apis`, `banco-e-migracao`, `depurar`, `testar-sem-rede`, `revisar-mudanca`, `publicar-versao`.
 
 ## Regras do projeto
