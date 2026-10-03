@@ -32,3 +32,4 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Arquivo novo que o `.exe` precise ler → adicionar ao `--add-data` do workflow e do `gerar_setup.bat`.
 - Visual do painel segue a loja da Steam (ver `docs/decisoes.md`, "Produto").
 - Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança.
+- Ao terminar cada tarefa, depois de `py tools/checar.py` dar `ok`: faça o commit e o push **sem perguntar**. Só pergunte antes de comandos que reescrevem histórico (`reset`, `rebase`, `push --force`) ou que apagam arquivos fora do projeto.

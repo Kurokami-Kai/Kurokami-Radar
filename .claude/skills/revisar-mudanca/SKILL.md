@@ -16,8 +16,9 @@ Regra de ouro (de `verification-before-completion`, obra/superpowers, se instala
 3. Arquivo novo lido pelo `.exe` → `--add-data` (o checar acusa).
 4. Função pública nova/alterada → `py tools/gerar_referencia.py`.
 5. Comportamento mudou para o usuário → `README.md`. Mudou rota/dado/arquitetura → doc em `docs/`. Pegadinha nova → `docs/decisoes.md`.
-6. Vai virar release? → skill `publicar-versao`.
-7. Resposta final ao usuário (curta):
+6. Com o `checar` em `ok` → commit e push **sem perguntar** (ver `CLAUDE.md`). Só pergunte antes de `reset`, `rebase`, `push --force` ou de apagar arquivos fora do projeto.
+7. Vai virar release? → skill `publicar-versao`.
+8. Resposta final ao usuário (curta):
    - o que mudou (3 a 6 itens);
    - **como testar no Windows** (passos);
    - o que você **não** conseguiu testar (notificação, bandeja, ponte, instalador…).
