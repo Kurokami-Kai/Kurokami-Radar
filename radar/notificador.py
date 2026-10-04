@@ -150,6 +150,12 @@ class Notificador:
             if avisados.get(str(c["appid"])) == fim:
                 continue
             avisados[str(c["appid"])] = fim
+            enviados.append(c)
+        # mesmo limite dos alertas: carrinho primeiro, depois o que acaba antes; o resto vira um resumo
+        enviados.sort(key=lambda c: (not c.get("carrinho"), c["fim"]))
+        limite = max(1, int((self.cfg.get("notificacoes") or {}).get("max_por_rodada") or 5))
+        for c in enviados[:limite]:
+            fim = c["fim"]
             h = max(1, round((fim - agora_) / 3600))
             j = self.b.um("SELECT capa FROM jogo WHERE appid=?", c["appid"])
             img = notificar.capa(c["appid"], j["capa"] if j else None)
@@ -158,7 +164,11 @@ class Notificador:
                               "%s%s na %s\n%s" % (brl(c["preco"]), (" · -%d%%" % c["corte"]) if c.get("corte") else "", c["loja"],
                                                    "está no seu carrinho" if c.get("carrinho") else "vale a pena pelos seus filtros"),
                               clique=c.get("url") or steam, botoes=[("Abrir oferta", c.get("url") or steam)], imagem=img)
-            enviados.append(c)
+        if len(enviados) > limite:
+            resto = enviados[limite:]
+            notificar.mostrar("+%d terminando em breve" % len(resto),
+                              ", ".join(c["nome"] for c in resto[:4]) + ("…" if len(resto) > 4 else ""),
+                              clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
         # limpa o que ja passou
         self.b.meta("avisos_fim", {k: v for k, v in avisados.items() if v > agora_ - 86400})
         self.b.commit()

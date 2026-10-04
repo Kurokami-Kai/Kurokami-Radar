@@ -491,7 +491,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
     <div class="shead"><h2>Destaques</h2><span class="aside" id="valeNote"></span></div>
     <div class="hero" id="hero"></div>
     <div class="shead"><h2>Todos que valem a pena</h2><div class="chips" id="cTagVale"></div></div>
-    <div class="hint" style="color:var(--dim);font-size:11.5px;margin:-4px 0 8px">Raridade = quanto tempo o jogo já passou neste preço ou menos: <span class="rr rr-lendario">★ Lendário</span> nunca esteve tão barato · <span class="rr rr-ultrarraro">Ultrarraro</span> quase nunca · <span class="rr rr-raro">Raro</span> menos de 8% do tempo · <span class="rr rr-incomum">Incomum</span> · <span class="rr rr-comum">Comum</span> promoção frequente</div>
+    <div class="hint" style="color:var(--dim);font-size:11.5px;margin:-4px 0 8px">Raridade = quantas vezes o jogo chega a esse desconto: <span class="rr rr-lendario">★ Lendário</span> nunca chegou (2+ anos de histórico) · <span class="rr rr-ultrarraro">Ultrarraro</span> menos de 1 vez a cada 16 meses · <span class="rr rr-raro">Raro</span> cerca de 1 vez por ano · <span class="rr rr-incomum">Incomum</span> · <span class="rr rr-comum">Comum</span> 3+ vezes por ano</div>
     <div id="valeLista"></div>
   </section>
 
@@ -1089,7 +1089,7 @@ async function renderCfg(){
    <div class="blk"><h4>O que vale a pena</h4><div class="in">
      <label class="f">Desconto mínimo (%) ${num('alerta.desconto_minimo',a.desconto_minimo,5,0,100)}</label>
      <label class="f">Avisar a partir de <select data-k="alerta.raridade_minima">${[['incomum','Incomum'],['raro','Raro'],['ultrarraro','Ultrarraro'],['lendario','Lendário']].map(([v,t])=>`<option value="${v}"${(a.raridade_minima||'raro')===v?' selected':''}>${t}</option>`).join('')}</select></label>
-     <div class="hint">Raridade = quantas vezes por ano o jogo chega a esse desconto (ou até 5 pontos menos) nos últimos 24 meses. Comum: 3+ por ano. Incomum: 1,5 a 3. Raro: 0,75 a 1,5. Ultrarraro: menos que isso. Lendário: nunca chegou, em 1 ano ou mais de histórico.</div>
+     <div class="hint">Raridade = quantas vezes por ano o jogo chega a esse desconto (ou até 5 pontos menos) nos últimos 24 meses. Comum: 3+ por ano. Incomum: 1,5 a 3. Raro: 0,75 a 1,5. Ultrarraro: menos que isso. Lendário: nunca chegou, com 2 anos ou mais de histórico e alguma promoção anterior (com 1 a 2 anos: no máximo Ultrarraro).</div>
      <label class="f">Selo Kurokami: desconto mínimo (%) ${num('alerta.selo_corte_minimo',a.selo_corte_minimo??0,5,0,100)}</label>
      <div class="hint">Selo Kurokami = o melhor desconto que o jogo costuma ter (até 5 pontos do máximo da vida, ou o menor preço em 24 meses), Raro ou melhor, com 1 ano ou mais de histórico. O Selo sempre avisa.</div>
      <label class="f">Tolerância acima do menor histórico (%) ${num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50)}</label>

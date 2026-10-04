@@ -12,7 +12,9 @@ py radar.py sondar 1659040    # respostas cruas das APIs em dados/sonda/sonda.js
 Com o Radar instalado aberto, feche-o antes (porta 80 e trava 47811 são compartilhadas).
 
 ## Testes rápidos
-- **Tudo de uma vez:** `py tools/checar.py` (também falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`).
+- **Tudo de uma vez:** `py tools/checar.py` (também falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`, e roda `tools/testar_piso.py`).
+- **Raridade e pílula de piso:** `py tools/testar_piso.py` — históricos sintéticos (Recorde raro em 17/19 meses e 50%, Lendário pela regra C). Mudou a regra? Acrescente o caso aqui.
+- **Toast de Selo:** `py radar.py testar-notificacao --selo` (passa pelo `Notificador._enviar`, como um alerta de verdade).
 - Sintaxe: `py -c "import ast,glob;[ast.parse(open(f,encoding='utf-8').read()) for f in glob.glob('radar/*.py')+['radar.py']]"`
 - JS do painel: extrair o `<script>` de `painel.html` e rodar `new Function(js)` no Node.
 - Lógica sem rede: copiar um `dados/radar.sqlite3` real e chamar `painel.api_lista({})`, `api_jogo`, `api_carrinho`, `analise.avaliar` com `b.ofertas_atuais()`.

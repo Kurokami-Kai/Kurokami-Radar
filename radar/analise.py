@@ -203,7 +203,9 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     out["eps_nivel"], out["por_ano"] = len(na_janela), round(por_ano, 2)
     out["ultima"] = _iso(no_nivel[-1][0]) if no_nivel else None
     desde = time.gmtime(t0).tm_year
-    if not no_nivel and dias_hist >= 365:
+    # Lendario: nunca chegou a esse nivel, com 24 meses ou mais de historico e pelo menos uma promocao
+    # anterior (sem promocao anterior e quase sempre buraco nos dados, ex.: ARK). Com 12-24 meses: Ultrarraro.
+    if not no_nivel and dias_hist >= JANELA_RARIDADE and anteriores:
         nivel, texto = "lendario", "nunca chegou a -%d%% (histórico desde %d)" % (nivel_min, desde)
     elif por_ano < 0.75:
         nivel = "ultrarraro"
@@ -214,7 +216,9 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
         nivel = "raro" if por_ano < 1.5 else "incomum" if por_ano < 3 else "comum"
         texto = ("-%d%% ou mais %d vezes em %s (%.1f por ano)" % (
             nivel_min, len(na_janela), "24 meses" if dias_hist >= JANELA_RARIDADE else "%d meses" % out["meses"], por_ano)).replace(".", ",")
-    if out["curto"] and RARIDADES.index(nivel) > RARIDADES.index("incomum"):
+    if not anteriores and RARIDADES.index(nivel) > RARIDADES.index("incomum"):
+        nivel, texto = "incomum", "nenhuma promoção anterior nas lojas marcadas (histórico desde %d)" % desde
+    elif out["curto"] and RARIDADES.index(nivel) > RARIDADES.index("incomum"):
         nivel, texto = "incomum", texto + " · histórico curto (%d dias)" % dias_hist
     out["nivel"], out["texto"] = nivel, texto
 

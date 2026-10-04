@@ -28,7 +28,7 @@ Causa: a v1 mede **preço em reais** e chama de Lendário qualquer centavo abaix
   - **Incomum**: 1,5–3/ano
   - **Raro**: 0,75–1,5/ano
   - **Ultrarraro**: < 0,75/ano (aconteceu ≤ 1 vez em 2 anos)
-  - **Lendário**: nunca atingiu esse nível (com tolerância) em ≥ 12 meses de histórico
+  - **Lendário**: nunca atingiu esse nível (com tolerância) em ≥ 12 meses de histórico *(trocado pela regra C — ver emenda de 04/10)*
 - Histórico < 6 meses → sem nível acima de **Incomum** (mostrar "histórico curto").
 
 ### Eixo 2 — Piso = quão perto do máximo da vida do jogo
@@ -85,3 +85,17 @@ Origem: estudo da página de promoções da SteamDB, usada só como inspiração
 - A definição de "no piso" do Selo não muda.
 - API: em /api/lista e /api/jogo, acrescentar `piso_tipo` (novo | raro | igual | 24m | null) e `piso_ref` {preco, corte, quando}.
 - Aceite extra: imprimir a distribuição de piso_tipo no banco real e os jogos com "Recorde raro", para o dono validar. Castle of Illusion a 80% continua sem Lendário e sem Selo, seja qual for a pílula.
+## Emenda (04/10) — Lendário pela regra C
+Verificação no banco real (22 Lendários com a regra original):
+- A regra já olhava o histórico **inteiro** (não só 24 meses). O histórico importado começa em 03/10/2021 (limite da ITAD).
+- Nos 22, o corte atual era de fato o maior já visto nas lojas marcadas. BRAVELY DEFAULT II, STAR OCEAN e STRANGER OF PARADISE são máximos reais (cortes subindo ano a ano; os 70% só no episódio atual).
+- 10 dos 22 tinham 12–23 meses de histórico. O **ARK: Survival Evolved** era buraco nos dados: nas lojas marcadas só um brinde (2022) e um preço cheio (2023), contados como 42 meses de histórico sem nenhuma promoção.
+
+Regra C (aprovada pelo dono):
+- **Lendário** = nunca chegou ao nível no histórico inteiro **e** ≥ 24 meses de histórico **e** ≥ 1 promoção anterior nas lojas marcadas.
+- 12–24 meses de histórico → no máximo **Ultrarraro**.
+- Nenhuma promoção anterior nas lojas marcadas → no máximo **Incomum** (sem Selo).
+- Simulação no banco de 03/10: Lendários 22 → 11, Selos 43 → 42 (sai o ARK).
+- Testes sintéticos em `tools/testar_piso.py` (rodam no `checar.py`), junto com os de Recorde raro (17/19 meses desde a **última** vez no nível do recorde anterior; ≤ 50%).
+
+Também nesta rodada: "Termina em breve" passou a respeitar `notificacoes.max_por_rodada` com resumo, e `py radar.py testar-notificacao --selo` mostra o toast de Selo.

@@ -5,7 +5,7 @@ Uso:
   py radar.py painel              so o painel no navegador, sem a bandeja (http://127.0.0.1:8787)
   py radar.py inicio instalar     abre o Radar sozinho ao entrar no Windows (inicio remover desfaz)
   py radar.py ciclo               uma rodada completa com notificacoes, mostrando tudo no terminal
-  py radar.py testar-notificacao  manda uma notificacao de exemplo
+  py radar.py testar-notificacao  manda uma notificacao de exemplo (--selo: alerta com SELO KUROKAMI)
   py radar.py chaves              grava/atualiza as chaves no Gerenciador de Credenciais
   py radar.py testar              testa as chaves salvas, uma por uma
   py radar.py lojas               lista as lojas da ITAD no Brasil e marca as monitoradas
@@ -313,6 +313,14 @@ def cmd_testar_notificacao(cfg, args):
     img = notificar.capa(j["appid"], j["capa"]) if j else None
     nome = j["nome"] if j else "Jogo de exemplo"
     url = "https://store.steampowered.com/app/%d/" % j["appid"] if j else "https://store.steampowered.com/"
+    if getattr(args, "selo", False):  # passa pelo caminho real dos alertas (titulo, botoes, capa)
+        from radar.notificador import Notificador
+        Notificador(b, cfg, log=lambda m: None)._enviar(
+            {"appid": j["appid"] if j else 0, "nome": nome, "preco": 999, "corte": 90, "loja": "Steam", "url": url,
+             "selo": True, "raridade": "lendario", "score": 90,
+             "motivo": "Selo Kurokami: Lendário: nunca chegou a -85% (TESTE)"})
+        print("Notificação de Selo enviada. Se não apareceu em uns segundos, veja Configurações > Sistema > Notificações")
+        return
     ok = notificar.mostrar(nome, "R$ 9,99 · -90% na Steam (TESTE)\nNo menor histórico · score 88",
                            clique=url, botoes=[("Abrir oferta", url)], imagem=img, rodape="notificação de teste")
     print("Notificação enviada. Se não apareceu em uns segundos, veja Configurações > Sistema > Notificações"
@@ -373,7 +381,8 @@ def main():
     s.add_argument("--abrir", action="store_true", help="abre o painel no navegador ao iniciar")
     sub.add_parser("painel")
     s = sub.add_parser("ciclo"); s.add_argument("--tudo", action="store_true")
-    sub.add_parser("testar-notificacao")
+    s = sub.add_parser("testar-notificacao")
+    s.add_argument("--selo", action="store_true", help="simula um alerta com SELO KUROKAMI (passa pelo notificador)")
     s = sub.add_parser("inicio"); s.add_argument("acao", choices=["instalar", "remover"])
     if len(sys.argv) == 1 and getattr(sys, "frozen", False):
         if sys.stdout is None or "bandeja" in os.path.basename(sys.executable).lower():
