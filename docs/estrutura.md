@@ -36,6 +36,9 @@ Kurokami Radar/
 │   ├── mapa.py              # mapa de seções/funções com linhas (ler só o trecho)
 │   ├── exportar_docs.py/.bat # reserva: docs → Área de Trabalho\kurokami-docs (o Projeto do claude.ai já lê do GitHub)
 │   ├── backtest_selo.py     # backtest do Selo e variantes sobre uma cópia temporária do banco (só números agregados)
+│   ├── backtest_tipos.py    # spec 04: backtest por tipo de recorde (Selo, novo, igual, 24m), métrica "não ficou mais barato em 12 meses"
+│   ├── medir_spec04.py      # spec 04: vitrine, avisos de hoje (regra atual × só Selo), userdata, DLCs em promoção, tempo do /api/lista
+│   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê
 │   ├── testar_piso.py       # testes sintéticos da raridade (Lendário) e da pílula de piso, sem rede nem banco
 │   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais, .gitignore, testar_piso)
 ├── docs/                    # esta documentação

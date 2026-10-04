@@ -1,6 +1,6 @@
 # Spec 04 — Vitrine, aba Promoções e avisos por tipo de recorde
 
-Status: **Etapa 1 a fazer** (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
+Status: **Etapa 1 feita em 04/10/2026 (resultados no fim); Etapa 2 aguarda o ok do dono** (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
 
 **Duas etapas. Faça a Etapa 1, entregue o relatório e PARE. A Etapa 2 só começa depois do ok do dono, que pode mudar números desta spec com base na Etapa 1.**
 
@@ -278,6 +278,70 @@ A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que ab
 - `docs/pendencias.md`: marcar como resolvido o item "Decidir se Raro/Ultrarraro sem Selo continuam alertando".
 - `README.md` e a seção `## 0.15.0` de `docs/novidades.md`, em linguagem de usuário.
 - Ao terminar, rode `py tools/gerar_referencia.py`.
+
+## Resultado da Etapa 1 (04/10/2026, banco instalado: 726 jogos; lojas GreenManGaming, Nuuvem, Steam)
+
+### 1.1 Backtest por tipo (`py tools/backtest_tipos.py`; semanas 10/2022–10/2025)
+Conferência: `selo` = **143 eventos / 71,3%** em +5, igual a `decisoes.md`. "ev. qq." = episódios que entram na variante em qualquer semana (não só na primeira), para comparar.
+
+| Variante | Eventos (ev. qq.) | Não ficou mais barato (R$) | Não batido +5 | +10 | Não voltou 6m | Novos/sem. normal (média) | Novos/sem. grande (média) | Estoque/sem. normal | Hoje | Texto |
+|---|---|---|---|---|---|---|---|---|---|---|
+| selo | 143 (161) | 60,1% | 71,3% | 87,4% | 15,4% | 0 (0,6) | 0 (2) | 1 | 11 | em 6 de 10 · ~0/semana (0 em grandes) |
+| novo ≥ 0 | 997 (1.074) | 28,0% | 34,0% | 48,8% | 16,1% | 4 (4,7) | 9 (12,9) | 10 | 77 | em 3 de 10 · ~4/semana (9) |
+| novo ≥ 50 | 493 (541) | 45,0% | 56,8% | 72,2% | 11,0% | 2 (2,3) | 4 (6,4) | 3 | 29 | em 5 de 10 · ~2/semana (4) |
+| igual ≥ 0 | 3.713 (3.902) | 50,9% | 53,5% | 66,8% | 7,8% | 14 (17,9) | 45,5 (46) | 27 | 204 | em 5 de 10 · ~14/semana (45,5) |
+| igual ≥ 50 | 2.765 (2.906) | 59,0% | 63,7% | 77,6% | 5,5% | 10 (13,5) | 32 (33,7) | 20 | 137 | em 6 de 10 · ~10/semana (32) |
+| 24m ≥ 0 | 384 (402) | 62,5% | 69,5% | 82,6% | 5,5% | 0 (2,1) | 0 (3,8) | 1 | 66 | em 6 de 10 · ~0/semana (0) |
+| 24m ≥ 50 | 321 (338) | 67,6% | 75,1% | 85,4% | 5,3% | 0 (1,8) | 0 (3,1) | 1 | 54 | em 7 de 10 · ~0/semana (0) |
+| base: toda promoção | 10.761 | 38,0% | 46,9% | 64,0% | 9,5% | 47 (54,8) | 111 (122,4) | 91 | 605 | em 4 de 10 · ~47/semana (111) |
+
+Para decidir: a mediana de avisos novos dá 0 em Selo e 24m (os eventos se concentram em poucas semanas); a média descreve melhor o volume ("~0,6/semana"). "Não ficou mais barato" em R$ é mais exigente que "não batido +5" em corte (Selo 60% contra 71%).
+
+### 1.2 Vitrine e avisos hoje (`py tools/medir_spec04.py`)
+- Vitrine (regra exclusiva selo > novo > igual > 24m): sem desconto mínimo **selo 11 · novo 65 · igual 212 · 24m 66**; com desconto ≥ 50% **selo 11 · novo 18 · igual 137 · 24m 54**.
+- Avisos de uma rodada: regra atual **38**; só Selo ligado **13** (todos de lojas oficiais; keyshop e completo 0 nos dois).
+- Deixam de avisar 26, todos Raro/Ultrarraro sem Selo.
+- Passa a avisar 1: Coffee Talk (favorito, Comum, -50%). É efeito da regra A.4 (favorito avisa em qualquer tipo); hoje o favorito precisa de Incomum.
+
+### 1.3 userdata.json
+Não existe em nenhum caminho procurado (pasta de dados, pasta do programa, `userdata_json`, `pasta_kurokami_precos` vazios). Sem números de seguidos/ignorados. Obs.: a lista oficial de métodos públicos da Steam traz `IStoreService/GetGamesFollowed` (para a spec 06).
+
+### 1.4 DLCs em promoção
+2.159 DLCs relevantes não possuídas de jogos possuídos; **1.184 com desconto agora** (todas com fim em 08/10: promoção de outono). Preço: **10 pela `oferta_atual` (ITAD)** e **1.174 só pelo preço Steam de `jogo`**.
+
+### 1.5 Desempenho atual
+`painel.api_lista({})`: mediana **0,54 s** (0,54 / 0,54 / 0,54), **808 itens**, **1.014 KB** de JSON.
+
+### 1.6 "Steam inteira" no BR (`py tools/teste_promocoes_steam.py`)
+| Fonte | Total | Chamadas | Itens/chamada | Tempo | 429 | MB |
+|---|---|---|---|---|---|---|
+| ITAD `deals/v2`, só Steam | desconhecido: parou no limite de 15 min com 66.000 lidos e `hasMore` verdadeiro (18.368 jogos, 18.664 DLCs, 24.855 pacotes) | 333 | 198 | 15 min | 3 | 84 |
+| ITAD `lookup/shop/61/id/v1` (appids) | 33.000 ids → 19.794 appids, depois uma falha | 172 | 192 | 7 min | 7 | 2 |
+| ITAD `deals/v2`, todas as lojas | desconhecido: 55.600 lidos em 15 min (Steam é a melhor oferta em 95%) | 283 | 197 | 15 min | 5 | 71 |
+| **Steam `IStoreQueryService/Query`, sem chave** | **107.927** (64.879 jogos, 35.449 DLCs, 7.599 de outros tipos: 11, 6, 2) | **108** | 1.000 | **2,7 min** | 0 | 126 |
+| Busca da loja (`specials=1`) | 99.438 informados; bloqueada depois de 14.600 (156 chamadas em 5 min) | 156 | 94 | 5 min | 10 | 35 |
+
+- Os 64.879 jogos da Steam batem com as ~65 mil da SteamDB. Todos os appids da busca e 99,8% dos mapeados da ITAD estão na consulta da Steam.
+- **Pegadinha:** a `Query` sem `sort` muda a ordem entre chamadas e a paginação repete itens (só 70.000 distintos em 107.927). Com `sort: 2`, os 107.927 são distintos (1 e 13 também dão ordem estável).
+- A `Query` não tem página oficial da Valve (só a referência não oficial de xpaw) e não aparece na lista pública de métodos, mas respondeu sem chave.
+
+Campos por fonte:
+
+| Campo | ITAD deals | Steam Query | Busca |
+|---|---|---|---|
+| appid | não (precisa do lookup, ~1 chamada por 200) | sim | sim (pacote vem como lista) |
+| tipo jogo/DLC | sim (game/dlc/package) | sim | não (só App/Sub) |
+| preço, cheio, corte | sim | sim (`best_purchase_option`) | só no HTML |
+| fim do desconto | sim (`expiry`) | sim (`discount_end_date`) | não |
+| menor histórico | sim (`historyLow`, `historyLow_1y`, `historyLow_3m`), **sem data** | não | não |
+| análises e nota | não | sim (`reviews`) | só no HTML |
+| lançamento | não | sim | só no texto |
+| capa | sim (`assets`) | sim (`assets`, se pedir) | sim |
+
+O que dá para calcular **sem baixar histórico**:
+- **ITAD:** novo recorde ≈ `flag` N (14.541 de 66.000) e igual ao recorde ≈ `flag` H (22.294), mas é o recorde da ITAD (todas as lojas, desde sempre), não o das lojas marcadas. Dá também "menor em 12 meses" (`historyLow_1y`), mas não em 24. Raridade e Selo não (precisam dos episódios).
+- **Steam:** nada disso (só o preço de agora).
+- **Busca:** nada disso.
 
 ## Fora desta spec
 - Veredito na ficha, keyshop "decente" e limpeza do resto das Configurações → **spec 05**.
