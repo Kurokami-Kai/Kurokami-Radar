@@ -236,7 +236,16 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_minimos(b, appids)`
 - `_idade_userdata()`
 - `api_resumo(_q)`
+- `invalidar_linhas()`
+- `linhas_promocoes()` — (linhas, cfg, conta) do cache, montando de novo se preciso.
+- `_montar_linhas(cfg, conta)`
 - `api_lista(_q)`
+- **class `PedidoInvalido`** — Vira HTTP 400 com a mensagem (em portugues).
+- `_ler_q(qs)` — Valida o q= de /api/promocoes. Campo ou valor desconhecido -> PedidoInvalido; ausente = sem filtro.
+- `_filtros(f)` — {grupo: predicado}; as contagens de um grupo usam todos os outros.
+- `_ordenar(itens, ordem)`
+- `api_promocoes(qs)` — Explorador da aba Promocoes: filtra, conta e pagina no Radar (pensando na Steam inteira, spec 07).
+- `api_vitrine(_q)` — Prateleiras da aba "Vale a pena": um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
 - `_rar_info(an)` — O 'por que essa raridade' da ficha.
 - `_estado_dlcs(b, a, j)` — Por que a ficha nao tem DLCs: falhou, a Steam nao informou ou ainda nao consultada (com a fila, se rodando).
 - `api_jogo(q)`

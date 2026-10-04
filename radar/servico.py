@@ -84,6 +84,8 @@ def ciclo(log=print, forcar=False, sem_limite=False):
         b.commit()
         capas = {a["appid"]: (ctx.jogos.get(a["appid"]) or {}).get("capa") for a in alertas}
         relatorio.gerar(alertas, capas, {a["appid"] for a in novos})
+        from . import painel
+        painel.invalidar_linhas()  # a vitrine e a aba Promocoes passam a ver a coleta nova
         log("Ciclo ok: %d valem a pena, %d notificado(s)" % (len(alertas), len(novos)))
         if forcar and sem_limite:
             b.meta("ult_completa", __import__("radar.banco", fromlist=["agora"]).agora())

@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import re
 import urllib.parse as _up
 
-from . import VERSAO, analise, caminhos, config, dlc as dlcmod, steam
+from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, steam
 from .rede import http_json
 from .banco import Banco
 
@@ -117,8 +117,38 @@ def api_resumo(_q):
     return r
 
 
-def api_lista(_q):
+# ------------------------------------------------------------------ linhas de Promocoes (cache em memoria)
+# Uma linha por jogo da lista (+ monitorados), com tudo que a vitrine, a aba Promocoes e /api/lista mostram.
+# Montar custa ~0,5 s (analisa o historico de todos); filtrar/ordenar no cache custa milissegundos. O cache e
+# refeito quando termina uma coleta (servico), em qualquer POST do painel, quando o config muda e quando o
+# userdata.json muda de data (conta_steam.assinatura); por seguranca, vence em 10 minutos.
+_LINHAS = {"itens": None, "sig": None, "quando": 0, "ms": None}
+_TRAVA_LINHAS = threading.Lock()
+VALIDADE_LINHAS = 600
+
+
+def invalidar_linhas():
+    with _TRAVA_LINHAS:
+        _LINHAS["itens"] = None
+
+
+def linhas_promocoes():
+    """(linhas, cfg, conta) do cache, montando de novo se preciso."""
+    import time
     cfg = config.carregar()
+    sig = (conta_steam.assinatura(cfg), json.dumps(cfg, sort_keys=True, default=str))
+    with _TRAVA_LINHAS:
+        if _LINHAS["itens"] is not None and _LINHAS["sig"] == sig and time.time() - _LINHAS["quando"] < VALIDADE_LINHAS:
+            return _LINHAS["itens"], cfg, _LINHAS["conta"]
+        t0 = time.perf_counter()
+        conta = conta_steam.relacao(cfg)
+        itens = _montar_linhas(cfg, conta)
+        _LINHAS.update(itens=itens, sig=sig, quando=time.time(), ms=round((time.perf_counter() - t0) * 1000),
+                       conta={"tem_dados": conta["fonte"] is not None, "quando": conta["quando"]})
+        return itens, cfg, _LINHAS["conta"]
+
+
+def _montar_linhas(cfg, conta):
     b = Banco()
     ctx = analise.Contexto(b, cfg)
     marc = _marcadas(cfg)
@@ -139,6 +169,7 @@ def api_lista(_q):
     parciais = {r["appid"] for r in b.q("SELECT DISTINCT jo.appid FROM jogo_opcao jo JOIN opcao o ON o.id=jo.opcao WHERE o.papel='parcial'")}
     # a GG.deals le a edicao parcial nesses jogos (ex.: HITMAN), entao o keyshop dela nao vale
     gg = {r["appid"]: dict(r) for r in b.q("SELECT * FROM gg") if r["appid"] not in parciais}
+    carrinho = {int(i["appid"]) for i in _ler_carrinho() if i.get("appid")}
     nb = {}
     for oid, o in ctx.opcoes.items():
         if o["tipo"] == "bundle":
@@ -165,6 +196,8 @@ def api_lista(_q):
         cheio = (melhor or {}).get("cheio") or j.get("cheio_steam")
         g = gg.get(a) or {}
         modo = config.modo_do_jogo(cfg, a)
+        tipos = analise.tipos_de(an)
+        volta, volta_ordem = analise.costuma_voltar(an, corte)
         out.append({
             "appid": a, "nome": j["nome"], "tipo": j.get("tipo"), "capa": j.get("capa"),
             "rpos": j.get("rpos") or 0, "rcount": j.get("rcount") or 0, "rotulo": j.get("rotulo") or "",
@@ -183,9 +216,186 @@ def api_lista(_q):
             "bundles": nb.get(a, 0), "n_dlcs": len(ctx.dlcs.get(a, [])), "modo": modo,
             "extra": a in extras, "fim": fim, "prioridade": j.get("prioridade"), "mudo": a in mudos,
             "favorito": analise.favorito(j, cfg["alerta"]),
+            # spec 04 (0.15)
+            "inicio": an["inicio"], "tipos": tipos, "tipo_oferta": analise.tipo_oferta(tipos),
+            "volta_texto": volta, "volta_ordem": volta_ordem, "volta_dica": analise.dica_volta(an, corte),
+            # monitorado por voce sem estar na lista da Steam: extra sem posicao vinda da lista de desejos
+            "na_lista": a not in extras or j.get("prioridade") is not None,
+            "tenho": a in ctx.possuidos, "no_carrinho": a in carrinho, "em_bundle": nb.get(a, 0) > 0,
+            "seguido": a in conta["seguidos"], "ignorado_steam": a in conta["ignorados"],
+            "keyshop_barata": g.get("keyshop") is not None and preco is not None and g["keyshop"] < preco * 0.6,
         })
     b.con.close()
-    return {"itens": out, "lojas": cfg["lojas"]}
+    return out
+
+
+def api_lista(_q):
+    itens, cfg, _conta = linhas_promocoes()
+    return {"itens": itens, "lojas": cfg["lojas"]}
+
+
+# ------------------------------------------------------------------ /api/promocoes e /api/vitrine
+class PedidoInvalido(Exception):
+    """Vira HTTP 400 com a mensagem (em portugues)."""
+
+
+RELACAO = ("na_lista", "extra", "no_carrinho", "seguido", "ignorado_steam", "mudo", "tenho", "base_tenho")
+OUTROS = {"promo": lambda o: o["corte"] > 0, "bundle": lambda o: o["em_bundle"],
+          "completo": lambda o: o["modo"] == "completo", "keyshop": lambda o: o["keyshop_barata"]}
+TIPO_ITEM = ("jogo", "dlc")
+POR_PAGINA = (50, 100, 250)
+# campo de ordenacao -> valor (None = sem valor: sempre por ultimo)
+ORDEM = {"nome": lambda o: (o["nome"] or "").lower(), "corte": lambda o: o["corte"] or None,
+         "preco": lambda o: o["preco"], "volta": lambda o: o["volta_ordem"],
+         "nota": lambda o: o["rpos"] if o["rcount"] else None, "analises": lambda o: o["rcount"] or None,
+         "lancamento": lambda o: o["lancamento"], "fim": lambda o: o["fim"], "inicio": lambda o: o["inicio"]}
+CAMPOS_Q = {"busca", "relacao", "qualquer_um", "mostrar_so", "tipo", "outros", "preco_de", "preco_ate", "analises_de",
+            "analises_ate", "nota_min", "desconto_min", "lanc_de", "lanc_ate", "em_breve", "ordem", "pagina", "por_pagina"}
+
+
+def _ler_q(qs):
+    """Valida o q= de /api/promocoes. Campo ou valor desconhecido -> PedidoInvalido; ausente = sem filtro."""
+    try:
+        q = json.loads((qs.get("q") or ["{}"])[0] or "{}")
+    except ValueError:
+        raise PedidoInvalido("q não é um JSON válido")
+    if not isinstance(q, dict):
+        raise PedidoInvalido("q deve ser um objeto JSON")
+    desconhecidos = set(q) - CAMPOS_Q
+    if desconhecidos:
+        raise PedidoInvalido("campo desconhecido: %s" % ", ".join(sorted(desconhecidos)))
+
+    def lista(campo, validos):
+        v = q.get(campo) or []
+        if not isinstance(v, list) or any(x not in validos for x in v):
+            raise PedidoInvalido("%s aceita só: %s" % (campo, ", ".join(validos)))
+        return v
+
+    def numero(campo):
+        v = q.get(campo)
+        if v in (None, ""):
+            return None
+        if isinstance(v, bool) or not isinstance(v, (int, float)):
+            raise PedidoInvalido("%s deve ser um número" % campo)
+        return v
+
+    def data(campo):
+        v = q.get(campo)
+        if v in (None, ""):
+            return None
+        try:
+            return int(datetime.strptime(v, "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp())
+        except (TypeError, ValueError):
+            raise PedidoInvalido("%s deve ser uma data aaaa-mm-dd" % campo)
+
+    rel = q.get("relacao") or {}
+    if not isinstance(rel, dict) or any(k not in RELACAO or v not in ("exigir", "excluir") for k, v in rel.items()):
+        raise PedidoInvalido("relacao aceita {campo: \"exigir\"|\"excluir\"} com campo em: %s" % ", ".join(RELACAO))
+    ordem = q.get("ordem") or [["corte", "desc"], ["nome", "asc"]]
+    if not isinstance(ordem, list) or any(not isinstance(x, list) or len(x) != 2 or x[0] not in ORDEM
+                                          or x[1] not in ("asc", "desc") for x in ordem):
+        raise PedidoInvalido("ordem aceita [[campo, \"asc\"|\"desc\"], ...] com campo em: %s" % ", ".join(ORDEM))
+    pp = q.get("por_pagina", 100)
+    if pp not in POR_PAGINA:
+        raise PedidoInvalido("por_pagina aceita só 50, 100 ou 250")
+    pagina = q.get("pagina", 1)
+    if isinstance(pagina, bool) or not isinstance(pagina, int) or pagina < 1:
+        raise PedidoInvalido("pagina deve ser um inteiro a partir de 1")
+    for campo in ("qualquer_um", "em_breve"):
+        if campo in q and not isinstance(q[campo], bool):
+            raise PedidoInvalido("%s deve ser true ou false" % campo)
+    busca = q.get("busca") or ""
+    if not isinstance(busca, str):
+        raise PedidoInvalido("busca deve ser texto")
+    return {"busca": busca.strip().lower(), "relacao": rel, "qualquer_um": bool(q.get("qualquer_um")),
+            "mostrar_so": lista("mostrar_so", analise.TIPOS), "tipo": lista("tipo", TIPO_ITEM),
+            "outros": lista("outros", list(OUTROS)),
+            "faixas": [("preco", numero("preco_de"), numero("preco_ate")),
+                       ("rcount", numero("analises_de"), numero("analises_ate")),
+                       ("nota", numero("nota_min"), None), ("corte", numero("desconto_min"), None),
+                       ("lancamento", data("lanc_de"), data("lanc_ate"))],
+            "em_breve": bool(q.get("em_breve")), "ordem": ordem, "pagina": pagina, "por_pagina": pp}
+
+
+def _filtros(f):
+    """{grupo: predicado}; as contagens de um grupo usam todos os outros."""
+    out = {}
+    if f["busca"]:
+        out["busca"] = lambda o: f["busca"] in (o["nome"] or "").lower()
+    exigir = [k for k, v in f["relacao"].items() if v == "exigir"]
+    excluir = [k for k, v in f["relacao"].items() if v == "excluir"]
+    if exigir or excluir:
+        junta = any if f["qualquer_um"] else all
+        out["relacao"] = lambda o: (not exigir or junta(o[k] for k in exigir)) and not any(o[k] for k in excluir)
+    if f["mostrar_so"]:
+        out["mostrar_so"] = lambda o: o["tipo_oferta"] in f["mostrar_so"]
+    if f["tipo"]:
+        out["tipo"] = lambda o: o["tipo"] in f["tipo"]
+    if f["outros"]:
+        out["outros"] = lambda o: any(OUTROS[k](o) for k in f["outros"])
+    for campo, de, ate in f["faixas"]:
+        if de is None and ate is None:
+            continue
+        val = (lambda o: o["rpos"] if o["rcount"] else None) if campo == "nota" else (lambda o, c=campo: o[c])
+
+        def faixa(o, val=val, de=de, ate=ate):
+            v = val(o)  # sem valor com a faixa ligada: fica fora
+            return v is not None and (de is None or v >= de) and (ate is None or v <= ate)
+        out["faixa_" + campo] = faixa
+    if f["em_breve"]:
+        out["em_breve"] = lambda o: bool(o["em_breve"])
+    return out
+
+
+def _ordenar(itens, ordem):
+    import functools
+
+    def cmp(x, y):
+        for campo, dir_ in ordem:
+            a, b_ = ORDEM[campo](x), ORDEM[campo](y)
+            if a is None or b_ is None:
+                if a is None and b_ is None:
+                    continue
+                return 1 if a is None else -1  # sem valor: sempre por ultimo
+            if a != b_:
+                return (-1 if a < b_ else 1) * (1 if dir_ == "asc" else -1)
+        return (x["appid"] > y["appid"]) - (x["appid"] < y["appid"])
+    return sorted(itens, key=functools.cmp_to_key(cmp))
+
+
+def api_promocoes(qs):
+    """Explorador da aba Promocoes: filtra, conta e pagina no Radar (pensando na Steam inteira, spec 07)."""
+    f = _ler_q(qs)
+    itens, _cfg, conta = linhas_promocoes()
+    filt = _filtros(f)
+    passa = lambda o, sem=None: all(p(o) for g, p in filt.items() if g != sem)
+    sel = [o for o in itens if passa(o)]
+    contagens = {"mostrar_so": dict.fromkeys(analise.TIPOS, 0), "tipo": dict.fromkeys(TIPO_ITEM, 0)}
+    for o in itens:
+        if o["tipo_oferta"] in contagens["mostrar_so"] and passa(o, "mostrar_so"):
+            contagens["mostrar_so"][o["tipo_oferta"]] += 1
+        if o["tipo"] in contagens["tipo"] and passa(o, "tipo"):
+            contagens["tipo"][o["tipo"]] += 1
+    sel = _ordenar(sel, f["ordem"])
+    pp, pg = f["por_pagina"], f["pagina"]
+    return {"total": len(sel), "pagina": pg, "por_pagina": pp, "itens": sel[(pg - 1) * pp:pg * pp],
+            "contagens": contagens, "conta": conta}
+
+
+def api_vitrine(_q):
+    """Prateleiras da aba "Vale a pena": um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
+    qualquer corte (o selo_corte_minimo ja esta nele); os outros blocos so com corte >= desconto_minimo."""
+    itens, cfg, _conta = linhas_promocoes()
+    al = cfg["alerta"]
+    dmin = al.get("desconto_minimo", 0) or 0
+    lig = analise.tipos_ligados(al)
+    out = {"avisa": {t: t in lig for t in analise.TIPOS}, "desconto_minimo": dmin}
+    for t, n in (("selo", 10), ("novo", 8), ("igual", 8), ("24m", 8)):
+        bl = [o for o in itens if o["tipo_oferta"] == t and not o["tenho"] and (t == "selo" or o["corte"] >= dmin)]
+        bl.sort(key=lambda o: (-(o["corte"] or 0), o["preco"] if o["preco"] is not None else 10**12, o["appid"]))
+        out[t] = {"total": len(bl), "itens": bl[:n]}
+    out["na_lista"] = sum(1 for o in itens if o["na_lista"])
+    return out
 
 
 def _rar_info(an):
@@ -243,14 +453,25 @@ def api_jogo(q):
     lojas_m = [l for l in hist if l.lower() in marc] + (["Steam (direto)"] if "steam" in marc else [])
     ofs_m = [o for o in atuais.values() if o["loja"].lower() in marc]
     melhor = min(ofs_m, key=lambda o: o["preco"]) if ofs_m else None
-    an = analise.analisar(b.linhas_lote(lojas_m, [a]).get(a, []) if lojas_m else [], melhor["preco"] if melhor else None,
-                          melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"])
+    lin_m = b.linhas_lote(lojas_m, [a]).get(a, []) if lojas_m else []
+    an = analise.analisar(lin_m, melhor["preco"] if melhor else None, melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"])
+    corte_m = melhor["corte"] if melhor else 0
+    tipos = analise.tipos_de(an)
+    volta, _ordem = analise.costuma_voltar(an, corte_m)
+    # linha informativa: a Steam sozinha da Novo recorde/Selo e as lojas marcadas nao (decisao final da spec 04)
+    st = atuais.get("Steam")
+    regua = analise.regua_steam(lin_m, melhor["preco"] if melhor else None, corte_m,
+                                b.linhas_lote(["Steam", "Steam (direto)"], [a]).get(a, []),
+                                st["preco"] if st else None, st["corte"] if st else 0, cfg_alerta=cfg["alerta"])         if "steam" in marc else None
     r = {"jogo":{k: j.get(k) for k in ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento",
                                          "preco_steam", "cheio_steam", "desconto_steam", "pai")},
          "historico": hist, "lojas": lojas, "dlcs": dl, "dlcs_estado": None if dl else _estado_dlcs(b, a, j),
          "caminhos": cam, "combo": combo,
          "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"], "selo_motivo": an["selo_motivo"], "no_piso": an["no_piso"],
          "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an), "score": an["score"],
+         "tipos": tipos, "tipo_oferta": analise.tipo_oferta(tipos), "volta_texto": volta,
+         "volta_dica": analise.dica_volta(an, corte_m), "regua_steam": regua,
+         "fim": _fim(melhor, j), "corte": corte_m,
          "gg":dict(gg) if gg else None, "modo": config.modo_do_jogo(cfg, a), "classes": dlcmod.CLASSES,
          "tenho": a in ctx.possuidos, "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
          "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a)),
@@ -568,6 +789,7 @@ def post_silenciar(d):
         b.con.execute("DELETE FROM silenciado WHERE appid=?", (a,))
     b.commit()
     b.con.close()
+    invalidar_linhas()
     return {"ok": True}
 
 
@@ -739,7 +961,8 @@ def post_pausar(_d):
 
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
-       "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso, "/api/ponte": api_ponte}
+       "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso, "/api/ponte": api_ponte,
+       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine}
 POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
@@ -875,6 +1098,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"erro": "o Radar aberto (versao %s) nao tem %s. Reinicie o Radar pela bandeja." % (VERSAO, u.path)}, 404)
         try:
             self._json(f(parse_qs(u.query)))
+        except PedidoInvalido as e:
+            self._json({"erro": str(e)}, 400)
         except Exception as e:
             _log_erro(u.path, e)
             self._json({"erro": str(e)}, 500)
@@ -899,7 +1124,9 @@ class Handler(BaseHTTPRequestHandler):
         try:
             n = int(self.headers.get("Content-Length") or 0)
             d = json.loads(self.rfile.read(n) or b"{}")
-            self._json(f(d))
+            r = f(d)
+            invalidar_linhas()  # silenciar, extra, tenho, carrinho, modo, dlc, config... mudam as linhas de Promocoes
+            self._json(r)
         except Exception as e:
             _log_erro(self.path, e)
             self._json({"erro": str(e)}, 500)
