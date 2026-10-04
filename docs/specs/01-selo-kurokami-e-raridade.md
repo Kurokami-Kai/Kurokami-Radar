@@ -1,6 +1,6 @@
 # Spec 01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica
 
-Status: **a implementar** · Pedido do dono em 02–03/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `editar-painel`
+Status: **feito em v0.14.0** (Selos e Recorde raro validados pelo dono antes de publicar) · Pedido do dono em 02–03/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `editar-painel`
 
 ## Problema (palavras do dono, resumidas)
 1. "Avaliação como métrica não vale." Os jogos já estão na lista de desejos: análise da Steam não deve decidir se uma promoção presta.

@@ -121,7 +121,12 @@ class Notificador:
         botoes = [("Abrir oferta", oferta), ("Não avisar mais", self._acao("silenciar", a["appid"]))]
         from .analise import NOME_RARIDADE
         rar = a.get("raridade")
-        titulo = ("%s · %s" % (NOME_RARIDADE[rar].upper(), a["nome"])) if rar in ("ultrarraro", "lendario") else a["nome"]
+        if a.get("selo"):
+            titulo = "SELO KUROKAMI · %s" % a["nome"]
+        elif rar in ("ultrarraro", "lendario"):
+            titulo = "%s · %s" % (NOME_RARIDADE[rar].upper(), a["nome"])
+        else:
+            titulo = a["nome"]
         notificar.mostrar(titulo, linha1 + "\n" + linha2, clique=oferta, botoes=botoes, imagem=img, rodape=rodape)
 
     def _acao(self, acao, appid):

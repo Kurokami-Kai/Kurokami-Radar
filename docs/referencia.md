@@ -32,12 +32,17 @@ Kurokami Radar - monitor de promocoes da wishlist Steam.
 Score, custo completo, bundles com desconto do que voce ja tem e regras de alerta.
 
 - `etiqueta(preco, cheio, pisos, cfg_alerta, flag)` — Qual o 'tamanho' do piso que este preco atinge. Devolve (tag, texto, acima_do_menor_de_sempre).
-- `raridade(linhas, preco, flag)` — Quao raro e este preco no historico do jogo (lojas que alertam).
+- `_ts(q)`
+- `_iso(t)`
+- `_igual(preco, ref)` — Centavos de diferenca (<= R$ 0,10 ou 1%) contam como igual.
+- `linha_do_tempo(linhas, agora_)` — Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
+- `episodios(segs, folga)` — Promocoes como episodios: [(ini, fim, maior_corte)]. Um intervalo sem desconto menor que `folga`
+- `analisar(linhas, preco, corte, agora_, cfg_alerta)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
+- `_score_v2(corte, nivel, no_piso)` — 0-100 sem analises: corte x peso da raridade, +10 no piso.
+- `favorito(jogo, cfg_alerta)` — Esta entre os N primeiros da ordem que voce deu na lista de desejos?
 - `raridade_ok(nivel, minimo)`
 - `_brl(c)`
 - `tag_minima_ok(tag, cfg_alerta)` — A etiqueta atinge o minimo que o usuario pediu para 'valer a pena'?
-- `qualidade(rpos, rcount)` — % positivas puxado para 70 quando ha poucas analises (40 analises 'virtuais').
-- `score(corte, rpos, rcount)`
 - **class `Contexto`** — Carrega uma vez o que a analise precisa do banco.
   - `preco(appid)`
   - `relevantes(appid)` — Base + DLCs que importam (sem cosmeticos etc., conforme o config).
@@ -211,6 +216,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_idade_userdata()`
 - `api_resumo(_q)`
 - `api_lista(_q)`
+- `_rar_info(an)` — O 'por que essa raridade' da ficha.
 - `_estado_dlcs(b, a, j)` — Por que a ficha nao tem DLCs: falhou, a Steam nao informou ou ainda nao consultada (com a fila, se rodando).
 - `api_jogo(q)`
 - `_ler_carrinho()`

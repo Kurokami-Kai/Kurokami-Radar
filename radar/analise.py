@@ -44,112 +44,202 @@ RARIDADES = ["comum", "incomum", "raro", "ultrarraro", "lendario"]
 NOME_RARIDADE = {"comum": "Comum", "incomum": "Incomum", "raro": "Raro", "ultrarraro": "Ultrarraro", "lendario": "Lendário"}
 
 
-def raridade(linhas, preco, flag=None):
-    """Quao raro e este preco no historico do jogo (lojas que alertam).
-    Olha o MENOR preco entre as lojas ao longo do tempo e mede, ANTES do episodio atual:
-    quanto tempo o jogo ficou neste preco ou menos e quantas vezes isso aconteceu.
-      Lendario  : nunca esteve tao barato (novo recorde)
-      Ultrarraro: menos de 2% do tempo, ou so 1 vez antes em 1 ano+ de historico
-      Raro      : menos de 8% do tempo
-      Incomum   : menos de 20% do tempo
-      Comum     : acontece com frequencia
-    Devolve {"nivel", "texto", "fracao", "vezes", "desde", "curto"} ou None."""
-    import time
+DIA = 86400.0
+PESO_RARIDADE = {"comum": 0.4, "incomum": 0.6, "raro": 0.8, "ultrarraro": 0.9, "lendario": 1.0}
+TOL_NIVEL = 5            # pontos de corte: 75% conta como "mesmo nivel" quando hoje e 80%
+JANELA_RARIDADE = 730    # dias (24 meses)
+
+
+def _ts(q):
     from datetime import datetime
-    if preco is None:
+    try:
+        return datetime.fromisoformat(str(q).replace("Z", "+00:00")).timestamp()
+    except ValueError:
         return None
-    VALIDADE_PROMO = 45 * 86400  # uma promocao sem registro de fim "acaba" sozinha depois disso
-    agora_ = time.time()
+
+
+def _iso(t):
+    from datetime import datetime, timezone
+    return datetime.fromtimestamp(t, timezone.utc).replace(microsecond=0).isoformat() if t is not None else None
+
+
+def _igual(preco, ref):
+    """Centavos de diferenca (<= R$ 0,10 ou 1%) contam como igual."""
+    return preco <= ref + max(10, ref * 0.01)
+
+
+def linha_do_tempo(linhas, agora_=None):
+    """Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
+    Cada registro vale ate o proximo da mesma loja; promocao sem fim registrado vence em 45 dias;
+    brindes (R$ 0) ficam de fora. Trechos sem nenhuma loja ativa tem menor_preco None."""
+    import time
+    agora_ = agora_ or time.time()
+    VALIDADE_PROMO = 45 * DIA
     por_loja = {}
     for r in linhas:
-        if not r["preco"] and preco:
-            continue  # brindes (R$ 0) nao contam como preco
-        try:
-            t = datetime.fromisoformat(str(r["quando"]).replace("Z", "+00:00")).timestamp()
-        except ValueError:
+        if not r["preco"]:
             continue
-        corte = r["corte"] if "corte" in r.keys() else 0
-        por_loja.setdefault(r["loja"], []).append((t, r["preco"], corte or 0))
-    if not por_loja:
-        return None
-    # cada registro vale ate o proximo da mesma loja; promocao sem fim registrado vence em 45 dias
-    # (sem isso, uma loja que parou de vender o jogo em promocao ficaria "em promocao" para sempre)
+        t = _ts(r["quando"])
+        if t is None or t > agora_:
+            continue
+        corte = (r["corte"] if "corte" in r.keys() else 0) or 0
+        por_loja.setdefault(r["loja"], []).append((t, r["preco"], corte))
+    # eventos: (tempo, tipo 0=sai/1=entra, loja, (preco, corte), id do registro)
     eventos = []
     for loja, regs in por_loja.items():
         regs.sort()
         for k, (t, p, c) in enumerate(regs):
-            fim = regs[k + 1][0] if k + 1 < len(regs) else agora_ + 1
+            fim = regs[k + 1][0] if k + 1 < len(regs) else agora_
             if c > 0:
                 fim = min(fim, t + VALIDADE_PROMO)
             if fim > t:
-                eventos.append((t, 1, loja, p, fim))
-                eventos.append((fim, 0, loja, p, fim))
+                eventos.append((t, 1, loja, (p, c), (loja, k)))
+                eventos.append((fim, 0, loja, (p, c), (loja, k)))
+    if not eventos:
+        return []
     eventos.sort(key=lambda e: (e[0], e[1]))
-    limiar = preco + max(10, preco * 0.01)  # centavos de diferenca contam como igual
-    ativos, linha = {}, []
-    for t, tipo, loja, p, fim in eventos:
+    ativos, segs = {}, []
+    for i, (t, tipo, loja, pc, rid) in enumerate(eventos):
         if tipo == 1:
-            ativos[loja] = (p, fim)
-        elif loja in ativos and ativos[loja][1] == fim:
+            ativos[loja] = (pc, rid)
+        elif loja in ativos and ativos[loja][1] == rid:
             del ativos[loja]
-        m = min((v[0] for v in ativos.values()), default=None)
-        if linha and linha[-1][0] == t:
-            linha[-1] = (t, m)
-        else:
-            linha.append((t, m))
-    linha = [(t, m) for t, m in linha if t <= agora_]
-    if not linha or all(m is None for _, m in linha):
-        return None
-    while linha and linha[0][1] is None:
-        linha.pop(0)
-    t0 = linha[0][0]
-    # inicio do episodio atual (a ultima vez que o menor preco caiu para <= limiar)
-    inicio = agora_
-    for i in range(len(linha) - 1, -1, -1):
-        if linha[i][1] is not None and linha[i][1] <= limiar:
-            inicio = linha[i][0]
-        else:
-            break
-    tempo_le, vezes, dentro, menor_antes = 0.0, 0, False, None
-    for i, (t, m) in enumerate(linha):
-        if t >= inicio:
-            break
-        fim = min(linha[i + 1][0] if i + 1 < len(linha) else agora_, inicio)
-        if m is None:
-            dentro = False
+        z = eventos[i + 1][0] if i + 1 < len(eventos) else agora_
+        if z <= t:
             continue
-        menor_antes = m if menor_antes is None else min(menor_antes, m)
-        if m <= limiar:
-            tempo_le += max(0, fim - t)
-            if not dentro:
-                vezes += 1
-            dentro = True
+        if ativos:
+            p, c = min(v[0] for v in ativos.values())
+            segs.append((t, z, p, c, max(v[0][1] for v in ativos.values())))
         else:
-            dentro = False
-    span = max(1.0, inicio - t0)
-    dias = span / 86400
-    fracao = tempo_le / span
-    desde = datetime.fromtimestamp(t0).year
-    curto = dias < 180
-    if flag == "N" or menor_antes is None or vezes == 0 or preco < menor_antes - max(10, menor_antes * 0.01):
-        nivel = "lendario"
-        texto = "nunca esteve tão barato (histórico desde %d)" % desde
-    elif fracao < 0.02 or (vezes <= 1 and dias >= 365):
+            segs.append((t, z, None, 0, 0))
+    # junta trechos vizinhos iguais
+    out = []
+    for s in segs:
+        if out and out[-1][2:] == s[2:] and out[-1][1] == s[0]:
+            out[-1] = (out[-1][0], s[1]) + s[2:]
+        else:
+            out.append(s)
+    while out and out[0][2] is None:
+        out.pop(0)
+    return out
+
+
+def episodios(segs, folga=DIA):
+    """Promocoes como episodios: [(ini, fim, maior_corte)]. Um intervalo sem desconto menor que `folga`
+    (uma loja acabou, outra comecou no mesmo dia) nao separa episodios."""
+    eps = []
+    for ini, fim, _p, _c, mc in segs:
+        if mc <= 0:
+            continue
+        if eps and ini - eps[-1][1] < folga:
+            eps[-1] = (eps[-1][0], fim, max(eps[-1][2], mc))
+        else:
+            eps.append((ini, fim, mc))
+    return eps
+
+
+def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
+    """Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
+    Devolve dict com: nivel, texto, por_ano, eps_nivel, ultima, corte_max, meses, curto, inicio,
+    no_piso, selo, piso_tipo, piso_ref, score. nivel/piso_tipo sao None se nao ha promocao."""
+    import time
+    agora_ = agora_ or time.time()
+    segs = linha_do_tempo(linhas, agora_)
+    corte = corte or 0
+    out = {"nivel": None, "texto": None, "por_ano": None, "eps_nivel": 0, "ultima": None, "corte_max": corte,
+           "meses": 0, "curto": True, "inicio": None, "no_piso": False, "selo": False,
+           "piso_tipo": None, "piso_ref": None, "score": 0}
+    if not segs:
+        if corte > 0:
+            out.update(nivel="comum", texto="sem histórico nas lojas marcadas", score=_score_v2(corte, "comum", False))
+        return out
+    t0 = segs[0][0]
+    dias_hist = (agora_ - t0) / DIA
+    out["meses"] = int(dias_hist // 30.4)
+    out["curto"] = dias_hist < 182
+    eps = episodios(segs)
+    # episodio atual: o ultimo, se ainda esta valendo
+    atual = eps[-1] if eps and eps[-1][1] >= agora_ - 1 else None
+    anteriores = eps[:-1] if atual else eps
+    if atual:
+        out["inicio"] = _iso(atual[0])
+    corte_max = max([e[2] for e in eps] + [corte])
+    out["corte_max"] = corte_max
+
+    # ---- pilula de piso (reais): compara com o que havia ANTES do episodio de preco atual
+    if preco is not None and corte > 0:
+        ini_preco = agora_
+        for s in reversed(segs):
+            if s[2] is not None and _igual(s[2], preco):
+                ini_preco = s[0]
+            else:
+                break
+        antes = [s for s in segs if s[1] <= ini_preco and s[2] is not None]
+        if antes:
+            rec = min(antes, key=lambda s: (s[2], -s[0]))
+            recorde = rec[2]
+            ultima_rec = max(s[1] for s in antes if _igual(s[2], recorde))
+            out["piso_ref"] = {"preco": recorde, "corte": rec[3], "quando": _iso(ultima_rec)}
+            jan = [s for s in antes if s[1] >= agora_ - JANELA_RARIDADE * DIA]
+            menor24 = min((s[2] for s in jan), default=None)
+            if preco < recorde - max(10, recorde * 0.01):
+                raro = (agora_ - ultima_rec) >= 548 * DIA or preco <= recorde * 0.5
+                out["piso_tipo"] = "raro" if raro else "novo"
+            elif _igual(preco, recorde):
+                out["piso_tipo"] = "igual"
+            elif menor24 is not None and _igual(preco, menor24):
+                out["piso_tipo"] = "24m"
+
+    if corte <= 0:
+        return out
+
+    # ---- eixo 1: raridade pela frequencia de episodios no mesmo nivel de corte
+    nivel_min = corte - TOL_NIVEL
+    no_nivel = [e for e in anteriores if e[2] >= nivel_min]
+    desde_jan = agora_ - JANELA_RARIDADE * DIA
+    na_janela = [e for e in no_nivel if e[1] >= desde_jan]
+    anos = max(0.5, (agora_ - max(t0, desde_jan)) / (365 * DIA))
+    por_ano = len(na_janela) / anos
+    out["eps_nivel"], out["por_ano"] = len(na_janela), round(por_ano, 2)
+    out["ultima"] = _iso(no_nivel[-1][0]) if no_nivel else None
+    desde = time.gmtime(t0).tm_year
+    if not no_nivel and dias_hist >= 365:
+        nivel, texto = "lendario", "nunca chegou a -%d%% (histórico desde %d)" % (nivel_min, desde)
+    elif por_ano < 0.75:
         nivel = "ultrarraro"
-        texto = ("só %d vez antes nesse preço, desde %d" % (vezes, desde)) if vezes <= 1 else \
-                "esteve assim só %.1f%% do tempo (%d vezes desde %d)" % (100 * fracao, vezes, desde)
-    elif fracao < 0.08:
-        nivel, texto = "raro", "esteve assim %d%% do tempo (%d vezes desde %d)" % (round(100 * fracao) or 1, vezes, desde)
-    elif fracao < 0.20:
-        nivel, texto = "incomum", "esteve assim %d%% do tempo (%d vezes desde %d)" % (round(100 * fracao), vezes, desde)
+        texto = ("nunca chegou a -%d%% (histórico desde %d)" % (nivel_min, desde)) if not no_nivel else \
+            "-%d%% ou mais %d vez(es) em 24 meses" % (nivel_min, len(na_janela)) if na_janela else \
+            "última vez a -%d%% ou mais: %s" % (nivel_min, time.strftime("%m/%Y", time.gmtime(no_nivel[-1][0])))
     else:
-        nivel, texto = "comum", "esteve assim %d%% do tempo: promoção frequente" % round(100 * fracao)
-    if curto:  # pouco historico: nao da para afirmar raridade alta
-        if dias < 60:
-            nivel, texto = "comum", "histórico curto (%d dias): raridade ainda incerta" % dias
-        elif RARIDADES.index(nivel) > RARIDADES.index("raro"):
-            nivel, texto = "raro", texto + " · histórico curto (%d dias)" % dias
-    return {"nivel": nivel, "texto": texto, "fracao": round(fracao, 4), "vezes": vezes, "desde": desde, "curto": curto}
+        nivel = "raro" if por_ano < 1.5 else "incomum" if por_ano < 3 else "comum"
+        texto = ("-%d%% ou mais %d vezes em %s (%.1f por ano)" % (
+            nivel_min, len(na_janela), "24 meses" if dias_hist >= JANELA_RARIDADE else "%d meses" % out["meses"], por_ano)).replace(".", ",")
+    if out["curto"] and RARIDADES.index(nivel) > RARIDADES.index("incomum"):
+        nivel, texto = "incomum", texto + " · histórico curto (%d dias)" % dias_hist
+    out["nivel"], out["texto"] = nivel, texto
+
+    # ---- eixo 2: no piso = perto do maximo da vida (corte) ou do menor preco de 24 meses
+    jan_p = [s[2] for s in segs if s[2] is not None and s[1] >= desde_jan]
+    menor24_tudo = min(jan_p, default=None)
+    out["no_piso"] = corte >= corte_max - TOL_NIVEL or (preco is not None and menor24_tudo is not None
+                                                        and preco <= menor24_tudo * 1.01)
+    minimo_selo = ((cfg_alerta or {}).get("selo_corte_minimo") or 0)
+    out["selo"] = bool(out["no_piso"] and RARIDADES.index(nivel) >= RARIDADES.index("raro")
+                       and dias_hist >= 365 and corte >= minimo_selo)
+    out["score"] = _score_v2(corte, nivel, out["no_piso"])
+    return out
+
+
+def _score_v2(corte, nivel, no_piso):
+    """0-100 sem analises: corte x peso da raridade, +10 no piso."""
+    return round(min(100, (corte or 0) * PESO_RARIDADE.get(nivel, 0.4) + (10 if no_piso else 0)), 1)
+
+
+def favorito(jogo, cfg_alerta):
+    """Esta entre os N primeiros da ordem que voce deu na lista de desejos?
+    A Steam manda prioridade 0 para quem nunca ordenou: isso e "sem posicao", nao "topo"."""
+    p = jogo.get("prioridade")
+    return bool(p) and p <= (cfg_alerta.get("favoritos_top") or 0)
 
 
 def raridade_ok(nivel, minimo):
@@ -169,19 +259,6 @@ def tag_minima_ok(tag, cfg_alerta):
     jan = cfg_alerta.get("janela_dias") or 0
     minimo = {0: "sempre", 365: "1a", 270: "9m", 180: "6m", 90: "3m"}.get(jan, "3m")
     return ORDEM_TAG[tag] >= ORDEM_TAG[minimo]
-
-
-def qualidade(rpos, rcount):
-    """% positivas puxado para 70 quando ha poucas analises (40 analises 'virtuais')."""
-    n = rcount or 0
-    if not n:
-        return None
-    return ((rpos or 0) * n + 70 * 40) / (n + 40)
-
-
-def score(corte, rpos, rcount):
-    q = qualidade(rpos, rcount)
-    return round((corte or 0) * (q if q is not None else 60) / 100, 1)
 
 
 class Contexto:
@@ -357,12 +434,8 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
         if appid in ctx.possuidos:
             continue  # voce ja tem (inclusive marcado como "ja tenho" no painel)
         nome = j.get("nome") or str(appid)
-        rpos, rcount = j.get("rpos") or 0, j.get("rcount") or 0
-        fav = j.get("prioridade") is not None and j["prioridade"] < (al.get("favoritos_top") or 0)
-        if not fav and al.get("ignorar_sem_avaliacoes") and not rcount:
-            continue
-        if not fav and al.get("avaliacao_minima") and rcount and rpos < al["avaliacao_minima"]:
-            continue
+        # analises da Steam nao decidem mais nada (o jogo ja esta na sua lista de desejos)
+        fav = favorito(j, al)
         modo = modo_do_jogo(cfg, appid)
 
         if modo == "completo" and ctx.dlcs.get(appid):
@@ -378,11 +451,10 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
                 soma_cheia = sum((ctx.jogos.get(a) or {}).get("cheio_steam") or 0
                                  for a in [appid] + ctx.relevantes(appid) if a not in ctx.possuidos)
                 corte = round(100 * (1 - m["custo_completo"] / soma_cheia)) if soma_cheia else 0
-                sc = score(corte, rpos, rcount)
-                if corte > 0 and piso is not None and m["custo_completo"] <= piso * tol and sc >= al.get("score_minimo", 0) \
+                if corte > 0 and piso is not None and m["custo_completo"] <= piso * tol \
                         and corte >= al.get("desconto_minimo", 0):
                     alertas.append({"appid": appid, "nome": nome, "loja": "Steam", "preco": m["custo_completo"], "corte": corte,
-                                    "score": sc, "tag": "completo",
+                                    "score": None, "tag": "completo",
                                     "motivo": "versão completa no menor valor já visto: %s" % m["nome"]})
             continue
 
@@ -399,22 +471,26 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
                 continue
             if cfg.get("somente_drm_steam") and not o["drm_steam"]:
                 continue
-            sc = score(o["corte"], rpos, rcount)
-            if not fav and (sc < al.get("score_minimo", 0) or o["corte"] < al.get("desconto_minimo", 0)):
-                continue  # favoritos (topo da sua lista) so precisam bater o piso
             if pisos is None:
                 lojas_p = list(lojas_marcadas) + (["Steam (direto)"] if "Steam" in lojas_marcadas else [])
                 linhas = ctx.b.linhas_lote(lojas_p, [appid]).get(appid, [])
                 pisos = ctx.b._pisos_de(linhas, (90, 180, 270, 365)) if linhas else {}
             tag, texto, acima = etiqueta(o["preco"], o.get("cheio"), pisos, al, o.get("flag"))
-            rar = raridade(linhas, o["preco"], o.get("flag")) if linhas else None
+            an = analisar(linhas, o["preco"], o["corte"], cfg_alerta=al)
+            if not an["nivel"]:
+                continue
             minimo = al.get("raridade_minima") or "raro"
-            if rar and raridade_ok(rar["nivel"], "incomum" if fav and RARIDADES.index(minimo) > 1 else minimo):
-                alertas.append({"appid": appid, "nome": nome, "loja": o["loja"], "preco": o["preco"], "corte": o["corte"],
-                                "score": sc, "url": o.get("url"), "tag": tag, "acima": acima, "favorito": fav,
-                                "raridade": rar["nivel"], "raridade_texto": rar["texto"],
-                                "menor_sempre": pisos.get(0),
-                                "motivo": "%s: %s" % (NOME_RARIDADE[rar["nivel"]], rar["texto"]) + (" · favorito da sua lista" if fav else "")})
+            if fav and RARIDADES.index(minimo if minimo in RARIDADES else "raro") > 1:
+                minimo = "incomum"  # favoritos (topo da sua lista) avisam a partir de Incomum
+            if not an["selo"] and not (raridade_ok(an["nivel"], minimo)
+                                       and (fav or o["corte"] >= al.get("desconto_minimo", 0))):
+                continue
+            motivo = ("Selo Kurokami: " if an["selo"] else "") + "%s: %s" % (NOME_RARIDADE[an["nivel"]], an["texto"])
+            alertas.append({"appid": appid, "nome": nome, "loja": o["loja"], "preco": o["preco"], "corte": o["corte"],
+                            "score": an["score"], "url": o.get("url"), "tag": tag, "acima": acima, "favorito": fav,
+                            "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"],
+                            "piso_tipo": an["piso_tipo"], "menor_sempre": pisos.get(0),
+                            "motivo": motivo + (" · favorito da sua lista" if fav else "")})
 
         # ---- keyshops, so quando muito barato
         g = gg.get(appid)
@@ -439,5 +515,6 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
         top = dict(lst[0])
         top["outras"] = [x["loja"] for x in lst[1:] if x["preco"] - top["preco"] <= 100 and x["loja"] != top["loja"]]
         final.append(top)
-    final.sort(key=lambda a: (-(RARIDADES.index(a["raridade"]) if a.get("raridade") in RARIDADES else -1), -(a["score"] or 0)))
+    final.sort(key=lambda a: (not a.get("selo"), -(RARIDADES.index(a["raridade"]) if a.get("raridade") in RARIDADES else -1),
+                              -(a["score"] or 0)))
     return final

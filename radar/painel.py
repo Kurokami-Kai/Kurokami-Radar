@@ -159,7 +159,8 @@ def api_lista(_q):
         ps = pisos.get(a) or {}
         tag, texto, acima = (analise.etiqueta(melhor["preco"], melhor.get("cheio"), ps, cfg["alerta"])
                              if melhor and melhor["corte"] else (None, None, None))
-        rar = analise.raridade(linhas.get(a, []), melhor["preco"]) if melhor and melhor["corte"] else None
+        an = analise.analisar(linhas.get(a, []), melhor["preco"] if melhor else None,
+                              melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"])
         preco = melhor["preco"] if melhor else j.get("preco_steam")
         cheio = (melhor or {}).get("cheio") or j.get("cheio_steam")
         g = gg.get(a) or {}
@@ -173,18 +174,23 @@ def api_lista(_q):
             "piso": ps.get(0, piso_marc), "piso_geral": piso_geral,
             "pisos": {"3m": ps.get(90), "6m": ps.get(180), "9m": ps.get(270), "1a": ps.get(365), "sempre": ps.get(0)},
             "tag": tag, "tag_texto": texto, "acima": acima,
-            "raridade": rar["nivel"] if rar else None, "raridade_texto": rar["texto"] if rar else None,
-            "no_piso": bool(rar and analise.raridade_ok(rar["nivel"], "raro")),
-            "score": analise.score(corte, j.get("rpos"), j.get("rcount")) if corte else 0,
+            "raridade": an["nivel"], "raridade_texto": an["texto"], "no_piso": an["no_piso"], "selo": an["selo"],
+            "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
+            "score": an["score"],
             "keyshop": g.get("keyshop"), "hist_keyshop": g.get("hist_keyshop"), "gg_url": g.get("url"),
             "vale": a in vale, "novo": a in novos, "motivo": (vale.get(a) or {}).get("motivo"),
             "base_tenho": bool(j.get("tipo") == "dlc" and j.get("pai") in ctx.possuidos),
             "bundles": nb.get(a, 0), "n_dlcs": len(ctx.dlcs.get(a, [])), "modo": modo,
             "extra": a in extras, "fim": fim, "prioridade": j.get("prioridade"), "mudo": a in mudos,
-            "favorito": j.get("prioridade") is not None and j["prioridade"] < (cfg["alerta"].get("favoritos_top") or 0),
+            "favorito": analise.favorito(j, cfg["alerta"]),
         })
     b.con.close()
     return {"itens": out, "lojas": cfg["lojas"]}
+
+
+def _rar_info(an):
+    """O 'por que essa raridade' da ficha."""
+    return {k: an.get(k) for k in ("corte_max", "eps_nivel", "por_ano", "ultima", "meses", "curto", "inicio")}
 
 
 def _estado_dlcs(b, a, j):
@@ -233,11 +239,19 @@ def api_jogo(q):
     gg = b.um("SELECT * FROM gg WHERE appid=?", a)
     if ctx.precos_parciais(a):
         gg = None
-    r = {"jogo": {k: j.get(k) for k in ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento",
+    marc = _marcadas(cfg)
+    lojas_m = [l for l in hist if l.lower() in marc] + (["Steam (direto)"] if "steam" in marc else [])
+    ofs_m = [o for o in atuais.values() if o["loja"].lower() in marc]
+    melhor = min(ofs_m, key=lambda o: o["preco"]) if ofs_m else None
+    an = analise.analisar(b.linhas_lote(lojas_m, [a]).get(a, []) if lojas_m else [], melhor["preco"] if melhor else None,
+                          melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"])
+    r = {"jogo":{k: j.get(k) for k in ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento",
                                          "preco_steam", "cheio_steam", "desconto_steam", "pai")},
          "historico": hist, "lojas": lojas, "dlcs": dl, "dlcs_estado": None if dl else _estado_dlcs(b, a, j),
          "caminhos": cam, "combo": combo,
-         "gg": dict(gg) if gg else None, "modo": config.modo_do_jogo(cfg, a), "classes": dlcmod.CLASSES,
+         "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"], "no_piso": an["no_piso"],
+         "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an), "score": an["score"],
+         "gg":dict(gg) if gg else None, "modo": config.modo_do_jogo(cfg, a), "classes": dlcmod.CLASSES,
          "tenho": a in ctx.possuidos, "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
          "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a)),
          "na_lista": a in ctx.lista, "fila": (lambda r: r["acao"] if r else None)(b.um("SELECT acao FROM fila_lista WHERE appid=?", a)),
@@ -307,13 +321,14 @@ def api_carrinho(_q):
         escolhida = next((o for o in ofs if o["loja"] == it.get("loja")), ofs[0] if ofs else None)
         tag, texto, acima = analise.etiqueta(escolhida["preco"], escolhida.get("cheio"), ps, cfg["alerta"]) \
             if escolhida and escolhida.get("corte") else (None, None, None)
-        rar = analise.raridade(b.linhas_lote(lojas_m, [a]).get(a, []), escolhida["preco"]) \
-            if escolhida and escolhida.get("corte") and lojas_m else None
+        an = analise.analisar(b.linhas_lote(lojas_m, [a]).get(a, []), escolhida["preco"], escolhida.get("corte"),
+                              cfg_alerta=cfg["alerta"]) if escolhida and escolhida.get("corte") and lojas_m else {}
         out.append({"appid": a, "nome": j.get("nome") or str(a), "capa": j.get("capa"), "tipo": j.get("tipo"),
                     "possuido": a in ctx.possuidos, "lojas": [{k: o.get(k) for k in ("loja", "preco", "cheio", "corte", "url")} for o in ofs],
                     "loja": escolhida["loja"] if escolhida else None, "piso": ps.get(0), "fim": _fim(escolhida, j),
                     "tag": tag, "tag_texto": texto, "acima": acima, "em_bundle": cobertos.get(a, []),
-                    "raridade": rar["nivel"] if rar else None, "raridade_texto": rar["texto"] if rar else None,
+                    "raridade": an.get("nivel"), "raridade_texto": an.get("texto"), "selo": an.get("selo", False),
+                    "piso_tipo": an.get("piso_tipo"), "piso_ref": an.get("piso_ref"),
                     "rpos": j.get("rpos") or 0, "rcount": j.get("rcount") or 0})
     # sugestoes: bundles da Steam com pelo menos 1 item do carrinho
     preco_esc = {x["appid"]: next((l["preco"] for l in x["lojas"] if l["loja"] == x["loja"]), None) for x in out}

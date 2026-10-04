@@ -18,7 +18,7 @@ Kurokami Radar/
 │   ├── coleta.py            # orquestra a coleta (catálogo, biblioteca, ITAD, GG, custo completo)
 │   ├── dlc.py               # classificação de DLCs por nome
 │   ├── series.py            # agrupa jogos da mesma série pelo nome (aba Biblioteca)
-│   ├── analise.py           # score, etiquetas, raridade, caminhos/combinação de compra, avaliar()
+│   ├── analise.py           # raridade v2 (episódios), piso, Selo, score, etiquetas, caminhos/combinação de compra, avaliar()
 │   ├── notificar.py         # toast do Windows via PowerShell; capa do jogo
 │   ├── notificador.py       # regras de envio (linha de base, rearme, silêncio, fim de promoção)
 │   ├── servico.py           # ciclo() e thread Servico (agenda, completa periódica)

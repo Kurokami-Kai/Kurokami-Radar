@@ -30,7 +30,7 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 
 - `perfil_steam`, `pais`, `userdata_json`, `pasta_kurokami_precos`
 - `lojas` (alertam), `somente_drm_steam`
-- `alerta`: `score_minimo`, `desconto_minimo`, `avaliacao_minima`, `ignorar_sem_avaliacoes`, `raridade_minima`, `favoritos_top`, `dias_minimos_completo`, `tolerancia_pct`, `janela_dias`/`perto` (informativos)
+- `alerta`: `desconto_minimo`, `raridade_minima`, `selo_corte_minimo` (Selo só a partir desse corte; padrão 0), `favoritos_top` (posições 1..N da ordem da wishlist; prioridade 0 = sem posição), `dias_minimos_completo`, `tolerancia_pct`, `janela_dias`/`perto` (informativos). `score_minimo`, `avaliacao_minima` e `ignorar_sem_avaliacoes` são ignorados desde a 0.14 (ficam por compatibilidade)
 - `keyshops`: `ativo`, `preco_maximo`, `pct_do_menor_oficial`
 - `dlc`: `ignorar_cosmeticos|extras|atalhos|pacotes|gratis`
 - `completo`: `padrao`, `jogos{appid:"completo"}`

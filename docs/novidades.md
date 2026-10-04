@@ -2,6 +2,14 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.14.0
+- **Raridade nova:** mede quantas vezes por ano o jogo chega àquele desconto, não o preço em reais. Promoções que se repetem não saem mais como *Lendário* (ex.: Castle of Illusion a 80%, quando 75% acontece todo mês).
+- **Selo Kurokami:** um selo dourado para o melhor desconto que o jogo costuma ter, e raro. Sempre avisa, com "SELO KUROKAMI" no título da notificação. Dá para exigir um desconto mínimo em Configurações.
+- **Pílula de piso** ao lado do preço: *Novo recorde*, *Recorde raro*, *Igual ao recorde*, *Menor em 24 meses* ou o menor preço já visto, em cinza.
+- A ficha do jogo explica a raridade: maior desconto da vida, quantas vezes chegou nesse nível em 24 meses e quando foi a última.
+- **Análises da Steam não decidem mais alertas** (o jogo já está na sua lista). Saíram das Configurações "Score mínimo", "Análises positivas mínimas" e "Ignorar sem análises".
+- Correção: quem nunca ordenou a lista de desejos na Steam tinha **todos** os jogos tratados como favoritos.
+
 ## 0.13.0 (publicada em 2026-10-03)
 - **A primeira verificação agora é completa:** lê as DLCs de todos os jogos de uma vez, sem esperar várias rodadas.
 - **Atualizando da 0.12:** a primeira abertura faz uma verificação completa (30 a 40 min), porque a 0.12 nunca a registrou. Deixe o Radar aberto até terminar.

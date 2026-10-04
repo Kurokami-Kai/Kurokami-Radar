@@ -49,7 +49,14 @@ Verificação **rápida** = o ciclo normal (respeita intervalos e orçamento). *
 
 ## Avaliação (`analise.avaliar`)
 
-Por jogo da lista (exceto os que o usuário já tem): para cada oferta das **lojas marcadas** (e DRM Steam, se exigido) calcula score (`desconto × qualidade das análises`), etiqueta de janela (3m/6m/9m/1a/sempre/perto) e **raridade** (fração do tempo, no histórico, em que o menor preço entre as lojas marcadas esteve ≤ preço atual). Alerta se score/desconto/avaliação mínimos e raridade ≥ `raridade_minima` (favoritos do topo da lista só precisam de raridade ≥ incomum). Modo completo e keyshop têm regras próprias. Saída agrupada: um alerta por jogo.
+Por jogo da lista (exceto os que o usuário já tem): para cada oferta das **lojas marcadas** (e DRM Steam, se exigido) roda `analise.analisar(linhas, preco, corte)`:
+- `linha_do_tempo` junta o histórico das lojas marcadas em trechos (menor preço, corte do menor, maior corte); `episodios` vira promoções (intervalo sem desconto < 1 dia não separa).
+- **Raridade** (eixo 1): episódios anteriores com corte ≥ atual − 5, por ano, nos últimos 24 meses. Comum ≥ 3/ano · Incomum 1,5–3 · Raro 0,75–1,5 · Ultrarraro < 0,75 · Lendário = nunca, com ≥ 12 meses de histórico. Histórico < 6 meses: no máximo Incomum.
+- **No piso** (eixo 2): corte ≥ maior corte da vida − 5, ou preço ≤ menor de 24 meses + 1%. **Selo Kurokami** = no piso + Raro ou melhor + ≥ 12 meses + corte ≥ `selo_corte_minimo`.
+- **Pílula de piso** (reais, só informativa): compara com o menor preço *antes* do episódio de preço atual: novo / raro (≥ 18 meses sem esse nível ou ≤ 50% do recorde) / igual / 24m.
+- **Score** (só ordenação): corte × peso da raridade (0,4…1,0) + 10 no piso. Análises não entram em nada.
+
+Alerta se tem Selo, ou raridade ≥ `raridade_minima` e corte ≥ `desconto_minimo` (favoritos, posições 1..`favoritos_top` da wishlist: a partir de Incomum e sem desconto mínimo). Modo completo e keyshop têm regras próprias. Saída agrupada: um alerta por jogo, Selo primeiro.
 
 ## Notificação (`notificador.Notificador`)
 

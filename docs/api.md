@@ -20,12 +20,12 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | Rota | Resposta (campos principais) |
 |---|---|
 | `/api/resumo` | `versao, na_lista, possuidos, vale_a_pena, atualizado, pausado, na_bandeja, proxima, estado, userdata_dias, atualizacao, progresso{ativo,modo,etapa,atual,total,decorrido,log[],ultima}, ult_completa, completa_dias` |
-| `/api/lista` | `itens[]`: `appid, nome, tipo, capa, rpos, rcount, rotulo, lancamento, preco, cheio, corte, loja, url, piso, piso_geral, pisos{3m,6m,9m,1a,sempre}, tag, tag_texto, acima, raridade, raridade_texto, no_piso, score, keyshop, hist_keyshop, gg_url, vale, novo, motivo, base_tenho, bundles, n_dlcs, modo, extra, fim, prioridade, mudo, favorito` |
-| `/api/jogo?appid=` | `jogo{}, historico{loja:[[iso,preco]]}, lojas[{loja,atual,cheio,corte,url,menor,marcada,vende}], dlcs[], dlcs_estado (só sem DLCs: `{motivo: pendente\|sem_dlcs\|falhou, quando?, fila?{atual,total}}`), caminhos[], combo, gg, modo, classes, tenho, tenho_manual, mudo, na_lista, fila, ponte_vista` |
+| `/api/lista` | `itens[]`: `appid, nome, tipo, capa, rpos, rcount, rotulo, lancamento, preco, cheio, corte, loja, url, piso, piso_geral, pisos{3m,6m,9m,1a,sempre}, tag, tag_texto, acima, raridade, raridade_texto, no_piso, selo, piso_tipo (novo\|raro\|igual\|24m\|null), piso_ref{preco,corte,quando}, rar_info{corte_max,eps_nivel,por_ano,ultima,meses,curto,inicio}, score, keyshop, hist_keyshop, gg_url, vale, novo, motivo, base_tenho, bundles, n_dlcs, modo, extra, fim, prioridade, mudo, favorito` |
+| `/api/jogo?appid=` | `jogo{}, historico{loja:[[iso,preco]]}, lojas[{loja,atual,cheio,corte,url,menor,marcada,vende}], dlcs[], dlcs_estado (só sem DLCs: `{motivo: pendente\|sem_dlcs\|falhou, quando?, fila?{atual,total}}`), caminhos[], combo, raridade, raridade_texto, selo, no_piso, piso_tipo, piso_ref, rar_info, score, gg, modo, classes, tenho, tenho_manual, mudo, na_lista, fila, ponte_vista` |
 | `/api/alertas` | último resultado de `avaliar` (`quando, itens[], novos[]`) |
 | `/api/notificacoes` | `itens[]` da tabela `alerta` (200 mais recentes) |
 | `/api/config` | `config, lojas_itad[], classes` |
-| `/api/carrinho` | `itens[]` (com `lojas[]`, `raridade`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `ponte_vista, ponte_falhas[], sem_pacote[]` |
+| `/api/carrinho` | `itens[]` (com `lojas[]`, `raridade`, `selo`, `piso_tipo`, `piso_ref`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `ponte_vista, ponte_falhas[], sem_pacote[]` |
 | `/api/buscar?q=` | busca na loja (nome, appid ou link) → `itens[{appid,nome,capa,preco,corte,tipo,na_lista,possuido}]` |
 | `/api/biblioteca` | `jogos[]` (valor, DLCs que contam, faltantes com preço/menor, bundles), `total{hoje,cheio,menor,falta_*}`, `franquias[]` (séries), `sem_lista_dlc, sem_dados, atualizado, falta_ids` |
 | `/api/acesso` | `rede_local, porta, ips[], pin, links[]` (só local) |

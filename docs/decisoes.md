@@ -22,8 +22,11 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 - Não usar várias chaves da mesma API para driblar limite (termos de uso).
 
 ## Avaliação
-- **Raridade** (não janelas) decide o alerta: fração do tempo em que o menor preço entre as lojas marcadas esteve ≤ preço atual, antes do episódio atual. Promoção sem registro de fim "vence" em 45 dias; brindes (R$ 0) não contam; histórico < 60 dias = "comum/incerto"; < 180 dias limita a "raro".
-- Score = `desconto × qualidade`, qualidade puxada para 70% com poucas análises (40 virtuais).
+- **Raridade v2 (0.14) mede o corte, não o preço.** A v1 media reais e chamava de Lendário qualquer centavo abaixo do piso: Castle of Illusion a 80% saía Lendário, mas 75% acontece todo mês; mudanças de preço base (HLM2 R$ 24,99 → R$ 46,99) também enganavam. Agora: episódios de promoção nas lojas marcadas, corte até 5 pontos abaixo = mesmo nível, frequência por ano em 24 meses (ver `arquitetura.md`). Promoção sem registro de fim "vence" em 45 dias; brindes (R$ 0) não contam.
+- **Dois eixos separados:** raridade (frequência do corte) decide o alerta; a **pílula de piso** (reais) é só informação e nunca alimenta a raridade. "Recorde raro" é regra nossa (≥ 18 meses sem aquele nível ou ≤ 50% do recorde); a SteamDB não documenta a dela e só olha a Steam.
+- **Selo Kurokami** = no piso + Raro ou melhor + ≥ 12 meses de histórico. Um jogo a R$ 10 todo mês não ganha Selo.
+- **Análises não decidem nada** (o jogo já está na lista de desejos): saíram do score e dos filtros de alerta. Score = corte × peso da raridade + 10 no piso, só para ordenar.
+- **`priority` 0 da wishlist = "sem posição"**, não "topo": quem nunca ordenou a lista tem tudo em 0, e com `favoritos_top` todos viravam favoritos. Favorito = posição 1..N.
 - Diferenças de centavos (≤ R$ 0,10 ou 1%) contam como "igual" ao piso.
 - "Completo" = combinação mais barata de edições/bundles/avulsos que cobre base + DLCs relevantes (`melhor_combinacao`, força bruta em até 14 opções). Pacotes (`classe=pacote`) contam por padrão.
 - Séries: agrupadas pelo **nome** (`series.py`), não pelo campo franquia da Steam ("EA Play" não é série).

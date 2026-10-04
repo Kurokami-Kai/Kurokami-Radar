@@ -1,11 +1,11 @@
 # Pendências e ideias
 
 ## Especificações prontas para implementar
-- [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica](specs/01-selo-kurokami-e-raridade.md)
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
-- [04 — Filtros, colunas e "DLCs em promoção"](specs/04-filtros-e-colunas-da-lista.md) — implementar depois da 01
+- [04 — Filtros, colunas e "DLCs em promoção"](specs/04-filtros-e-colunas-da-lista.md) — a 01 já está feita (v0.14.0)
 
 ## Feitas
+- [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica (feito em v0.14.0)](specs/01-selo-kurokami-e-raridade.md)
 - [02 — DLCs não aparecem (feito em v0.13.0)](specs/02-dlcs-nao-aparecem.md)
 
 ## Ideias
@@ -19,5 +19,5 @@ Em ordem aproximada de valor. Nada aqui foi iniciado.
 - **Dividir o `painel.html`** (≈80 KB) em CSS/JS separados ou módulos, mantendo sem build.
 - **Ponte**: confirmar com uso real; ajustar se a Steam mudar `/cart/addtocart`.
 - **Versão multiusuário na nuvem** (discutida, não decidida): Oracle Always Free + login Steam OpenID + Telegram; exigiria pedir permissão de uso às APIs.
-- **Guia em PDF** para usuários: ainda não cobre a ponte nem a raridade.
+- **Guia em PDF** para usuários: ainda não cobre a ponte, a raridade v2 nem o Selo.
 - **Faixa do evento da Steam com data de fim** (falta fonte).

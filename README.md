@@ -82,7 +82,10 @@ Repita de vez em quando: o painel avisa quando o arquivo tiver mais de 30 dias. 
 
 ### Abas do painel
 
-- **Vale a pena:** o que bateu os seus filtros, com a **raridade do preço**: ★ *Lendário* (nunca esteve tão barato), *Ultrarraro* (quase nunca), *Raro* (menos de 8% do tempo), *Incomum* e *Comum* (promoção frequente). Por padrão o Radar só avisa a partir de *Raro*.
+- **Vale a pena:** o que bateu os seus filtros, com a **raridade do desconto**, medida por quantas vezes por ano o jogo chega a esse desconto (ou até 5 pontos menos) nos últimos 24 meses: ★ *Lendário* (nunca chegou), *Ultrarraro* (menos de 1 vez a cada 16 meses), *Raro* (cerca de 1 vez por ano), *Incomum* e *Comum* (3 ou mais vezes por ano). Por padrão o Radar só avisa a partir de *Raro*.
+- **Selo Kurokami** (dourado): o melhor desconto que aquele jogo costuma ter, e raro (Raro ou melhor, com 1 ano ou mais de histórico). O Selo sempre avisa, e a notificação começa com "SELO KUROKAMI".
+- **Pílula de piso**, ao lado do preço, em reais: *Novo recorde* (azul), *Recorde raro* (azul-claro: recorde que não se via havia 18 meses ou pela metade do preço), *Igual ao recorde* (verde), *Menor em 24 meses* (roxo). Sem pílula, aparece o menor preço já visto em cinza.
+- As **análises da Steam** aparecem como informação, mas não decidem alertas: o jogo já está na sua lista de desejos.
 - **Lista de desejos:** tudo, com filtros, ordenação e três visualizações. Clique num jogo para ver o histórico em gráfico, as lojas, as formas de comprar e as DLCs (se não houver, a ficha diz por quê: lista ainda na fila, a Steam não informou ou a consulta falhou).
 - **Biblioteca:** valor da sua coleção, quanto falta para completar cada jogo com as DLCs, séries e coleção.
 - **Carrinho:** simule uma compra (jogos e bundles), escolha a loja de cada item e veja o total.

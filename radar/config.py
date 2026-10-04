@@ -20,21 +20,24 @@ PADRAO = {
         "modo": "menor_historico",
         "tolerancia_pct": 0,          # 5 = aceita ate 5% acima do menor historico
         # Raridade minima para avisar: comum, incomum, raro, ultrarraro, lendario.
-        # Mede quanto tempo o jogo ja passou nesse preco (ou menos) no historico das lojas que alertam.
+        # Mede quantas vezes por ano o jogo chega a esse corte (ou ate 5 pontos menos) nas lojas que alertam.
+        # O Selo Kurokami (melhor corte que o jogo costuma ter, e raro) sempre avisa.
         "raridade_minima": "raro",
+        "selo_corte_minimo": 0,       # so ganha Selo a partir deste corte (%)
         # (informativo) piso por janela: 90 (3 meses), 180, 270, 365 (1 ano) ou 0 (so o de todos os tempos).
         # Cada jogo ganha a etiqueta do maior piso que atinge (sempre > 1 ano > 9m > 6m > 3m).
         "janela_dias": 90,
         # "Perto do menor de sempre": vale mesmo sem bater piso nenhum se a diferenca for pequena
         # em relacao ao preco cheio (HL Miami 2: R$ 7,04 x R$ 4,99 num jogo de R$ 46,99 = 4% do cheio).
         "perto": {"ativo": True, "pct_do_cheio": 10, "reais": 3},
-        "score_minimo": 60,           # 0 a 100 (desconto x qualidade das analises)
         "desconto_minimo": 50,
-        "avaliacao_minima": 75,       # % de analises positivas
+        # (ignorados desde a 0.14: analises nao decidem mais alertas; ficam por compatibilidade)
+        "score_minimo": 60,
+        "avaliacao_minima": 75,
         "ignorar_sem_avaliacoes": True,
         "dias_minimos_completo": 14,  # modo completo: so alerta depois de observar o custo por esse tempo
-        # os N primeiros da sua lista de desejos (ordem que voce deu na Steam) so precisam bater o piso:
-        # score, desconto e avaliacao minimos nao valem para eles
+        # os N primeiros da sua lista de desejos (ordem que voce deu na Steam) avisam a partir de Incomum
+        # e sem desconto minimo
         "favoritos_top": 10
     },
 
