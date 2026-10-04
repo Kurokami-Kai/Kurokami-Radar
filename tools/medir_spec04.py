@@ -1,6 +1,7 @@
 """Medicoes da spec 04, Etapa 1.2 a 1.5, numa COPIA do banco real (apagada no fim); nada e gravado no banco.
 
 Uso: py tools/medir_spec04.py [--banco CAMINHO] [--config CAMINHO]
+1b filtros padrao de Promocoes e coluna "Costuma voltar"
 1.2 vitrine (regra exclusiva selo > novo > igual > 24m) e avisos de uma rodada: regra atual x "so o Selo ligado"
 1.3 userdata.json (so numeros)   1.4 DLCs em promocao   1.5 tempo/tamanho de painel.api_lista({})
 Resultado bruto em dados/sonda/medir_spec04.json (fora do Git)."""
@@ -156,8 +157,69 @@ def medir(raiz_real):
     res["1.4"] = {"dlcs_relevantes_sem_ter": len(dl), "com_desconto": len(promo), "com_desconto_lojas_marcadas": len(na_marc),
                   "via_oferta_atual_itad": len(itad), "so_preco_steam_do_jogo": len(steam - itad)}
     print("1.4 DLCs:", json.dumps(res["1.4"], ensure_ascii=False))
+
+    # ---- 1b: filtros padrao de Promocoes e coluna "Costuma voltar" (jogos da lista em promocao, sem os que voce tem)
+    lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")}
+               if l.lower() in {x.lower() for x in cfg["lojas"]}]
+    if "steam" in {x.lower() for x in cfg["lojas"]}:
+        lojas_m.append("Steam (direto)")
+    linhas = b.linhas_lote(lojas_m)
+    promo = [it for it in lista["itens"] if it["corte"] and it["appid"] not in ctx.possuidos]
+    somem = [it for it in promo if it["corte"] < 50 or (it["rcount"] or 0) < 5000]
+    poucas = [it for it in promo if it["corte"] >= 50 and (it["rcount"] or 0) < 5000]
+    dist, ex, antigos = {}, {}, 0
+    for it in promo:
+        txt, ordem = costuma_voltar(it, linhas.get(it["appid"], []))
+        dist[txt] = dist.get(txt, 0) + 1
+        ex.setdefault(txt, [])
+        if len(ex[txt]) < 3:
+            ri = it["rar_info"] or {}
+            ex[txt].append("%s (-%d%%; %s)" % (it["nome"], it["corte"], dica(it)))
+        if txt == "nunca teve esse desconto" and (it["rar_info"] or {}).get("ultima"):
+            antigos += 1
+    res["1b"] = {"em_promocao": len(promo), "somem_com_padrao": len(somem), "ficam_com_padrao": len(promo) - len(somem),
+                 "corte50_rcount_menor_5000": len(poucas), "costuma_voltar": dist, "exemplos": ex,
+                 "nunca_teve_mas_teve_antes_de_24m": antigos}
+    print("1b em promoção (sem os que você tem): %d · somem com os filtros padrão: %d (ficam %d) · corte >= 50 com < 5.000 análises: %d"
+          % (len(promo), len(somem), len(promo) - len(somem), len(poucas)))
+    for txt, n in sorted(dist.items(), key=lambda x: -x[1]):
+        print("   %-26s %4d  ex.: %s" % (txt, n, " | ".join(ex[txt])))
+    print("   (\"nunca teve esse desconto\" que teve esse nível antes da janela de 24 meses: %d)" % antigos)
     b.con.close()
     return res
+
+
+def costuma_voltar(it, linhas):
+    """(texto, ordem) da coluna "Costuma voltar" (emenda 2 da spec 04). Ordem: menor = mais raro; None = fim."""
+    ri = it.get("rar_info") or {}
+    if not it.get("corte"):
+        return None, None
+    if ri.get("curto"):
+        return "histórico curto", None
+    eps = analise.episodios(analise.linha_do_tempo(linhas))
+    ant = eps[:-1] if eps and eps[-1][1] >= time.time() - 1 else eps
+    if not ant:
+        return "primeira promoção", None
+    if not ri.get("eps_nivel"):
+        return "nunca teve esse desconto", 0
+    x = 12 / ri["por_ano"]
+    if x < 1.5:
+        txt = "todo mês"
+    elif x < 10.5:
+        txt = "a cada ~%d meses" % round(x)
+    elif x < 18:
+        txt = "1 vez por ano"
+    else:
+        txt = "1 vez em 2 anos"
+    return txt, ri["por_ano"]
+
+
+def dica(it):
+    ri = it.get("rar_info") or {}
+    ult = ri.get("ultima")
+    return "nos últimos 2 anos: %s vezes com -%d%% ou mais%s · maior desconto que já teve: -%s%%" % (
+        ri.get("eps_nivel") or 0, max(0, it["corte"] - 5),
+        " (última em %s/%s)" % (ult[5:7], ult[:4]) if ult else "", ri.get("corte_max"))
 
 
 if __name__ == "__main__":

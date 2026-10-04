@@ -1,6 +1,6 @@
 # Spec 04 — Vitrine, aba Promoções e avisos por tipo de recorde
 
-Status: **Etapa 1 feita em 04/10/2026 (resultados no fim); Etapa 2 aguarda o ok do dono** (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
+Status: **Etapas 1 e 1b feitas em 04/10/2026 (resultados no fim); Etapa 2 aguarda o ok do dono** · Emenda de 04/10 incorporada ao corpo (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
 
 **Duas etapas. Faça a Etapa 1, entregue o relatório e PARE. A Etapa 2 só começa depois do ok do dono, que pode mudar números desta spec com base na Etapa 1.**
 
@@ -111,27 +111,29 @@ Relatório de cada fonte:
 2. **Tipos da oferta**, calculados sobre a oferta avaliada nas lojas marcadas:
    - `tipos` (lista, não exclusiva): `selo` se `an["selo"]`; `novo` se `piso_tipo in ("novo","raro")`; `igual`; `24m`.
    - `tipo_oferta`: o primeiro de [selo, novo, igual, 24m] presente em `tipos`, ou None. É exclusivo e é usado na vitrine, no "Mostrar só" e no título do aviso.
-3. **Não favorito avisa** se existe `t` em `tipos` com `alerta.tipos[t]` ligado e:
+   - **Selo = só a regra G** (emenda 1): `piso_tipo == "raro"` com ≥ 1 promoção anterior nas lojas marcadas e corte ≥ `selo_corte_minimo`. F (Lendário) deixa de dar Selo. `piso_tipo == "raro"` sem promoção anterior conta como `novo`.
+   - Na tela, `24m` se chama **"Menor em 2 anos"**.
+3. **Avisa** se existe `t` em `tipos` com `alerta.tipos[t]` ligado e:
    - `t == "selo"` (o `selo_corte_minimo` já está dentro de `an["selo"]`); **ou**
    - corte ≥ `alerta.desconto_minimo`.
-4. **Favorito** (posições 1..`favoritos_top`) avisa se `tipos` não estiver vazio, mesmo com os tipos desligados e sem desconto mínimo. Isso substitui a regra "a partir de Incomum".
+4. **Sem exceção para favoritos** (emenda 3): todos seguem as 4 caixas. `alerta.favoritos_top` passa a ser ignorado (fica no config por compatibilidade). O campo `favorito` pode continuar na API.
 5. **Raridade não decide mais aviso.**
    - `alerta.raridade_minima` passa a ser ignorado (fica no config por compatibilidade).
    - Raro e Ultrarraro sem Selo deixam de avisar.
-   - A raridade continua calculada e exibida.
+   - A raridade continua calculada por dentro (`rar_info`, coluna "Costuma voltar", spec 05), mas **não é mais exibida** (emenda 2).
    - Os avisos de keyshop e de modo completo não mudam.
 6. **Ligar um tipo não dispara em massa.**
    - Guarde em `meta.tipos_ligados` os tipos da última rodada.
    - Quando um tipo passa de desligado para ligado, os jogos que avisariam só por causa dele entram em `notificado` sem toast. Sai um único toast: "<Tipo> ligado: N jogos já estão assim agora. Você vai receber só os próximos.", com o botão "Ver", que abre a vitrine.
    - Sem `meta.tipos_ligados` (primeira rodada da 0.15), grave os tipos atuais sem toast.
-7. **Título e motivo do aviso** (use `piso_ref`; confira que, no caso `24m`, ele traz o menor de sempre, senão use o menor de sempre das lojas marcadas):
+7. **Título e motivo do aviso** (use `piso_ref`; confira que, no caso `24m`, ele traz o menor de sempre, senão use o menor de sempre das lojas marcadas). O título **nunca** usa raridade (sai o "LENDÁRIO · <jogo>" / "ULTRARRARO · <jogo>" de `notificador.py`):
 
    | Tipo | Título | Motivo |
    |---|---|---|
-   | `selo` | "SELO KUROKAMI · <jogo>" | o que já existe |
+   | `selo` | "SELO KUROKAMI · <jogo>" | `selo_motivo` novo: se preço ≤ 50% do menor anterior, "preço caiu pela metade ou mais (o menor anterior era R$ X, mm/aaaa)"; senão, "o menor preço anterior (R$ X) foi há N meses" |
    | `novo` | "Novo recorde · <jogo>" | "menor preço já registrado (antes R$ X em mm/aaaa)" |
    | `igual` | "Igual ao recorde · <jogo>" | "mesmo preço do menor já registrado (mm/aaaa)" |
-   | `24m` | "Menor em 24 meses · <jogo>" | "menor preço em 2 anos (o menor de sempre foi R$ X em mm/aaaa)" |
+   | `24m` | "Menor em 2 anos · <jogo>" | "menor preço em 2 anos (o menor de sempre foi R$ X em mm/aaaa)" |
 
 8. **Ordem** da saída e do `max_por_rodada`: selo, novo, igual, 24m; dentro de cada tipo, maior corte primeiro.
 9. `vale` passa a significar "avisaria agora". O "termina em breve" não muda. Os itens de `ultimos_alertas` ganham `tipos` e `tipo_oferta`.
@@ -144,20 +146,21 @@ Relatório de cada fonte:
 - Na docstring: "a spec 06 (login por QR) troca só esta função".
 
 ### C. Filtros no Radar (servidor)
-1. **Cache das linhas.** `painel.linhas_promocoes()` monta, por jogo, os campos de `/api/lista` mais `inicio`, `tipos`, `tipo_oferta`, `na_lista`, `tenho` (`possuido` ou `tenho_manual`), `no_carrinho`, `em_bundle`, `seguido` e `ignorado_steam`.
+1. **Cache das linhas.** `painel.linhas_promocoes()` monta, por jogo, os campos de `/api/lista` mais `inicio`, `tipos`, `tipo_oferta`, `na_lista`, `tenho` (`possuido` ou `tenho_manual`), `no_carrinho`, `em_bundle`, `seguido`, `ignorado_steam`, `volta_texto` e `volta_ordem` (emenda 2).
    - Fica em memória, com lock.
    - É refeito quando termina uma coleta, quando o config é gravado, nos POST de silenciar, extra, tenho, carrinho, modo e dlc, e quando o userdata.json muda de data.
 2. **`GET /api/promocoes?q=<JSON url-encoded>`**
-   - Campos de `q`: `busca`, `relacao{campo: "exigir"|"excluir"}`, `qualquer_um` (bool), `mostrar_so[]`, `tipo[]`, `raridade[]`, `outros[]`, `preco_de`/`preco_ate` (centavos), `analises_de`/`analises_ate`, `nota_min`, `desconto_min`, `lanc_de`/`lanc_ate` (aaaa-mm-dd), `em_breve` (bool), `ordem` ([[campo, "asc"|"desc"], ...]), `pagina` (a partir de 1). São 100 itens por página.
-   - Resposta: `{total, pagina, itens[], contagens{mostrar_so{selo,novo,igual,24m}, raridade{...}, tipo{jogo,dlc}}, conta{tem_dados, quando}}`.
+   - Campos de `q`: `busca`, `relacao{campo: "exigir"|"excluir"}`, `qualquer_um` (bool), `mostrar_so[]`, `tipo[]`, `outros[]`, `preco_de`/`preco_ate` (centavos), `analises_de`/`analises_ate`, `nota_min`, `desconto_min`, `lanc_de`/`lanc_ate` (aaaa-mm-dd), `em_breve` (bool), `ordem` ([[campo, "asc"|"desc"], ...]), `pagina` (a partir de 1), `por_pagina` (só 50, 100 ou 250; padrão 100).
+   - Não há filtro de raridade (emenda 2).
+   - Resposta: `{total, pagina, por_pagina, itens[], contagens{mostrar_so{selo,novo,igual,24m}, tipo{jogo,dlc}}, conta{tem_dados, quando}}`.
    - Cada contagem é calculada com todos os outros filtros aplicados, menos o do próprio grupo (como na SteamDB).
 3. **Combinação dos filtros.**
    - Os grupos se combinam com E.
-   - Dentro de Mostrar só, Tipo, Raridade e Outros, as caixas se combinam com OU.
+   - Dentro de Mostrar só, Tipo e Outros, as caixas se combinam com OU.
    - Na Relação, os "exigir" se combinam com E (ou com OU se `qualquer_um`), e os "excluir" sempre excluem.
    - Um item sem o valor de uma faixa ativa (ex.: sem data de lançamento com o filtro de lançamento ligado) fica fora.
 4. **Ordenação.**
-   - Campos permitidos: `nome`, `corte`, `preco`, `raridade` (lendario > ultrarraro > raro > incomum > comum > sem promoção), `nota` (rpos/rcount), `analises` (rcount), `lancamento`, `fim`, `inicio`.
+   - Campos permitidos: `nome`, `corte`, `preco`, `volta` (por `volta_ordem`: "nunca teve esse desconto" primeiro, depois do mais raro ao mais frequente; "primeira promoção", "histórico curto" e vazio no fim, como os nulos), `nota` (rpos/rcount), `analises` (rcount), `lancamento`, `fim`, `inicio`.
    - Valores nulos ficam sempre por último; o desempate final é o appid.
    - Padrão: corte desc, depois nome asc.
 5. **Validação:** campo ou valor desconhecido → 400 com mensagem em português; campos ausentes = sem filtro.
@@ -169,17 +172,18 @@ Relatório de cada fonte:
 
 **D1. Aba "Vale a pena" = vitrine**, no padrão das prateleiras da loja Steam.
 - **Topo:** carrossel "Selo Kurokami" (reaproveite o `hero`), com até 10 jogos de `tipo_oferta == "selo"` e "Ver tudo (N)". Se estiver vazio: "Nenhum jogo com Selo agora."
-- **Abaixo, nesta ordem:** blocos "Novo recorde", "Igual ao recorde", "Menor em 24 meses".
+- **Abaixo, nesta ordem:** blocos "Novo recorde", "Igual ao recorde", "Menor em 2 anos".
   - Cada jogo aparece em um bloco só (`tipo_oferta`).
   - Os três blocos respeitam `alerta.desconto_minimo`.
   - Bloco vazio não aparece.
 - **Cada bloco tem:**
   - título com 🔔 se o tipo avisa;
-  - subtítulo de uma linha: "o menor preço que já registramos" / "o mesmo preço do menor já registrado" / "o menor preço dos últimos 2 anos (já esteve mais barato antes)";
+  - subtítulo de uma linha, só a descrição (emenda 7): Selo "O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade" · Novo recorde "Nunca esteve tão barato" · Igual ao recorde "No mesmo preço do menor já registrado" · Menor em 2 anos "No menor preço dos últimos 2 anos";
   - grade de até 8 capas (4 × 2; 2 colunas em `max-width:720px`), por corte desc e depois preço asc;
   - "Ver tudo (N)".
 - **Capa:** arte, nome, caixa de preço da Steam, botão + do carrinho e, se faltar menos de 72 h, "⏳ termina em…". Sem outras pílulas.
-- **"Ver tudo"** abre Promoções com Mostrar só = aquele tipo e, fora do Selo, "Desconto ≥ `desconto_minimo`". O total exibido ali é o mesmo N.
+- **"Ver tudo"** abre Promoções com Mostrar só = aquele tipo e, fora do Selo, "Desconto ≥ `desconto_minimo`". **Não** aplica o filtro de análises (emenda 4). O total exibido ali é o mesmo N.
+- **Sem raridade e sem "Costuma voltar"** na vitrine.
 - **Sai da aba:**
   - a lista "Todos que valem a pena";
   - as pílulas Todos/Selo/Lendário/Ultrarraro+/Raro+/Incomum+;
@@ -187,9 +191,11 @@ Relatório de cada fonte:
   - a faixa "Promoções raras da sua lista… / Ver a lista inteira".
 - **Contador do topo da página:** "N na vitrine · M na lista".
 
-**D2. Aba "Lista de desejos" passa a se chamar "Promoções"** em todos os textos visíveis (o id interno pode continuar `lista`). É um explorador que começa sem filtros e usa `/api/promocoes`.
+**D2. Aba "Lista de desejos" passa a se chamar "Promoções"** em todos os textos visíveis (o id interno pode continuar `lista`). É um explorador que usa `/api/promocoes`.
 
-A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que abre um painel. Os filtros aplicam na hora (espera de 250 ms na digitação), o estado fica salvo no navegador (`ls.set`) e há um botão "Limpar filtros". De cima para baixo:
+**Filtros padrão (emenda 4):** sem estado salvo no navegador (primeira vez), a aba abre com "Desconto ≥ 50%" e "Análises ≥ 5.000" (`rcount ≥ 5000`), já como chips com ×. Com estado salvo, vale o estado salvo.
+
+A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que abre um painel. Os filtros aplicam na hora (espera de 250 ms na digitação), o estado fica salvo no navegador (`ls.set`), e há os botões "Limpar filtros" (remove tudo) e "Restaurar padrão" (volta aos dois chips). De cima para baixo:
 
 1. **Busca por nome.**
 2. **"Sua relação com o jogo"**, cada linha com 3 estados: ✕ esconder / — tanto faz / ✓ só esses.
@@ -198,7 +204,6 @@ A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que ab
    |---|---|
    | Na lista de desejos | `na_lista` |
    | Monitorado por você | `extra` |
-   | Favorito | `favorito` |
    | No carrinho | `no_carrinho` |
    | Seguido na Steam | `seguido` |
    | Ignorado na Steam | `ignorado_steam` |
@@ -208,10 +213,9 @@ A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que ab
 
    - Caixa "Qualquer um": os ✓ passam a valer com OU.
    - Sem dados da conta (`conta.tem_dados` falso): Seguido e Ignorado ficam desativados, com a dica "precisa dos dados da sua conta Steam".
-3. **"Mostrar só"**, combinadas com OU, cada caixa com uma bolinha na cor da sua pílula: Selo Kurokami · Novo recorde · Igual ao recorde · Menor em 24 meses (`tipo_oferta`). Cada caixa mostra a sua contagem.
+3. **"Mostrar só"**, combinadas com OU, cada caixa com uma bolinha na cor da sua pílula: Selo Kurokami · Novo recorde · Igual ao recorde · Menor em 2 anos (`tipo_oferta`). Cada caixa mostra a sua contagem.
 4. **Listas recolhíveis**, com ponto azul no título quando há algo marcado:
    - **Tipo:** Jogo, DLC.
-   - **Raridade:** Lendário, Ultrarraro, Raro, Incomum, Comum, Sem promoção. Cada nível só ele, sem "+".
    - **Outros:** Só em promoção · Em bundle · Modo completo · Keyshop bem mais barata (usa o campo `keyshop` atual; a spec 05 troca a regra).
 5. **Faixas:**
    - Preço de/até (R$);
@@ -222,15 +226,16 @@ A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que ab
 
    Análises e nota filtram só a tela, nunca aviso.
 
-**Chips** acima da tabela: um por filtro ativo (ex.: "Selo Kurokami", "Desconto ≥ 50%", "✓ Favorito", "✕ Silenciado"). O × remove só aquele filtro.
+**Chips** acima da tabela: um por filtro ativo (ex.: "Selo Kurokami", "Desconto ≥ 50%", "Análises ≥ 5.000", "✓ No carrinho", "✕ Silenciado"). O × remove só aquele filtro.
 
 **Tabela (padrão):**
 - **Colunas:**
+  - ícones (emenda 6), à esquerda da capa: carrinho em fundo amarelo se `no_carrinho`; lista em fundo verde se `na_lista`; nada nos outros casos;
   - capa;
   - nome, com o Selo e a pílula de recorde ao lado;
   - %, na caixa verde;
+  - Costuma voltar (`volta_texto`; dica ao passar o mouse ou tocar: "Nos últimos 2 anos: N vezes com -Y% ou mais (última em mm/aaaa) · maior desconto que já teve: -Z%");
   - Preço;
-  - Raridade (pílula);
   - Análises (%, com a cor de `revClass`);
   - Lançamento;
   - Termina ("em 5 dias"; vazio se não houver data);
@@ -238,28 +243,31 @@ A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que ab
   - botão + do carrinho.
 - **Ordenação:** clique ordena e inverte; Shift+clique soma critérios. A seta mostra a direção e o número mostra a ordem dos critérios.
 - **Visualização em Grade:** usa um seletor com os mesmos critérios.
-- **"Mostrar mais":** carrega a próxima página.
+- **Itens por página** (emenda 5): seletor 50 / 100 (padrão) / 250, com a escolha salva; paginação numerada no fim da tabela. Sem "Mostrar mais".
 - **No celular:** a tabela rola na horizontal dentro do próprio contêiner, sem a página rolar de lado.
 
 **Sai da aba:**
 - a barra azul de atalhos;
-- as pílulas cumulativas de raridade;
+- as pílulas cumulativas de raridade, o filtro, a coluna e a ordenação por raridade (emenda 2);
 - "Restringir por preço", "Desconto mínimo", "Análises de usuários" e "Restringir por";
 - as visualizações em linhas e compacta;
 - o seletor "Ordenar por".
 
-**D3. Ficha:** mostrar "Termina em" sempre que houver data, e não só abaixo de 72 h. O resto da ficha é da spec 05.
+**D3. Ficha:**
+- mostrar "Termina em" sempre que houver data, e não só abaixo de 72 h;
+- o bloco "Por que <raridade>" vira "Costuma voltar: <texto>", com a linha da dica embaixo; o bloco do Selo continua acima dele, quando houver (emenda 2);
+- a frase "em cerca de 7 de 10 casos…" usa o número da Etapa 1b, na métrica em R$ (ver resultado da 1b);
+- a frase de referência do Selo passa a ser "o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade".
+
+O resto da ficha é da spec 05.
 
 **D4. Configurações:** o bloco "O que vale a pena" passa a se chamar **"O que te avisa"**.
-- **4 caixas** (Selo Kurokami, Novo recorde, Igual ao recorde, Menor em 24 meses).
-  - Cada caixa tem uma linha fixa com os números da Etapa 1 (com o `desconto_minimo` padrão): "Em X de 10 vezes, o jogo não ficou mais barato nos 12 meses seguintes · ~N avisos por semana (M em grandes promoções)".
-  - Registre a data do backtest em `docs/decisoes.md`.
-- **"Desconto mínimo (%)":** com a dica "vale para Novo recorde, Igual e Menor em 24 meses".
+- **4 caixas** (Selo Kurokami, Novo recorde, Igual ao recorde, Menor em 2 anos); só o Selo vem ligado.
+  - Cada caixa tem uma linha fixa: a descrição da emenda 7 + " · ~N avisos por semana (M em grandes promoções)", com a **média** de avisos novos por semana da Etapa 1b (`desconto_minimo` padrão; uma casa decimal quando < 1). As 4 frases prontas estão no resultado da Etapa 1b.
+  - O "em X de 10" fica só em `docs/decisoes.md`, com a data do backtest.
+- **"Desconto mínimo (%)":** com a dica "vale para Novo recorde, Igual e Menor em 2 anos".
 - **"Selo Kurokami: desconto mínimo (%)":** fica como está.
-- **Favoritos:**
-  - o texto passa a ser "Você tem N favoritos: eles avisam em qualquer tipo, sem desconto mínimo";
-  - com N = 0: "Sua lista de desejos não tem ordem: ordene-a na Steam para ter favoritos".
-- **Saem:** "Avisar a partir de" e a dica do Score. O resto da aba é da spec 05.
+- **Saem:** "Avisar a partir de", a dica do Score e o campo de favoritos (emenda 3). O resto da aba é da spec 05.
 
 **D5. Biblioteca → "DLCs em promoção"**
 - **O que entra:** DLCs relevantes (`relevantes()`) que o usuário não tem, de jogos que ele tem, com desconto agora.
@@ -268,16 +276,124 @@ A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que ab
 
 ### E. Docs
 - `docs/api.md`: `/api/promocoes`, `/api/vitrine` e os campos novos de `/api/lista`.
-- `docs/dados.md`: `alerta.tipos`, `meta.tipos_ligados` e `raridade_minima` ignorado.
-- `docs/arquitetura.md`: a regra de aviso, o cache das linhas e o `conta_steam`.
+- `docs/dados.md`: `alerta.tipos`, `meta.tipos_ligados`, e `raridade_minima` e `favoritos_top` ignorados.
+- `docs/arquitetura.md`: a regra de aviso, o Selo só G, a coluna "Costuma voltar", o cache das linhas e o `conta_steam`.
 - `docs/decisoes.md`:
   - avisos por tipo, com a tabela da Etapa 1;
   - Raro/Ultrarraro sem Selo deixam de avisar;
-  - o Selo contém o rare deal;
+  - o Selo passa a ser só o rare deal (G): F sai por causa da escada de descontos (F 67,5% × G 84,3% em +5, backtest de 04/10) e os números da Etapa 1b;
+  - raridade sai das telas (vira "Costuma voltar") e favoritos não têm mais exceção de aviso;
+  - a frase de referência do Selo: "o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade";
   - filtros no servidor, pensando na Steam inteira.
 - `docs/pendencias.md`: marcar como resolvido o item "Decidir se Raro/Ultrarraro sem Selo continuam alertando".
-- `README.md` e a seção `## 0.15.0` de `docs/novidades.md`, em linguagem de usuário.
+- `README.md` e a seção `## 0.15.0` de `docs/novidades.md`, em linguagem de usuário (avisar que os Selos de hoje, todos do tipo F, deixam de ser Selo; a frase nova do Selo; raridade virou "Costuma voltar").
+- `tools/testar_piso.py`: casos "maior desconto da história sem recorde raro → sem Selo", "escada 40% → 50% com 30 meses de histórico → sem Selo", "recorde raro com promoção anterior → Selo".
+- `tools/backtest_selo.py`: a variante "Selo" passa a ser G com ≥ 1 promoção anterior.
 - Ao terminar, rode `py tools/gerar_referencia.py`.
+
+## Emenda (04/10) — decisões do dono depois da Etapa 1
+
+O Radar responde duas perguntas separadas:
+- **"Está barato agora?"** — 4 tipos de preço, em reais. Só eles decidem aviso.
+- **"Essa promoção volta sempre?"** — a coluna "Costuma voltar". Só informa.
+
+### 1. Selo Kurokami = só o rare deal (G)
+- **Selo** = `piso_tipo == "raro"` **e** ≥ 1 promoção anterior nas lojas marcadas **e** corte ≥ `alerta.selo_corte_minimo`.
+  - É a regra G atual, sem mudar nada: preço abaixo do menor registrado antes do episódio atual (diferença > R$ 0,10 e > 1%), **e** (o preço esteve no nível desse recorde pela última vez há ≥ 18 meses, **ou** preço ≤ 50% dele).
+- **F (Lendário / maior desconto da história) deixa de dar Selo.**
+- **Motivo:** na escada de descontos (o corte sobe de degrau a cada ano, ex.: Forza 20% → 30% → 40% → 50%), cada degrau novo vira "maior desconto da história" depois de 24 meses de histórico. No backtest de 04/10, F acertou 67,5% e G 84,3% (+5, corte). Registre isso em `docs/decisoes.md`.
+- **`selo_motivo`** diz qual condição bateu; se as duas baterem, use a primeira:
+  - ≤ 50%: "preço caiu pela metade ou mais (o menor anterior era R$ X, mm/aaaa)";
+  - senão: "o menor preço anterior (R$ X) foi há N meses".
+- **Frase de referência para os textos do usuário:** "o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade". Ela substitui "o maior desconto ou o menor preço em muito tempo" no README, na ficha e nos docs.
+- **Ficha:** a frase "em cerca de 7 de 10 casos…" passa a usar o número da Etapa 1b, na métrica em R$.
+- **Na Etapa 2:**
+  - mude `analise.py`;
+  - em `tools/testar_piso.py`, acrescente estes casos:
+    - maior desconto da história sem recorde raro → sem Selo;
+    - escada 40% → 50% com 30 meses de histórico → sem Selo;
+    - recorde raro com promoção anterior → Selo;
+  - a variante "Selo" do `tools/backtest_selo.py` passa a ser G com ≥ 1 promoção anterior;
+  - atualize `arquitetura.md`, o README e `novidades.md` (avisar que os Selos de hoje, todos do tipo F, deixam de ser Selo).
+- `tipos`/`tipo_oferta` (A.2) não mudam: `selo` se `an["selo"]`; `piso_tipo == "raro"` sem promoção anterior conta como `novo`.
+
+### 2. Os 5 níveis de raridade saem das telas → coluna "Costuma voltar"
+- **Saem de todas as telas e textos do usuário:** os nomes Comum/Incomum/Raro/Ultrarraro/Lendário, as pílulas coloridas, a legenda, o filtro "Raridade" (D2), a coluna "Raridade" e a ordenação por raridade. Isso vale para Promoções, vitrine, ficha, carrinho, biblioteca, notificações e Configurações.
+- **Notificação:** o título deixa de usar raridade (sai o "LENDÁRIO · <jogo>" / "ULTRARRARO · <jogo>" de `notificador.py`). O título segue a tabela de A.7.
+- **Por dentro, nada muda no cálculo:** `analisar` continua calculando nível, episódios e `rar_info` (usados pela coluna e pela spec 05). Os campos `raridade`/`raridade_texto` podem continuar na API, mas o painel não os mostra. O `score` fica só interno.
+- **Campos novos** em `/api/lista` e `/api/promocoes`: `volta_texto` (string ou null) e `volta_ordem` (número para ordenar).
+- **Valor da coluna** (só com corte > 0; sem promoção = vazio):
+
+  | Situação | Texto |
+  |---|---|
+  | `rar_info.curto` (histórico < 6 meses) | "histórico curto" |
+  | nenhuma promoção anterior nas lojas marcadas | "primeira promoção" |
+  | `eps_nivel == 0` | "nunca teve esse desconto" |
+  | X < 1,5 (X = 12 / `por_ano` meses) | "todo mês" |
+  | 1,5 ≤ X < 10,5 | "a cada ~N meses" (N = round(X)) |
+  | 10,5 ≤ X < 18 | "1 vez por ano" |
+  | X ≥ 18 | "1 vez em 2 anos" |
+
+- **Ordenação (`volta_ordem`):** "nunca teve esse desconto" primeiro, depois do mais raro ao mais frequente (menor `por_ano` primeiro), "todo mês" por último. "Primeira promoção", "histórico curto" e vazio ficam sempre no fim, como os nulos.
+- **Dica ao passar o mouse** (tocar, no celular): "Nos últimos 2 anos: N vezes com -Y% ou mais (última em mm/aaaa) · maior desconto que já teve: -Z%". Y = corte atual − 5; N = `eps_nivel`; Z = `corte_max`.
+- **Ficha (D3):** o bloco "Por que <raridade>" vira "Costuma voltar: <texto>", com a mesma linha da dica embaixo. O bloco do Selo continua acima dele, quando houver.
+- **Onde aparece:** na tabela de Promoções (coluna "Costuma voltar", entre "%" e "Preço") e na ficha. Na vitrine não aparece.
+
+### 3. Favoritos saem
+- Sai a regra A.4: não há mais exceção de aviso para favoritos. Todos seguem as 4 caixas.
+- `alerta.favoritos_top` passa a ser ignorado (fica no config por compatibilidade), assim como `alerta.raridade_minima`.
+- Saem o campo de favoritos das Configurações (D4), a linha "Favorito" da relação com o jogo (D2) e o chip correspondente. O campo `favorito` pode continuar na API.
+- No Aceite 3, troque o caso do favorito por: "um jogo com `piso_tipo == "24m"` e corte < `desconto_minimo` não avisa".
+
+### 4. Filtros padrão ao abrir Promoções (como a SteamDB)
+- **Sem estado salvo no navegador** (primeira vez), a aba abre com "Desconto ≥ 50%" e "Análises ≥ 5.000" (`rcount ≥ 5000`), já como chips com ×.
+- **Com estado salvo,** vale o estado salvo.
+- **Botões:** "Limpar filtros" remove tudo; um botão novo, "Restaurar padrão", volta aos dois chips.
+- **"Ver tudo" da vitrine** abre com Mostrar só = aquele tipo e, fora do Selo, "Desconto ≥ `desconto_minimo`". **Não** aplica o filtro de análises, para o total bater com o N do bloco.
+
+### 5. Itens por página
+- Seletor com 50, 100 (padrão) e 250; a escolha fica salva.
+- Paginação numerada no fim da tabela; o "Mostrar mais" sai.
+- Em `/api/promocoes`, `por_pagina` aceita só 50, 100 ou 250.
+- As `contagens` de C.2 ficam só com `mostrar_so` e `tipo` (a de raridade sai).
+
+### 6. Ícones na linha (como a SteamDB)
+À esquerda da capa, na tabela:
+- ícone de carrinho em fundo amarelo se `no_carrinho`;
+- ícone de lista em fundo verde se `na_lista`;
+- nada nos outros casos.
+
+### 7. Textos das 4 caixas de aviso (D4) e dos blocos da vitrine (D1)
+Só a descrição e a quantidade de avisos. O "em X de 10" fica só em `docs/decisoes.md`.
+
+| Caixa / bloco | Descrição |
+|---|---|
+| Selo Kurokami | "O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade" |
+| Novo recorde | "Nunca esteve tão barato" |
+| Igual ao recorde | "No mesmo preço do menor já registrado" |
+| Menor em 2 anos | "No menor preço dos últimos 2 anos" |
+
+- **Nas Configurações**, depois da descrição: " · ~N avisos por semana (M em grandes promoções)". Use a **média** de avisos novos por semana (não a mediana), com o `desconto_minimo` padrão, e uma casa decimal quando for < 1.
+- **Na vitrine**, o subtítulo do bloco é só a descrição.
+- O tipo `24m` passa a ser exibido como "Menor em 2 anos" em todos os textos do usuário.
+- Só o Selo vem ligado.
+
+### Aceite (trocas)
+- **Aceite 2:** com só o Selo ligado, uma rodada no banco de hoje avisa só jogos com Selo G (imprima quantos e quais). Não avisa ninguém por raridade nem por favorito.
+- **Aceite 6:** sai o caso "marcar só Ultrarraro". Entram estes:
+  - ordenar por "Costuma voltar" põe "nunca teve esse desconto" primeiro e "histórico curto", "primeira promoção" e vazios por último;
+  - nenhuma tela mostra Comum/Incomum/Raro/Ultrarraro/Lendário (`grep` no `painel.html` e no `notificador.py`).
+
+### Etapa 1b — medir e parar
+1. Rode `tools/backtest_tipos.py` com a variante `selo` = G + ≥ 1 promoção anterior: eventos, não ficou mais barato (R$), não batido +5/+10, não voltou em 6m, **média** de avisos novos por semana normal/grande, hoje.
+2. Reimprima a média de avisos novos por semana de `novo`, `igual` e `24m` com o `desconto_minimo` padrão.
+3. No banco real de hoje:
+   - quantos jogos da lista estão em promoção;
+   - quantos somem com os filtros padrão (corte < 50 ou `rcount` < 5000);
+   - quantos jogos com corte ≥ 50 têm `rcount` < 5000.
+4. Distribuição da coluna "Costuma voltar" hoje entre os jogos em promoção (quantos em cada texto) e 3 exemplos de cada.
+5. Monte as 4 frases finais do item 7 com os números.
+6. Registre tudo na spec e **PARE**.
 
 ## Resultado da Etapa 1 (04/10/2026, banco instalado: 726 jogos; lojas GreenManGaming, Nuuvem, Steam)
 
@@ -343,6 +459,63 @@ O que dá para calcular **sem baixar histórico**:
 - **Steam:** nada disso (só o preço de agora).
 - **Busca:** nada disso.
 
+## Resultado da Etapa 1b (04/10/2026, mesmo banco)
+
+### 1. Selo = só G (`py tools/backtest_tipos.py`; G com ≥ 1 promoção anterior)
+| Variante | Eventos (ev. qq.) | Não ficou mais barato (R$) | Não batido +5 | +10 | Não voltou 6m | Média de avisos novos/sem. normal / grande | Hoje |
+|---|---|---|---|---|---|---|---|
+| **selo (só G)** | **47** (56) | **74,5%** | **89,4%** | 93,6% | 31,9% | **0,2 / 0,7** | **0** |
+| selo antigo (F ou G), para comparar | 143 (161) | 60,1% | 71,3% | 87,4% | 15,4% | 0,6 / 2 | 11 |
+
+- Confere com o `backtest_selo.py`: a G tinha 51 eventos, e 4 deles não tinham promoção anterior.
+- **Hoje não há nenhum Selo G.** Os 11 Selos de hoje são todos F e somem; o carrossel da vitrine abriria vazio ("Nenhum jogo com Selo agora.") e o Aceite 2 imprimiria 0 avisos.
+- Frase da ficha: "em cerca de **7** de 10 casos" (74,5%, métrica em R$).
+
+### 2. Média de avisos novos por semana (desconto ≥ 50%)
+| Tipo | Semana normal | Grande promoção |
+|---|---|---|
+| novo | 2,3 | 6,4 |
+| igual | 13,5 | 33,7 |
+| 24m | 1,8 | 3,1 |
+
+### 3. Filtros padrão de Promoções (banco real, jogos da lista em promoção que você não tem)
+- Em promoção: **618**.
+- Somem com os filtros padrão (corte < 50 ou < 5.000 análises): **413**. Ficam **205**.
+- Com corte ≥ 50 e < 5.000 análises: **197**. Quase todo o corte vem das análises.
+
+### 4. Coluna "Costuma voltar" hoje (618 jogos em promoção; `py tools/medir_spec04.py`)
+| Texto | Jogos | Exemplos |
+|---|---|---|
+| a cada ~2 meses | 162 | Anno 1503 History Edition (-50%), Dragon Age Inquisition (-75%), Nelke & the Legendary Alchemists (-77%) |
+| todo mês | 149 | Balatro (-20%), Zombie Army 4 (-90%), Tales of Xillia Remastered (-25%) |
+| a cada ~3 meses | 79 | Mortal Kombat: Legacy Kollection (-50%), Team Fortress Classic (-80%), RoboCop: Rogue City (-90%) |
+| histórico curto | 71 | Rubinite (-20%), Counter-Strike (-80%), Assassin's Creed Black Flag Resynced (-10%) |
+| a cada ~5 meses | 34 | The Alters (-55%), Rustil (-40%), Battlefield 6 (-50%) |
+| nunca teve esse desconto | 32 | Valdis Story (-50%), BlazBlue Entropy Effect (-47%), FANTASIAN Neo Dimension (-60%) |
+| a cada ~4 meses | 32 | Hellblade II (-75%), Atelier Ryza DX (-35%), Return of the Obra Dinn (-33%) |
+| a cada ~6 meses | 21 | Atelier Yumia (-50%), Farthest Frontier (-50%), WitchSpring R (-50%) |
+| a cada ~8 meses | 14 | Labyrinth of Touhou Tri (-30%), TEVI (-50%), Prince of Persia The Lost Crown (-70%) |
+| 1 vez por ano | 9 | The Rogue Prince of Persia (-70%), WITCH ON THE HOLY NIGHT (-50%), Escape from Duckov (-30%) |
+| 1 vez em 2 anos | 6 | First Cut: Samurai Duel (-50%), Sniper Elite: Resistance (-60%), Hi-Fi RUSH (-55%) |
+| a cada ~10 meses | 4 | Mega Man Star Force Legacy Collection (-25%), NINJA GAIDEN 2 Black (-60%), LEGO Batman (-30%) |
+| primeira promoção | 3 | Avatar Legends (-20%), The Adventures of Elliot (-29%), ARK: Survival Evolved (-34%) |
+| a cada ~9 meses | 1 | RAIDOU Remastered (-45%) |
+| a cada ~7 meses | 1 | Esoteric Ebb (-34%) |
+
+Exemplo de dica: "Nos últimos 2 anos: 14 vezes com -70% ou mais (última em 09/2026) · maior desconto que já teve: -90%" (Dragon Age Inquisition).
+
+Para decidir na Etapa 2:
+- **"nunca teve esse desconto" nem sempre é verdade:** `eps_nivel` conta só os últimos 24 meses. Em 5 dos 32 casos o jogo já teve esse nível antes disso. Exemplo: Valdis Story está a -50%, já teve -75% e esteve nesse nível pela última vez em 03/2024. Sugestão: usar "nunca teve esse desconto" só quando não há episódio no nível em todo o histórico (`ultima` vazio); senão, "não teve nos últimos 2 anos".
+- A dica precisa do singular: "1 vez", não "1 vezes".
+
+### 5. As 4 frases finais (Configurações; média, desconto ≥ 50%)
+- **Selo Kurokami:** "O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade · ~0,2 avisos por semana (0,7 em grandes promoções)"
+- **Novo recorde:** "Nunca esteve tão barato · ~2 avisos por semana (6 em grandes promoções)"
+- **Igual ao recorde:** "No mesmo preço do menor já registrado · ~14 avisos por semana (34 em grandes promoções)"
+- **Menor em 2 anos:** "No menor preço dos últimos 2 anos · ~2 avisos por semana (3 em grandes promoções)"
+
+Para `docs/decisoes.md` (não vai para a tela), com desconto ≥ 50% e a métrica em R$: Selo em 7 de 10 · Novo recorde em 5 de 10 · Igual em 6 de 10 · Menor em 2 anos em 7 de 10.
+
 ## Fora desta spec
 - Veredito na ficha, keyshop "decente" e limpeza do resto das Configurações → **spec 05**.
 - Seguidos, ignorados e família pela conta Steam sem `userdata.json` → **spec 06** (troca só `conta_steam.relacao`).
@@ -352,15 +525,17 @@ O que dá para calcular **sem baixar histórico**:
 
 ## Aceite
 1. A Etapa 1 foi entregue com a métrica em R$, a conferência do Selo (143 eventos / 71,3%) e os números de 1.2 a 1.6.
-2. Com só o Selo ligado, os avisos de uma rodada são os de hoje menos os Raro/Ultrarraro sem Selo (teste sem rede, numa cópia do banco).
-3. Ligar "Novo recorde" passa a avisar um jogo com `piso_tipo == "novo"` e corte ≥ `desconto_minimo`; desligar para de avisar. Um favorito em `24m` avisa com o tipo desligado e corte abaixo do mínimo. Um jogo Selo + novo recorde avisa com só "Novo recorde" ligado.
+2. Com só o Selo ligado, uma rodada no banco de hoje avisa só jogos com Selo G (imprima quantos e quais). Não avisa ninguém por raridade nem por favorito (teste sem rede, numa cópia do banco).
+3. Ligar "Novo recorde" passa a avisar um jogo com `piso_tipo == "novo"` e corte ≥ `desconto_minimo`; desligar para de avisar. Um jogo com `piso_tipo == "24m"` e corte < `desconto_minimo` não avisa. Um jogo Selo + novo recorde avisa com só "Novo recorde" ligado.
 4. Ligar um tipo com N jogos já qualificados gera 1 toast de resumo e nenhum aviso individual. Os que entrarem depois avisam normalmente.
-5. Na vitrine, nenhum jogo aparece em dois blocos, e "Ver tudo" abre Promoções com o chip certo e o mesmo total N.
+5. Na vitrine, nenhum jogo aparece em dois blocos, e "Ver tudo" abre Promoções com o chip certo, sem o filtro de análises, e o mesmo total N.
 6. Em Promoções:
-   - marcar só "Ultrarraro" não mostra Lendários;
-   - "✓ Favorito" + "✕ Silenciado" funcionam combinados;
-   - com "Qualquer um", "✓ Favorito" + "✓ No carrinho" mostra a união;
-   - as contagens batem com o total ao marcar a caixa.
+   - "✓ Monitorado por você" + "✕ Silenciado" funcionam combinados;
+   - com "Qualquer um", "✓ Monitorado por você" + "✓ No carrinho" mostra a união;
+   - as contagens batem com o total ao marcar a caixa;
+   - ordenar por "Costuma voltar" põe "nunca teve esse desconto" primeiro e "histórico curto", "primeira promoção" e vazios por último;
+   - nenhuma tela mostra Comum/Incomum/Raro/Ultrarraro/Lendário (`grep` no `painel.html` e no `notificador.py`);
+   - sem estado salvo, a aba abre com os chips "Desconto ≥ 50%" e "Análises ≥ 5.000"; "Restaurar padrão" volta a eles.
 7. Os chips refletem exatamente os filtros ativos, o × remove só aquele filtro e o estado volta igual ao recarregar.
 8. Ordenar por "Termina" põe primeiro o que acaba antes; por "Começou", o que acabou de entrar. Shift+clique soma critérios, e os nulos ficam por último.
 9. `/api/promocoes` com o cache pronto responde em ≤ 300 ms no banco real (imprima os tempos).

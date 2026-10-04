@@ -1,4 +1,4 @@
-"""Backtest por tipo de recorde (spec 04, Etapa 1.1): Selo, novo recorde, igual ao recorde e menor em 24 meses,
+"""Backtest por tipo de recorde (spec 04, Etapas 1.1 e 1b): Selo (so G), novo recorde, igual ao recorde e menor em 24 meses,
 cada um medido sozinho, como se fosse a unica opcao de aviso ligada.
 
 Uso: py tools/backtest_tipos.py [--banco CAMINHO] [--config CAMINHO] [--de 2022-10-06] [--ate 2025-10-02]
@@ -32,14 +32,15 @@ from radar.analise import episodios, linha_do_tempo  # noqa: E402
 from radar.banco import Banco  # noqa: E402
 from tools.backtest_selo import ANO, DIA, achar_banco, grande_promo, ler_config  # noqa: E402
 
-TIPOS = {"selo": lambda r: r["selo"], "novo": lambda r: r["piso_tipo"] in ("novo", "raro"),
+# selo = so a regra G (emenda de 04/10): piso_tipo "raro" com >= 1 promocao anterior; "selo_fg" = Selo antigo (F ou G)
+TIPOS = {"selo": lambda r: r["piso_tipo"] == "raro" and r["_anteriores"], "selo_fg": lambda r: r["selo"], "novo": lambda r: r["piso_tipo"] in ("novo", "raro"),
          "igual": lambda r: r["piso_tipo"] == "igual", "24m": lambda r: r["piso_tipo"] == "24m",
          "todas": lambda r: True}
 
 
 def variantes(dmin):
     """[(nome, tipo, corte minimo)]: selo so com selo_corte_minimo (ja dentro de r["selo"])."""
-    out = [("selo", "selo", 0)]
+    out = [("selo", "selo", 0), ("selo antigo (F ou G)", "selo_fg", 0)]
     for t in ("novo", "igual", "24m"):
         out += [("%s >=0" % t, t, 0), ("%s >=%d" % (t, dmin), t, dmin)]
     return out + [("base: toda promocao", "todas", 0)]
@@ -101,6 +102,8 @@ def rodar(b, marc, dmin, args):
                 continue
             preco, corte = segs[-1][2], segs[-1][3]
             r = analise.analisar(sub, preco, corte, agora_=ts)
+            eps = episodios(segs)  # promocao anterior = algum episodio antes do atual (como em analisar)
+            r["_anteriores"] = bool(eps[:-1] if eps and eps[-1][1] >= ts - 1 else eps)
             chave = (a, r["inicio"] or lim)
             for nome, tipo, cmin in VAR:
                 cand = bool(TIPOS[tipo](r)) and corte >= cmin
