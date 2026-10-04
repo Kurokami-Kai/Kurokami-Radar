@@ -6,6 +6,7 @@ App local de Windows (Python 3.12) que monitora a lista de desejos da Steam em v
 
 Leia só o que a tarefa pede, nesta ordem de utilidade:
 
+- `docs/aprendizados.md` — leia no início de toda tarefa; atualize no fim.
 - `docs/decisoes.md` — **sempre leia antes de mexer em coleta, preços, avaliação ou instalador.** Lista armadilhas que já foram bugs reais (preço "atual", fusos, pacote base, GG.deals, versão da página etc.) e as preferências de produto.
 - `docs/estrutura.md` — o que cada arquivo e pasta contém e onde ficam os dados. Consulte para achar onde ler, editar ou criar algo.
 - `docs/arquitetura.md` — como as peças conversam: threads, ciclo de coleta, fontes de dados e seus limites, avaliação, notificação, painel, ponte, distribuição e atualização.
