@@ -5,7 +5,7 @@ Uso:
   py radar.py painel              so o painel no navegador, sem a bandeja (http://127.0.0.1:8787)
   py radar.py inicio instalar     abre o Radar sozinho ao entrar no Windows (inicio remover desfaz)
   py radar.py ciclo               uma rodada completa com notificacoes, mostrando tudo no terminal
-  py radar.py testar-notificacao  manda uma notificacao de exemplo (--selo: alerta com SELO KUROKAMI)
+  py radar.py testar-notificacao  manda uma notificacao de exemplo (--selo: SELO KUROKAMI; --tipo novo|igual|24m)
   py radar.py chaves              grava/atualiza as chaves no Gerenciador de Credenciais
   py radar.py testar              testa as chaves salvas, uma por uma
   py radar.py lojas               lista as lojas da ITAD no Brasil e marca as monitoradas
@@ -160,8 +160,9 @@ def cmd_verificar(cfg, args):
     print(" %d jogo(s) dispararia(m) alerta agora" % len(al))
     print("=" * 78)
     for a in al:
-        print(" %-38.38s %-18.18s %11s %5s  score %5s" % (
-            a["nome"], a["loja"], brl(a["preco"]), ("-%d%%" % a["corte"]) if a["corte"] else "", a["score"] if a["score"] is not None else "—"))
+        print(" %-38.38s %-18.18s %11s %5s  %s" % (
+            a["nome"], a["loja"], brl(a["preco"]), ("-%d%%" % a["corte"]) if a["corte"] else "",
+            analise.NOME_TIPO.get(a.get("tipo_oferta"), a.get("tag") or "")))
         print("   %s%s" % (a["motivo"], ("  (também: %s)" % ", ".join(a["outras"])) if a.get("outras") else ""))
 
 
@@ -313,20 +314,29 @@ def cmd_testar_notificacao(cfg, args):
     img = notificar.capa(j["appid"], j["capa"]) if j else None
     nome = j["nome"] if j else "Jogo de exemplo"
     url = "https://store.steampowered.com/app/%d/" % j["appid"] if j else "https://store.steampowered.com/"
-    if getattr(args, "selo", False):  # um Selo de verdade do seu banco, pelo mesmo caminho de uma rodada
+    tipo = "selo" if getattr(args, "selo", False) else getattr(args, "tipo", None)
+    if tipo:  # um alerta de verdade do seu banco, daquele tipo, pelo mesmo caminho de uma rodada
+        import copy
         from radar import analise
         from radar.notificador import Notificador
-        alertas = analise.avaliar(analise.Contexto(b, cfg), b.ofertas_atuais(), {}, set(cfg["lojas"]))
-        a = next((x for x in alertas if x.get("selo")), None)
-        if a is None:  # nenhum Selo hoje: exemplo no mesmo formato
+        c = copy.deepcopy(cfg)  # todos os tipos ligados e sem desconto minimo, so para achar um exemplo
+        c["alerta"]["tipos"] = dict.fromkeys(analise.TIPOS, True)
+        c["alerta"]["desconto_minimo"] = 0
+        of = {k: [dict(o, drm_steam=True) for o in v] for k, v in b.ofertas_atuais().items()}
+        alertas = analise.avaliar(analise.Contexto(b, c), of, {}, set(cfg["lojas"]))
+        a = next((x for x in alertas if x.get("tipo_oferta") == tipo), None)
+        if a is None:  # nenhum hoje: exemplo no mesmo formato
+            exemplo = {"selo": "Selo Kurokami: preço caiu pela metade ou mais (o menor anterior era R$ 19,99, 03/2024)",
+                       "novo": "menor preço já registrado (antes R$ 12,49 em 03/2024)",
+                       "igual": "mesmo preço do menor já registrado (03/2024)",
+                       "24m": "menor preço em 2 anos (o menor de sempre foi R$ 7,49 em 11/2022)"}[tipo]
             a = {"appid": j["appid"] if j else 0, "nome": nome, "preco": 999, "corte": 90, "loja": "Steam", "url": url,
-                 "selo": True, "raridade": "lendario", "score": 100,
-                 "motivo": "Selo Kurokami: Lendário: nunca chegou a -85% (histórico desde 10/2021)"}
+                 "selo": tipo == "selo", "tipo_oferta": tipo, "tipos": [tipo], "motivo": exemplo}
         Notificador(b, cfg, log=lambda m: None)._enviar(a)
-        print("Notificação de Selo enviada (%s): %s" % (a["nome"], a["motivo"]))
+        print("Notificação de %s enviada (%s): %s" % (analise.NOME_TIPO[tipo], a["nome"], a["motivo"]))
         print("Se não apareceu em uns segundos, veja Configurações > Sistema > Notificações")
         return
-    ok = notificar.mostrar(nome, "R$ 9,99 · -90% na Steam (TESTE)\nRaro: -85% ou mais 1 vez em 24 meses · score 88",
+    ok = notificar.mostrar(nome, "R$ 9,99 · -90% na Steam (TESTE)\nMenor preço já registrado (antes R$ 12,49 em 03/2024)",
                            clique=url, botoes=[("Abrir oferta", url)], imagem=img, rodape="notificação de teste")
     print("Notificação enviada. Se não apareceu em uns segundos, veja Configurações > Sistema > Notificações"
           if ok else "Falhou ao chamar o PowerShell.")
@@ -388,6 +398,7 @@ def main():
     s = sub.add_parser("ciclo"); s.add_argument("--tudo", action="store_true")
     s = sub.add_parser("testar-notificacao")
     s.add_argument("--selo", action="store_true", help="simula um alerta com SELO KUROKAMI (passa pelo notificador)")
+    s.add_argument("--tipo", choices=["novo", "igual", "24m"], help="alerta de Novo recorde, Igual ao recorde ou Menor em 2 anos")
     s = sub.add_parser("inicio"); s.add_argument("acao", choices=["instalar", "remover"])
     if len(sys.argv) == 1 and getattr(sys, "frozen", False):
         if sys.stdout is None or "bandeja" in os.path.basename(sys.executable).lower():

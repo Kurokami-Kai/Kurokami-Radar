@@ -44,6 +44,7 @@ Kurokami Radar/
 │   ├── testar_piso.py       # testes sintéticos do piso, Lendário, Selo (só G), tipos e "Costuma voltar", sem rede nem banco
 │   ├── testar_avisos.py     # regra de aviso da 0.15 numa cópia do banco (só Selo, ligar/desligar tipos, resumo ao ligar)
 │   ├── testar_promocoes.py  # /api/promocoes e /api/vitrine numa cópia do banco (tempos, filtros, ordenação, 400)
+│   ├── rodar_instalado.py   # roda um comando do radar.py pelo código com os dados da instalação (%LOCALAPPDATA%)
 │   ├── painel_copia.py      # sobe o painel numa cópia do banco (porta 8799), sem coleta: para ver o visual e tirar prints
 │   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais, .gitignore, testar_piso)
 ├── docs/                    # esta documentação
