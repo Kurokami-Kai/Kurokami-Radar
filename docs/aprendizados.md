@@ -13,3 +13,9 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Teste real achou o que os testes sintéticos não acharam:** o toast do WRC 7 dizia "R$ 4,74, 10/2026" (data do nível, não do preço). Rodar o caminho real (`rodar_instalado.py`, toasts) antes de publicar vale o custo.
 - **Releia a skill antes do último passo:** `novidades.md` ia com um comando de desenvolvedor; a skill `publicar-versao` proíbe. `gh` não existe aqui: acompanhe o workflow pela API pública (`api.github.com/repos/<repo>/actions/runs`).
 - **Ao remover código morto, procure quem o usa também em `tools/`** (o `medir_spec04.py` quebrou com `raridade_ok` removido).
+
+## 2026-10-04 — economia de tokens (configuração)
+- **Criados:** `.claude/settings.json` (`model: opusplan`), subagentes `explorador` (Haiku, effort low) e `revisor` (Sonnet) e a skill do projeto `economia-de-contexto` (complementa a global).
+- **Agente novo não carrega na sessão aberta** ("Agent type not found"): teste com `claude -p "..." --agent explorador --output-format json` (o prompt vem antes de `--allowedTools`, que engole argumentos).
+- **Medido (explorador, "funções da aba Promoções"):** Haiku 4.5, 10 turnos, ~127 mil tokens de entrada (109 mil de cache) + 2,4 mil de saída, US$ 0,059. Achou `painel.html` 758–888 (22 funções).
+- **O resumo veio com 28 linhas (tabela)**, não 15: a instrução do agente agora proíbe tabela e manda agrupar. Ainda não remedido.

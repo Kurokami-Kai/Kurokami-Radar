@@ -6,6 +6,7 @@ App local de Windows (Python 3.12) que monitora a lista de desejos da Steam em v
 
 Leia só o que a tarefa pede, nesta ordem de utilidade:
 
+- Leitura e testes: subagente explorador; revisão de diff: revisor; painel.html só por função (tools/mapa.py); regras em .claude/skills/economia-de-contexto.
 - `docs/aprendizados.md` — leia no início de toda tarefa; atualize no fim.
 - `docs/decisoes.md` — **sempre leia antes de mexer em coleta, preços, avaliação ou instalador.** Lista armadilhas que já foram bugs reais (preço "atual", fusos, pacote base, GG.deals, versão da página etc.) e as preferências de produto.
 - `docs/estrutura.md` — o que cada arquivo e pasta contém e onde ficam os dados. Consulte para achar onde ler, editar ou criar algo.
