@@ -550,6 +550,7 @@ def api_carrinho(_q):
                     "tag": tag, "tag_texto": texto, "acima": acima, "em_bundle": cobertos.get(a, []),
                     "raridade": an.get("nivel"), "raridade_texto": an.get("texto"), "selo": an.get("selo", False), "selo_motivo": an.get("selo_motivo"),
                     "piso_tipo": an.get("piso_tipo"), "piso_ref": an.get("piso_ref"),
+                    "tipo_oferta": analise.tipo_oferta(analise.tipos_de(an)) if an else None, "corte": (escolhida or {}).get("corte") or 0,
                     "rpos": j.get("rpos") or 0, "rcount": j.get("rcount") or 0})
     # sugestoes: bundles da Steam com pelo menos 1 item do carrinho
     preco_esc = {x["appid"]: next((l["preco"] for l in x["lojas"] if l["loja"] == x["loja"]), None) for x in out}
@@ -737,9 +738,38 @@ def api_biblioteca(_q):
          "franquias": franquias,
          "sem_dados": sum(1 for a in tem if (J.get(a) or {}).get("nome") is None),
          "falta_ids": [d["appid"] for g in jogos for d in g["falta"]],
-         "atualizado": b.meta("ult_biblioteca")}
+         "atualizado": b.meta("ult_biblioteca"), "dlcs_promo": _dlcs_em_promocao(b, cfg, ctx, jogos)}
     b.con.close()
     return r
+
+
+def _dlcs_em_promocao(b, cfg, ctx, jogos):
+    """DLCs que contam (relevantes), que voce nao tem, de jogos que voce tem, com desconto agora (spec 04, D5).
+    Preco: a oferta mais barata das lojas marcadas (ITAD) ou, se so houver ela, o preco da Steam ("preço Steam")."""
+    marc = _marcadas(cfg)
+    faltam = {d["appid"]: g for g in jogos for d in g["falta"]}
+    if not faltam:
+        return []
+    atuais = b.ofertas_atuais(list(faltam))
+    lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")} if l.lower() in marc]
+    if "steam" in marc:
+        lojas_m.append("Steam (direto)")
+    linhas = b.linhas_lote(lojas_m, list(faltam)) if lojas_m else {}
+    out = []
+    for a, g in faltam.items():
+        j = ctx.jogos.get(a) or {}
+        ofs = [o for o in atuais.get(a, []) if o["loja"].lower() in marc and o["preco"] is not None and o["corte"]]
+        if not ofs:
+            continue
+        m = min(ofs, key=lambda o: o["preco"])
+        an = analise.analisar(linhas.get(a, []), m["preco"], m["corte"], cfg_alerta=cfg["alerta"])
+        tipos = analise.tipos_de(an)
+        out.append({"appid": a, "nome": j.get("nome") or str(a), "capa": j.get("capa"), "pai": g["appid"], "pai_nome": g["nome"],
+                    "preco": m["preco"], "cheio": m.get("cheio"), "corte": m["corte"], "loja": m["loja"],
+                    "so_steam": m.get("fonte") == "catalogo", "fim": _fim(m, j), "tipo_oferta": analise.tipo_oferta(tipos),
+                    "piso_ref": an["piso_ref"]})
+    out.sort(key=lambda d: (-d["corte"], d["preco"]))
+    return out
 
 
 def api_acesso(_q):

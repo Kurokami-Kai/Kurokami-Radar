@@ -20,7 +20,8 @@ Kurokami Radar/
 │   ├── series.py            # agrupa jogos da mesma série pelo nome (aba Biblioteca)
 │   ├── analise.py           # raridade v2 (episódios), piso, Selo, score, etiquetas, caminhos/combinação de compra, avaliar()
 │   ├── notificar.py         # toast do Windows via PowerShell; capa do jogo
-│   ├── notificador.py       # regras de envio (linha de base, rearme, silêncio, fim de promoção)
+│   ├── notificador.py       # regras de envio (linha de base, tipo recém-ligado vira resumo, rearme, silêncio, fim de promoção)
+│   ├── conta_steam.py       # seguidos e ignorados da conta Steam (userdata.json); único leitor de rgFollowedApps/rgIgnoredApps
 │   ├── servico.py           # ciclo() e thread Servico (agenda, completa periódica)
 │   ├── progresso.py         # estado da checagem em andamento (painel e tooltip)
 │   ├── relatorio.py         # dados/alertas.html (página estática de reserva)
@@ -40,7 +41,10 @@ Kurokami Radar/
 │   ├── medir_spec04.py      # spec 04: vitrine, avisos de hoje (regra atual × só Selo), userdata, DLCs em promoção, tempo do /api/lista
 │   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê; --retrato grava os preços
 │   ├── regua_steam.py       # spec 04 (1c): o Radar × "só a Steam" nos recordes raros, storeLow da ITAD e custo do histórico da Steam inteira
-│   ├── testar_piso.py       # testes sintéticos da raridade (Lendário) e da pílula de piso, sem rede nem banco
+│   ├── testar_piso.py       # testes sintéticos do piso, Lendário, Selo (só G), tipos e "Costuma voltar", sem rede nem banco
+│   ├── testar_avisos.py     # regra de aviso da 0.15 numa cópia do banco (só Selo, ligar/desligar tipos, resumo ao ligar)
+│   ├── testar_promocoes.py  # /api/promocoes e /api/vitrine numa cópia do banco (tempos, filtros, ordenação, 400)
+│   ├── painel_copia.py      # sobe o painel numa cópia do banco (porta 8799), sem coleta: para ver o visual e tirar prints
 │   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais, .gitignore, testar_piso)
 ├── docs/                    # esta documentação
 ├── .github/workflows/gerar-instalador.yml   # build do Setup.exe em Releases

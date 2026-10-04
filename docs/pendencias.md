@@ -2,13 +2,13 @@
 
 ## Especificações prontas para implementar
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
-- [04 — Vitrine, aba Promoções e avisos por tipo de recorde](specs/04-vitrine-promocoes-e-avisos.md) — Etapas 1, 1b e 1c feitas (04/10), com a emenda; Etapa 2 aguarda o ok
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
 - 06 — Login Steam por QR, começando por teste (a escrever)
 - 07 — Promoções da Steam inteira, com base no teste da 04 (a escrever)
 - 08 — Layout em etapas: inventário, referência, base visual, uma aba por vez, celular (a escrever)
 
 ## Feitas
+- [04 — Vitrine, aba Promoções e avisos por tipo de recorde (feito em v0.15.0)](specs/04-vitrine-promocoes-e-avisos.md)
 - [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica (feito em v0.14.0)](specs/01-selo-kurokami-e-raridade.md)
 - [02 — DLCs não aparecem (feito em v0.13.0)](specs/02-dlcs-nao-aparecem.md)
 
@@ -28,4 +28,4 @@ Em ordem aproximada de valor. Nada aqui foi iniciado.
 - **Carrinho:** repensar a aba e avaliar alternativas à ponte do Tampermonkey. Só anotação, nada decidido.
 - **Keyshops depois de bundles:** quando um jogo entra num bundle (ex.: Humble Choice, que muda na 1ª terça do mês), as keyshops costumam baixar alguns dias depois, quando os revendedores reabastecem. A GG.deals tem API de bundles com histórico; avaliar o aviso "entrou no Humble Choice; keyshops costumam cair nos dias seguintes".
 - **Promoções fora da lista de desejos** (a SteamDB mostra a Steam inteira): exigiria outra fonte de dados e mudaria o tamanho da coleta. Só ideia.
-- Decidir se Raro/Ultrarraro sem Selo continuam alertando (backtest: 53,5% não batido, igual a promoção no piso) — junto com a spec 05.
+- ~~Decidir se Raro/Ultrarraro sem Selo continuam alertando~~ — resolvido na 0.15 (spec 04): não avisam mais; a raridade só informa ("Costuma voltar").

@@ -13,7 +13,10 @@ Com o Radar instalado aberto, feche-o antes (porta 80 e trava 47811 são compart
 
 ## Testes rápidos
 - **Tudo de uma vez:** `py tools/checar.py` (também falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`, e roda `tools/testar_piso.py`).
-- **Raridade e pílula de piso:** `py tools/testar_piso.py` — históricos sintéticos (Recorde raro em 17/19 meses e 50%, Lendário pela regra C). Mudou a regra? Acrescente o caso aqui.
+- **Raridade, piso e Selo:** `py tools/testar_piso.py` — históricos sintéticos (Recorde raro em 17/19 meses e 50%, Lendário pela regra C, Selo só G, escada de descontos, tipos, "Costuma voltar"). Mudou a regra? Acrescente o caso aqui.
+- **Avisos (cópia do banco, sem rede):** `py tools/testar_avisos.py` — só Selo, ligar/desligar tipos, 24m abaixo do mínimo, resumo ao ligar um tipo.
+- **Promoções e vitrine (cópia do banco):** `py tools/testar_promocoes.py` — tempos de `/api/promocoes` (meta ≤ 300 ms), filtros, contagens, ordenação, 400, vitrine × "Ver tudo", ficha.
+- **Ver o painel sem a bandeja:** `py tools/painel_copia.py` → `http://127.0.0.1:8799/kurokami#vale` (cópia do banco). Prints sem instalar nada: Edge headless (`msedge --headless=new --screenshot=… --window-size=1280,2400 URL`); abaixo de ~500 px o Edge recorta, então para o celular ponha o painel num `<iframe>` de 390 px.
 - **Backtest do Selo:** `py tools/backtest_selo.py` (≈ 30 s) — semana a semana, só com o histórico conhecido até a data; mede "não batido" em 12 meses (+5/+10), "não voltou" em 6 meses e Selos por semana, para as variantes A–H, "F ou G" e duas linhas de base. Lê uma cópia temporária do banco.
 - **Spec 04, Etapa 1:** `py tools/backtest_tipos.py` (≈ 30 s; por tipo de recorde, Selo só G e o antigo F ou G, com "não ficou mais barato em 12 meses" em R$), `py tools/medir_spec04.py` (vitrine, avisos de hoje, filtros padrão, "Costuma voltar", userdata, DLCs, tempo do `/api/lista`) e `py tools/teste_promocoes_steam.py` (≈ 20 min, rede; feche o Radar antes). Etapa 1c: `py tools/regua_steam.py --itad [--retratos retrato_1.json retrato_2.json]` e `py tools/backtest_tipos.py --so-steam`. Resultados em `dados/sonda/`.
 - **Toast de Selo:** `py radar.py testar-notificacao --selo` (pega um Selo de verdade do seu banco e passa pelo `Notificador._enviar`, como numa rodada).

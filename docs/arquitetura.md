@@ -52,20 +52,27 @@ Verificação **rápida** = o ciclo normal (respeita intervalos e orçamento). *
 Por jogo da lista (exceto os que o usuário já tem): para cada oferta das **lojas marcadas** (e DRM Steam, se exigido) roda `analise.analisar(linhas, preco, corte)`:
 - `linha_do_tempo` junta o histórico das lojas marcadas em trechos (menor preço, corte do menor, maior corte); `episodios` vira promoções (intervalo sem desconto < 1 dia não separa).
 - **Raridade** (eixo 1): episódios anteriores com corte ≥ atual − 5, por ano, nos últimos 24 meses. Comum ≥ 3/ano · Incomum 1,5–3 · Raro 0,75–1,5 · Ultrarraro < 0,75 · Lendário = nunca (histórico inteiro), com ≥ 24 meses de histórico e ≥ 1 promoção anterior; 12–24 meses: no máximo Ultrarraro. Sem promoção anterior nas lojas marcadas ou histórico < 6 meses: no máximo Incomum.
-- **No piso** (eixo 2): corte ≥ maior corte da vida − 5, ou preço ≤ menor de 24 meses + 1%. **Selo Kurokami** = F ou G, com corte ≥ `selo_corte_minimo`. F = Lendário (acima). G = pílula Recorde raro (≥ 18 meses sem o nível do recorde anterior, ou ≤ 50% dele) + ≥ 1 promoção anterior nas lojas marcadas. `selo_motivo` diz qual bateu. Raro e Ultrarraro sozinhos não dão Selo (backtest em `decisoes.md`: 71,3% não batido em 12 meses, 1 Selo por semana normal).
-  - *Frase para os textos do usuário (referência):* "o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo".
-- **Pílula de piso** (reais, só informativa): compara com o menor preço *antes* do episódio de preço atual: novo / raro (≥ 18 meses sem esse nível ou ≤ 50% do recorde) / igual / 24m.
-- **Score** (só ordenação): corte × peso da raridade (0,4…1,0) + 10 no piso. Análises não entram em nada.
+- A raridade não aparece mais nas telas (0.15): vira a coluna informativa **"Costuma voltar"** (`costuma_voltar`: histórico curto · primeira promoção · nunca teve esse desconto (histórico inteiro) · não teve nos últimos 2 anos · todo mês · a cada ~N meses · 1 vez por ano · 1 vez em 2 anos; `dica_volta` dá a linha "Nos últimos 2 anos: N vezes com -Y% ou mais…").
+- **No piso** (eixo 2): corte ≥ maior corte da vida − 5, ou preço ≤ menor de 24 meses + 1%.
+- **Tipo de preço** (reais): compara com o menor preço *antes* do episódio de preço atual (`piso_ref`, o menor de sempre): `piso_tipo` novo / raro (≥ 18 meses sem esse nível ou ≤ 50% do recorde) / igual / 24m (igual ao menor dos últimos 24 meses).
+- **Selo Kurokami (0.15)** = só G: `piso_tipo == "raro"` + ≥ 1 promoção anterior nas lojas marcadas + corte ≥ `selo_corte_minimo`. `selo_motivo`: "preço caiu pela metade ou mais (o menor anterior era R$ X, mm/aaaa)" ou "o menor preço anterior (R$ X) foi há N meses". O Lendário (F) não dá mais Selo (escada de descontos; ver `decisoes.md`).
+  - *Frase para os textos do usuário (referência):* "o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade".
+- `tipos_de(an)` = lista não exclusiva: `selo` se Selo; `novo` se `piso_tipo` novo ou raro; `igual`; `24m`. `tipo_oferta` = o primeiro de [selo, novo, igual, 24m] (vitrine, "Mostrar só", título do aviso).
+- **Score** fica só interno (corte × peso da raridade + 10 no piso). Análises não entram em nada.
 
-Alerta se tem Selo, ou raridade ≥ `raridade_minima` e corte ≥ `desconto_minimo` (favoritos, posições 1..`favoritos_top` da wishlist: a partir de Incomum e sem desconto mínimo). Modo completo e keyshop têm regras próprias. Saída agrupada: um alerta por jogo, Selo primeiro.
+**Avisa** (`avisa_por`) se algum tipo da oferta está ligado em `alerta.tipos` e (é o Selo, que já tem o `selo_corte_minimo`, ou corte ≥ `desconto_minimo`). Raridade e favoritos não decidem nada. Motivo por tipo (`motivo_tipo`). Modo completo e keyshop têm regras próprias. Saída agrupada: um alerta por jogo, na ordem selo, novo, igual, 24m e, dentro de cada, maior corte (`chave_aviso`).
+
+**Régua da Steam** (`regua_steam`): só informativa. Se a Steam sozinha ("Steam (direto)" + Steam da ITAD) dá Novo recorde ou Selo e as lojas marcadas não, a ficha diz "Na Steam, é o menor preço já registrado. Nas suas lojas, <loja> já teve R$ X (mm/aaaa)." (`menor_anterior` acha o registro que impediu).
 
 ## Notificação (`notificador.Notificador`)
 
-Linha de base na primeira vez (não dispara nada em massa) → avisa novidades, quedas ≥ `melhora_minima_reais` e jogos que "rearmaram" (saíram e voltaram). Respeita pausa, horário de silêncio (guarda pendentes), máximo por rodada (resto vira resumo) e silenciados. Avisos de "termina em breve" para carrinho/vale a pena.
+Linha de base na primeira vez (não dispara nada em massa) → ao **ligar um tipo** (`meta.tipos_ligados` muda), quem já estava assim e só avisaria por ele entra em `notificado` sem toast e sai um resumo "<Tipo> ligado: N jogos já estão assim agora…" com "Ver" (abre `#vale`) → avisa novidades, quedas ≥ `melhora_minima_reais` e jogos que "rearmaram" (saíram e voltaram). Respeita pausa, horário de silêncio (guarda pendentes), máximo por rodada (resto vira resumo) e silenciados. Avisos de "termina em breve" para carrinho/o que avisa. Título por tipo ("SELO KUROKAMI · …", "Novo recorde · …", "Igual ao recorde · …", "Menor em 2 anos · …"), nunca por raridade.
 
 ## Painel
 
-`painel.html` é um SPA único (HTML+CSS+JS inline, sem build), visual da loja Steam. Lê tudo via `/api/*` (ver `api.md`). Localhost sempre liberado; outros aparelhos só com PIN (cookie `kr`) e se `painel.rede_local` estiver ligado. Porta 80 com reserva na 8787.
+`painel.html` é um SPA único (HTML+CSS+JS inline, sem build), visual da loja Steam. Lê tudo via `/api/*` (ver `api.md`). Abas: **Vale a pena** = vitrine (`/api/vitrine`: carrossel do Selo e prateleiras Novo recorde, Igual ao recorde, Menor em 2 anos), **Promoções** = explorador com filtros **no servidor** (`/api/promocoes`, pensando na Steam inteira, spec 07), Biblioteca (com "DLCs em promoção"), Carrinho, Notificações, Configurações ("O que te avisa"). O endereço guarda a aba (`#vale`, `#lista`…).
+
+**Cache das linhas** (`painel.linhas_promocoes`): uma linha por jogo da lista, montada em ~0,5 s e guardada em memória com trava; filtrar/ordenar nele custa milissegundos. É refeito quando termina uma coleta (`servico.ciclo`), em qualquer POST do painel, quando o config ou o `userdata.json` muda (assinatura) e, por segurança, a cada 10 min. `/api/lista` também usa o cache. Seguidos/ignorados vêm de `conta_steam.relacao` (único leitor do `userdata.json` para isso). Localhost sempre liberado; outros aparelhos só com PIN (cookie `kr`) e se `painel.rede_local` estiver ligado. Porta 80 com reserva na 8787.
 
 ## Ponte com a Steam (`ponte.user.js`)
 

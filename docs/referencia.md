@@ -256,6 +256,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `api_buscar(q)` — Nome, appid ou link da Steam -> resultados da loja.
 - `post_extra(d)` — Passa a monitorar um jogo fora da lista de desejos (ou para de monitorar).
 - `api_biblioteca(_q)` — Visao de colecionador: valor da biblioteca, o que falta para completar cada jogo e as franquias.
+- `_dlcs_em_promocao(b, cfg, ctx, jogos)` — DLCs que contam (relevantes), que voce nao tem, de jogos que voce tem, com desconto agora (spec 04, D5).
 - `api_acesso(_q)`
 - `post_acesso(d)`
 - `post_tenho(d)` — Marca/desmarca "ja tenho" (para compras feitas depois do userdata.json).

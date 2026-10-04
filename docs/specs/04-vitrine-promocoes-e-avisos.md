@@ -1,6 +1,6 @@
 # Spec 04 — Vitrine, aba Promoções e avisos por tipo de recorde
 
-Status: **Etapas 1, 1b e 1c feitas em 04/10/2026 (resultados no fim); Etapa 2 em andamento (0.15.0)** · Emenda e decisões de 04/10 incorporadas ao corpo (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
+Status: **feito em v0.15.0** (Etapas 1, 1b e 1c em 04/10/2026, resultados no fim; Etapa 2 implementada em 04/10/2026, não publicada) · Emenda e decisões de 04/10 incorporadas ao corpo (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
 
 **Duas etapas. Faça a Etapa 1, entregue o relatório e PARE. A Etapa 2 só começa depois do ok do dono, que pode mudar números desta spec com base na Etapa 1.**
 

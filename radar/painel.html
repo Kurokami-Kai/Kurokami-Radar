@@ -459,6 +459,68 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .cartbtn:hover,.cartbtn.on{background:var(--disc-bg);color:var(--disc-fg)}
 @media (max-width:900px){.carr-grid{grid-template-columns:1fr}.crow{grid-template-columns:90px 1fr auto 28px}.crow .lojsel{grid-column:2}}
 @media (max-width:720px){.mhead{grid-template-columns:1fr}.nrow{grid-template-columns:90px 1fr auto}.nrow .q{display:none}}
+/* ---------- 0.15: vitrine e Promoções (spec 04) ---------- */
+.vhead{align-items:flex-end}.vhead h2{margin:0}
+.vsub{color:var(--muted);font-size:12px;margin-top:4px}
+.vtudo{background:none;border:0;color:var(--blue);cursor:pointer;font-size:12.5px;padding:0;white-space:nowrap}
+.vtudo:hover{color:#fff}
+.vgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.vcard .row{justify-content:space-between}
+.vfim{font-size:11px;color:#ff9b8a}
+.pbrowse{grid-template-columns:minmax(0,1fr) 260px}
+.pfbtn{display:none;padding:5px 10px}
+.pchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.pchip{display:inline-flex;align-items:center;gap:4px;background:rgba(103,193,245,.16);color:var(--blue);font-size:12px;padding:3px 4px 3px 8px;border-radius:2px}
+.pchip button{background:none;border:0;color:inherit;cursor:pointer;font-size:14px;line-height:1;padding:0 4px}
+.pchip button:hover{color:#fff}
+.tri{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12.5px;padding:3px 0}
+.tri.off{opacity:.45}
+.tri .tb{display:inline-flex;gap:1px}
+.tri .tb button{background:rgba(0,0,0,.3);border:0;color:var(--muted);width:24px;height:22px;cursor:pointer;font-size:12px}
+.tri .tb button[aria-pressed="true"][data-v=""]{background:#3d4450;color:#fff}
+.tri .tb button[aria-pressed="true"][data-v="exigir"]{background:#4c8a1c;color:#fff}
+.tri .tb button[aria-pressed="true"][data-v="excluir"]{background:#a34c25;color:#fff}
+.tri.off .tb button{cursor:not-allowed}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+details.blk>summary{list-style:none;cursor:pointer}
+details.blk>summary::-webkit-details-marker{display:none}
+details.blk>summary h4::after{content:"▾";float:right;opacity:.7}
+details.blk[open]>summary h4::after{content:"▴"}
+.pon{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue);margin-left:6px;vertical-align:middle}
+.pin{background:#0e141b;border:0;color:#fff;padding:5px 6px;border-radius:2px;box-shadow:inset 0 0 0 1px #2f4d64;font:inherit;font-size:12px;width:76px}
+.pfx .f{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px}
+.pfx input[type=date]{width:128px}
+.pbtns{display:flex;gap:6px}.pbtns button{flex:1;padding:7px 6px}
+.ptab td{vertical-align:middle}
+.ptab tr{cursor:pointer}
+.ptab .pcap .art{width:72px}
+.ptab td{padding:4px 6px}
+.ptab td.t{max-width:240px;min-width:150px;white-space:normal}
+.ptab td.volta{white-space:normal;max-width:110px;line-height:1.25}
+#pOrdG[hidden]{display:none}
+.ptab .pnm{color:#e5e5e5}
+.ptab .pct{background:var(--disc-bg);color:var(--disc-fg);padding:2px 5px;font-size:12px}
+.ptab td.volta{color:var(--muted);cursor:help}
+.ptab th.srt{cursor:pointer;user-select:none}.ptab th.srt:hover,.ptab th.srt.on{color:#fff}
+.ptab th sup{font-size:9px;margin-left:1px}
+.icos{width:46px}
+.ico{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:2px;font-size:11px;margin-right:2px}
+.ico-carr{background:#e2a635;color:#1b2838}.ico-lista{background:#4c8a1c;color:#fff}
+.pager{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:12px 0 30px}
+.pager button{background:rgba(103,193,245,.12);color:var(--blue);border:0;min-width:32px;height:30px;border-radius:2px;cursor:pointer}
+.pager button[aria-current="true"]{background:var(--blue);color:#0b2235}
+.pager button:disabled{opacity:.35;cursor:default}
+.pager span{color:var(--dim);align-self:center}
+.regua{background:rgba(26,111,209,.14);padding:8px 10px;font-size:12px;color:#cfe3ff;margin-top:8px}
+.dlcp td.t{white-space:normal}
+@media (max-width:900px){.pbrowse{grid-template-columns:minmax(0,1fr)}}
+.pbrowse>div{min-width:0}
+@media (max-width:720px){
+  .vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pfbtn{display:inline-block}
+  .pside{display:none}.pside.open{display:flex}
+  .ptab .pcap .art{width:64px}
+}
 </style></head><body>
 <header class="topbar">
   <div class="wrap">
@@ -468,7 +530,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
     </div>
     <nav class="nav" aria-label="Seções">
       <button data-tab="vale" aria-current="page">Vale a pena</button>
-      <button data-tab="lista">Lista de desejos</button>
+      <button data-tab="lista">Promoções</button>
       <button data-tab="bib">Biblioteca</button>
       <button data-tab="carr">Carrinho <span id="carrN" style="color:var(--disc-fg)"></span></button>
       <button data-tab="notif">Notificações</button>
@@ -484,75 +546,37 @@ select.mini{padding:3px 6px;font-size:11.5px}
 
 <main>
   <section id="tab-vale" class="wrap tabsec">
-    <div class="subnav">
-      <span class="lk" style="cursor:default">Promoções <b>raras</b> da sua lista, pelos seus filtros</span>
-      <button class="lk" data-goto="lista">Ver a lista inteira</button>
-    </div>
-    <div class="shead"><h2>Destaques</h2><span class="aside" id="valeNote"></span></div>
+    <div class="shead vhead"><div><h2>Selo Kurokami</h2><div class="vsub" id="valeNote"></div></div></div>
     <div class="hero" id="hero"></div>
-    <div class="shead"><h2>Todos que valem a pena</h2><div class="chips" id="cTagVale"></div></div>
-    <div class="hint" style="color:var(--dim);font-size:11.5px;margin:-4px 0 8px">Raridade = quantas vezes o jogo chega a esse desconto: <span class="rr rr-lendario">★ Lendário</span> nunca chegou (2+ anos de histórico) · <span class="rr rr-ultrarraro">Ultrarraro</span> menos de 1 vez a cada 16 meses · <span class="rr rr-raro">Raro</span> cerca de 1 vez por ano · <span class="rr rr-incomum">Incomum</span> · <span class="rr rr-comum">Comum</span> 3+ vezes por ano</div>
-    <div id="valeLista"></div>
+    <div id="vitrine"></div>
   </section>
 
   <section id="tab-lista" class="wrap tabsec" hidden>
-    <div class="subnav">
-      <button class="lk" data-quick="vale">Vale a pena <b id="qVale"></b></button>
-      <button class="lk" data-quick="piso">Raro ou melhor <b id="qPiso"></b></button>
-      <button class="lk" data-quick="dlc">DLCs dos seus jogos <b id="qDlc"></b></button>
-      <button class="lk" data-quick="todos">Toda a lista <b id="qTodos"></b></button>
-      <label class="search"><span class="sr">Buscar</span><input id="q" type="search" placeholder="buscar na lista de desejos" autocomplete="off"><span aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span></label>
-    </div>
-    <div class="shead"><h2>Lista de desejos</h2><span class="aside" id="listaNote"></span></div>
-    <div class="browse">
+    <div class="shead"><h2>Promoções</h2><span class="aside" id="listaNote"></span></div>
+    <div class="browse pbrowse">
       <div>
         <div class="toolbar">
           <span class="count"><b id="cnt">0</b> resultados</span>
-          <label>Ordenar por
-            <select id="sort">
-              <option value="rar">Mais raro primeiro</option>
-              <option value="score">Vale a pena (score)</option>
-              <option value="disc">Maior desconto</option>
-              <option value="price">Menor preço</option>
-              <option value="rating">Melhor avaliação</option>
-              <option value="gap">Mais perto do menor histórico</option>
-              <option value="save">Maior economia</option>
-              <option value="name">Nome</option>
-              <option value="rel">Lançamento</option>
-              <option value="prio">Ordem da sua lista na Steam</option>
-            </select>
-          </label>
+          <button class="btn-ghost pfbtn" id="pfBtn" type="button" aria-expanded="false">Filtros</button>
+          <label>Por página <select id="pPP"><option value="50">50</option><option value="100">100</option><option value="250">250</option></select></label>
+          <label id="pOrdG" hidden>Ordenar <select id="pOrd"></select></label>
           <div class="views" role="group" aria-label="Visualização">
-            <button data-view="list" title="Lista" aria-pressed="true"><svg width="15" height="13" viewBox="0 0 15 13" fill="currentColor"><rect width="4" height="3"/><rect x="5" width="10" height="3"/><rect y="5" width="4" height="3"/><rect x="5" y="5" width="10" height="3"/><rect y="10" width="4" height="3"/><rect x="5" y="10" width="10" height="3"/></svg></button>
-            <button data-view="grid" title="Grade"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6"/><rect x="8" width="6" height="6"/><rect y="8" width="6" height="6"/><rect x="8" y="8" width="6" height="6"/></svg></button>
-            <button data-view="compact" title="Compacta"><svg width="15" height="13" viewBox="0 0 15 13" fill="currentColor"><rect width="15" height="2"/><rect y="3.6" width="15" height="2"/><rect y="7.2" width="15" height="2"/><rect y="10.8" width="15" height="2"/></svg></button>
+            <button data-view="tabela" title="Tabela" aria-pressed="true"><svg width="15" height="13" viewBox="0 0 15 13" fill="currentColor"><rect width="15" height="2"/><rect y="3.6" width="15" height="2"/><rect y="7.2" width="15" height="2"/><rect y="10.8" width="15" height="2"/></svg></button>
+            <button data-view="grade" title="Grade"><svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect width="6" height="6"/><rect x="8" width="6" height="6"/><rect y="8" width="6" height="6"/><rect x="8" y="8" width="6" height="6"/></svg></button>
           </div>
         </div>
-        <div class="sum" id="sum"></div>
+        <div class="pchips" id="pChips"></div>
         <div id="results"></div>
+        <div class="pager" id="pPager"></div>
       </div>
-      <aside class="side" aria-label="Filtros">
-        <div class="blk"><h4>Restringir por preço</h4><div class="in">
-          <div class="rangev" id="priceV">Qualquer preço</div>
-          <input class="range" id="price" type="range" min="0" max="8" step="1" value="8" aria-label="Preço máximo">
-        </div></div>
-        <div class="blk"><h4>Desconto mínimo</h4><div class="in"><div class="chips" id="cDisc">
-          <button data-v="0" aria-pressed="true">Qualquer</button><button data-v="50">50%+</button><button data-v="75">75%+</button><button data-v="90">90%</button>
-        </div></div></div>
-        <div class="blk"><h4>Análises de usuários</h4><div class="in"><div class="chips" id="cRev">
-          <button data-v="0" aria-pressed="true">Todas</button><button data-v="70">70%+</button><button data-v="80">80%+</button><button data-v="90">90%+</button>
-        </div></div></div>
-        <div class="blk"><h4>Raridade do preço</h4><div class="in"><div class="chips" id="cTagLista"></div>
-          <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">Quantas vezes o jogo chega a esse desconto (ou até 5 pontos menos) nas lojas que alertam.</div></div></div>
-        <div class="blk"><h4>Restringir por</h4><div class="in" id="ticks"></div></div>
-      </aside>
+      <aside class="side pside" id="pSide" aria-label="Filtros"></aside>
     </div>
   </section>
 
   <section id="tab-bib" class="wrap tabsec" hidden>
     <div class="libtop" id="bibTop"></div>
     <div class="libbar">
-      <span class="seg" id="bibSeg"><button data-bseg="completar" aria-pressed="true">Completar</button><button data-bseg="franquias">Franquias</button><button data-bseg="colecao">Coleção</button></span>
+      <span class="seg" id="bibSeg"><button data-bseg="completar" aria-pressed="true">Completar</button><button data-bseg="franquias">Franquias</button><button data-bseg="colecao">Coleção</button><button data-bseg="dlcpromo">DLCs em promoção</button></span>
       <label class="search"><span class="sr">Buscar na biblioteca</span><input id="bq" type="search" placeholder="Buscar na biblioteca" autocomplete="off"></label>
       <select id="bsort"></select>
     </div>
@@ -631,11 +655,8 @@ function revClass(p,n){return !n?'rv-non':(p>=70?'rv-pos':(p>=40?'rv-mix':'rv-ne
 
 /* ================= estado ================= */
 let L=[], IDX=new Map(), RES={};
-const S=Object.assign({tab:'vale',sort:'score',disc:0,rev:0,price:8,view:'list',
-  t:{sale:true,piso:false,vale:false,hideDlc:false,onlyBase:false,bun:false,cmp:false,ks:false}},ls.get('s',{}),{q:'',shown:50});
+const S=Object.assign({tab:'vale',pview:'tabela'},ls.get('s',{}),{q:'',shown:50});
 const save=()=>{const {q,shown,...r}=S;ls.set('s',r);};
-const PRICE_STEPS=[500,1000,2000,3000,5000,7500,10000,20000,Infinity];
-const PRICE_LBL=['Até R$ 5','Até R$ 10','Até R$ 20','Até R$ 30','Até R$ 50','Até R$ 75','Até R$ 100','Até R$ 200','Qualquer preço'];
 
 /* ================= blocos ================= */
 function priceBlock(o,lg){
@@ -646,30 +667,23 @@ function priceBlock(o,lg){
 const ksBarata=o=>o.keyshop!=null&&o.preco!=null&&o.keyshop<o.preco*0.6;
 const ORDEM={sempre:5,'1a':4,'9m':3,'6m':2,'3m':1,perto:0};
 const TAGTXT={sempre:'Menor de sempre','1a':'Menor em 1 ano','9m':'Menor em 9 meses','6m':'Menor em 6 meses','3m':'Menor em 3 meses',perto:'Perto do menor',completo:'Completo no menor',keyshop:'Keyshop barata'};
-const RARS=['comum','incomum','raro','ultrarraro','lendario'];
-const RARTXT={comum:'Comum',incomum:'Incomum',raro:'Raro',ultrarraro:'Ultrarraro',lendario:'Lendário'};
-const rarIdx=r=>RARS.indexOf(r);
-function rarPill(o){if(!o.raridade)return '';return `<span class="rr rr-${o.raridade}" title="${esc(o.raridade_texto||'')}">${o.raridade==='lendario'?'★ ':''}${RARTXT[o.raridade]}</span>`;}
 const SELO_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#14110a" stroke="#f5c75b" stroke-width="5"/><path d="M22 38a11 11 0 0 1 20 0" stroke="#f5c75b" stroke-width="4" fill="none"/><path d="M32 32 50 16" stroke="#f5c75b" stroke-width="5"/><circle cx="32" cy="32" r="7" fill="#f5c75b"/></svg>';
-function seloBadge(o){return o.selo?`<span class="selo" title="${esc('Selo Kurokami: '+(o.selo_motivo||'o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo'))}">${SELO_SVG}SELO KUROKAMI</span>`:'';}
-const PPTXT={novo:'Novo recorde',raro:'Recorde raro',igual:'Igual ao recorde','24m':'Menor em 24 meses'};
+function seloBadge(o){return o.selo?`<span class="selo" title="${esc('Selo Kurokami: '+(o.selo_motivo||'o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade'))}">${SELO_SVG}SELO KUROKAMI</span>`:'';}
+const PPTXT={novo:'Novo recorde',raro:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
 function mesAno(iso){if(!iso)return '';const d=new Date(iso);return String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
 function pisoRefTxt(r){return r?`${brl(r.preco)}${r.corte?' a -'+r.corte+'%':''} (${mesAno(r.quando)})`:'';}
-function pisoPill(o){if(!(o.corte>0))return '';const r=o.piso_ref;
-  if(o.piso_tipo)return `<span class="pp pp-${o.piso_tipo}" title="${esc(r?((o.piso_tipo==='novo'||o.piso_tipo==='raro'?'recorde anterior: ':'menor de sempre: ')+pisoRefTxt(r)):'')}">${PPTXT[o.piso_tipo]}</span>`;
-  return r?`<span class="pp pp-ref">menor: ${esc(pisoRefTxt(r))}</span>`:'';}
+function pisoPill(o){const p=recPill(o);if(p)return p;const r=o.piso_ref;
+  return o.corte>0&&r&&o.tipo_oferta!=='selo'?`<span class="pp pp-ref">menor: ${esc(pisoRefTxt(r))}</span>`:'';}
 function precoComPiso(o){const p=pisoPill(o);return p?`<span class="ppwrap">${priceBlock(o)}${p}</span>`:priceBlock(o);}
 function tagPill(o){if(!o.tag)return '';const extra=o.tag==='perto'&&o.acima!=null?` +${brl(o.acima)}`:'';return `<span class="tg tg-${o.tag}" title="${esc(o.tag_texto||'')}">${TAGTXT[o.tag]||o.tag}${extra}</span>`;}
 function fimTxt(t){if(!t)return '';const h=(t*1000-Date.now())/36e5;if(h<=0||h>72)return '';return h<1?'termina em minutos':h<24?`termina em ${Math.round(h)}h`:`termina em ${Math.round(h/24)}d`;}
 function flags(o){
   const f=[];
-  if(o.favorito)f.push('<span class="flag" style="background:#e2a63533;color:#f0c674">★ favorito</span>');
   const ft=fimTxt(o.fim);if(ft)f.push(`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${ft}</span>`);
   if(o.mudo)f.push('<span class="flag own">🔕 sem alertas</span>');
   if(o.novo)f.push('<span class="pill-novo">NOVO</span>');
   if(o.selo)f.push(seloBadge(o));
-  if(o.raridade)f.push(rarPill(o));
-  if(o.vale)f.push('<span class="flag alert">Vale a pena</span>');
+  if(o.vale)f.push('<span class="flag alert">🔔 Avisa</span>');
   if(o.modo==='completo')f.push('<span class="flag cmp">Modo completo</span>');
   if(o.base_tenho)f.push('<span class="flag own">Você tem o jogo base</span>');
   if(o.bundles)f.push(`<span class="flag bun">Em ${o.bundles} bundle${o.bundles>1?'s':''}</span>`);
@@ -680,22 +694,15 @@ function flags(o){
 function thumb(o){const rc=revClass(o.rpos,o.rcount);const c={'rv-pos':'#66c0f4','rv-mix':'#b9a074','rv-neg':'#a34c25','rv-non':'#3d4b58'}[rc];
   return `<svg class="thumb" viewBox="0 0 18 18"><rect width="18" height="18" rx="2" fill="${c}" opacity=".9"/><path d="M5 8h2v6H5zM8 14V8l2.5-4c.9 0 1.4.6 1.2 1.6L11.3 7.5H14c.7 0 1.1.6 1 1.2l-.9 4.4c-.1.5-.6.9-1.1.9z" fill="#0e1c25"/></svg>`;}
 function revText(o){return o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo||o.rpos+'%')}</span> <span style="color:var(--dim)">(${fmtK(o.rcount)})</span>`:'<span class="rv-non">Sem análises</span>';}
-function rowHTML(o){return `<a class="srow" href="#" data-open="${o.appid}" data-hv="${o.appid}">
-  ${art(o.appid,o.nome,o.capa,{small:true})}
-  <span class="tt"><div>${esc(o.nome)}</div><span class="flags">${flags(o)}</span>${o.raridade_texto?`<div class="motivo">${esc(o.raridade_texto)} · ${esc(o.loja)}</div>`:''}</span>
-  <span class="rel">${o.lancamento?fmtUnix(o.lancamento):''}</span>${thumb(o)}<span style="display:flex;gap:6px;align-items:center;justify-self:end">${cartBtn(o.appid)}${precoComPiso(o)}</span></a>`;}
 function cartBtnB(id){const on=CARR.some(c=>c.bundle===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cartb="${id}" title="${on?'Tirar o bundle do carrinho':'Pôr o bundle no carrinho'}">${on?'✓':'+'}</span>`;}
 function cartBtn(id){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}" title="${on?'Tirar do carrinho':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
 function capCard(o){return `<a class="cap" href="#" data-open="${o.appid}" data-hv="${o.appid}">${art(o.appid,o.nome,o.capa)}
   <div class="meta"><div class="nm">${esc(o.nome)}</div><div class="row"><span class="rvs">${revText(o)}</span><span style="display:flex;gap:5px;align-items:center">${cartBtn(o.appid)}${precoComPiso(o)}</span></div></div></a>`;}
-function compactHTML(list){return `<div class="ctab-wrap"><table class="ctab tnum"><thead><tr><th>Jogo</th><th>Loja</th><th class="n">Desc.</th><th class="n">Agora</th><th>Raridade</th><th class="n">Piso</th><th class="n">Keyshop</th><th class="n">Análises</th><th class="n">Score</th><th></th></tr></thead><tbody>
-  ${list.map(o=>`<tr data-open="${o.appid}" data-hv="${o.appid}" style="cursor:pointer"><td class="t">${o.vale?'● ':''}${esc(o.nome)}</td><td>${esc(o.loja)}</td><td class="n">${o.corte>0?`<span class="pctx">-${o.corte}%</span>`:''}</td><td class="n">${brl(o.preco)}</td><td>${o.selo?seloBadge(o)+' ':''}${rarPill(o)}</td><td class="n" title="menor de sempre ${brl(o.piso)}">${o.piso_tipo?pisoPill(o):brl(o.piso)}</td><td class="n">${o.keyshop!=null?brl(o.keyshop):''}</td><td class="n ${revClass(o.rpos,o.rcount)}">${o.rcount?o.rpos+'%':'—'}</td><td class="n">${o.score?Math.round(o.score):''}</td><td>${cartBtn(o.appid)}</td></tr>`).join('')}
-  </tbody></table></div>`;}
 
 /* ================= hover ================= */
 const HV=$('#hv');let hvT=null,hvEl=null;
 function hvHTML(id){const o=IDX.get(+id);if(!o)return '';
-  const tags=[];if(o.vale)tags.push('<span class="g">Vale a pena</span>');if(o.selo)tags.push('<span class="g">Selo Kurokami</span>');
+  const tags=[];if(o.vale)tags.push('<span class="g">Avisa</span>');if(o.selo)tags.push('<span class="g">Selo Kurokami</span>');
   if(o.base_tenho)tags.push('<span>Você tem o jogo base</span>');if(o.modo==='completo')tags.push('<span class="v">Modo completo</span>');
   if(o.bundles)tags.push(`<span class="v">Em ${o.bundles} bundle(s)</span>`);
   return `<h4>${esc(o.nome)}</h4><div class="rel">${o.lancamento?'Lançamento: '+fmtUnix(o.lancamento):'Na sua lista de desejos'}</div>
@@ -703,9 +710,9 @@ function hvHTML(id){const o=IDX.get(+id);if(!o)return '';
     <div class="revl">Análises: ${o.rcount?`<b class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</b> · ${o.rpos}% de ${fmtN(o.rcount)}`:'<b>sem análises</b>'}</div>
     <div class="kv tnum">${o.preco!=null?`<span>Melhor preço (${esc(o.loja)})</span><b>${brl(o.preco)}</b>`:''}
       ${o.corte>0?`<span>Preço cheio</span><b>${brl(o.cheio)}</b>`:''}
-      ${o.raridade?`<span>Raridade</span><b>${RARTXT[o.raridade]}</b>`:''}${o.piso_tipo?`<span>Piso</span><b>${PPTXT[o.piso_tipo]}</b>`:''}<span>Menor de sempre</span><b>${brl(o.piso)}</b>
+      ${o.volta_texto?`<span>Costuma voltar</span><b>${esc(o.volta_texto)}</b>`:''}${o.tipo_oferta?`<span>Preço</span><b>${TIPO_NOME[o.tipo_oferta]}</b>`:''}<span>Menor de sempre</span><b>${brl(o.piso)}</b>
       ${o.keyshop!=null?`<span>Keyshop (GG.deals)</span><b>${brl(o.keyshop)}</b>`:''}
-      ${o.score?`<span>Score</span><b>${Math.round(o.score)} / 100</b>`:''}</div>
+</div>
     ${tags.length?`<div class="tags">${tags.join('')}</div>`:''}<div class="note">Clique para ver histórico, lojas e caminhos de compra</div>`;}
 document.addEventListener('mouseover',e=>{const el=e.target.closest('[data-hv]');if(el===hvEl)return;clearTimeout(hvT);HV.classList.remove('on');hvEl=el;if(!el)return;
   hvT=setTimeout(()=>{const h=hvHTML(el.dataset.hv);if(!h)return;HV.innerHTML=h;const r=el.getBoundingClientRect(),w=310,hh=HV.offsetHeight;
@@ -717,7 +724,7 @@ async function salvarCarr(){await post('/api/carrinho',{itens:CARR});$('#carrN')
 async function alternarCarr(id,forcar){const i=CARR.findIndex(c=>c.appid===id);
   if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}else if(i<0){CARR.push({appid:id,loja:null});toast('No carrinho');}
   await salvarCarr();$$(`[data-cart="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.appid===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
-  if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();}
+  if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();if(S.tab==='lista')renderLista();}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cart]');if(!c)return;e.preventDefault();e.stopPropagation();alternarCarr(+c.dataset.cart);},true);
 async function alternarBundle(id){const i=CARR.findIndex(c=>c.bundle===id);if(i>=0){CARR.splice(i,1);toast('Bundle saiu do carrinho');}else{CARR.push({bundle:id});toast('Bundle no carrinho');}
   await salvarCarr();$$(`[data-cartb="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.bundle===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
@@ -726,97 +733,188 @@ document.addEventListener('click',e=>{const c=e.target.closest('[data-cartb]');i
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(!o)return;e.preventDefault();HV.classList.remove('on');abrirJogo(+o.dataset.open);});
 
 /* ================= abas ================= */
-function setTab(t){S.tab=t;save();$$('.nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
+function setTab(t){S.tab=t;save();try{history.replaceState(null,'','#'+t);}catch(e){}$$('.nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===t?'page':'false'));
   ['vale','lista','bib','carr','notif','cfg'].forEach(x=>$('#tab-'+x).hidden=x!==t);render();}
 $$('.nav button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
-$$('[data-goto]').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.goto)));
 
-/* ================= vale a pena ================= */
-let heroI=0;
-function valeItens(){return L.filter(o=>o.vale).sort((a,b)=>(b.selo-a.selo)||rarIdx(b.raridade)-rarIdx(a.raridade)||b.score-a.score);}
-S.tagVale=S.tagVale||'';
-function filtroTag(o,t){if(!t)return true;if(t==='selo')return !!o.selo;return !!o.raridade&&rarIdx(o.raridade)>=rarIdx(t);}
-function chipsTag(sel,atual,base){const opts=[['','Todos'],['selo','Selo Kurokami'],['lendario','★ Lendário'],['ultrarraro','Ultrarraro+'],['raro','Raro+'],['incomum','Incomum+']];
-  $(sel).innerHTML=opts.map(([v,t])=>`<button data-tag="${v}" aria-pressed="${atual===v}">${t} <span style="opacity:.6">${base.filter(o=>filtroTag(o,v)).length}</span></button>`).join('');}
-function renderVale(){
-  const it=valeItens();$('#valeNote').textContent=`${it.length} jogo(s) · checado ${fmtISO(RES.atualizado)}`;
-  if(!it.length){$('#hero').innerHTML='<div class="empty">Nada valendo a pena com os seus filtros agora. Ajuste em Configurações ou veja a lista inteira.</div>';$('#valeLista').innerHTML='';return;}
-  const top=it.slice(0,10);heroI=(heroI+top.length)%top.length;const o=top[heroI];
+/* ================= vale a pena (vitrine) ================= */
+let heroI=0, VIT=null;
+const TIPO_NOME={selo:'Selo Kurokami',novo:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
+const TIPO_DESC={selo:'O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade',novo:'Nunca esteve tão barato',
+  igual:'No mesmo preço do menor já registrado','24m':'No menor preço dos últimos 2 anos'};
+const TIPO_COR={selo:'#f5c75b',novo:'#1a6fd1',igual:'#4c8a1c','24m':'#6a3fc0'};
+function vitCard(o){const ft=fimTxt(o.fim);
+  return `<a class="cap vcard" href="#" data-open="${o.appid}" data-hv="${o.appid}">${art(o.appid,o.nome,o.capa)}
+  <div class="meta"><div class="nm">${esc(o.nome)}</div>${ft?`<div class="vfim">⏳ ${ft}</div>`:''}
+    <div class="row"><span>${cartBtn(o.appid)}</span>${priceBlock(o)}</div></div></a>`;}
+function verTudo(t){const P0={mostrar_so:[t],relacao:{tenho:'excluir'}};if(t!=='selo'&&VIT&&VIT.desconto_minimo)P0.desconto_min=VIT.desconto_minimo;
+  P=P0;PG=1;salvarP();setTab('lista');}
+async function renderVale(){
+  try{VIT=await api('/api/vitrine');}catch(e){return;}
+  atualizarStatus();
+  const sel=VIT.selo,top=sel.itens;
+  $('#valeNote').innerHTML=`${VIT.avisa.selo?'🔔 ':''}${esc(TIPO_DESC.selo)}${sel.total?` · <button class="lk vtudo" data-vertudo="selo">Ver tudo (${sel.total})</button>`:''}`;
+  if(!top.length){$('#hero').innerHTML='<div class="empty">Nenhum jogo com Selo agora.</div>';}
+  else{heroI=(heroI+top.length)%top.length;const o=top[heroI];
   $('#hero').innerHTML=`<div class="hero-stage">
     <a class="hero-art" href="#" data-open="${o.appid}">${art(o.appid,o.nome,o.capa,{style:'--fs:30px'})}</a>
-    <div class="hero-info"><h3><a href="#" data-open="${o.appid}">${esc(o.nome)}</a></h3><div class="flags">${flags(o)}</div>
-      <div class="hero-why tnum"><span>Análises</span><b>${o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</span> · ${o.rpos}%`:'Sem análises'}</b>
-        <span>Score</span><span class="meter"><i style="width:${Math.min(100,o.score)}%"></i></span>
-        <span>Loja</span><b>${esc(o.loja)}</b><span>Raridade</span><b>${rarPill(o)} ${esc(o.raridade_texto||'')}</b></div>
-      <div class="hero-next">${[1,2,3,4].map(k=>{const n=top[(heroI+k)%top.length];return `<button type="button" data-heroi="${(heroI+k)%top.length}" title="${esc(n.nome)}">${art(n.appid,n.nome,n.capa,{small:true})}</button>`;}).join('')}</div>
+    <div class="hero-info"><h3><a href="#" data-open="${o.appid}">${esc(o.nome)}</a></h3><div class="flags">${seloBadge(o)}${fimTxt(o.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(o.fim)}</span>`:''}</div>
+      <div class="hero-why tnum"><span>Por quê</span><b>${esc((o.selo_motivo||'').replace(/^./,c=>c.toUpperCase()))}</b>
+        <span>Loja</span><b>${esc(o.loja)}</b><span>Análises</span><b>${o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</span> · ${o.rpos}%`:'Sem análises'}</b></div>
+      ${top.length>1?`<div class="hero-next">${[1,2,3,4].slice(0,top.length-1).map(k=>{const n=top[(heroI+k)%top.length];return `<button type="button" data-heroi="${(heroI+k)%top.length}" title="${esc(n.nome)}">${art(n.appid,n.nome,n.capa,{small:true})}</button>`;}).join('')}</div>`:''}
       <div class="hero-foot"><span style="display:flex;gap:8px;align-items:center"><a class="btn-go green" href="${esc(o.url||storeUrl(o.appid))}" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13px">Abrir oferta</a>${cartBtn(o.appid)}</span>${priceBlock(o,true)}</div></div></div>
-    <button class="arrow l" aria-label="Anterior" data-hero="-1"><svg viewBox="0 0 12 22"><path d="M11 1 1 11l10 10" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
+    ${top.length>1?`<button class="arrow l" aria-label="Anterior" data-hero="-1"><svg viewBox="0 0 12 22"><path d="M11 1 1 11l10 10" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
     <button class="arrow r" aria-label="Próximo" data-hero="1"><svg viewBox="0 0 12 22"><path d="m1 1 10 10L1 21" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
-    <div class="dots">${top.map((_,i)=>`<button aria-label="Destaque ${i+1}" data-heroi="${i}" aria-current="${i===heroI}"></button>`).join('')}</div>`;
-  chipsTag('#cTagVale',S.tagVale,it);
-  const fl=it.filter(o=>filtroTag(o,S.tagVale));
-  $('#valeLista').innerHTML=fl.length?`<div class="rows">${fl.map(rowHTML).join('')}</div>`:'<div class="empty">Nenhum com essa etiqueta.</div>';
+    <div class="dots">${top.map((_,i)=>`<button aria-label="Destaque ${i+1}" data-heroi="${i}" aria-current="${i===heroI}"></button>`).join('')}</div>`:''}`;}
+  $('#vitrine').innerHTML=['novo','igual','24m'].map(t=>{const b=VIT[t];if(!b||!b.total)return '';
+    return `<div class="shead vhead"><div><h2>${VIT.avisa[t]?'🔔 ':''}${TIPO_NOME[t]}</h2><div class="vsub">${esc(TIPO_DESC[t])}</div></div>
+      <button class="lk vtudo" data-vertudo="${t}">Ver tudo (${b.total})</button></div>
+      <div class="vgrid">${b.itens.map(vitCard).join('')}</div>`;}).join('')||
+    `<div class="empty" style="margin-top:20px">Nenhum outro recorde com desconto de ${VIT.desconto_minimo}% ou mais agora.</div>`;
 }
-$('#tab-vale').addEventListener('click',e=>{const b=e.target.closest('#cTagVale [data-tag]');if(!b)return;S.tagVale=b.dataset.tag;save();renderVale();});
+$('#tab-vale').addEventListener('click',e=>{const v=e.target.closest('[data-vertudo]');if(v){e.preventDefault();verTudo(v.dataset.vertudo);}});
 $('#hero').addEventListener('click',e=>{const a=e.target.closest('[data-hero]'),d=e.target.closest('[data-heroi]');
   if(a){heroI+=+a.dataset.hero;renderVale();}else if(d){heroI=+d.dataset.heroi;renderVale();}});
 
-/* ================= lista ================= */
-const TICKS=[['sale','Só em promoção',o=>o.corte>0],['vale','Vale a pena (filtros do alerta)',o=>o.vale],
-  ['hideDlc','Ocultar DLCs',o=>o.tipo==='dlc'],['onlyBase','Só DLCs de jogos que tenho',o=>o.base_tenho],['bun','Faz parte de bundle',o=>o.bundles>0],
-  ['cmp','Modo completo',o=>o.modo==='completo'],['ks','Keyshop bem mais barata',ksBarata]];
-function renderTicks(){chipsTag('#cTagLista',S.tagLista||'',L);$('#ticks').innerHTML=TICKS.map(([k,l,f])=>`<label class="tick"><input type="checkbox" data-tick="${k}" ${S.t[k]?'checked':''}>${l}<span class="c">${L.filter(f).length}</span></label>`).join('');}
-$('#cTagLista').addEventListener('click',e=>{const b=e.target.closest('[data-tag]');if(!b)return;S.tagLista=b.dataset.tag;S.shown=50;save();renderTicks();renderLista();});
-$('#ticks').addEventListener('change',e=>{const k=e.target.dataset.tick;if(!k)return;S.t[k]=e.target.checked;S.shown=50;save();renderLista();});
-function filtrar(){
-  const max=PRICE_STEPS[S.price], big=1e12;
-  const r=L.filter(o=>{
-    if(S.t.sale&&!(o.corte>0))return false; if(!filtroTag(o,S.tagLista||''))return false; if(S.t.vale&&!o.vale)return false;
-    if(S.t.hideDlc&&o.tipo==='dlc')return false; if(S.t.onlyBase&&!o.base_tenho)return false; if(S.t.bun&&!o.bundles)return false;
-    if(S.t.cmp&&o.modo!=='completo')return false; if(S.t.ks&&!ksBarata(o))return false;
-    if(o.corte<S.disc)return false; if(S.rev&&(!o.rcount||o.rpos<S.rev))return false;
-    if(max!==Infinity&&(o.preco==null||o.preco>max))return false;
-    if(S.q&&!o.nome.toLowerCase().includes(S.q))return false; return true;});
-  const gap=o=>o.preco!=null&&o.piso?o.preco/o.piso:big;
-  const cmp={rar:(a,b)=>(b.selo-a.selo)||rarIdx(b.raridade)-rarIdx(a.raridade)||b.score-a.score,score:(a,b)=>b.score-a.score||b.corte-a.corte,disc:(a,b)=>b.corte-a.corte||b.score-a.score,price:(a,b)=>(a.preco??big)-(b.preco??big),
-    rating:(a,b)=>b.rpos-a.rpos||b.rcount-a.rcount,gap:(a,b)=>gap(a)-gap(b),save:(a,b)=>((b.cheio||0)-(b.preco||0))-((a.cheio||0)-(a.preco||0)),
-    name:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR'),rel:(a,b)=>(b.lancamento||0)-(a.lancamento||0),prio:(a,b)=>(a.prioridade??1e9)-(b.prioridade??1e9)}[S.sort];
-  return r.sort(cmp);
+/* ================= promoções (explorador; filtros no Radar: /api/promocoes) ================= */
+const P_PADRAO={desconto_min:50,analises_de:5000};
+let P=ls.get('promo',null)||JSON.parse(JSON.stringify(P_PADRAO)), PG=1, PP=ls.get('pp',100), PR=null, pSeq=0;
+const salvarP=()=>{ls.set('promo',P);ls.set('pp',PP);};
+const REL=[['na_lista','Na lista de desejos'],['extra','Monitorado por você'],['no_carrinho','No carrinho'],['seguido','Seguido na Steam'],
+  ['ignorado_steam','Ignorado na Steam'],['mudo','Silenciado'],['tenho','Tenho'],['base_tenho','Tenho o jogo base']];
+const OUTROS_TXT={promo:'Só em promoção',bundle:'Em bundle',completo:'Modo completo',keyshop:'Keyshop bem mais barata'};
+const COLS=[['nome','Jogo','asc'],['corte','%','desc'],['volta','Costuma voltar','asc'],['preco','Preço','asc'],['nota','Análises','desc'],
+  ['lancamento','Lançamento','desc'],['fim','Termina','asc'],['inicio','Começou','desc']];
+const COLNOME=Object.fromEntries(COLS.map(c=>[c[0],c[1]]));
+function qPromo(){const q={pagina:PG,por_pagina:PP};
+  for(const [k,v] of Object.entries(P)){if(v==null||v===''||v===false)continue;if(Array.isArray(v)&&!v.length)continue;
+    if(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)continue;q[k]=v;}return q;}
+async function renderLista(){
+  const seq=++pSeq;let r;
+  try{r=await api('/api/promocoes?q='+encodeURIComponent(JSON.stringify(qPromo())));}catch(e){return;}
+  if(seq!==pSeq)return;PR=r;
+  const maxPg=Math.max(1,Math.ceil(r.total/PP));if(PG>maxPg){PG=maxPg;return renderLista();}
+  $('#cnt').textContent=fmtN(r.total);
+  $('#listaNote').textContent=L.length?`${fmtN(L.filter(o=>o.corte>0).length)} em promoção de ${fmtN(L.length)} na lista`:'';
+  renderSide();renderChips();
+  const box=$('#results');
+  if(!r.itens.length)box.innerHTML='<div class="empty">Nenhum jogo com esses filtros.</div>';
+  else box.innerHTML=S.pview==='grade'?`<div class="cgrid">${r.itens.map(capCard).join('')}</div>`:tabelaPromo(r.itens);
+  $$('.views [data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.pview));
+  $('#pOrdG').hidden=S.pview!=='grade';
+  const o0=(P.ordem||[['corte','desc'],['nome','asc']])[0];
+  $('#pOrd').innerHTML=COLS.flatMap(([k,t])=>[['asc','↑'],['desc','↓']].map(([d,s])=>`<option value="${k}:${d}"${o0[0]===k&&o0[1]===d?' selected':''}>${t} ${s}</option>`)).join('');
+  $('#pPP').value=String(PP);
+  $('#pPager').innerHTML=paginas(PG,maxPg);
 }
-function renderLista(){
-  const r=filtrar(),sl=r.slice(0,S.shown),box=$('#results');
-  $('#cnt').textContent=fmtN(r.length);
-  const sv=r.reduce((s,o)=>s+(o.corte>0?(o.cheio||0)-(o.preco||0):0),0),now=r.reduce((s,o)=>s+(o.preco||0),0);
-  $('#sum').innerHTML=r.length?`Levar tudo isso custaria ${brl0(now)}, economia de <b>${brl0(sv)}</b> sobre o preço cheio.`:'';
-  if(!r.length){box.innerHTML='<div class="empty">Nenhum jogo com esses filtros.</div>';}
-  else{const more=r.length>S.shown?`<button class="more" id="moreBtn">Mostrar mais ${Math.min(50,r.length-S.shown)} de ${fmtN(r.length-S.shown)}</button>`:'';
-    box.innerHTML=(S.view==='grid'?`<div class="cgrid">${sl.map(capCard).join('')}</div>`:S.view==='compact'?compactHTML(sl):`<div class="rows">${sl.map(rowHTML).join('')}</div>`)+more;}
-  $$('.views [data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
-  $('#sort').value=S.sort;$('#price').value=S.price;$('#priceV').textContent=PRICE_LBL[S.price];
-  [['#cDisc','disc'],['#cRev','rev']].forEach(([id,k])=>$$(id+' button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===S[k])));
-  $('#qVale').textContent=L.filter(o=>o.vale).length;$('#qPiso').textContent=L.filter(o=>o.raridade&&rarIdx(o.raridade)>=2).length;
-  $('#qDlc').textContent=L.filter(o=>o.base_tenho).length;$('#qTodos').textContent=fmtN(L.length);
-  $('#listaNote').textContent=`${fmtN(L.filter(o=>o.corte>0).length)} em promoção de ${fmtN(L.length)}`;
-}
-$('#results').addEventListener('click',e=>{if(e.target.id==='moreBtn'){S.shown+=50;renderLista();}});
-$('#q').addEventListener('input',e=>{S.q=e.target.value.trim().toLowerCase();S.shown=50;renderLista();});
-$('#sort').addEventListener('change',e=>{S.sort=e.target.value;S.shown=50;save();renderLista();});
-$('#price').addEventListener('input',e=>{S.price=+e.target.value;S.shown=50;save();renderLista();});
-[['#cDisc','disc'],['#cRev','rev']].forEach(([id,k])=>$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S[k]=+b.dataset.v;S.shown=50;save();renderLista();}));
-$$('.views [data-view]').forEach(b=>b.addEventListener('click',()=>{S.view=b.dataset.view;save();renderLista();}));
-$$('[data-quick]').forEach(b=>b.addEventListener('click',()=>{const q=b.dataset.quick;
-  Object.keys(S.t).forEach(k=>S.t[k]=false);S.tagLista='';if(q==='vale')S.t.vale=true;if(q==='piso')S.tagLista='raro';if(q==='dlc')S.t.onlyBase=true;
-  S.shown=50;save();renderTicks();renderLista();}));
+function paginas(pg,max){if(max<=1)return '';const ns=new Set([1,max,pg-2,pg-1,pg,pg+1,pg+2].filter(n=>n>=1&&n<=max));const l=[...ns].sort((a,b)=>a-b);
+  let h=`<button data-pg="${pg-1}" ${pg<=1?'disabled':''}>‹</button>`,ant=0;
+  l.forEach(n=>{if(n-ant>1)h+='<span>…</span>';h+=`<button data-pg="${n}" aria-current="${n===pg}">${n}</button>`;ant=n;});
+  return h+`<button data-pg="${pg+1}" ${pg>=max?'disabled':''}>›</button>`;}
+function relTempo(t,futuro){if(!t)return '';const ms=futuro?t*1000-Date.now():Date.now()-Date.parse(t);if(isNaN(ms))return '';const h=ms/36e5;
+  if(futuro&&h<=0)return 'acabou';const d=Math.round(h/24);
+  const txt=h<1?'menos de 1h':h<24?`${Math.round(h)}h`:`${d} dia${d>1?'s':''}`;return futuro?'em '+txt:'há '+txt;}
+function recPill(o){const t=o.tipo_oferta;if(!t||t==='selo'||!(o.corte>0))return '';const r=o.piso_ref;
+  return `<span class="pp pp-${t}" title="${esc(r?((t==='novo'?'recorde anterior: ':'menor de sempre: ')+pisoRefTxt(r)):'')}">${TIPO_NOME[t]}</span>`;}
+function icones(o){return `${o.no_carrinho?'<span class="ico ico-carr" title="No carrinho">🛒</span>':''}${o.na_lista?'<span class="ico ico-lista" title="Na lista de desejos">☰</span>':''}`;}
+function tabelaPromo(it){const ord=P.ordem||[['corte','desc'],['nome','asc']];
+  const th=(k,cls)=>{const i=ord.findIndex(x=>x[0]===k);const seta=i<0?'':(ord[i][1]==='asc'?'▲':'▼')+(ord.length>1?`<sup>${i+1}</sup>`:'');
+    return `<th class="srt${cls?' '+cls:''}${i>=0?' on':''}" data-sort="${k}" title="Clique ordena; Shift+clique soma critérios">${COLNOME[k]} ${seta}</th>`;};
+  return `<div class="ctab-wrap ptab-wrap"><table class="ctab ptab tnum"><thead><tr><th></th><th></th>${th('nome')}${th('corte','n')}${th('volta')}${th('preco','n')}${th('nota','n')}${th('lancamento','n')}${th('fim','n')}${th('inicio','n')}<th></th></tr></thead><tbody>
+  ${it.map(o=>`<tr data-open="${o.appid}" data-hv="${o.appid}"><td class="icos">${icones(o)}</td><td class="pcap">${art(o.appid,o.nome,o.capa,{small:true})}</td>
+    <td class="t"><span class="pnm">${esc(o.nome)}</span> ${o.selo?seloBadge(o):''}${recPill(o)}</td>
+    <td class="n">${o.corte>0?`<span class="pct">-${o.corte}%</span>`:''}</td>
+    <td class="volta"${o.volta_dica?` title="${esc(o.volta_dica)}"`:''}>${o.volta_texto?esc(o.volta_texto):''}</td>
+    <td class="n">${brl(o.preco)}</td><td class="n ${revClass(o.rpos,o.rcount)}" title="${o.rcount?fmtN(o.rcount)+' análises':''}">${o.rcount?o.rpos+'%':'—'}</td>
+    <td class="n">${o.lancamento?new Date(o.lancamento*1000).toLocaleDateString('pt-BR'):(o.em_breve?'em breve':'')}</td><td class="n">${relTempo(o.fim,true)}</td><td class="n">${relTempo(o.inicio,false)}</td>
+    <td>${cartBtn(o.appid)}</td></tr>`).join('')}</tbody></table></div>`;}
+function ordenarPor(k,somar){const padrao=(COLS.find(c=>c[0]===k)||[])[2]||'asc';let o=(P.ordem||[['corte','desc'],['nome','asc']]).map(x=>[...x]);
+  const i=o.findIndex(x=>x[0]===k);
+  if(somar){if(i>=0)o[i][1]=o[i][1]==='asc'?'desc':'asc';else o.push([k,padrao]);}
+  else o=(i===0)?[[k,o[0][1]==='asc'?'desc':'asc']]:[[k,padrao]];
+  P.ordem=o;PG=1;salvarP();renderLista();}
+const reais=c=>c==null?'':String(c/100);
+function renderSide(){const r=PR||{contagens:{mostrar_so:{},tipo:{}},conta:{tem_dados:false}};const ct=r.contagens,rel=P.relacao||{};
+  const sem=!r.conta.tem_dados;
+  const tri=(k,l)=>{const v=rel[k]||'';const off=sem&&(k==='seguido'||k==='ignorado_steam');
+    return `<div class="tri${off?' off':''}"${off?' title="precisa dos dados da sua conta Steam"':''}><span>${l}</span><span class="tb" role="group" aria-label="${l}">
+      <button data-rel="${k}" data-v="excluir" aria-pressed="${v==='excluir'}" title="esconder">✕</button><button data-rel="${k}" data-v="" aria-pressed="${!v}" title="tanto faz">—</button><button data-rel="${k}" data-v="exigir" aria-pressed="${v==='exigir'}" title="só esses">✓</button></span></div>`;};
+  const caixa=(grupo,v,l,n,cor)=>`<label class="tick"><input type="checkbox" data-grupo="${grupo}" data-v="${v}" ${(P[grupo]||[]).includes(v)?'checked':''}>${cor?`<i class="dot" style="background:${cor}"></i>`:''}${l}${n!=null?`<span class="c">${fmtN(n)}</span>`:''}</label>`;
+  const num=(k,ph,step)=>`<input type="number" class="pin" data-num="${k}" placeholder="${ph}" step="${step||1}" min="0" value="${k.startsWith('preco')?reais(P[k]):(P[k]??'')}">`;
+  const sel=(k,l)=>`<label class="f">${l} <select data-sel="${k}"><option value="">—</option>${Array.from({length:20},(_,i)=>(i+1)*5).map(x=>`<option value="${x}"${P[k]===x?' selected':''}>${x}%</option>`).join('')}</select></label>`;
+  const aberto=g=>(ls.get('aberto',{})[g])?' open':'';
+  const marca=g=>(P[g]||[]).length?' <i class="pon"></i>':'';
+  const ae=document.activeElement;let foco=null,pos=null;
+  if(ae&&$('#pSide').contains(ae)){foco=ae.id?'#'+ae.id:ae.dataset.num?`[data-num="${ae.dataset.num}"]`:ae.dataset.data?`[data-data="${ae.dataset.data}"]`:null;try{pos=ae.selectionStart;}catch(e){}}
+  $('#pSide').innerHTML=`<div class="blk"><h4>Buscar por nome</h4><div class="in"><input type="search" class="pin" id="pBusca" placeholder="nome do jogo" value="${esc(P.busca||'')}" style="width:100%"></div></div>
+    <div class="blk"><h4>Sua relação com o jogo</h4><div class="in">${REL.map(([k,l])=>tri(k,l)).join('')}
+      <label class="tick"><input type="checkbox" id="pQq" ${P.qualquer_um?'checked':''}>Qualquer um (os ✓ valem com OU)</label>
+      ${sem?'<div class="hint">Seguido e Ignorado precisam dos dados da sua conta Steam (userdata.json).</div>':''}</div></div>
+    <div class="blk"><h4>Mostrar só</h4><div class="in">${['selo','novo','igual','24m'].map(t=>caixa('mostrar_so',t,TIPO_NOME[t],ct.mostrar_so[t],TIPO_COR[t])).join('')}</div></div>
+    <details class="blk"${aberto('tipo')} data-ab="tipo"><summary><h4>Tipo${marca('tipo')}</h4></summary><div class="in">${caixa('tipo','jogo','Jogo',ct.tipo.jogo)}${caixa('tipo','dlc','DLC',ct.tipo.dlc)}</div></details>
+    <details class="blk"${aberto('outros')} data-ab="outros"><summary><h4>Outros${marca('outros')}</h4></summary><div class="in">${Object.entries(OUTROS_TXT).map(([k,l])=>caixa('outros',k,l)).join('')}</div></details>
+    <div class="blk"><h4>Faixas</h4><div class="in pfx">
+      <div class="f">Preço (R$) ${num('preco_de','de',1)} ${num('preco_ate','até',1)}</div>
+      <div class="f">Análises ${num('analises_de','de',100)} ${num('analises_ate','até',100)}</div>
+      ${sel('nota_min','Nota ≥')}${sel('desconto_min','Desconto ≥')}
+      <div class="f">Lançamento <input type="date" class="pin" data-data="lanc_de" value="${esc(P.lanc_de||'')}"> <input type="date" class="pin" data-data="lanc_ate" value="${esc(P.lanc_ate||'')}"></div>
+      <label class="tick"><input type="checkbox" id="pBreve" ${P.em_breve?'checked':''}>Só em breve</label>
+      <div class="hint">Análises e nota filtram só a tela, nunca os avisos.</div></div></div>
+    <div class="pbtns"><button class="btn-ghost" id="pLimpa" type="button">Limpar filtros</button><button class="btn-ghost" id="pPadrao" type="button">Restaurar padrão</button></div>`;
+  if(foco){const n=$('#pSide '+foco);if(n){n.focus();try{if(pos!=null)n.setSelectionRange(pos,pos);}catch(e){}}}}
+function chipsAtivos(){const c=[],R=P.relacao||{};
+  if(P.busca)c.push(['busca',`"${P.busca}"`]);
+  REL.forEach(([k,l])=>{if(R[k])c.push(['rel:'+k,(R[k]==='exigir'?'✓ ':'✕ ')+l]);});
+  if(P.qualquer_um)c.push(['qualquer_um','Qualquer um']);
+  (P.mostrar_so||[]).forEach(t=>c.push(['mostrar_so:'+t,TIPO_NOME[t]]));
+  (P.tipo||[]).forEach(t=>c.push(['tipo:'+t,t==='dlc'?'DLC':'Jogo']));
+  (P.outros||[]).forEach(t=>c.push(['outros:'+t,OUTROS_TXT[t]]));
+  if(P.preco_de!=null)c.push(['preco_de','Preço ≥ '+brl(P.preco_de)]);if(P.preco_ate!=null)c.push(['preco_ate','Preço ≤ '+brl(P.preco_ate)]);
+  if(P.analises_de!=null)c.push(['analises_de','Análises ≥ '+fmtN(P.analises_de)]);if(P.analises_ate!=null)c.push(['analises_ate','Análises ≤ '+fmtN(P.analises_ate)]);
+  if(P.nota_min!=null)c.push(['nota_min','Nota ≥ '+P.nota_min+'%']);if(P.desconto_min!=null)c.push(['desconto_min','Desconto ≥ '+P.desconto_min+'%']);
+  if(P.lanc_de)c.push(['lanc_de','Lançado desde '+P.lanc_de.split('-').reverse().join('/')]);if(P.lanc_ate)c.push(['lanc_ate','Lançado até '+P.lanc_ate.split('-').reverse().join('/')]);
+  if(P.em_breve)c.push(['em_breve','Só em breve']);
+  return c;}
+function renderChips(){const c=chipsAtivos();
+  $('#pChips').innerHTML=c.map(([k,t])=>`<span class="pchip">${esc(t)}<button data-tira="${esc(k)}" aria-label="Tirar o filtro ${esc(t)}">×</button></span>`).join('');}
+function tirarFiltro(k){const [g,v]=k.split(':');
+  if(g==='rel'){const R={...(P.relacao||{})};delete R[v];P.relacao=R;}
+  else if(v!==undefined)P[g]=(P[g]||[]).filter(x=>x!==v);
+  else delete P[g];
+  PG=1;salvarP();renderLista();}
+let pT=null;
+function mudouP(atraso){PG=1;salvarP();clearTimeout(pT);pT=setTimeout(renderLista,atraso||0);}
+$('#pSide').addEventListener('click',e=>{const b=e.target.closest('[data-rel]');
+  if(b){if(b.closest('.tri.off'))return;const R={...(P.relacao||{})};if(b.dataset.v)R[b.dataset.rel]=b.dataset.v;else delete R[b.dataset.rel];P.relacao=R;mudouP();return;}
+  if(e.target.id==='pLimpa'){P={};mudouP();return;}
+  if(e.target.id==='pPadrao'){P=JSON.parse(JSON.stringify(P_PADRAO));mudouP();return;}});
+$('#pSide').addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.grupo){const g=t.dataset.grupo,v=t.dataset.v;const l=new Set(P[g]||[]);t.checked?l.add(v):l.delete(v);P[g]=[...l];mudouP();return;}
+  if(t.id==='pQq'){P.qualquer_um=t.checked;mudouP();return;}
+  if(t.id==='pBreve'){P.em_breve=t.checked;mudouP();return;}
+  if(t.dataset.sel){const v=t.value;if(v==='')delete P[t.dataset.sel];else P[t.dataset.sel]=+v;mudouP();return;}
+  if(t.dataset.data){if(t.value)P[t.dataset.data]=t.value;else delete P[t.dataset.data];mudouP();return;}});
+$('#pSide').addEventListener('input',e=>{const t=e.target;
+  if(t.id==='pBusca'){P.busca=t.value.trim();if(!P.busca)delete P.busca;mudouP(250);return;}
+  if(t.dataset.num){const k=t.dataset.num,v=t.value.trim().replace(',','.');
+    if(v===''||isNaN(+v))delete P[k];else P[k]=k.startsWith('preco')?Math.round(+v*100):Math.round(+v);mudouP(250);}});
+$('#pSide').addEventListener('toggle',e=>{const d=e.target.closest('details[data-ab]');if(!d)return;const a=ls.get('aberto',{});a[d.dataset.ab]=d.open;ls.set('aberto',a);},true);
+$('#pChips').addEventListener('click',e=>{const b=e.target.closest('[data-tira]');if(b)tirarFiltro(b.dataset.tira);});
+$('#results').addEventListener('click',e=>{const h=e.target.closest('th[data-sort]');if(!h)return;e.preventDefault();e.stopPropagation();ordenarPor(h.dataset.sort,e.shiftKey);},true);
+$('#pPager').addEventListener('click',e=>{const b=e.target.closest('[data-pg]');if(!b||b.disabled)return;PG=+b.dataset.pg;renderLista();$('#tab-lista').scrollIntoView({block:'start'});});
+$('#pPP').addEventListener('change',e=>{PP=+e.target.value;PG=1;salvarP();renderLista();});
+$('#pOrd').addEventListener('change',e=>{const [k,d]=e.target.value.split(':');P.ordem=[[k,d]];PG=1;salvarP();renderLista();});
+$$('.views [data-view]').forEach(b=>b.addEventListener('click',()=>{S.pview=b.dataset.view;save();renderLista();}));
+$('#pfBtn').addEventListener('click',()=>{const s=$('#pSide');s.classList.toggle('open');$('#pfBtn').setAttribute('aria-expanded',s.classList.contains('open'));});
 
 /* ================= modal do jogo ================= */
-function porqueRar(m){const i=m.rar_info||{};if(!m.raridade)return '';
+function porqueVolta(m){const o=IDX.get(m.jogo.appid)||{};
   const selo=m.selo?`<div style="margin-bottom:6px">${seloBadge(m)} <b>${esc((m.selo_motivo||'').replace(/^./,c=>c.toUpperCase()))}</b><br>
-    O jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes.</div>`:'';
-  return `<div class="porque">${selo}<b>Por que ${esc(RARTXT[m.raridade])}</b><br>
-    Maior desconto da vida (lojas que alertam): <b>-${i.corte_max||0}%</b><br>
-    No mesmo nível nos últimos 24 meses: <b>${i.eps_nivel||0} vez(es)</b>${i.por_ano!=null?` (${String(i.por_ano).replace('.',',')} por ano)`:''}<br>
-    Última vez nesse nível: <b>${i.ultima?new Date(i.ultima).toLocaleDateString('pt-BR'):'nunca'}</b> · histórico de <b>${i.meses||0} meses</b>${i.curto?' (curto)':''}
-    ${m.piso_ref?`<br>Menor preço antes desta promoção: <b>${esc(pisoRefTxt(m.piso_ref))}</b>`:''}</div>`;}
+    O menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade. Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes.</div>`:'';
+  const volta=m.volta_texto?`<b>Costuma voltar: ${esc(m.volta_texto)}</b>${m.volta_dica?`<br>${esc(m.volta_dica)}`:''}`:'';
+  const ref=m.piso_ref&&m.corte>0?`${volta?'<br>':''}Menor preço antes desta promoção: <b>${esc(pisoRefTxt(m.piso_ref))}</b>`:'';
+  const regua=m.regua_steam?`<div class="regua">${esc(m.regua_steam.texto)}</div>`:'';
+  return selo||volta||ref?`<div class="porque">${selo}${volta}${ref}</div>${regua}`:regua;}
 const CORES=['#66c0f4','#a1cd44','#e2a635','#ef6f6a','#c7b3ff','#4fd1c5','#f472b6','#facc15','#94a3b8','#fb923c'];
 let MJ=null, MVIS=new Set(), MRANGE=365;
 async function abrirJogo(appid){
@@ -856,10 +954,10 @@ function renderModal(){
     <div><h2>${esc(j.nome)}</h2><div class="flags" style="margin-bottom:10px">${flags(o)}</div>
       <div class="kvs"><span>Análises</span><b>${j.rcount?`<span class="${revClass(j.rpos,j.rcount)}">${esc(j.rotulo)}</span> · ${j.rpos}% de ${fmtN(j.rcount)}`:'—'}</b>
         ${j.lancamento?`<span>Lançamento</span><b>${fmtUnix(j.lancamento)}</b>`:''}
-        <span>Melhor preço</span><b>${brl(o.preco)} ${o.loja?'na '+esc(o.loja):''}</b><span>Raridade</span><b>${o.raridade?rarPill(o)+' '+esc(o.raridade_texto||''):'—'}</b><span>Piso</span><b>${o.piso_tipo?pisoPill(o)+' ':''}menor de sempre ${brl(o.piso)}${o.piso_geral!=null&&o.piso_geral<o.piso?` (${brl(o.piso_geral)} em lojas que não alertam)`:''}</b>
+        <span>Melhor preço</span><b>${brl(o.preco)} ${o.loja?'na '+esc(o.loja):''}</b>${MJ.fim?`<span>Termina em</span><b>${fmtUnix(MJ.fim)} (${relTempo(MJ.fim,true)})</b>`:''}<span>Piso</span><b>${o.tipo_oferta&&o.tipo_oferta!=='selo'?pisoPill(o)+' ':''}menor de sempre ${brl(o.piso)}${o.piso_geral!=null&&o.piso_geral<o.piso?` (${brl(o.piso_geral)} em lojas que não alertam)`:''}</b>
         ${g&&g.keyshop!=null?`<span>Keyshop</span><b>${brl(g.keyshop)} (menor ${brl(g.hist_keyshop)}) · <a href="${esc(g.url)}" target="_blank" rel="noopener">GG.deals</a></b>`:''}
-        ${o.score?`<span>Score</span><b>${Math.round(o.score)}</b>`:''}</div>
-      ${porqueRar(MJ)}
+</div>
+      ${porqueVolta(MJ)}
       <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <a class="btn-go green" href="${storeUrl(j.appid)}" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13px">Página na Steam</a>
         <button class="btn-ghost" data-mcart="${j.appid}" style="padding:8px 12px">${CARR.some(c=>c.appid===j.appid)?'Tirar do carrinho':'Pôr no carrinho'}</button>
@@ -927,7 +1025,8 @@ function desenharGrafico(){
 let BD=null;S.bseg=S.bseg||'completar';S.bsort=S.bsort||'perto';S.bq='';const ABERTOS=new Set();
 const BSORTS={completar:[['perto','Mais perto de completar'],['barato','Mais barato para completar'],['promo','DLCs faltantes em promoção'],['caro','Mais caro para completar'],['nome','Nome']],
   franquias:[['tenho','Mais jogos que tenho'],['falta','Mais coisas faltando'],['nome','Nome']],
-  colecao:[['valor','Maior valor'],['nome','Nome'],['aval','Melhor avaliados']]};
+  colecao:[['valor','Maior valor'],['nome','Nome'],['aval','Melhor avaliados']],
+  dlcpromo:[['corte','Maior desconto'],['preco','Menor preço'],['fim','Termina antes'],['nome','Nome']]};
 async function renderBib(){
   if(!BD){$('#bibView').innerHTML='<div class="empty">carregando a biblioteca…</div>';BD=await api('/api/biblioteca');}
   const t=BD.total;
@@ -978,6 +1077,16 @@ async function renderBib(){
       ${x.tenho.map(g=>`<li><span>${esc(g.nome)}</span><span style="color:var(--dim)">${g.dlc_faltam?g.dlc_faltam+' DLC faltando':'✓ tenho'}</span></li>`).join('')}</ul></div>`).join('')}</div>
       <div class="hint" style="color:var(--dim);font-size:11px;margin-bottom:30px">Os jogos "faltando" de uma franquia são os que estão na sua lista de desejos: a Steam não informa a franquia inteira.</div>`:
       '<div class="empty">Sem franquias ainda: a informação chega na leitura da biblioteca.</div>';
+  }else if(S.bseg==='dlcpromo'){
+    let l=(BD.dlcs_promo||[]).filter(d=>!q||d.nome.toLowerCase().includes(q)||d.pai_nome.toLowerCase().includes(q));
+    l.sort({corte:(a,b)=>b.corte-a.corte||a.preco-b.preco,preco:(a,b)=>a.preco-b.preco,fim:(a,b)=>(a.fim||9e12)-(b.fim||9e12),nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[S.bsort]);
+    $('#bibView').innerHTML=l.length?`<div class="sum">${fmtN(l.length)} DLCs que contam, de jogos que você tem, com desconto agora${l.length>300?' (mostrando 300)':''}.</div>
+      <div class="ctab-wrap"><table class="ctab ptab dlcp tnum"><thead><tr><th></th><th>DLC</th><th>Jogo</th><th class="n">%</th><th class="n">Preço</th><th></th><th class="n">Termina</th><th></th></tr></thead><tbody>
+      ${l.slice(0,300).map(d=>`<tr data-open="${d.appid}"><td class="pcap">${art(d.appid,d.nome,d.capa,{small:true})}</td><td class="t">${esc(d.nome)}</td><td class="t" style="color:var(--muted)">${esc(d.pai_nome)}</td>
+        <td class="n"><span class="pct">-${d.corte}%</span></td><td class="n">${brl(d.preco)}${d.so_steam?'<div class="vsub" style="margin:0">preço Steam</div>':`<div class="vsub" style="margin:0">${esc(d.loja)}</div>`}</td>
+        <td>${d.tipo_oferta&&d.tipo_oferta!=='selo'?`<span class="pp pp-${d.tipo_oferta}">${TIPO_NOME[d.tipo_oferta]}</span>`:(d.tipo_oferta==='selo'?seloBadge({selo:true}):'')}</td>
+        <td class="n">${relTempo(d.fim,true)}</td><td>${cartBtn(d.appid)}</td></tr>`).join('')}</tbody></table></div>`:
+      '<div class="empty">Nenhuma DLC dos seus jogos em promoção agora.</div>';
   }else{
     let l=[...J];l.sort({valor:(a,b)=>b.valor_cheio-a.valor_cheio,nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR'),aval:(a,b)=>b.rpos-a.rpos||b.rcount-a.rcount}[S.bsort]);
     $('#bibView').innerHTML=`<div class="colgrid vert">${l.slice(0,300).map(g=>`<button class="colcard" data-open="${g.appid}">${art(g.appid,g.nome,g.capa_v,{alt:g.capa,v:!!g.capa_v})}<div class="nm">${esc(g.nome)}</div><div class="v tnum">${brl0(g.valor_cheio)} cheio${g.dlc_tenho_todas?' · '+g.dlc_tenho_todas+' DLCs':''}</div></button>`).join('')}</div>`;
@@ -999,7 +1108,7 @@ async function renderCarr(){
   $('#carrNote').textContent=(it.length||CD.bundles.length)?`${it.length} item(ns)${CD.bundles.length?` + ${CD.bundles.length} bundle(s)`:''}`:'';
   $('#carrLista').innerHTML=it.length?it.map(c=>{const sel=c.lojas.find(l=>l.loja===c.loja)||c.lojas[0]||{};
     return `<div class="crow">${art(c.appid,c.nome,c.capa,{small:true})}
-      <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(c.fim)}</span>`:''}${c.raridade?rarPill(c):''}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
+      <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(c.fim)}</span>`:''}${c.tipo_oferta==='selo'?seloBadge(c):recPill(c)}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
       <select class="mini lojsel" data-cloja="${c.appid}">${c.lojas.map(l=>`<option value="${esc(l.loja)}"${l.loja===sel.loja?' selected':''}>${esc(l.loja)} · ${brl(l.preco)}${l.corte?' (-'+l.corte+'%)':''}</option>`).join('')||'<option>sem preço</option>'}</select>
       ${priceBlock({preco:sel.preco,cheio:sel.cheio,corte:sel.corte||0})}
       <button class="xbtn" data-cart="${c.appid}" title="Tirar do carrinho">×</button></div>`;}).join(''):
@@ -1088,17 +1197,16 @@ async function renderCfg(){
      <div class="lojas">${lojas.map(l=>`<label class="tick"><input type="checkbox" data-loja="${esc(l)}" ${marc.has(l.toLowerCase())?'checked':''}>${esc(l)}</label>`).join('')}</div>
      ${chk('somente_drm_steam',c.somente_drm_steam,'Só chave ativável na Steam (DRM Steam)')}
      <div class="hint">O Radar coleta todas as lojas; isto só decide de onde pode vir um alerta.</div></div></div>
-   <div class="blk"><h4>O que vale a pena</h4><div class="in">
+   <div class="blk"><h4>O que te avisa</h4><div class="in">
+     ${(()=>{const tp=a.tipos||{selo:true};return [['selo','~0,2 avisos por semana (0,7 em grandes promoções)'],['novo','~2 avisos por semana (6 em grandes promoções)'],
+       ['igual','~14 avisos por semana (34 em grandes promoções)'],['24m','~2 avisos por semana (3 em grandes promoções)']].map(([t,n])=>
+       `${chk('alerta.tipos.'+t,!!tp[t],TIPO_NOME[t])}<div class="hint" style="margin:-2px 0 8px 23px">${esc(TIPO_DESC[t])} · ${n}</div>`).join('');})()}
      <label class="f">Desconto mínimo (%) ${num('alerta.desconto_minimo',a.desconto_minimo,5,0,100)}</label>
-     <label class="f">Avisar a partir de <select data-k="alerta.raridade_minima">${[['incomum','Incomum'],['raro','Raro'],['ultrarraro','Ultrarraro'],['lendario','Lendário']].map(([v,t])=>`<option value="${v}"${(a.raridade_minima||'raro')===v?' selected':''}>${t}</option>`).join('')}</select></label>
-     <div class="hint">Raridade = quantas vezes por ano o jogo chega a esse desconto (ou até 5 pontos menos) nos últimos 24 meses. Comum: 3+ por ano. Incomum: 1,5 a 3. Raro: 0,75 a 1,5. Ultrarraro: menos que isso. Lendário: nunca chegou, com 2 anos ou mais de histórico e alguma promoção anterior (com 1 a 2 anos: no máximo Ultrarraro).</div>
+     <div class="hint">Vale para Novo recorde, Igual e Menor em 2 anos.</div>
      <label class="f">Selo Kurokami: desconto mínimo (%) ${num('alerta.selo_corte_minimo',a.selo_corte_minimo??0,5,0,100)}</label>
-     <div class="hint">Selo Kurokami = o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. Sai quando o desconto é o maior da história do jogo (2 anos ou mais de histórico) ou quando o preço é o menor em 18 meses ou mais (ou metade do recorde anterior). O Selo sempre avisa. Nos dados de 2022–2025, em cerca de 7 de 10 casos o jogo não ficou mais barato nos 12 meses seguintes.</div>
+     <div class="hint">Ligar um tipo não dispara avisos de tudo o que já está assim: você recebe um resumo e, daí em diante, só os próximos. Análises da Steam não decidem avisos.</div>
      <label class="f">Tolerância acima do menor histórico (%) ${num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50)}</label>
-     <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label>
-     <label class="f">Favoritos: os primeiros da sua lista ${num('alerta.favoritos_top',a.favoritos_top??10,1,0,200)}</label>
-     <div class="hint">Os N primeiros da ordem que você deu na lista de desejos da Steam avisam a partir de Incomum, sem desconto mínimo. Se você nunca ordenou a lista, não há favoritos.</div>
-     <div class="hint">Análises da Steam não decidem alertas: o jogo já está na sua lista. Score (só para ordenar) = desconto × peso da raridade, +10 no piso.</div></div></div>
+     <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label></div></div>
    <div class="blk"><h4>Keyshops (via GG.deals)</h4><div class="in">
      ${chk('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata')}
      <label class="f">Abaixo de (R$) ${num('keyshops.preco_maximo',k.preco_maximo,1,0)}</label>
@@ -1115,7 +1223,7 @@ async function renderCfg(){
      <label class="f">Máximo por checagem ${num('notificacoes.max_por_rodada',n.max_por_rodada??5,1,1,20)}</label>
      <label class="f">Avisar de novo se cair (R$) ${num('notificacoes.melhora_minima_reais',n.melhora_minima_reais??0.5,0.5,0)}</label>
      <label class="f">Avisar quando faltar (horas) para acabar ${num('notificacoes.termina_em_breve_horas',n.termina_em_breve_horas??24,1,0,168)}</label>
-     <div class="hint">Vale para o que está no carrinho ou "vale a pena". 0 desliga.</div>
+     <div class="hint">Vale para o que está no carrinho ou que avisa. 0 desliga.</div>
      ${chk('notificacoes.silencio.ativo',si.ativo,'Horário de silêncio')}
      <label class="f">De <input type="time" data-k="notificacoes.silencio.de" value="${esc(si.de||'23:00')}"></label>
      <label class="f">Até <input type="time" data-k="notificacoes.silencio.ate" value="${esc(si.ate||'08:00')}"></label></div></div>
@@ -1154,7 +1262,9 @@ async function salvarCfg(){
 }
 
 /* ================= status / ações ================= */
-const VERSAO_PAGINA='0.14.0';
+const VERSAO_PAGINA='0.15.0';
+function nVitrine(){return VIT?['selo','novo','igual','24m'].reduce((s,t)=>s+((VIT[t]||{}).total||0),0):null;}
+function atualizarStatus(){const el=$('#stTopo');if(el&&VIT)el.innerHTML=`<b>${nVitrine()}</b> na vitrine · ${fmtN(RES.na_lista)} na lista`;}
 async function carregarResumo(){
   RES=await api('/api/resumo');$('#ver').textContent=RES.versao;
   if(RES.userdata_dias!=null&&RES.userdata_dias>30&&!$('#aviso-ud')){const d=document.createElement('div');d.id='aviso-ud';
@@ -1170,7 +1280,7 @@ async function carregarResumo(){
     d.innerHTML=`O Radar que está rodando é a versão <b>${esc(RES.versao)}</b>, mas os arquivos são da <b>${VERSAO_PAGINA}</b>. Clique com o direito no ícone da bandeja → <b>Sair</b> e abra de novo (ou "Reiniciar", nas versões novas).`;
     document.body.prepend(d);}
   const P=RES.progresso||{};const pct=P.total?Math.round(100*P.atual/P.total):null;
-  let t=`<b>${RES.vale_a_pena}</b> valem a pena · ${fmtN(RES.na_lista)} na lista`;
+  let t=`<span id="stTopo"><b>${nVitrine()??'…'}</b> na vitrine · ${fmtN(RES.na_lista)} na lista</span>`;
   if(P.ativo)t+=`<br><span style="color:#66c0f4">verificação ${P.modo==='completa'?'completa':'rápida'}: ${esc((P.etapa||'').slice(0,42))}${pct!=null?' '+pct+'%':''}</span> ▾`;
   else if(RES.na_bandeja)t+=`<br>${RES.estado==='erro'?'<span class="err">erro na última checagem</span> · ':''}próxima: ${fmtISO(RES.proxima)} ▾`;
   else t+='<br>checado '+fmtISO(RES.atualizado);
@@ -1194,13 +1304,15 @@ $('#btnPausa').addEventListener('click',async()=>{const r=await post('/api/pausa
 $('#btnVerif').addEventListener('click',async()=>{const r=await post('/api/verificar');if(!r.ok){toast(r.erro);return;}toast('Checando…');
   pollResumo.ativo=true;setTimeout(()=>carregarResumo().catch(()=>{}),1500);});
 async function carregarLista(){const d=await api('/api/lista');L=d.itens;IDX=new Map(L.map(o=>[o.appid,o]));render();}
-function render(){if(S.tab==='vale')renderVale();else if(S.tab==='lista'){renderTicks();renderLista();}else if(S.tab==='bib')renderBib();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else renderCfg();}
+function render(){if(S.tab==='vale')renderVale();else if(S.tab==='lista')renderLista();else if(S.tab==='bib')renderBib();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else renderCfg();}
 
 async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&RES.progresso)||{};
-  if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;await carregarLista();toast('Verificação concluída');}
+  if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;await carregarLista();try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}toast('Verificação concluída');}
   if(P.ativo)pollResumo.ativo=true;setTimeout(pollResumo,P.ativo?3000:30000);}
 (async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,loja:i.loja}));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
-  setTab(['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();setTimeout(pollResumo,3000);})();
+  const h=location.hash.slice(1);  // #vale, #lista... (o resumo "Tipo ligado" abre a vitrine com #vale)
+  setTab(['vale','lista','bib','carr','notif','cfg'].includes(h)?h:['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();
+  if(!VIT){try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}}setTimeout(pollResumo,3000);})();
 
 </script>
 </body></html>

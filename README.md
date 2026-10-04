@@ -1,6 +1,6 @@
 # Kurokami Radar
 
-Monitora a sua **lista de desejos da Steam** em dezenas de lojas, guarda o **histórico de preços** no seu PC e avisa pela **central de notificações do Windows** quando um jogo chega no menor preço, com filtros de qualidade (score = desconto × análises). Tem um painel no navegador com lista, biblioteca de colecionador, carrinho simulado com bundles e acesso pelo celular.
+Monitora a sua **lista de desejos da Steam** em dezenas de lojas, guarda o **histórico de preços** no seu PC e avisa pela **central de notificações do Windows** quando um jogo chega no menor preço em muito tempo (Selo Kurokami) ou nos tipos de recorde que você escolher. Tem um painel no navegador com lista, biblioteca de colecionador, carrinho simulado com bundles e acesso pelo celular.
 
 Tudo roda no seu PC. Nada é enviado para servidor nenhum além das consultas às lojas (Steam, IsThereAnyDeal e GG.deals).
 
@@ -82,14 +82,12 @@ Repita de vez em quando: o painel avisa quando o arquivo tiver mais de 30 dias. 
 
 ### Abas do painel
 
-- **Vale a pena:** o que bateu os seus filtros, com a **raridade do desconto**, medida por quantas vezes por ano o jogo chega a esse desconto (ou até 5 pontos menos) nos últimos 24 meses: ★ *Lendário* (nunca chegou, com 2 anos ou mais de histórico e alguma promoção anterior nas lojas que alertam; com 1 a 2 anos de histórico, no máximo *Ultrarraro*), *Ultrarraro* (menos de 1 vez a cada 16 meses), *Raro* (cerca de 1 vez por ano), *Incomum* e *Comum* (3 ou mais vezes por ano). Por padrão o Radar só avisa a partir de *Raro*.
-- **Selo Kurokami** (dourado): o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. Sai quando o desconto é o maior da história do jogo (com 2 anos ou mais de histórico) ou quando o preço é o menor em 18 meses ou mais. O Selo sempre avisa, a notificação começa com "SELO KUROKAMI" e diz qual dos dois aconteceu. Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes.
-- **Pílula de piso**, ao lado do preço, em reais: *Novo recorde* (azul), *Recorde raro* (azul-claro: recorde que não se via havia 18 meses ou pela metade do preço), *Igual ao recorde* (verde), *Menor em 24 meses* (roxo). Sem pílula, aparece o menor preço já visto em cinza.
-- As **análises da Steam** aparecem como informação, mas não decidem alertas: o jogo já está na sua lista de desejos.
-- **Lista de desejos:** tudo, com filtros, ordenação e três visualizações. Clique num jogo para ver o histórico em gráfico, as lojas, as formas de comprar e as DLCs (se não houver, a ficha diz por quê: lista ainda na fila, a Steam não informou ou a consulta falhou).
-- **Biblioteca:** valor da sua coleção, quanto falta para completar cada jogo com as DLCs, séries e coleção.
+- **Vale a pena:** a vitrine, como as prateleiras da loja Steam. No topo, o carrossel do **Selo Kurokami** (dourado): *o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade*. Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes. Abaixo, as prateleiras **Novo recorde** (nunca esteve tão barato), **Igual ao recorde** e **Menor em 2 anos**, com o desconto mínimo das Configurações. Cada jogo aparece em uma prateleira só; "Ver tudo" abre a lista completa em Promoções.
+- **Promoções:** todos os jogos da sua lista, num explorador como o da SteamDB. Filtros que se combinam: sua relação com o jogo (✓ só esses, ✕ esconder: na lista, monitorado, no carrinho, silenciado, tenho...), Mostrar só (os 4 tipos de preço), Tipo, Outros, preço, análises, nota, desconto e lançamento. Cada filtro ativo vira um chip com ×. A tabela ordena clicando no título da coluna (Shift+clique soma critérios) e tem a coluna **Costuma voltar** ("todo mês", "a cada ~3 meses", "1 vez por ano", "nunca teve esse desconto"...), que só informa. Abre com "Desconto ≥ 50%" e "Análises ≥ 5.000"; "Restaurar padrão" volta a eles. No celular, os filtros ficam no botão **Filtros**. Clique num jogo para ver o histórico em gráfico, as lojas, as formas de comprar, quando a promoção termina e as DLCs. Se só a Steam tiver o recorde, a ficha avisa ("Na Steam, é o menor preço já registrado. Nas suas lojas, Nuuvem já teve R$ 4,74 (07/2025).").
+- As **análises da Steam** aparecem como informação, mas não decidem avisos: o jogo já está na sua lista de desejos.
+- **Biblioteca:** valor da sua coleção, quanto falta para completar cada jogo com as DLCs, séries, coleção e **DLCs em promoção** (as que faltam nos seus jogos e estão com desconto agora).
 - **Carrinho:** simule uma compra (jogos e bundles), escolha a loja de cada item e veja o total.
-- **Configurações:** lojas, filtros, keyshops, tipos de DLC, notificações e acesso pelo celular.
+- **Configurações:** lojas, **O que te avisa** (Selo Kurokami ligado; Novo recorde, Igual ao recorde e Menor em 2 anos você liga se quiser, cada um com quantos avisos costuma dar por semana), desconto mínimo, keyshops, tipos de DLC, notificações e acesso pelo celular. Ligar um tipo não enche a tela de avisos: chega um resumo e, daí em diante, só os próximos.
 
 ### Pelo celular
 
