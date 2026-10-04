@@ -25,7 +25,27 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 - **Raridade v2 (0.14) mede o corte, não o preço.** A v1 media reais e chamava de Lendário qualquer centavo abaixo do piso: Castle of Illusion a 80% saía Lendário, mas 75% acontece todo mês; mudanças de preço base (HLM2 R$ 24,99 → R$ 46,99) também enganavam. Agora: episódios de promoção nas lojas marcadas, corte até 5 pontos abaixo = mesmo nível, frequência por ano em 24 meses (ver `arquitetura.md`). Promoção sem registro de fim "vence" em 45 dias; brindes (R$ 0) não contam.
 - **Dois eixos separados:** raridade (frequência do corte) decide o alerta; a **pílula de piso** (reais) é só informação e nunca alimenta a raridade. "Recorde raro" é regra nossa (≥ 18 meses sem aquele nível ou ≤ 50% do recorde); a SteamDB não documenta a dela e só olha a Steam.
 - **Lendário (regra C, 04/10):** nunca chegou a esse nível no histórico **inteiro** (que começa em 03/10/2021: limite da importação da ITAD), **com ≥ 24 meses de histórico e ≥ 1 promoção anterior** nas lojas marcadas; com 12–24 meses, no máximo Ultrarraro. Motivos: jogos de 1 ano "nunca chegaram" a quase nada (10 dos 22 Lendários eram de 12–23 meses), e sem promoção anterior é buraco nos dados — o ARK: Survival Evolved tinha só um brinde e um preço cheio nas lojas marcadas e saía Lendário com "42 meses de histórico". Sem promoção anterior: no máximo Incomum (logo, sem Selo).
-- **Selo Kurokami** = no piso + Raro ou melhor + ≥ 12 meses de histórico. Um jogo a R$ 10 todo mês não ganha Selo.
+- **Selo Kurokami = F ou G (04/10)**: o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. **F** = Lendário (regra C); **G** = pílula Recorde raro (novo recorde em reais e o recorde anterior visto pela última vez há ≥ 18 meses, ou preço ≤ 50% dele). Em ambos, corte ≥ `selo_corte_minimo`. Raro e Ultrarraro sozinhos não ganham Selo. O motivo diz qual bateu: "maior desconto da história (-85%; antes, no máximo -80%)" ou "menor preço desde mm/aaaa" (início do histórico). **Não prometer** "raro" nem que não vai se repetir: o mesmo nível volta em até 6 meses em ~85% dos Selos.
+- **Backtest do Selo** (`tools/backtest_selo.py`, banco de 04/10, 723 jogos da lista, semanas de 10/2022 a 10/2025, só com o histórico conhecido em cada data; cada Selo conta uma vez por episódio). **Meta fixada antes de olhar os resultados:** "não batido" (sem corte ≥ Selo + 5 em 12 meses) **≥ 70%** e **≤ 3 Selos por semana normal** (mediana).
+
+  | Variante | Selos | Não batido +5 | +10 | Não voltou em 6m | Semana normal / grande promoção |
+  |---|---|---|---|---|---|
+  | A regra antiga (no piso + Raro+ + 12 meses) | 953 | 52,8% | 68,7% | 13,0% | 6 / 20 |
+  | B A com ≥ 24 meses | 440 | 61,6% | 79,3% | 12,7% | 2 / 8 |
+  | C B + escada parada | 134 | 67,2% | 79,9% | 23,1% | 0 / 2 |
+  | D B + 1 por jogo a cada 12 meses | 213 | 65,3% | 79,8% | 16,9% | 1 / 4 |
+  | E B + C + D | 120 | 69,2% | 80,8% | 21,7% | 0 / 2 |
+  | F só Lendário (regra C) | 120 | 67,5% | 85,8% | 15,8% | 0 / 2,5 |
+  | G Recorde raro ("rare deal" da SteamDB) | 51 | 84,3% | 90,2% | 29,4% | 0 / 1 |
+  | H qualquer novo recorde em R$ | 996 | 33,9% | 48,8% | 16,2% | 10 / 25 |
+  | **F ou G (escolhida)** | 147 | **70,1%** | 86,4% | 15,0% | **1 / 3** |
+  | alertas sem Selo (Raro/Ultrarraro, desconto mínimo) | 679 | 53,5% | 69,1% | 11,9% | 5 / 13,5 |
+  | base: toda promoção | 10.725 | 47,0% | 64,1% | 9,4% | 91 / 211,5 |
+  | base: toda promoção no piso | 8.481 | 52,1% | 69,4% | 7,6% | 71 / 178,5 |
+
+  **Por que F ou G:** é a única que cumpre as duas metas (por 0,1 ponto: dentro da margem de erro, empata com a E, que é mais complexa). F e G quase não se sobrepõem (24 casos), então somam volume sem perder acerto. A G sozinha acerta mais, mas tem só 51 casos em 3 anos. A regra antiga (A) acertava o mesmo que "toda promoção no piso". Os motivos de erro eram reais, não do backtest: escada de descontos (o corte do jogo sobe ano a ano) e mudança de patamar (o novo máximo vira o normal). Ressalvas: usa a lista de hoje (viés de sobrevivência); as semanas das grandes promoções são aproximadas; G/H são decididas em reais e "batido" é medido em corte.
+- **Recorde em reais por si só (H) acerta menos que qualquer promoção** (33,9% contra 47%): recorde por centavos logo é batido. Por isso a pílula azul "Novo recorde" é só informação e **nunca alerta**.
+- **Pendente:** pela regra G como foi escrita, a **primeira promoção** de um jogo com preço ≤ 50% do cheio vira Recorde raro (o "recorde anterior" é o preço cheio). No backtest foram 4 de 51 casos de G, com 25% de acerto; sem eles, F ou G daria 71,3%. Hoje nenhum jogo está assim. Exigir ≥ 1 promoção anterior também na G (como na F) aguarda o dono.
 - **"Termina em breve" usa o mesmo `max_por_rodada`** (carrinho primeiro, depois o que acaba antes; o resto vira "+N terminando em breve"): no fim de um evento da Steam, 36 de 44 alertas acabavam na mesma janela de 24 h.
 - **Análises não decidem nada** (o jogo já está na lista de desejos): saíram do score e dos filtros de alerta. Score = corte × peso da raridade + 10 no piso, só para ordenar.
 - **`priority` 0 da wishlist = "sem posição"**, não "topo": quem nunca ordenou a lista tem tudo em 0, e com `favoritos_top` todos viravam favoritos. Favorito = posição 1..N.

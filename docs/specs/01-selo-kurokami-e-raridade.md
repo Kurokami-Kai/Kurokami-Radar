@@ -5,7 +5,7 @@ Status: **feito em v0.14.0** (Selos e Recorde raro validados pelo dono antes de 
 ## Problema (palavras do dono, resumidas)
 1. "Avaliação como métrica não vale." Os jogos já estão na lista de desejos: análise da Steam não deve decidir se uma promoção presta.
 2. As etiquetas estão erradas: promoções marcadas como **Lendário** são **recorrentes** — basta olhar o histórico.
-3. Falta um selo para "o melhor preço que esse jogo realisticamente tem, e é raro": **Selo Kurokami**. Ex.: um jogo cujo desconto máximo da vida é 50% — 50% nele é um graal. 20% num jogo que nunca passa de 20% não é. E um jogo que fica R$ 10 todo mês, sem exceção, tem bom preço mas **não** é Selo Kurokami.
+3. Falta um selo para quando o jogo está na melhor oferta da história dele: **Selo Kurokami**. Ex.: um jogo cujo desconto máximo da vida é 50%, chegando a 50%. 20% num jogo que nunca passa de 20% não é. E um jogo que fica R$ 10 todo mês, sem exceção, tem bom preço mas **não** é Selo Kurokami. *(Definição final na emenda de 04/10 — "F ou G".)*
 
 ## Diagnóstico com dados reais (banco do dono, 02/10)
 | Jogo | Histórico de cortes (lojas marcadas) | Hoje | v1 disse | Deveria |
@@ -36,7 +36,7 @@ Causa: a v1 mede **preço em reais** e chama de Lendário qualquer centavo abaix
 - **No piso**: corte atual ≥ `corte_max` − 5 pontos **ou** preço ≤ menor preço de 24 meses (+1%).
 
 ### Selo Kurokami (badge à parte, acima de tudo)
-Todas as condições:
+*Definição original, substituída pela emenda "Selo = F ou G" (04/10).* Todas as condições:
 1. **No piso** (eixo 2): é o melhor que esse jogo costuma chegar;
 2. **Raridade ≥ Raro** (eixo 1): não é a promoção de todo mês;
 3. **Histórico ≥ 12 meses**;
@@ -99,3 +99,11 @@ Regra C (aprovada pelo dono):
 - Testes sintéticos em `tools/testar_piso.py` (rodam no `checar.py`), junto com os de Recorde raro (17/19 meses desde a **última** vez no nível do recorde anterior; ≤ 50%).
 
 Também nesta rodada: "Termina em breve" passou a respeitar `notificacoes.max_por_rodada` com resumo, e `py radar.py testar-notificacao --selo` mostra o toast de Selo.
+## Emenda (04/10) — Selo = F ou G
+Promessa, em linguagem simples, em todo lugar onde o Selo é explicado: **o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo**. Sem "raro", sem "graal", sem prometer que não vai se repetir.
+- **F** = Lendário (regra C). **G** = pílula Recorde raro. Em ambos, corte ≥ `alerta.selo_corte_minimo`. Raro e Ultrarraro sozinhos não ganham Selo (continuam alertando pela `raridade_minima`).
+- Motivo diz qual bateu (toast, ficha e relatório): "Selo Kurokami: maior desconto da história (-85%; antes, no máximo -80%)" ou "Selo Kurokami: menor preço desde mm/aaaa" (mês/ano do início do histórico). Na API: `selo_motivo`.
+- Ficha, quando houver Selo: "Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes."
+- Por quê: backtest A–H em `docs/decisoes.md` (meta fixada antes: ≥ 70% não batido em 12 meses e ≤ 3 Selos por semana normal; "F ou G" deu 70,1% e 1/semana).
+- Banco de 04/10: **11 Selos** (todos F) e **38 alertas** (11 Selos, 20 Ultrarraros, 7 Raros).
+- Pendente: 1ª promoção ≤ 50% do preço cheio conta como Recorde raro (ver `decisoes.md`).

@@ -22,10 +22,14 @@ def promo(meses_atras, preco, corte, dur=10):
             dict(loja="Steam", preco=CHEIO, corte=0, quando=iso(meses_atras, -dur))]
 
 
-def rodar_caso(hist, preco, corte, inicio_meses=40):
+def rodar_caso(hist, preco, corte, inicio_meses=40, cfg_alerta=None):
     linhas = [dict(loja="Steam", preco=CHEIO, corte=0, quando=iso(inicio_meses))] + hist + \
              [dict(loja="Steam", preco=preco, corte=corte, quando=iso(0, 1))]
-    return analisar(linhas, preco, corte, agora_=AGORA.timestamp())
+    return analisar(linhas, preco, corte, agora_=AGORA.timestamp(), cfg_alerta=cfg_alerta)
+
+
+def mes_ano(meses_atras):
+    return (AGORA - timedelta(days=meses_atras * MES)).strftime("%m/%Y")
 
 
 # (nome, historico, preco atual, corte atual, campo, esperado, inicio do historico em meses)
@@ -44,15 +48,24 @@ CASOS = [
     ("nunca chegou, 30 meses, promos anteriores", mensal50(30), 3000, 70, "nivel", "lendario", 30),
     ("nunca chegou, 18 meses -> Ultrarraro", mensal50(18), 3000, 70, "nivel", "ultrarraro", 18),
     ("nunca chegou, sem promo anterior -> Incomum", [], 3000, 70, "nivel", "incomum", 30),
-    ("sem promo anterior nao ganha Selo", [], 3000, 70, "selo", False, 30),
+    # 1a promocao <= 50% do preco cheio: Recorde raro pela regra G como foi escrita (decisao pendente, ver decisoes.md)
+    ("1a promo a -70%: Recorde raro (G)", [], 3000, 70, "selo_motivo", "menor preço desde " + mes_ano(30), 30),
     ("mesmo nivel todo mes -> Comum", mensal50(30), 5000, 50, "nivel", "comum", 30),
+    # Selo Kurokami = F (Lendario) ou G (Recorde raro); Raro e Ultrarraro sozinhos nao
+    ("Selo F: Lendario", mensal50(30), 3000, 70, "selo_motivo", "maior desconto da história (-70%; antes, no máximo -50%)", 30),
+    ("Selo G: Recorde raro (19 meses)", promo(19, 5000, 50), 4500, 55, "selo_motivo", "menor preço desde " + mes_ano(40), 40),
+    ("Selo G: Recorde raro (50%)", promo(2, 5000, 50), 2500, 75, "selo", True, 40),
+    ("novo recorde comum nao ganha Selo", promo(17, 5000, 50), 4500, 55, "selo", False, 40),
+    ("Ultrarraro (18 meses, sem recorde em R$) nao ganha Selo", mensal50(18) + promo(1, 2900, 71), 3000, 70, "selo", False, 18),
+    ("Raro sozinho nao ganha Selo", promo(20, 5000, 50) + promo(8, 5000, 50), 5000, 50, "selo", False, 30),
+    ("selo_corte_minimo 80 barra Selo de -70%", mensal50(30), 3000, 70, "selo", False, 30, {"selo_corte_minimo": 80}),
 ]
 
 
 def rodar():
     falhas = []
-    for nome, hist, preco, corte, campo, esperado, inicio in CASOS:
-        r = rodar_caso(hist, preco, corte, inicio)
+    for nome, hist, preco, corte, campo, esperado, inicio, *cfg in CASOS:
+        r = rodar_caso(hist, preco, corte, inicio, cfg[0] if cfg else None)
         if r[campo] != esperado:
             falhas.append("%s: %s=%r (esperado %r)" % (nome, campo, r[campo], esperado))
     return falhas

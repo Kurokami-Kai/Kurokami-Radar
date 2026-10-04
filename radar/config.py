@@ -21,7 +21,7 @@ PADRAO = {
         "tolerancia_pct": 0,          # 5 = aceita ate 5% acima do menor historico
         # Raridade minima para avisar: comum, incomum, raro, ultrarraro, lendario.
         # Mede quantas vezes por ano o jogo chega a esse corte (ou ate 5 pontos menos) nas lojas que alertam.
-        # O Selo Kurokami (melhor corte que o jogo costuma ter, e raro) sempre avisa.
+        # O Selo Kurokami (melhor oferta da historia do jogo: maior desconto ou menor preco em muito tempo) sempre avisa.
         "raridade_minima": "raro",
         "selo_corte_minimo": 0,       # so ganha Selo a partir deste corte (%)
         # (informativo) piso por janela: 90 (3 meses), 180, 270, 365 (1 ano) ou 0 (so o de todos os tempos).

@@ -12,7 +12,8 @@ Metricas por variante (cada Selo conta uma vez por episodio de promocao, na prim
   hoje                : episodios em promocao agora que a variante marcou (no dia em que comecaram)
 Variantes: A atual (regra C) · B so com >= 24 meses de historico · C B + escada parada · D B + 1 Selo por jogo
 a cada 12 meses (salvo corte 10+ pontos acima) · E B+C+D · F so Lendario · G pilula Recorde raro (regra
-"rare deal" da SteamDB, em reais) · H qualquer novo recorde em reais (pilulas novo/raro) · F ou G. Linhas de base: toda promocao; toda
+"rare deal" da SteamDB, em reais) · H qualquer novo recorde em reais (pilulas novo/raro) · F ou G · Selo atual (= F ou G com
+selo_corte_minimo 0) · alertas sem Selo (Raro/Ultrarraro com desconto_minimo do config). Linhas de base: toda promocao; toda
 promocao no piso."""
 import argparse
 import bisect
@@ -32,10 +33,11 @@ from radar.banco import Banco  # noqa: E402
 
 DIA = 86400
 ANO = 365 * DIA
-VARIANTES = ["A", "B", "C", "D", "E", "F", "G", "H", "FouG", "todas", "no_piso"]
-NOMES = {"A": "A atual (regra C)", "B": "B >= 24 meses", "C": "C B + escada parada", "D": "D B + 1 por jogo/12m",
+VARIANTES = ["A", "B", "C", "D", "E", "F", "G", "H", "FouG", "Selo", "alerta_sem_selo", "todas", "no_piso"]
+NOMES = {"A": "A Selo antigo (regra C)", "B": "B >= 24 meses", "C": "C B + escada parada", "D": "D B + 1 por jogo/12m",
          "E": "E B + C + D", "F": "F so Lendario",
-         "G": "G Recorde raro (SteamDB)", "H": "H novo recorde em R$", "FouG": "F ou G", "todas": "base: toda promocao", "no_piso": "base: toda promocao no piso"}
+         "G": "G Recorde raro (SteamDB)", "H": "H novo recorde em R$", "FouG": "F ou G",
+         "Selo": "Selo atual (F ou G)", "alerta_sem_selo": "alertas sem Selo (Raro+)", "todas": "base: toda promocao", "no_piso": "base: toda promocao no piso"}
 
 
 def grande_promo(dt):
@@ -55,13 +57,16 @@ def achar_banco():
     return max(cands, key=lambda c: os.path.getmtime(c[0]))
 
 
-def lojas_marcadas(arq_config):
+def ler_config(arq_config):
+    """(lojas marcadas, desconto_minimo). So le; nunca cria/grava config."""
     from radar.config import PADRAO
-    lojas = PADRAO["lojas"]
-    if arq_config and os.path.isfile(arq_config):  # so le; nunca cria/grava config
+    c = {}
+    if arq_config and os.path.isfile(arq_config):
         with open(arq_config, encoding="utf-8-sig") as f:
-            lojas = json.load(f).get("lojas") or lojas
-    return {l.lower() for l in lojas}
+            c = json.load(f)
+    lojas = c.get("lojas") or PADRAO["lojas"]
+    dmin = (c.get("alerta") or {}).get("desconto_minimo", PADRAO["alerta"]["desconto_minimo"])
+    return {l.lower() for l in lojas}, dmin
 
 
 def escada_parada(eps_ate, ts):
@@ -82,12 +87,12 @@ def main():
     try:
         copia = os.path.join(tmp, "radar.sqlite3")
         shutil.copy2(origem, copia)
-        rodar(Banco(copia), lojas_marcadas(cfg_arq or args.config), args)
+        rodar(Banco(copia), *ler_config(cfg_arq or args.config), args)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-def rodar(b, marc, args):
+def rodar(b, marc, dmin, args):
     lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")}
                if l.lower() in marc] + (["Steam (direto)"] if "steam" in marc else [])
     jogos = {r["appid"] for r in b.q("SELECT appid FROM jogo WHERE na_lista=1 AND possuido=0")}
@@ -121,10 +126,14 @@ def rodar(b, marc, args):
                 continue
             preco, corte = segs[-1][2], segs[-1][3]
             r = analise.analisar(sub, preco, corte, agora_=ts)
-            base = {"todas": True, "no_piso": r["no_piso"], "A": r["selo"], "F": r["nivel"] == "lendario",
+            # regra antiga do Selo (antes de 04/10): no piso + Raro ou melhor + 12 meses; A-E partem dela
+            velho = r["no_piso"] and r["nivel"] in ("raro", "ultrarraro", "lendario") and r["meses"] >= 12
+            base = {"todas": True, "no_piso": r["no_piso"], "A": velho, "F": r["nivel"] == "lendario",
+                    "Selo": r["selo"], "alerta_sem_selo": not r["selo"] and corte >= dmin
+                    and r["nivel"] in ("raro", "ultrarraro", "lendario"),
                     "G": r["piso_tipo"] == "raro", "H": r["piso_tipo"] in ("novo", "raro"),
                     "FouG": r["nivel"] == "lendario" or r["piso_tipo"] == "raro"}
-            b24 = r["selo"] and r["meses"] >= 24
+            b24 = velho and r["meses"] >= 24
             parada = escada_parada(episodios(segs), ts) if b24 else False
             base.update(B=b24, C=b24 and parada)
             chave = (a, r["inicio"] or lim)

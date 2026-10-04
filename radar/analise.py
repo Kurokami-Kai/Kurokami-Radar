@@ -141,13 +141,15 @@ def episodios(segs, folga=DIA):
 def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     """Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
     Devolve dict com: nivel, texto, por_ano, eps_nivel, ultima, corte_max, meses, curto, inicio,
-    no_piso, selo, piso_tipo, piso_ref, score. nivel/piso_tipo sao None se nao ha promocao."""
+    no_piso, selo, selo_motivo, piso_tipo, piso_ref, score. nivel/piso_tipo sao None se nao ha promocao.
+    Selo Kurokami = melhor oferta da historia do jogo: Lendario (maior desconto, regra C) ou Recorde raro
+    (menor preco em muito tempo), com corte >= alerta.selo_corte_minimo."""
     import time
     agora_ = agora_ or time.time()
     segs = linha_do_tempo(linhas, agora_)
     corte = corte or 0
     out = {"nivel": None, "texto": None, "por_ano": None, "eps_nivel": 0, "ultima": None, "corte_max": corte,
-           "meses": 0, "curto": True, "inicio": None, "no_piso": False, "selo": False,
+           "meses": 0, "curto": True, "inicio": None, "no_piso": False, "selo": False, "selo_motivo": None,
            "piso_tipo": None, "piso_ref": None, "score": 0}
     if not segs:
         if corte > 0:
@@ -230,9 +232,14 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     menor24_tudo = min(jan_p, default=None)
     out["no_piso"] = corte >= corte_max - TOL_NIVEL or (preco is not None and menor24_tudo is not None
                                                         and preco <= menor24_tudo * 1.01)
+    # Selo (decidido pelo backtest de 04/10, ver decisoes.md): Lendario OU Recorde raro. Raro e Ultrarraro sozinhos nao.
     minimo_selo = ((cfg_alerta or {}).get("selo_corte_minimo") or 0)
-    out["selo"] = bool(out["no_piso"] and RARIDADES.index(nivel) >= RARIDADES.index("raro")
-                       and dias_hist >= 365 and corte >= minimo_selo)
+    if corte >= minimo_selo:
+        if nivel == "lendario":
+            out["selo_motivo"] = "maior desconto da história (-%d%%; antes, no máximo -%d%%)" % (corte, antes_max)
+        elif out["piso_tipo"] == "raro":
+            out["selo_motivo"] = "menor preço desde %s" % desde
+    out["selo"] = out["selo_motivo"] is not None
     out["score"] = _score_v2(corte, nivel, out["no_piso"])
     return out
 
@@ -492,11 +499,12 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
             if not an["selo"] and not (raridade_ok(an["nivel"], minimo)
                                        and (fav or o["corte"] >= al.get("desconto_minimo", 0))):
                 continue
-            motivo = ("Selo Kurokami: " if an["selo"] else "") + "%s: %s" % (NOME_RARIDADE[an["nivel"]], an["texto"])
+            motivo = ("Selo Kurokami: " + an["selo_motivo"]) if an["selo"] else \
+                "%s: %s" % (NOME_RARIDADE[an["nivel"]], an["texto"])
             alertas.append({"appid": appid, "nome": nome, "loja": o["loja"], "preco": o["preco"], "corte": o["corte"],
                             "score": an["score"], "url": o.get("url"), "tag": tag, "acima": acima, "favorito": fav,
                             "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"],
-                            "piso_tipo": an["piso_tipo"], "menor_sempre": pisos.get(0),
+                            "selo_motivo": an["selo_motivo"], "piso_tipo": an["piso_tipo"], "menor_sempre": pisos.get(0),
                             "motivo": motivo + (" · favorito da sua lista" if fav else "")})
 
         # ---- keyshops, so quando muito barato

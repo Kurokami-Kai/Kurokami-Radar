@@ -175,7 +175,7 @@ def api_lista(_q):
             "pisos": {"3m": ps.get(90), "6m": ps.get(180), "9m": ps.get(270), "1a": ps.get(365), "sempre": ps.get(0)},
             "tag": tag, "tag_texto": texto, "acima": acima,
             "raridade": an["nivel"], "raridade_texto": an["texto"], "no_piso": an["no_piso"], "selo": an["selo"],
-            "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
+            "selo_motivo": an["selo_motivo"], "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
             "score": an["score"],
             "keyshop": g.get("keyshop"), "hist_keyshop": g.get("hist_keyshop"), "gg_url": g.get("url"),
             "vale": a in vale, "novo": a in novos, "motivo": (vale.get(a) or {}).get("motivo"),
@@ -249,7 +249,7 @@ def api_jogo(q):
                                          "preco_steam", "cheio_steam", "desconto_steam", "pai")},
          "historico": hist, "lojas": lojas, "dlcs": dl, "dlcs_estado": None if dl else _estado_dlcs(b, a, j),
          "caminhos": cam, "combo": combo,
-         "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"], "no_piso": an["no_piso"],
+         "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"], "selo_motivo": an["selo_motivo"], "no_piso": an["no_piso"],
          "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an), "score": an["score"],
          "gg":dict(gg) if gg else None, "modo": config.modo_do_jogo(cfg, a), "classes": dlcmod.CLASSES,
          "tenho": a in ctx.possuidos, "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
@@ -327,7 +327,7 @@ def api_carrinho(_q):
                     "possuido": a in ctx.possuidos, "lojas": [{k: o.get(k) for k in ("loja", "preco", "cheio", "corte", "url")} for o in ofs],
                     "loja": escolhida["loja"] if escolhida else None, "piso": ps.get(0), "fim": _fim(escolhida, j),
                     "tag": tag, "tag_texto": texto, "acima": acima, "em_bundle": cobertos.get(a, []),
-                    "raridade": an.get("nivel"), "raridade_texto": an.get("texto"), "selo": an.get("selo", False),
+                    "raridade": an.get("nivel"), "raridade_texto": an.get("texto"), "selo": an.get("selo", False), "selo_motivo": an.get("selo_motivo"),
                     "piso_tipo": an.get("piso_tipo"), "piso_ref": an.get("piso_ref"),
                     "rpos": j.get("rpos") or 0, "rcount": j.get("rcount") or 0})
     # sugestoes: bundles da Steam com pelo menos 1 item do carrinho

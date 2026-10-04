@@ -4,7 +4,7 @@ Texto para a descrição do release (aparece na janela de atualização). A seç
 
 ## 0.14.0
 - **Raridade nova:** mede quantas vezes por ano o jogo chega àquele desconto, não o preço em reais. Promoções que se repetem não saem mais como *Lendário* (ex.: Castle of Illusion a 80%, quando 75% acontece todo mês).
-- **Selo Kurokami:** um selo dourado para o melhor desconto que o jogo costuma ter, e raro. Sempre avisa, com "SELO KUROKAMI" no título da notificação. Dá para exigir um desconto mínimo em Configurações.
+- **Selo Kurokami:** um selo dourado quando o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. A notificação diz qual: "maior desconto da história (-85%; antes, no máximo -80%)" ou "menor preço desde mm/aaaa". Sempre avisa, com "SELO KUROKAMI" no título. Dá para exigir um desconto mínimo em Configurações.
 - **Pílula de piso** ao lado do preço: *Novo recorde*, *Recorde raro*, *Igual ao recorde*, *Menor em 24 meses* ou o menor preço já visto, em cinza.
 - *Lendário* exige 2 anos ou mais de histórico e alguma promoção anterior; jogos mais novos chegam no máximo a *Ultrarraro*.
 - A ficha do jogo explica a raridade: maior desconto da vida, quantas vezes chegou nesse nível em 24 meses e quando foi a última.

@@ -651,7 +651,7 @@ const RARTXT={comum:'Comum',incomum:'Incomum',raro:'Raro',ultrarraro:'Ultrarraro
 const rarIdx=r=>RARS.indexOf(r);
 function rarPill(o){if(!o.raridade)return '';return `<span class="rr rr-${o.raridade}" title="${esc(o.raridade_texto||'')}">${o.raridade==='lendario'?'★ ':''}${RARTXT[o.raridade]}</span>`;}
 const SELO_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#14110a" stroke="#f5c75b" stroke-width="5"/><path d="M22 38a11 11 0 0 1 20 0" stroke="#f5c75b" stroke-width="4" fill="none"/><path d="M32 32 50 16" stroke="#f5c75b" stroke-width="5"/><circle cx="32" cy="32" r="7" fill="#f5c75b"/></svg>';
-function seloBadge(o){return o.selo?`<span class="selo" title="Selo Kurokami: o melhor desconto que esse jogo costuma ter, e raro">${SELO_SVG}SELO KUROKAMI</span>`:'';}
+function seloBadge(o){return o.selo?`<span class="selo" title="${esc('Selo Kurokami: '+(o.selo_motivo||'o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo'))}">${SELO_SVG}SELO KUROKAMI</span>`:'';}
 const PPTXT={novo:'Novo recorde',raro:'Recorde raro',igual:'Igual ao recorde','24m':'Menor em 24 meses'};
 function mesAno(iso){if(!iso)return '';const d=new Date(iso);return String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
 function pisoRefTxt(r){return r?`${brl(r.preco)}${r.corte?' a -'+r.corte+'%':''} (${mesAno(r.quando)})`:'';}
@@ -810,7 +810,9 @@ $$('[data-quick]').forEach(b=>b.addEventListener('click',()=>{const q=b.dataset.
 
 /* ================= modal do jogo ================= */
 function porqueRar(m){const i=m.rar_info||{};if(!m.raridade)return '';
-  return `<div class="porque"><b>Por que ${esc(RARTXT[m.raridade])}${m.selo?' e Selo Kurokami':''}</b><br>
+  const selo=m.selo?`<div style="margin-bottom:6px">${seloBadge(m)} <b>${esc((m.selo_motivo||'').replace(/^./,c=>c.toUpperCase()))}</b><br>
+    O jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes.</div>`:'';
+  return `<div class="porque">${selo}<b>Por que ${esc(RARTXT[m.raridade])}</b><br>
     Maior desconto da vida (lojas que alertam): <b>-${i.corte_max||0}%</b><br>
     No mesmo nível nos últimos 24 meses: <b>${i.eps_nivel||0} vez(es)</b>${i.por_ano!=null?` (${String(i.por_ano).replace('.',',')} por ano)`:''}<br>
     Última vez nesse nível: <b>${i.ultima?new Date(i.ultima).toLocaleDateString('pt-BR'):'nunca'}</b> · histórico de <b>${i.meses||0} meses</b>${i.curto?' (curto)':''}
@@ -1091,7 +1093,7 @@ async function renderCfg(){
      <label class="f">Avisar a partir de <select data-k="alerta.raridade_minima">${[['incomum','Incomum'],['raro','Raro'],['ultrarraro','Ultrarraro'],['lendario','Lendário']].map(([v,t])=>`<option value="${v}"${(a.raridade_minima||'raro')===v?' selected':''}>${t}</option>`).join('')}</select></label>
      <div class="hint">Raridade = quantas vezes por ano o jogo chega a esse desconto (ou até 5 pontos menos) nos últimos 24 meses. Comum: 3+ por ano. Incomum: 1,5 a 3. Raro: 0,75 a 1,5. Ultrarraro: menos que isso. Lendário: nunca chegou, com 2 anos ou mais de histórico e alguma promoção anterior (com 1 a 2 anos: no máximo Ultrarraro).</div>
      <label class="f">Selo Kurokami: desconto mínimo (%) ${num('alerta.selo_corte_minimo',a.selo_corte_minimo??0,5,0,100)}</label>
-     <div class="hint">Selo Kurokami = o melhor desconto que o jogo costuma ter (até 5 pontos do máximo da vida, ou o menor preço em 24 meses), Raro ou melhor, com 1 ano ou mais de histórico. O Selo sempre avisa.</div>
+     <div class="hint">Selo Kurokami = o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. Sai quando o desconto é o maior da história do jogo (2 anos ou mais de histórico) ou quando o preço é o menor em 18 meses ou mais (ou metade do recorde anterior). O Selo sempre avisa. Nos dados de 2022–2025, em cerca de 7 de 10 casos o jogo não ficou mais barato nos 12 meses seguintes.</div>
      <label class="f">Tolerância acima do menor histórico (%) ${num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50)}</label>
      <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label>
      <label class="f">Favoritos: os primeiros da sua lista ${num('alerta.favoritos_top',a.favoritos_top??10,1,0,200)}</label>

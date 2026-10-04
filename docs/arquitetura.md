@@ -52,7 +52,7 @@ Verificação **rápida** = o ciclo normal (respeita intervalos e orçamento). *
 Por jogo da lista (exceto os que o usuário já tem): para cada oferta das **lojas marcadas** (e DRM Steam, se exigido) roda `analise.analisar(linhas, preco, corte)`:
 - `linha_do_tempo` junta o histórico das lojas marcadas em trechos (menor preço, corte do menor, maior corte); `episodios` vira promoções (intervalo sem desconto < 1 dia não separa).
 - **Raridade** (eixo 1): episódios anteriores com corte ≥ atual − 5, por ano, nos últimos 24 meses. Comum ≥ 3/ano · Incomum 1,5–3 · Raro 0,75–1,5 · Ultrarraro < 0,75 · Lendário = nunca (histórico inteiro), com ≥ 24 meses de histórico e ≥ 1 promoção anterior; 12–24 meses: no máximo Ultrarraro. Sem promoção anterior nas lojas marcadas ou histórico < 6 meses: no máximo Incomum.
-- **No piso** (eixo 2): corte ≥ maior corte da vida − 5, ou preço ≤ menor de 24 meses + 1%. **Selo Kurokami** = no piso + Raro ou melhor + ≥ 12 meses + corte ≥ `selo_corte_minimo`.
+- **No piso** (eixo 2): corte ≥ maior corte da vida − 5, ou preço ≤ menor de 24 meses + 1%. **Selo Kurokami** = (Lendário **ou** pílula Recorde raro) + corte ≥ `selo_corte_minimo`; `selo_motivo` diz qual bateu. Raro e Ultrarraro sozinhos não dão Selo (ver o backtest em `decisoes.md`).
 - **Pílula de piso** (reais, só informativa): compara com o menor preço *antes* do episódio de preço atual: novo / raro (≥ 18 meses sem esse nível ou ≤ 50% do recorde) / igual / 24m.
 - **Score** (só ordenação): corte × peso da raridade (0,4…1,0) + 10 no piso. Análises não entram em nada.
 
