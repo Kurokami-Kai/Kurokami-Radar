@@ -543,7 +543,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
           <button data-v="0" aria-pressed="true">Todas</button><button data-v="70">70%+</button><button data-v="80">80%+</button><button data-v="90">90%+</button>
         </div></div></div>
         <div class="blk"><h4>Raridade do preço</h4><div class="in"><div class="chips" id="cTagLista"></div>
-          <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">Quanto tempo o jogo já passou neste preço (ou menos) no histórico.</div></div></div>
+          <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">Quantas vezes o jogo chega a esse desconto (ou até 5 pontos menos) nas lojas que alertam.</div></div></div>
         <div class="blk"><h4>Restringir por</h4><div class="in" id="ticks"></div></div>
       </aside>
     </div>
@@ -740,7 +740,7 @@ function chipsTag(sel,atual,base){const opts=[['','Todos'],['selo','Selo Kurokam
   $(sel).innerHTML=opts.map(([v,t])=>`<button data-tag="${v}" aria-pressed="${atual===v}">${t} <span style="opacity:.6">${base.filter(o=>filtroTag(o,v)).length}</span></button>`).join('');}
 function renderVale(){
   const it=valeItens();$('#valeNote').textContent=`${it.length} jogo(s) · checado ${fmtISO(RES.atualizado)}`;
-  if(!it.length){$('#hero').innerHTML='<div class="empty">Nada no menor histórico com os seus filtros agora. Ajuste em Configurações ou veja a lista inteira.</div>';$('#valeLista').innerHTML='';return;}
+  if(!it.length){$('#hero').innerHTML='<div class="empty">Nada valendo a pena com os seus filtros agora. Ajuste em Configurações ou veja a lista inteira.</div>';$('#valeLista').innerHTML='';return;}
   const top=it.slice(0,10);heroI=(heroI+top.length)%top.length;const o=top[heroI];
   $('#hero').innerHTML=`<div class="hero-stage">
     <a class="hero-art" href="#" data-open="${o.appid}">${art(o.appid,o.nome,o.capa,{style:'--fs:30px'})}</a>

@@ -98,7 +98,7 @@ def main(esperar=False, abrir=False):
         else:
             txt = "próxima checagem %s" % serv.proxima.strftime("%H:%M")
             if serv.ultimo:
-                txt = "%d no menor histórico · %s" % (serv.ultimo[1], txt)
+                txt = "%d valendo a pena · %s" % (serv.ultimo[1], txt)
             if serv.estado == "erro":
                 txt = "erro na última checagem · " + txt
         tray.title = ("Kurokami Radar%s\n%s" % (" (pausado)" if pausado() else "", txt))[:127]

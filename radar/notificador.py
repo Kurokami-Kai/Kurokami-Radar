@@ -1,6 +1,6 @@
 """Decide QUAIS alertas viram notificacao:
 - primeira vez: so registra o que ja esta em promocao (sem avalanche de avisos);
-- depois: avisa jogo que entrou no menor historico, ou que caiu mais ainda;
+- depois: avisa jogo que passou a valer a pena (Selo ou raridade), ou que caiu mais ainda;
 - quando a promocao acaba, o jogo "rearma" e volta a avisar na proxima;
 - horario de silencio guarda os avisos para depois; acima do limite, vira um resumo."""
 import json
@@ -43,7 +43,7 @@ class Notificador:
         alertas = [a for a in alertas if a["appid"] not in mudos]
         atuais = {a["appid"]: a for a in alertas}
 
-        # rearma quem saiu do menor historico / da promocao
+        # rearma quem deixou de valer a pena / saiu da promocao
         sairam = [a for a, n in ja.items() if n["ativo"] and a not in atuais]
         self.b.con.executemany("UPDATE notificado SET ativo=0 WHERE appid=?", [(a,) for a in sairam])
 
@@ -62,7 +62,7 @@ class Notificador:
             self.b.meta("linha_de_base", agora())
             self.b.commit()
             notificar.mostrar("Kurokami Radar ativo",
-                              "%d jogos da sua lista já estão no menor histórico.\nDaqui pra frente você recebe só as novidades." % len(alertas),
+                              "%d jogos da sua lista já valem a pena agora.\nDaqui pra frente você recebe só as novidades." % len(alertas),
                               clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
             self.log("Linha de base: %d alertas atuais registrados sem notificar" % len(alertas))
             return []
@@ -98,7 +98,7 @@ class Notificador:
             self._enviar(a)
         if len(novos) > limite:
             resto = len(novos) - limite
-            notificar.mostrar("+%d oferta%s no menor histórico" % (resto, "s" if resto > 1 else ""),
+            notificar.mostrar("+%d oferta%s que vale%s a pena" % (resto, "s" if resto > 1 else "", "m" if resto > 1 else ""),
                               ", ".join(a["nome"] for a in novos[limite:limite + 4]) + ("…" if resto > 4 else ""),
                               clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
         self.b.con.executemany("INSERT INTO alerta(appid, loja, preco, motivo, quando, enviado) VALUES(?,?,?,?,?,1)",

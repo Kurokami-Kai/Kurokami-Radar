@@ -38,10 +38,10 @@ def gerar(alertas, capas, novos_ids=()):
             html.escape(a["loja"]), outras, sc, novo,
             ('<span class="pct">-%d%%</span>' % a["corte"]) if a.get("corte") else "", preco)
 
-    corpo = "".join(linha(a) for a in alertas) or '<p style="padding:30px;text-align:center;color:#8f98a0">Nada no menor histórico com os seus filtros agora.</p>'
+    corpo = "".join(linha(a) for a in alertas) or '<p style="padding:30px;text-align:center;color:#8f98a0">Nada valendo a pena com os seus filtros agora.</p>'
     pag = ('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
            '<title>Kurokami Radar - alertas</title><style>%s</style></head><body><header><h1>KUROKAMI RADAR</h1>'
-           '<p>%d jogos no menor histórico com os seus filtros · atualizado %s</p></header><main>%s</main>'
+           '<p>%d jogos valendo a pena com os seus filtros · atualizado %s</p></header><main>%s</main>'
            '<div class="foot">Preços via IsThereAnyDeal, GG.deals e Steam</div></body></html>') % (
         CSS, len(alertas), datetime.now().strftime("%d/%m %H:%M"), corpo)
     caminhos.garantir()

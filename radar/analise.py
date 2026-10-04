@@ -202,14 +202,17 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     por_ano = len(na_janela) / anos
     out["eps_nivel"], out["por_ano"] = len(na_janela), round(por_ano, 2)
     out["ultima"] = _iso(no_nivel[-1][0]) if no_nivel else None
-    desde = time.gmtime(t0).tm_year
+    desde = time.strftime("%m/%Y", time.gmtime(t0))  # "histórico desde 10/2021"
     # Lendario: nunca chegou a esse nivel, com 24 meses ou mais de historico e pelo menos uma promocao
     # anterior (sem promocao anterior e quase sempre buraco nos dados, ex.: ARK). Com 12-24 meses: Ultrarraro.
+    antes_max = max((e[2] for e in anteriores), default=0)
+    nunca = "nunca chegou a -%d%% (%shistórico desde %s)" % (
+        corte, ("antes, no máximo -%d%%; " % antes_max) if antes_max else "", desde)
     if not no_nivel and dias_hist >= JANELA_RARIDADE and anteriores:
-        nivel, texto = "lendario", "nunca chegou a -%d%% (histórico desde %d)" % (nivel_min, desde)
+        nivel, texto = "lendario", nunca
     elif por_ano < 0.75:
         nivel = "ultrarraro"
-        texto = ("nunca chegou a -%d%% (histórico desde %d)" % (nivel_min, desde)) if not no_nivel else \
+        texto = nunca if not no_nivel else \
             "-%d%% ou mais %d vez(es) em 24 meses" % (nivel_min, len(na_janela)) if na_janela else \
             "última vez a -%d%% ou mais: %s" % (nivel_min, time.strftime("%m/%Y", time.gmtime(no_nivel[-1][0])))
     else:
@@ -217,7 +220,7 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
         texto = ("-%d%% ou mais %d vezes em %s (%.1f por ano)" % (
             nivel_min, len(na_janela), "24 meses" if dias_hist >= JANELA_RARIDADE else "%d meses" % out["meses"], por_ano)).replace(".", ",")
     if not anteriores and RARIDADES.index(nivel) > RARIDADES.index("incomum"):
-        nivel, texto = "incomum", "nenhuma promoção anterior nas lojas marcadas (histórico desde %d)" % desde
+        nivel, texto = "incomum", "nenhuma promoção anterior nas lojas marcadas (histórico desde %s)" % desde
     elif out["curto"] and RARIDADES.index(nivel) > RARIDADES.index("incomum"):
         nivel, texto = "incomum", texto + " · histórico curto (%d dias)" % dias_hist
     out["nivel"], out["texto"] = nivel, texto

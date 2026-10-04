@@ -313,15 +313,20 @@ def cmd_testar_notificacao(cfg, args):
     img = notificar.capa(j["appid"], j["capa"]) if j else None
     nome = j["nome"] if j else "Jogo de exemplo"
     url = "https://store.steampowered.com/app/%d/" % j["appid"] if j else "https://store.steampowered.com/"
-    if getattr(args, "selo", False):  # passa pelo caminho real dos alertas (titulo, botoes, capa)
+    if getattr(args, "selo", False):  # um Selo de verdade do seu banco, pelo mesmo caminho de uma rodada
+        from radar import analise
         from radar.notificador import Notificador
-        Notificador(b, cfg, log=lambda m: None)._enviar(
-            {"appid": j["appid"] if j else 0, "nome": nome, "preco": 999, "corte": 90, "loja": "Steam", "url": url,
-             "selo": True, "raridade": "lendario", "score": 90,
-             "motivo": "Selo Kurokami: Lendário: nunca chegou a -85% (TESTE)"})
-        print("Notificação de Selo enviada. Se não apareceu em uns segundos, veja Configurações > Sistema > Notificações")
+        alertas = analise.avaliar(analise.Contexto(b, cfg), b.ofertas_atuais(), {}, set(cfg["lojas"]))
+        a = next((x for x in alertas if x.get("selo")), None)
+        if a is None:  # nenhum Selo hoje: exemplo no mesmo formato
+            a = {"appid": j["appid"] if j else 0, "nome": nome, "preco": 999, "corte": 90, "loja": "Steam", "url": url,
+                 "selo": True, "raridade": "lendario", "score": 100,
+                 "motivo": "Selo Kurokami: Lendário: nunca chegou a -85% (histórico desde 10/2021)"}
+        Notificador(b, cfg, log=lambda m: None)._enviar(a)
+        print("Notificação de Selo enviada (%s): %s" % (a["nome"], a["motivo"]))
+        print("Se não apareceu em uns segundos, veja Configurações > Sistema > Notificações")
         return
-    ok = notificar.mostrar(nome, "R$ 9,99 · -90% na Steam (TESTE)\nNo menor histórico · score 88",
+    ok = notificar.mostrar(nome, "R$ 9,99 · -90% na Steam (TESTE)\nRaro: -85% ou mais 1 vez em 24 meses · score 88",
                            clique=url, botoes=[("Abrir oferta", url)], imagem=img, rodape="notificação de teste")
     print("Notificação enviada. Se não apareceu em uns segundos, veja Configurações > Sistema > Notificações"
           if ok else "Falhou ao chamar o PowerShell.")
