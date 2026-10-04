@@ -28,14 +28,14 @@ def gerar(alertas, capas, novos_ids=()):
         url = a.get("url") or "https://store.steampowered.com/app/%d/" % a["appid"]
         img = capas.get(a["appid"]) or ""
         preco = "Grátis" if a["preco"] == 0 else "R$ %s" % ("%.2f" % (a["preco"] / 100)).replace(".", ",")
-        outras = (" · também: " + ", ".join(a["outras"])) if a.get("outras") else ""
+        from .analise import texto_outras
+        outras = (" · " + texto_outras(a)) if a.get("outras") else ""
         novo = " · <b>novo</b>" if a["appid"] in novos_ids else ""
-        sc = (" · score %d" % round(a["score"])) if a.get("score") else ""
         return ('<a class="row" href="%s" target="_blank" rel="noopener"><img src="%s" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
-                '<div><div class="n">%s</div><div class="m">%s na %s%s%s%s</div></div>'
+                '<div><div class="n">%s</div><div class="m">%s na %s%s%s</div></div>'
                 '<div class="pb">%s<span class="prs">%s</span></div></a>') % (
             html.escape(url), html.escape(img), html.escape(a["nome"]), html.escape(a["motivo"]),
-            html.escape(a["loja"]), outras, sc, novo,
+            html.escape(a["loja"]), html.escape(outras), novo,
             ('<span class="pct">-%d%%</span>' % a["corte"]) if a.get("corte") else "", preco)
 
     corpo = "".join(linha(a) for a in alertas) or '<p style="padding:30px;text-align:center;color:#8f98a0">Nada valendo a pena com os seus filtros agora.</p>'

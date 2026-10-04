@@ -258,6 +258,16 @@ def favorito(jogo, cfg_alerta):
     return bool(p) and p <= (cfg_alerta.get("favoritos_top") or 0)
 
 
+def texto_outras(a):
+    """Outras lojas que tambem bateram o alerta com ate R$ 1 a mais:
+    "mesmo preço na Nuuvem · na GOG por +R$ 0,40" (ate R$ 0,10 de diferenca = mesmo preco)."""
+    difs = a.get("outras_dif") or [[l, 0] for l in (a.get("outras") or [])]
+    iguais = [l for l, d in difs if d <= 10]
+    partes = ["mesmo preço na " + " e na ".join(iguais)] if iguais else []
+    partes += ["na %s por +%s" % (l, _brl(d)) for l, d in difs if d > 10]
+    return " · ".join(partes)
+
+
 def raridade_ok(nivel, minimo):
     return nivel in RARIDADES and RARIDADES.index(nivel) >= RARIDADES.index(minimo if minimo in RARIDADES else "raro")
 
@@ -530,7 +540,9 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
         lst.sort(key=lambda a: (a["preco"], -RARIDADES.index(a["raridade"]) if a.get("raridade") in RARIDADES else 0,
                                 a["loja"] != "Steam"))
         top = dict(lst[0])
-        top["outras"] = [x["loja"] for x in lst[1:] if x["preco"] - top["preco"] <= 100 and x["loja"] != top["loja"]]
+        perto = [x for x in lst[1:] if x["preco"] - top["preco"] <= 100 and x["loja"] != top["loja"]]
+        top["outras"] = [x["loja"] for x in perto]
+        top["outras_dif"] = [[x["loja"], x["preco"] - top["preco"]] for x in perto]  # centavos a mais
         final.append(top)
     final.sort(key=lambda a: (not a.get("selo"), -(RARIDADES.index(a["raridade"]) if a.get("raridade") in RARIDADES else -1),
                               -(a["score"] or 0)))

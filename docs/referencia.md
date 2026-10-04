@@ -40,6 +40,7 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
 - `analisar(linhas, preco, corte, agora_, cfg_alerta)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
 - `_score_v2(corte, nivel, no_piso)` — 0-100 sem analises: corte x peso da raridade, +10 no piso.
 - `favorito(jogo, cfg_alerta)` — Esta entre os N primeiros da ordem que voce deu na lista de desejos?
+- `texto_outras(a)` — Outras lojas que tambem bateram o alerta com ate R$ 1 a mais:
 - `raridade_ok(nivel, minimo)`
 - `_brl(c)`
 - `tag_minima_ok(tag, cfg_alerta)` — A etiqueta atinge o minimo que o usuario pediu para 'valer a pena'?

@@ -114,10 +114,12 @@ class Notificador:
         oferta = a.get("url") or steam
         desc = (" · -%d%%" % a["corte"]) if a.get("corte") else ""
         linha1 = "%s%s na %s" % (brl(a["preco"]), desc, a["loja"])
-        linha2 = a["motivo"][0].upper() + a["motivo"][1:]
-        if a.get("score"):
-            linha2 += " · score %d" % round(a["score"])
-        rodape = ("também: " + ", ".join(a["outras"])) if a.get("outras") else None
+        from .analise import texto_outras
+        motivo = a["motivo"]
+        if a.get("selo") and motivo.startswith("Selo Kurokami: "):
+            motivo = motivo[len("Selo Kurokami: "):]  # o titulo ja diz SELO KUROKAMI
+        linha2 = motivo[0].upper() + motivo[1:]
+        rodape = texto_outras(a) or None
         botoes = [("Abrir oferta", oferta), ("Não avisar mais", self._acao("silenciar", a["appid"]))]
         from .analise import NOME_RARIDADE
         rar = a.get("raridade")
