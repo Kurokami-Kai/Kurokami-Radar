@@ -14,7 +14,7 @@ Com o Radar instalado aberto, feche-o antes (porta 80 e trava 47811 são compart
 ## Testes rápidos
 - **Tudo de uma vez:** `py tools/checar.py` (também falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`, e roda `tools/testar_piso.py`).
 - **Raridade e pílula de piso:** `py tools/testar_piso.py` — históricos sintéticos (Recorde raro em 17/19 meses e 50%, Lendário pela regra C). Mudou a regra? Acrescente o caso aqui.
-- **Backtest do Selo:** `py tools/backtest_selo.py` (≈ 30 s) — semana a semana, só com o histórico conhecido até a data; mede "não batido" em 12 meses (+5/+10), "não voltou" em 6 meses e Selos por semana, para as variantes A–F e duas linhas de base. Lê uma cópia temporária do banco.
+- **Backtest do Selo:** `py tools/backtest_selo.py` (≈ 30 s) — semana a semana, só com o histórico conhecido até a data; mede "não batido" em 12 meses (+5/+10), "não voltou" em 6 meses e Selos por semana, para as variantes A–H, "F ou G" e duas linhas de base. Lê uma cópia temporária do banco.
 - **Toast de Selo:** `py radar.py testar-notificacao --selo` (pega um Selo de verdade do seu banco e passa pelo `Notificador._enviar`, como numa rodada).
 - Sintaxe: `py -c "import ast,glob;[ast.parse(open(f,encoding='utf-8').read()) for f in glob.glob('radar/*.py')+['radar.py']]"`
 - JS do painel: extrair o `<script>` de `painel.html` e rodar `new Function(js)` no Node.

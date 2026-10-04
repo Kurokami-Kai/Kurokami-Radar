@@ -9,9 +9,10 @@ Metricas por variante (cada Selo conta uma vez por episodio de promocao, na prim
   nao batido +5 / +10 : nos 12 meses seguintes nao houve corte >= corte do Selo + 5 (ou + 10)
   nao voltou 6m       : nos 6 meses seguintes o mesmo nivel (+-5) nao voltou
   selos/semana        : mediana em semanas normais x semanas de grandes promocoes da Steam
-  hoje                : quantos Selos a variante daria agora
+  hoje                : episodios em promocao agora que a variante marcou (no dia em que comecaram)
 Variantes: A atual (regra C) · B so com >= 24 meses de historico · C B + escada parada · D B + 1 Selo por jogo
-a cada 12 meses (salvo corte 10+ pontos acima) · E B+C+D · F so Lendario. Linhas de base: toda promocao; toda
+a cada 12 meses (salvo corte 10+ pontos acima) · E B+C+D · F so Lendario · G pilula Recorde raro (regra
+"rare deal" da SteamDB, em reais) · H qualquer novo recorde em reais (pilulas novo/raro) · F ou G. Linhas de base: toda promocao; toda
 promocao no piso."""
 import argparse
 import bisect
@@ -31,9 +32,10 @@ from radar.banco import Banco  # noqa: E402
 
 DIA = 86400
 ANO = 365 * DIA
-VARIANTES = ["A", "B", "C", "D", "E", "F", "todas", "no_piso"]
+VARIANTES = ["A", "B", "C", "D", "E", "F", "G", "H", "FouG", "todas", "no_piso"]
 NOMES = {"A": "A atual (regra C)", "B": "B >= 24 meses", "C": "C B + escada parada", "D": "D B + 1 por jogo/12m",
-         "E": "E B + C + D", "F": "F so Lendario", "todas": "base: toda promocao", "no_piso": "base: toda promocao no piso"}
+         "E": "E B + C + D", "F": "F so Lendario",
+         "G": "G Recorde raro (SteamDB)", "H": "H novo recorde em R$", "FouG": "F ou G", "todas": "base: toda promocao", "no_piso": "base: toda promocao no piso"}
 
 
 def grande_promo(dt):
@@ -119,7 +121,9 @@ def rodar(b, marc, args):
                 continue
             preco, corte = segs[-1][2], segs[-1][3]
             r = analise.analisar(sub, preco, corte, agora_=ts)
-            base = {"todas": True, "no_piso": r["no_piso"], "A": r["selo"], "F": r["nivel"] == "lendario"}
+            base = {"todas": True, "no_piso": r["no_piso"], "A": r["selo"], "F": r["nivel"] == "lendario",
+                    "G": r["piso_tipo"] == "raro", "H": r["piso_tipo"] in ("novo", "raro"),
+                    "FouG": r["nivel"] == "lendario" or r["piso_tipo"] == "raro"}
             b24 = r["selo"] and r["meses"] >= 24
             parada = escada_parada(episodios(segs), ts) if b24 else False
             base.update(B=b24, C=b24 and parada)
