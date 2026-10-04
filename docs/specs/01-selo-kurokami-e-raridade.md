@@ -71,3 +71,17 @@ Exemplos esperados: jogo cujo máximo da vida é 50% e chega a 50% 1x/ano → **
 - Hotline Miami 2 a 85% = Comum, sem selo.
 - Imprimir a **distribuição** de níveis e quantos selos saem hoje; o dono valida a lista dos selos antes de publicar.
 - Nenhum alerta depende de análise.
+
+## Emenda (03/10) — Pílula de piso e "recorde raro"
+Origem: estudo da página de promoções da SteamDB, usada só como inspiração. A SteamDB olha só o preço da Steam; aqui o piso é sempre entre as LOJAS MARCADAS.
+
+- Pílula de piso, separada da pílula de raridade e do Selo. É medida em reais (eixo 2) e NUNCA alimenta a raridade (eixo 1, por frequência do corte). Usa a tolerância que já existe (≤ R$ 0,10 ou 1% = igual):
+  - "Novo recorde" (azul): preço atual abaixo do menor já visto.
+  - "Recorde raro" (azul-claro, variante do anterior): é novo recorde E (a última vez que o preço esteve no nível do recorde anterior foi há ≥ 18 meses OU o preço atual é ≤ 50% do recorde anterior). A regra é nossa: a SteamDB não documenta a dela.
+  - "Igual ao recorde" (verde).
+  - "Menor em 24 meses" (roxo): ≤ menor dos últimos 24 meses, sem ser recorde.
+  - Nenhuma das anteriores: referência em cinza "menor: R$ X a -Y% (mês/ano)".
+- A caixa de desconto continua verde no estilo da loja Steam. A pílula fica ao lado do preço; não recolorir a caixa.
+- A definição de "no piso" do Selo não muda.
+- API: em /api/lista e /api/jogo, acrescentar `piso_tipo` (novo | raro | igual | 24m | null) e `piso_ref` {preco, corte, quando}.
+- Aceite extra: imprimir a distribuição de piso_tipo no banco real e os jogos com "Recorde raro", para o dono validar. Castle of Illusion a 80% continua sem Lendário e sem Selo, seja qual for a pílula.
