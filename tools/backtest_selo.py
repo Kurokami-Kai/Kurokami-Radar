@@ -12,8 +12,8 @@ Metricas por variante (cada Selo conta uma vez por episodio de promocao, na prim
   hoje                : episodios em promocao agora que a variante marcou (no dia em que comecaram)
 Variantes: A atual (regra C) · B so com >= 24 meses de historico · C B + escada parada · D B + 1 Selo por jogo
 a cada 12 meses (salvo corte 10+ pontos acima) · E B+C+D · F so Lendario · G pilula Recorde raro (regra
-"rare deal" da SteamDB, em reais) · H qualquer novo recorde em reais (pilulas novo/raro) · F ou G · Selo atual (= F ou G com
-selo_corte_minimo 0) · alertas sem Selo (Raro/Ultrarraro com desconto_minimo do config). Linhas de base: toda promocao; toda
+"rare deal" da SteamDB, em reais) · H qualquer novo recorde em reais (pilulas novo/raro) · F ou G · Selo atual (= G com
+>= 1 promocao anterior e selo_corte_minimo 0, desde a 0.15; ate a 0.14 era F ou G) · alertas sem Selo (Raro/Ultrarraro com desconto_minimo do config). Linhas de base: toda promocao; toda
 promocao no piso."""
 import argparse
 import bisect
@@ -37,7 +37,7 @@ VARIANTES = ["A", "B", "C", "D", "E", "F", "G", "H", "FouG", "Selo", "alerta_sem
 NOMES = {"A": "A Selo antigo (regra C)", "B": "B >= 24 meses", "C": "C B + escada parada", "D": "D B + 1 por jogo/12m",
          "E": "E B + C + D", "F": "F so Lendario",
          "G": "G Recorde raro (SteamDB)", "H": "H novo recorde em R$", "FouG": "F ou G (G sem promo ant.)",
-         "Selo": "Selo atual (F ou G)", "alerta_sem_selo": "alertas sem Selo (Raro+)", "todas": "base: toda promocao", "no_piso": "base: toda promocao no piso"}
+         "Selo": "Selo atual (so G)", "alerta_sem_selo": "alertas sem Selo (Raro+)", "todas": "base: toda promocao", "no_piso": "base: toda promocao no piso"}
 
 
 def grande_promo(dt):

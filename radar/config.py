@@ -19,10 +19,12 @@ PADRAO = {
         # menor_historico: so dispara no piso (com tolerancia) das lojas marcadas
         "modo": "menor_historico",
         "tolerancia_pct": 0,          # 5 = aceita ate 5% acima do menor historico
-        # Raridade minima para avisar: comum, incomum, raro, ultrarraro, lendario.
-        # Mede quantas vezes por ano o jogo chega a esse corte (ou ate 5 pontos menos) nas lojas que alertam.
-        # O Selo Kurokami (melhor oferta da historia do jogo: maior desconto ou menor preco em muito tempo) sempre avisa.
-        "raridade_minima": "raro",
+        # O que avisa (0.15, spec 04): tipos de preco em reais nas lojas marcadas.
+        #   selo  = Selo Kurokami: o menor preco em muito tempo (recorde anterior de 1,5 ano ou mais, ou preco pela metade)
+        #   novo  = novo recorde (nunca esteve tao barato) · igual = igual ao recorde · 24m = menor preco em 2 anos
+        # O Selo avisa a partir de selo_corte_minimo; os outros, a partir de desconto_minimo.
+        "tipos": {"selo": True, "novo": False, "igual": False, "24m": False},
+        "raridade_minima": "raro",    # (ignorado desde a 0.15: a raridade so informa, na coluna "Costuma voltar")
         "selo_corte_minimo": 0,       # so ganha Selo a partir deste corte (%)
         # (informativo) piso por janela: 90 (3 meses), 180, 270, 365 (1 ano) ou 0 (so o de todos os tempos).
         # Cada jogo ganha a etiqueta do maior piso que atinge (sempre > 1 ano > 9m > 6m > 3m).
@@ -36,8 +38,7 @@ PADRAO = {
         "avaliacao_minima": 75,
         "ignorar_sem_avaliacoes": True,
         "dias_minimos_completo": 14,  # modo completo: so alerta depois de observar o custo por esse tempo
-        # os N primeiros da sua lista de desejos (ordem que voce deu na Steam) avisam a partir de Incomum
-        # e sem desconto minimo
+        # (ignorado desde a 0.15: favoritos nao tem mais excecao de aviso; fica por compatibilidade)
         "favoritos_top": 10
     },
 

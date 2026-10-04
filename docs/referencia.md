@@ -39,7 +39,12 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
 - `episodios(segs, folga)` — Promocoes como episodios: [(ini, fim, maior_corte)]. Um intervalo sem desconto menor que `folga`
 - `analisar(linhas, preco, corte, agora_, cfg_alerta)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
 - `tipos_de(an)` — Tipos de preco da oferta (nao exclusivos): selo, novo (inclui "raro" sem Selo), igual, 24m.
+- `tipos_ligados(cfg_alerta)` — Tipos que avisam, pelo config (alerta.tipos). Sem a chave (config antigo): so o Selo.
+- `avisa_por(tipos, corte, cfg_alerta)` — Tipos ligados que fazem a oferta avisar: o Selo sempre (o selo_corte_minimo ja esta nele); os outros so com
 - `tipo_oferta(tipos)` — O tipo exclusivo (o mais importante) ou None.
+- `costuma_voltar(an, corte)` — Coluna "Costuma voltar" (so informa; spec 04): (texto, ordem). ordem menor = mais raro; None = fim da lista
+- `dica_volta(an, corte)` — A linha da dica (e da ficha): "Nos últimos 2 anos: N vezes com -Y% ou mais (última em mm/aaaa) · maior
+- `motivo_tipo(an, tipo)` — O motivo do aviso pelo tipo (A.7 da spec 04). piso_ref e o menor antes do episodio atual (de sempre,
 - `menor_anterior(linhas, ref)` — O registro que fez o menor preco anterior (piso_ref): (loja, preco, quando) do ultimo registro com esse preco
 - `regua_steam(linhas, preco, corte, linhas_steam, preco_s, corte_s, agora_, cfg_alerta)` — Regua so da Steam ("Steam (direto)" + Steam da ITAD) x lojas marcadas. Informativo, nunca avisa.
 - `_score_v2(corte, nivel, no_piso)` — 0-100 sem analises: corte x peso da raridade, +10 no piso.
@@ -58,6 +63,8 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
   - `melhor_combinacao(appid, max_opcoes)` — Jeito mais barato de ter base + DLCs relevantes, combinando bundles/edicoes e itens avulsos.
   - `_opcoes_das_dlcs(appid)` — Bundles/edicoes ligados as DLCs do jogo (alem dos ligados ao proprio jogo).
 - `avaliar(ctx, ofertas_itad, gg, lojas_marcadas)` — Devolve a lista de alertas que dispararia agora. ofertas_itad: {appid: [oferta]}.
+- `ordem_tipo(t)`
+- `chave_aviso(a)` — Ordem dos avisos (e do max_por_rodada): selo, novo, igual, 24m (keyshop e completo depois); maior corte primeiro.
 
 ## `radar/atualizador.py`
 Atualizacao pelo GitHub Releases: verifica, baixa o instalador novo e instala por cima (dados ficam).
@@ -138,6 +145,13 @@ config.json: tudo que nao e segredo. O painel web (etapa 3) vai editar este arqu
 - `salvar(cfg)`
 - `modo_do_jogo(cfg, appid)`
 
+## `radar/conta_steam.py`
+Relacao da sua conta Steam com os jogos: seguidos e ignorados (spec 04, B).
+
+- `_vazio()`
+- `relacao(cfg)` — {"seguidos": set[int], "ignorados": set[int], "fonte": "userdata" | None, "quando": iso | None}.
+- `assinatura(cfg)` — (arquivo, data de modificacao) do userdata.json: muda quando o arquivo muda (o cache do painel usa).
+
 ## `radar/credenciais.py`
 Chaves de API no Gerenciador de Credenciais do Windows (via keyring).
 
@@ -195,6 +209,7 @@ Decide QUAIS alertas viram notificacao:
 - `em_silencio(cfg, agora_local)`
 - **class `Notificador`** — 
   - `_lista_url()`
+  - `_vitrine_url()`
   - `processar(alertas)`
   - `_enviar(a)`
   - `_acao(acao, appid)`

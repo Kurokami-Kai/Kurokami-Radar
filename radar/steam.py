@@ -64,7 +64,7 @@ def ler_userdata(arquivo):
     except (OSError, json.JSONDecodeError):
         return {}
     return {"wishlist": u.get("rgWishlist") or [], "possuidos": u.get("rgOwnedApps") or [],
-            "carrinho": u.get("rgAppsInCart") or [], "ignorados": list((u.get("rgIgnoredApps") or {}).keys())}
+            "carrinho": u.get("rgAppsInCart") or []}  # seguidos/ignorados: so em conta_steam.relacao
 
 
 def url_asset(item, *campos):

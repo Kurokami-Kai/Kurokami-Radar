@@ -33,8 +33,9 @@ from radar.analise import episodios, linha_do_tempo  # noqa: E402
 from radar.banco import Banco  # noqa: E402
 from tools.backtest_selo import ANO, DIA, achar_banco, grande_promo, ler_config  # noqa: E402
 
-# selo = so a regra G (emenda de 04/10): piso_tipo "raro" com >= 1 promocao anterior; "selo_fg" = Selo antigo (F ou G)
-TIPOS = {"selo": lambda r: r["piso_tipo"] == "raro" and r["_anteriores"], "selo_fg": lambda r: r["selo"], "novo": lambda r: r["piso_tipo"] in ("novo", "raro"),
+# selo = so a regra G (emenda de 04/10; = r["selo"] desde a 0.15): piso_tipo "raro" com >= 1 promocao anterior;
+# "selo_fg" = Selo antigo da 0.14 (F Lendario ou G)
+TIPOS = {"selo": lambda r: r["piso_tipo"] == "raro" and r["_anteriores"], "selo_fg": lambda r: r["nivel"] == "lendario" or (r["piso_tipo"] == "raro" and r["_anteriores"]), "novo": lambda r: r["piso_tipo"] in ("novo", "raro"),
          "igual": lambda r: r["piso_tipo"] == "igual", "24m": lambda r: r["piso_tipo"] == "24m",
          "todas": lambda r: True}
 

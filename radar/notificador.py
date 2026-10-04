@@ -1,6 +1,7 @@
 """Decide QUAIS alertas viram notificacao:
 - primeira vez: so registra o que ja esta em promocao (sem avalanche de avisos);
-- depois: avisa jogo que passou a valer a pena (Selo ou raridade), ou que caiu mais ainda;
+- depois: avisa jogo que entrou num tipo de preco ligado (Selo, novo recorde, igual, menor em 2 anos), ou que caiu mais ainda;
+- ligar um tipo nas Configuracoes nao dispara em massa: quem ja estava assim entra sem aviso e sai um resumo;
 - quando a promocao acaba, o jogo "rearma" e volta a avisar na proxima;
 - horario de silencio guarda os avisos para depois; acima do limite, vira um resumo."""
 import json
@@ -35,6 +36,10 @@ class Notificador:
         from . import painel
         return painel.url() if painel.CONTROLE["servico"] else notificar._uri(caminhos.ARQ_RELATORIO)
 
+    def _vitrine_url(self):
+        from . import painel
+        return painel.url() + "#vale" if painel.CONTROLE["servico"] else self._lista_url()
+
     def processar(self, alertas):
         ncfg = self.cfg.get("notificacoes") or {}
         melhora = int(round((ncfg.get("melhora_minima_reais") or 0.5) * 100))
@@ -58,6 +63,10 @@ class Notificador:
                 "loja=excluded.loja, quando=CASE WHEN excluded.preco < notificado.preco OR notificado.ativo=0 THEN excluded.quando ELSE notificado.quando END",
                 (a["appid"], a["loja"], a["preco"], agora()))
 
+        from .analise import NOME_TIPO, chave_aviso, tipos_ligados
+        lig = tipos_ligados(self.cfg.get("alerta"))
+        ant = self.b.meta("tipos_ligados")
+        self.b.meta("tipos_ligados", lig)
         if not self.b.meta("linha_de_base"):
             self.b.meta("linha_de_base", agora())
             self.b.commit()
@@ -66,6 +75,20 @@ class Notificador:
                               clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
             self.log("Linha de base: %d alertas atuais registrados sem notificar" % len(alertas))
             return []
+
+        # tipo que acabou de ser ligado: quem ja estava assim (e so avisaria por ele) entra sem toast; sai 1 resumo.
+        # Sem meta.tipos_ligados (1a rodada da 0.15) nada e "recem-ligado".
+        ligou = [t for t in lig if ant is not None and t not in ant]
+        resumos = []
+        if ligou:
+            so_por = [a for a in novos if a.get("avisa_por") and set(a["avisa_por"]) <= set(ligou)]
+            ids = {a["appid"] for a in so_por}
+            novos = [a for a in novos if a["appid"] not in ids]
+            for t in ligou:
+                n = sum(1 for a in so_por if t in a["avisa_por"])
+                if n:
+                    resumos.append((t, n))
+                self.log("%s ligado: %d jogo(s) ja estavam assim, registrados sem aviso" % (NOME_TIPO[t], n))
 
         if self.b.meta("pausado"):
             self.b.commit()
@@ -88,11 +111,17 @@ class Notificador:
             novos += [p for p in pend if p["appid"] in atuais and p["appid"] not in vistos]
             self.b.meta("pendentes", [])
 
+        if ncfg.get("ativas", True):
+            for t, n in resumos:
+                notificar.mostrar("%s ligado" % NOME_TIPO[t],
+                                  "%d jogo%s já %s assim agora. Você vai receber só os próximos." % (
+                                      n, "s" if n > 1 else "", "estão" if n > 1 else "está"),
+                                  clique=self._vitrine_url(), botoes=[("Ver", self._vitrine_url())])
         if not ncfg.get("ativas", True) or not novos:
             self.b.commit()
             return []
 
-        novos.sort(key=lambda a: -(a.get("score") or 0))
+        novos.sort(key=chave_aviso)  # selo, novo, igual, 24m; maior corte primeiro
         limite = max(1, int(ncfg.get("max_por_rodada") or 5))
         for a in novos[:limite]:
             self._enviar(a)
@@ -116,17 +145,17 @@ class Notificador:
         linha1 = "%s%s na %s" % (brl(a["preco"]), desc, a["loja"])
         from .analise import texto_outras
         motivo = a["motivo"]
-        if a.get("selo") and motivo.startswith("Selo Kurokami: "):
+        if motivo.startswith("Selo Kurokami: "):
             motivo = motivo[len("Selo Kurokami: "):]  # o titulo ja diz SELO KUROKAMI
         linha2 = motivo[0].upper() + motivo[1:]
         rodape = texto_outras(a) or None
         botoes = [("Abrir oferta", oferta), ("Não avisar mais", self._acao("silenciar", a["appid"]))]
-        from .analise import NOME_RARIDADE
-        rar = a.get("raridade")
-        if a.get("selo"):
+        from .analise import NOME_TIPO
+        t = a.get("tipo_oferta")  # o titulo nunca usa raridade (spec 04)
+        if t == "selo":
             titulo = "SELO KUROKAMI · %s" % a["nome"]
-        elif rar in ("ultrarraro", "lendario"):
-            titulo = "%s · %s" % (NOME_RARIDADE[rar].upper(), a["nome"])
+        elif t in NOME_TIPO:
+            titulo = "%s · %s" % (NOME_TIPO[t], a["nome"])
         else:
             titulo = a["nome"]
         notificar.mostrar(titulo, linha1 + "\n" + linha2, clique=oferta, botoes=botoes, imagem=img, rodape=rodape)
