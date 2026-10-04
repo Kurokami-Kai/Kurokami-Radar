@@ -20,6 +20,10 @@ Complementa a skill geral `~/.claude/skills/economia-de-contexto` (buscar antes 
 - `/compact` quando a conversa passar de uns 40 turnos, dizendo o que manter.
 - Modelo do projeto: `opusplan` (Opus no planejamento, Sonnet na execução).
 
+## Medir
+- `ccusage daily` / `ccusage session` (npm global; rode no PowerShell, no Git Bash o `node` não acha) antes e depois de uma mudança de processo.
+- Se o `rtk` estiver instalado (hook global do usuário), os comandos do Bash já saem comprimidos; `rtk gain` mostra a economia. Não instale hook do rtk no `.claude/` do repositório: quem clonar sem rtk ficaria com o hook quebrado.
+
 ## Esforço
 - Baixo para tarefa mecânica: docs, renomear, rodar testes.
 - Alto só para regra de negócio (preço, piso, avaliação, coleta).

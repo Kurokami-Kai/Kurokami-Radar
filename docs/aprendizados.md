@@ -19,3 +19,4 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Agente novo não carrega na sessão aberta** ("Agent type not found"): teste com `claude -p "..." --agent explorador --output-format json` (o prompt vem antes de `--allowedTools`, que engole argumentos).
 - **Medido (explorador, "funções da aba Promoções"):** Haiku 4.5, 10 turnos, ~127 mil tokens de entrada (109 mil de cache) + 2,4 mil de saída, US$ 0,059. Achou `painel.html` 758–888 (22 funções).
 - **O resumo veio com 28 linhas (tabela)**, não 15: a instrução do agente agora proíbe tabela e manda agrupar. Ainda não remedido.
+- **ccusage e rtk:** `npm i -g ccusage` funciona (no PowerShell; `npx` pelo Git Bash falha). rtk 0.51.0 tem binário Windows (`%LOCALAPPDATA%\Programstk`, checksum ok, telemetria desligada), mas o hook global (`rtk init -g`) mexe em `~/.claude/settings.json` e o modo automático bloqueia: o dono roda.
