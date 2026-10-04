@@ -8,3 +8,8 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Leituras grandes:** o `painel.html` foi lido em blocos de 100–200 linhas mais de uma vez. Mapeie antes (`tools/mapa.py`) e leia só a função que vai mudar; para achar código morto, um script que conta referências (função/const/classe CSS) é mais barato que ler.
 - **Medir na fonte, não supor:** `IStoreQueryService/Query` sem `sort` repete itens entre páginas (70 mil "distintos" em 107.927; `sort: 2` resolve); o Edge headless não renderiza abaixo de ~500 px (para o celular, iframe de 390 px); Playwright num venv do scratchpad com `channel="msedge"` dispensa baixar navegador.
 - **Pelo código, o `radar.py` usa a pasta do repositório** (sem banco): para teste real use `tools/rodar_instalado.py` (backup do banco antes). Para o painel numa cópia: `tools/painel_copia.py`. Datas em textos: `piso_ref.quando` é a última vez no *nível* (com folga de centavos), `quando_preco` é a do preço em si.
+
+## 2026-10-04 — ajustes antes de publicar a 0.15.0
+- **Teste real achou o que os testes sintéticos não acharam:** o toast do WRC 7 dizia "R$ 4,74, 10/2026" (data do nível, não do preço). Rodar o caminho real (`rodar_instalado.py`, toasts) antes de publicar vale o custo.
+- **Releia a skill antes do último passo:** `novidades.md` ia com um comando de desenvolvedor; a skill `publicar-versao` proíbe. `gh` não existe aqui: acompanhe o workflow pela API pública (`api.github.com/repos/<repo>/actions/runs`).
+- **Ao remover código morto, procure quem o usa também em `tools/`** (o `medir_spec04.py` quebrou com `raridade_ok` removido).
