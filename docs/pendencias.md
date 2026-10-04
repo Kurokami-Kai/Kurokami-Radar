@@ -2,7 +2,11 @@
 
 ## Especificações prontas para implementar
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
-- [04 — Filtros, colunas e "DLCs em promoção"](specs/04-filtros-e-colunas-da-lista.md) — a 01 já está feita (v0.14.0)
+- [04 — Vitrine, aba Promoções e avisos por tipo de recorde](specs/04-vitrine-promocoes-e-avisos.md) — Etapa 1 (medir) primeiro
+- 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
+- 06 — Login Steam por QR, começando por teste (a escrever)
+- 07 — Promoções da Steam inteira, com base no teste da 04 (a escrever)
+- 08 — Layout em etapas: inventário, referência, base visual, uma aba por vez, celular (a escrever)
 
 ## Feitas
 - [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica (feito em v0.14.0)](specs/01-selo-kurokami-e-raridade.md)
