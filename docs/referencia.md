@@ -38,6 +38,10 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
 - `linha_do_tempo(linhas, agora_)` — Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
 - `episodios(segs, folga)` — Promocoes como episodios: [(ini, fim, maior_corte)]. Um intervalo sem desconto menor que `folga`
 - `analisar(linhas, preco, corte, agora_, cfg_alerta)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
+- `tipos_de(an)` — Tipos de preco da oferta (nao exclusivos): selo, novo (inclui "raro" sem Selo), igual, 24m.
+- `tipo_oferta(tipos)` — O tipo exclusivo (o mais importante) ou None.
+- `menor_anterior(linhas, ref)` — O registro que fez o menor preco anterior (piso_ref): (loja, preco, quando) do ultimo registro com esse preco
+- `regua_steam(linhas, preco, corte, linhas_steam, preco_s, corte_s, agora_, cfg_alerta)` — Regua so da Steam ("Steam (direto)" + Steam da ITAD) x lojas marcadas. Informativo, nunca avisa.
 - `_score_v2(corte, nivel, no_piso)` — 0-100 sem analises: corte x peso da raridade, +10 no piso.
 - `favorito(jogo, cfg_alerta)` — Esta entre os N primeiros da ordem que voce deu na lista de desejos?
 - `texto_outras(a)` — Outras lojas que tambem bateram o alerta com ate R$ 1 a mais:

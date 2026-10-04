@@ -1,6 +1,6 @@
 # Spec 04 — Vitrine, aba Promoções e avisos por tipo de recorde
 
-Status: **Etapas 1, 1b e 1c feitas em 04/10/2026 (resultados no fim); Etapa 2 aguarda o ok do dono** · Emenda e decisões de 04/10 incorporadas ao corpo (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
+Status: **Etapas 1, 1b e 1c feitas em 04/10/2026 (resultados no fim); Etapa 2 em andamento (0.15.0)** · Emenda e decisões de 04/10 incorporadas ao corpo (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
 
 **Duas etapas. Faça a Etapa 1, entregue o relatório e PARE. A Etapa 2 só começa depois do ok do dono, que pode mudar números desta spec com base na Etapa 1.**
 
@@ -258,6 +258,7 @@ A lateral fica à direita. Em `max-width:720px`, vira um botão "Filtros" que ab
 - o bloco "Por que <raridade>" vira "Costuma voltar: <texto>", com a linha da dica embaixo; o bloco do Selo continua acima dele, quando houver (emenda 2);
 - a frase "em cerca de 7 de 10 casos…" usa o número da Etapa 1b, na métrica em R$ (ver resultado da 1b);
 - a frase de referência do Selo passa a ser "o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade".
+- **linha informativa da régua da Steam** (decisão final, abaixo): quando o jogo é Novo recorde ou Selo só pela Steam e não pelas lojas marcadas, "Na Steam, é o menor preço já registrado. Nas suas lojas, <loja> já teve R$ X (mm/aaaa)." Sem aviso e sem filtro; vem de `analise.regua_steam` (campo `regua_steam` de `/api/jogo`).
 
 O resto da ficha é da spec 05.
 
@@ -395,6 +396,13 @@ Só a descrição e a quantidade de avisos. O "em X de 10" fica só em `docs/dec
 4. Distribuição da coluna "Costuma voltar" hoje entre os jogos em promoção (quantos em cada texto) e 3 exemplos de cada.
 5. Monte as 4 frases finais do item 7 com os números.
 6. Registre tudo na spec e **PARE**.
+
+## Decisão final (04/10, depois da Etapa 1c)
+- **A régua das lojas marcadas continua decidindo tudo** (avisos, vitrine, filtros). A régua só da Steam ("Steam (direto)" + Steam da ITAD) vira **uma linha informativa na ficha**, sem aviso e sem filtro.
+- **Quando aparece:** o jogo é Novo recorde ou Selo pela régua só da Steam e **não** é pela régua das lojas marcadas (ou é um tipo menor: Selo na Steam, Novo recorde nas marcadas).
+- **Texto:** "Na Steam, é o menor preço já registrado. Nas suas lojas, <loja> já teve R$ X (mm/aaaa)." <loja>, R$ X e a data vêm do registro das lojas marcadas que impediu (o último com o menor preço anterior).
+- **Código:** `analise.regua_steam()` (e `analise.menor_anterior()`); `tools/regua_steam.py` usa a mesma função.
+- **Números da Etapa 1c (lista de hoje):** 1 Selo da Steam (WRC 7: "Nas suas lojas, Nuuvem já teve R$ 4,74 (07/2025).") e 8 Novos recordes da Steam que não são do Radar (ex.: Street Fighter 6: "Nuuvem já teve R$ 68,99 (08/2026)"). Backtest só Steam: Selo 55 eventos e 78,2% não ficou mais barato, contra 47 e 74,5% do Radar.
 
 ## Resultado da Etapa 1 (04/10/2026, banco instalado: 726 jogos; lojas GreenManGaming, Nuuvem, Steam)
 

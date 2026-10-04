@@ -2,7 +2,8 @@
 
 Uso: py tools/regua_steam.py [--banco CAMINHO] [--config CAMINHO] [--itad] [--retratos A.json B.json]
   1   os 5 rare deals que a SteamDB mostrava em 04/10 (jogos fora da lista: historico da ITAD so em memoria, com --itad)
-  2/3 "Selo da Steam" (regra G so com a Steam) e "Novo recorde na Steam" na lista de hoje x o Radar
+  2/3 "Selo da Steam" (regra G so com a Steam) e "Novo recorde na Steam" na lista de hoje x o Radar; a linha da ficha
+      ("Na Steam, e o menor preco ja registrado...") vem de analise.regua_steam
   4   (--itad) storeLow do deals/v2 e games/storelow/v2 (menor por loja, com data), ate 5 chamadas
   5   (--retratos) quantos precos mudam entre dois retratos do IStoreQueryService e quanto isso ocupa no SQLite
 O backtest "so Steam" e `py tools/backtest_tipos.py --so-steam`. Resultado bruto em dados/sonda/regua_steam.json."""
@@ -227,6 +228,10 @@ def lista_hoje(b, cfg):
         m = ler(lin_m.get(a, []), melhor["preco"], melhor["corte"], agora)
         item = {"nome": nome, "steam": st["preco"], "marcadas": [melhor["loja"], melhor["preco"]], "radar_piso": m["piso_tipo"],
                 "radar_g": m["g"], "radar_selo_atual": m["selo_atual"], "impediu": None if m["g"] else txt_ref(m)}
+        # a linha informativa da ficha vem de radar/analise.py (a mesma funcao que o painel usa)
+        rs = analise.regua_steam(lin_m.get(a, []), melhor["preco"], melhor["corte"], lin_s.get(a, []), st["preco"],
+                                 st["corte"], agora_=agora, cfg_alerta=cfg["alerta"])
+        item["linha_ficha"] = rs and rs["texto"]
         if s["g"]:
             selo_s.append(item)
         if s["piso_tipo"] in ("novo", "raro"):
@@ -237,11 +242,15 @@ def lista_hoje(b, cfg):
         print("   - %s: Steam %s · marcadas %s %s · Radar %s%s" % (
             x["nome"], brl(x["steam"]), x["marcadas"][0], brl(x["marcadas"][1]), x["radar_piso"],
             "" if x["radar_g"] else " · impediu: " + x["impediu"]))
+        if x["linha_ficha"]:
+            print("     ficha: " + x["linha_ficha"])
     fora = [x for x in novo_s if not x["radar_novo"]]
     print("== 3. Novo recorde na Steam hoje: %d · não são Novo recorde do Radar: %d" % (len(novo_s), len(fora)))
     for x in fora:
         print("   - %s: Steam %s · marcadas %s %s · Radar %s · menor anterior nas marcadas: %s" % (
             x["nome"], brl(x["steam"]), x["marcadas"][0], brl(x["marcadas"][1]), x["radar_piso"], x["impediu"]))
+        if x["linha_ficha"]:
+            print("     ficha: " + x["linha_ficha"])
     return {"selo_steam": selo_s, "novo_steam": novo_s}
 
 

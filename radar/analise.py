@@ -246,6 +246,62 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     return out
 
 
+TIPOS = ["selo", "novo", "igual", "24m"]  # ordem de importancia (vitrine, avisos, "Mostrar so")
+NOME_TIPO = {"selo": "Selo Kurokami", "novo": "Novo recorde", "igual": "Igual ao recorde", "24m": "Menor em 2 anos"}
+
+
+def tipos_de(an):
+    """Tipos de preco da oferta (nao exclusivos): selo, novo (inclui "raro" sem Selo), igual, 24m."""
+    t = ["selo"] if an.get("selo") else []
+    pt = an.get("piso_tipo")
+    if pt in ("novo", "raro"):
+        t.append("novo")
+    elif pt in ("igual", "24m"):
+        t.append(pt)
+    return t
+
+
+def tipo_oferta(tipos):
+    """O tipo exclusivo (o mais importante) ou None."""
+    return next((t for t in TIPOS if t in (tipos or [])), None)
+
+
+def menor_anterior(linhas, ref):
+    """O registro que fez o menor preco anterior (piso_ref): (loja, preco, quando) do ultimo registro com esse preco
+    exato ate a ultima vez no nivel. None se nao achar."""
+    if not ref:
+        return None
+    lim = ref.get("quando") or "9999"
+    achados = [r for r in linhas if r["preco"] == ref["preco"] and r["quando"] <= lim]
+    if not achados:
+        return None
+    r = max(achados, key=lambda r: r["quando"])
+    return {"loja": r["loja"], "preco": r["preco"], "quando": r["quando"]}
+
+
+def regua_steam(linhas, preco, corte, linhas_steam, preco_s, corte_s, agora_=None, cfg_alerta=None):
+    """Regua so da Steam ("Steam (direto)" + Steam da ITAD) x lojas marcadas. Informativo, nunca avisa.
+    Devolve {"steam": tipo, "radar": tipo, "loja", "preco", "quando", "texto"} quando a Steam sozinha da Novo recorde
+    ou Selo e as lojas marcadas nao (ou dao um tipo menor); senao None. loja/preco/quando = o registro das lojas
+    marcadas que impediu. Ex.: WRC 7 em 04/10/2026, Steam R$ 2,39 = Selo so na Steam; a Nuuvem teve R$ 4,74 em 07/2025."""
+    if preco_s is None or not corte_s:
+        return None
+    an_s = analisar(linhas_steam, preco_s, corte_s, agora_=agora_, cfg_alerta=cfg_alerta)
+    t_s = "selo" if an_s["selo"] else "novo" if an_s["piso_tipo"] in ("novo", "raro") else None
+    if not t_s:
+        return None
+    an_m = analisar(linhas, preco, corte, agora_=agora_, cfg_alerta=cfg_alerta) if preco is not None else {}
+    t_m = "selo" if an_m.get("selo") else "novo" if an_m.get("piso_tipo") in ("novo", "raro") else None
+    if t_m == "selo" or t_m == t_s:
+        return None
+    imp = menor_anterior(linhas, an_m.get("piso_ref"))
+    if not imp:
+        return None
+    texto = "Na Steam, é o menor preço já registrado. Nas suas lojas, %s já teve %s (%s/%s)." % (
+        imp["loja"], _brl(imp["preco"]), imp["quando"][5:7], imp["quando"][:4])
+    return {"steam": t_s, "radar": t_m, "texto": texto, **imp}
+
+
 def _score_v2(corte, nivel, no_piso):
     """0-100 sem analises: corte x peso da raridade, +10 no piso."""
     return round(min(100, (corte or 0) * PESO_RARIDADE.get(nivel, 0.4) + (10 if no_piso else 0)), 1)
