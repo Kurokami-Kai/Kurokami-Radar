@@ -2,6 +2,9 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.14.1
+- Correção: no ícone da bandeja, "Abrir pasta dos dados" e "Ver log" não faziam nada. Agora abrem (o log é criado vazio se ainda não existir).
+
 ## 0.14.0 (publicada em 2026-10-04)
 - **Raridade nova:** mede quantas vezes por ano o jogo chega àquele desconto, não o preço em reais. Promoções que se repetem não saem mais como *Lendário* (ex.: Castle of Illusion a 80%, quando 75% acontece todo mês).
 - **Selo Kurokami:** um selo dourado quando o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo. A notificação diz qual: "maior desconto da história (-85%; antes, no máximo -80%)" ou "menor preço já registrado (dados desde mm/aaaa)". Sempre avisa, com "SELO KUROKAMI" no título. Dá para exigir um desconto mínimo em Configurações.

@@ -105,8 +105,9 @@ Icone na bandeja do Windows. Roda o servico em segundo plano.
 
 - `desenhar_icone(cor_ponto)`
 - `abrir(caminho)`
+- `abrir_log()` — Abre o log; se ainda nao existe (nada foi registrado), cria vazio antes.
 - `_comando_atual()`
-- `main(esperar, abrir)`
+- `main(esperar, abrir_painel)`
 
 ## `radar/caminhos.py`
 Pastas do app.

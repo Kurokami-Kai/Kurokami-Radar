@@ -21,4 +21,7 @@ Em ordem aproximada de valor. Nada aqui foi iniciado.
 - **Versão multiusuário na nuvem** (discutida, não decidida): Oracle Always Free + login Steam OpenID + Telegram; exigiria pedir permissão de uso às APIs.
 - **Guia em PDF** para usuários: ainda não cobre a ponte, a raridade v2 nem o Selo.
 - **Faixa do evento da Steam com data de fim** (falta fonte).
+- **Carrinho:** repensar a aba e avaliar alternativas à ponte do Tampermonkey. Só anotação, nada decidido.
+- **Keyshops depois de bundles:** quando um jogo entra num bundle (ex.: Humble Choice, que muda na 1ª terça do mês), as keyshops costumam baixar alguns dias depois, quando os revendedores reabastecem. A GG.deals tem API de bundles com histórico; avaliar o aviso "entrou no Humble Choice; keyshops costumam cair nos dias seguintes".
+- **Promoções fora da lista de desejos** (a SteamDB mostra a Steam inteira): exigiria outra fonte de dados e mudaria o tamanho da coleta. Só ideia.
 - Decidir se Raro/Ultrarraro sem Selo continuam alertando (backtest: 53,5% não batido, igual a promoção no piso) — junto com a spec 05.

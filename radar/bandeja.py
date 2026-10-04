@@ -30,6 +30,14 @@ def abrir(caminho):
         subprocess.Popen(["xdg-open", caminho])
 
 
+def abrir_log():
+    """Abre o log; se ainda nao existe (nada foi registrado), cria vazio antes."""
+    if not os.path.isfile(caminhos.ARQ_LOG):
+        caminhos.garantir()
+        open(caminhos.ARQ_LOG, "a", encoding="utf-8").close()
+    abrir(caminhos.ARQ_LOG)
+
+
 def _comando_atual():
     if getattr(sys, "frozen", False):
         return [sys.executable, "bandeja", "--esperar"]
@@ -37,7 +45,7 @@ def _comando_atual():
     return [pyw if os.path.isfile(pyw) else sys.executable, os.path.join(caminhos.BASE, "radar.py"), "bandeja", "--esperar"]
 
 
-def main(esperar=False, abrir=False):
+def main(esperar=False, abrir_painel=False):
     import time
     trava = socket.socket()
     fim = time.time() + (20 if esperar else 0)
@@ -113,9 +121,9 @@ def main(esperar=False, abrir=False):
         painel.iniciar()
     except OSError as e:
         log("Painel nao iniciou (porta %d ocupada?): %s" % (painel.PORTA, e))
-    abrir_painel = lambda *_: __import__("webbrowser").open(painel.url())
-    if abrir:
-        abrir_painel()
+    ir_ao_painel = lambda *_: __import__("webbrowser").open(painel.url())
+    if abrir_painel:
+        ir_ao_painel()
 
     def sair(_i, _item):
         serv.parar = True
@@ -135,14 +143,14 @@ def main(esperar=False, abrir=False):
         sair(_i, _item)
 
     menu = pystray.Menu(
-        pystray.MenuItem("Abrir painel", abrir_painel, default=True),
+        pystray.MenuItem("Abrir painel", ir_ao_painel, default=True),
         pystray.MenuItem("Verificar agora", lambda *_: serv.agora()),
         pystray.MenuItem("Pausar notificações", alternar_pausa, checked=lambda _i: pausado()),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Chaves e perfil…", lambda *_: subprocess.Popen([sys.executable] + (
             [] if getattr(sys, "frozen", False) else [os.path.join(caminhos.BASE, "radar.py")]) + ["chaves"])),
         pystray.MenuItem("Abrir pasta dos dados", lambda *_: abrir(caminhos.RAIZ_DADOS)),
-        pystray.MenuItem("Ver log", lambda *_: abrir(caminhos.ARQ_LOG)),
+        pystray.MenuItem("Ver log", lambda *_: abrir_log()),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Procurar atualização…", lambda *_: __import__("radar.atualizador", fromlist=["x"]).abrir_janela_separada()),
         pystray.MenuItem("Reiniciar", reiniciar),

@@ -436,7 +436,7 @@ def main():
             time.sleep(3600)
     if args.cmd == "bandeja":
         from radar import bandeja
-        bandeja.main(esperar=getattr(args, "esperar", False), abrir=getattr(args, "abrir", False))
+        bandeja.main(esperar=getattr(args, "esperar", False), abrir_painel=getattr(args, "abrir", False))
         return
     if args.cmd in ("lojas", "sondar", "atualizar", "verificar", "ciclo") and not pedir_chaves_se_faltar():
         return
