@@ -36,7 +36,7 @@ ANO = 365 * DIA
 VARIANTES = ["A", "B", "C", "D", "E", "F", "G", "H", "FouG", "Selo", "alerta_sem_selo", "todas", "no_piso"]
 NOMES = {"A": "A Selo antigo (regra C)", "B": "B >= 24 meses", "C": "C B + escada parada", "D": "D B + 1 por jogo/12m",
          "E": "E B + C + D", "F": "F so Lendario",
-         "G": "G Recorde raro (SteamDB)", "H": "H novo recorde em R$", "FouG": "F ou G",
+         "G": "G Recorde raro (SteamDB)", "H": "H novo recorde em R$", "FouG": "F ou G (G sem promo ant.)",
          "Selo": "Selo atual (F ou G)", "alerta_sem_selo": "alertas sem Selo (Raro+)", "todas": "base: toda promocao", "no_piso": "base: toda promocao no piso"}
 
 

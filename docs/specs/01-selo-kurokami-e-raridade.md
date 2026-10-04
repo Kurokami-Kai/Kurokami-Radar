@@ -100,10 +100,14 @@ Regra C (aprovada pelo dono):
 
 Também nesta rodada: "Termina em breve" passou a respeitar `notificacoes.max_por_rodada` com resumo, e `py radar.py testar-notificacao --selo` mostra o toast de Selo.
 ## Emenda (04/10) — Selo = F ou G
-Promessa, em linguagem simples, em todo lugar onde o Selo é explicado: **o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo**. Sem "raro", sem "graal", sem prometer que não vai se repetir.
-- **F** = Lendário (regra C). **G** = pílula Recorde raro. Em ambos, corte ≥ `alerta.selo_corte_minimo`. Raro e Ultrarraro sozinhos não ganham Selo (continuam alertando pela `raridade_minima`).
-- Motivo diz qual bateu (toast, ficha e relatório): "Selo Kurokami: maior desconto da história (-85%; antes, no máximo -80%)" ou "Selo Kurokami: menor preço desde mm/aaaa" (mês/ano do início do histórico). Na API: `selo_motivo`.
+Regra exata:
+- **F** = Lendário (regra C): nenhum episódio anterior com corte ≥ corte atual − 5 pontos no histórico inteiro das lojas marcadas, com **≥ 24 meses** de histórico e **≥ 1 promoção anterior**.
+- **G** = pílula Recorde raro + ≥ 1 promoção anterior nas lojas marcadas: preço atual abaixo do menor preço registrado antes do episódio atual (diferença > R$ 0,10 e > 1%) **e** (o preço esteve no nível desse recorde anterior pela última vez há **≥ 18 meses** **ou** preço atual **≤ 50%** do recorde anterior).
+- Em ambos, corte ≥ `alerta.selo_corte_minimo` (padrão 0). Raro e Ultrarraro sozinhos não ganham Selo (continuam alertando pela `raridade_minima`).
+- Motivo diz qual bateu (toast, ficha e relatório): "Selo Kurokami: maior desconto da história (-85%; antes, no máximo -80%)" ou "Selo Kurokami: menor preço já registrado (dados desde mm/aaaa)" (mês/ano do primeiro registro nas lojas marcadas). Na API: `selo_motivo`.
+
+*Frase para os textos do usuário (referência, não substitui a regra):* "o jogo está na melhor oferta da história dele: o maior desconto ou o menor preço em muito tempo". Nos textos do usuário: sem "raro", sem "graal", sem prometer que não vai se repetir.
 - Ficha, quando houver Selo: "Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes."
-- Por quê: backtest A–H em `docs/decisoes.md` (meta fixada antes: ≥ 70% não batido em 12 meses e ≤ 3 Selos por semana normal; "F ou G" deu 70,1% e 1/semana).
+- Por quê: backtest A–H em `docs/decisoes.md` (meta fixada antes: ≥ 70% não batido em 12 meses e ≤ 3 Selos por semana normal; "F ou G" deu 70,1% e 1/semana; com ≥ 1 promoção anterior também na G, 71,3%, 143 Selos, 1/semana).
 - Banco de 04/10: **11 Selos** (todos F) e **38 alertas** (11 Selos, 20 Ultrarraros, 7 Raros).
-- Pendente: 1ª promoção ≤ 50% do preço cheio conta como Recorde raro (ver `decisoes.md`).
+- G exige ≥ 1 promoção anterior (decidido em 04/10): a 1ª promoção ≤ 50% do preço cheio mostra a pílula Recorde raro, mas não ganha Selo.

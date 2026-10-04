@@ -48,12 +48,13 @@ CASOS = [
     ("nunca chegou, 30 meses, promos anteriores", mensal50(30), 3000, 70, "nivel", "lendario", 30),
     ("nunca chegou, 18 meses -> Ultrarraro", mensal50(18), 3000, 70, "nivel", "ultrarraro", 18),
     ("nunca chegou, sem promo anterior -> Incomum", [], 3000, 70, "nivel", "incomum", 30),
-    # 1a promocao <= 50% do preco cheio: Recorde raro pela regra G como foi escrita (decisao pendente, ver decisoes.md)
-    ("1a promo a -70%: Recorde raro (G)", [], 3000, 70, "selo_motivo", "menor preço desde " + mes_ano(30), 30),
+    # 1a promocao <= 50% do preco cheio: a pilula diz Recorde raro, mas sem promocao anterior nao ha Selo (como o ARK)
+    ("1a promo a -70%: pilula Recorde raro", [], 3000, 70, "piso_tipo", "raro", 30),
+    ("1a promo a -70%: sem Selo", [], 3000, 70, "selo", False, 30),
     ("mesmo nivel todo mes -> Comum", mensal50(30), 5000, 50, "nivel", "comum", 30),
     # Selo Kurokami = F (Lendario) ou G (Recorde raro); Raro e Ultrarraro sozinhos nao
     ("Selo F: Lendario", mensal50(30), 3000, 70, "selo_motivo", "maior desconto da história (-70%; antes, no máximo -50%)", 30),
-    ("Selo G: Recorde raro (19 meses)", promo(19, 5000, 50), 4500, 55, "selo_motivo", "menor preço desde " + mes_ano(40), 40),
+    ("Selo G: Recorde raro (19 meses)", promo(19, 5000, 50), 4500, 55, "selo_motivo", "menor preço já registrado (dados desde %s)" % mes_ano(40), 40),
     ("Selo G: Recorde raro (50%)", promo(2, 5000, 50), 2500, 75, "selo", True, 40),
     ("novo recorde comum nao ganha Selo", promo(17, 5000, 50), 4500, 55, "selo", False, 40),
     ("Ultrarraro (18 meses, sem recorde em R$) nao ganha Selo", mensal50(18) + promo(1, 2900, 71), 3000, 70, "selo", False, 18),

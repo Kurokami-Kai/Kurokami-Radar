@@ -237,8 +237,10 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     if corte >= minimo_selo:
         if nivel == "lendario":
             out["selo_motivo"] = "maior desconto da história (-%d%%; antes, no máximo -%d%%)" % (corte, antes_max)
-        elif out["piso_tipo"] == "raro":
-            out["selo_motivo"] = "menor preço desde %s" % desde
+        elif out["piso_tipo"] == "raro" and anteriores:
+            # como no Lendario: sem promocao anterior nas lojas marcadas o "recorde anterior" e o preco cheio
+            # (quase sempre buraco nos dados, ex.: ARK); a pilula continua, o Selo nao
+            out["selo_motivo"] = "menor preço já registrado (dados desde %s)" % desde
     out["selo"] = out["selo_motivo"] is not None
     out["score"] = _score_v2(corte, nivel, out["no_piso"])
     return out

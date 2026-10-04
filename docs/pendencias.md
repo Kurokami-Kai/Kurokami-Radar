@@ -21,3 +21,4 @@ Em ordem aproximada de valor. Nada aqui foi iniciado.
 - **Versão multiusuário na nuvem** (discutida, não decidida): Oracle Always Free + login Steam OpenID + Telegram; exigiria pedir permissão de uso às APIs.
 - **Guia em PDF** para usuários: ainda não cobre a ponte, a raridade v2 nem o Selo.
 - **Faixa do evento da Steam com data de fim** (falta fonte).
+- Decidir se Raro/Ultrarraro sem Selo continuam alertando (backtest: 53,5% não batido, igual a promoção no piso) — junto com a spec 05.
