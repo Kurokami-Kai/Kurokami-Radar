@@ -69,7 +69,10 @@ CASOS = [
     ("recorde raro com promocao anterior -> Selo", promo(20, 5000, 50), 4500, 55, "selo", True, 40),
     ("Selo G (19 meses): motivo", promo(19, 5000, 50), 4500, 55, "selo_motivo", "o menor preço anterior (R$ 50,00) foi há 18 meses", 40),
     ("Selo G (50%): motivo", promo(2, 5000, 50), 2500, 75, "selo_motivo",
-     "preço caiu pela metade ou mais (o menor anterior era R$ 50,00, %s)" % mes_ano(2 - 10 / MES), 40),
+     "preço caiu pela metade ou mais (o menor anterior era R$ 50,00, %s)" % mes_ano(2), 40),
+    # a data do texto e a do preco do recorde, nao a da ultima vez no nivel (WRC 7: R$ 4,74 em 07/2025, R$ 4,79 em 10/2026)
+    ("metade: data do recorde, nao do nivel", promo(15, 474, 90) + promo(1, 479, 90), 239, 95, "selo_motivo",
+     "preço caiu pela metade ou mais (o menor anterior era R$ 4,74, %s)" % mes_ano(15), 40),
     ("Selo + novo recorde: tipos", promo(20, 5000, 50), 4500, 55, "tipos", ["selo", "novo"], 40),
     ("recorde raro sem promo anterior conta como novo", [], 3000, 70, "tipos", ["novo"], 30),
     # "Costuma voltar" (so informa)

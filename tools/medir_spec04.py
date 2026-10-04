@@ -2,7 +2,7 @@
 
 Uso: py tools/medir_spec04.py [--banco CAMINHO] [--config CAMINHO]
 1b filtros padrao de Promocoes e coluna "Costuma voltar"
-1.2 vitrine (regra exclusiva selo > novo > igual > 24m) e avisos de uma rodada: regra atual x "so o Selo ligado"
+1.2 vitrine (regra exclusiva selo > novo > igual > 24m) e avisos de uma rodada pela regra do config
 1.3 userdata.json (so numeros)   1.4 DLCs em promocao   1.5 tempo/tamanho de painel.api_lista({})
 Resultado bruto em dados/sonda/medir_spec04.json (fora do Git)."""
 import argparse
@@ -64,6 +64,7 @@ def medir(raiz_real):
     # ---- 1.5 desempenho de /api/lista
     tempos = []
     for _ in range(3):
+        painel.invalidar_linhas()  # desde a 0.15 o /api/lista vem de um cache: mede a montagem
         t = time.perf_counter(); lista = painel.api_lista({}); tempos.append(time.perf_counter() - t)
     kb = len(json.dumps(lista, ensure_ascii=False).encode("utf-8")) / 1024
     res["1.5"] = {"mediana_s": round(statistics.median(tempos), 3), "tempos_s": [round(x, 3) for x in tempos],
@@ -88,45 +89,15 @@ def medir(raiz_real):
     res["1.2_vitrine"] = blocos
     print("1.2 vitrine sem desconto_minimo: %s | com desconto_minimo %d%%: %s" % (blocos["sem"], dmin, blocos["com"]))
 
-    # ---- 1.2 avisos de uma rodada: regra atual x so o Selo ligado (favoritos avisam em qualquer tipo)
+    # ---- 1.2 avisos de uma rodada pela regra do config (desde a 0.15: tipos ligados; a comparacao com a regra da
+    # 0.14 foi feita em 04/10 e esta na spec 04)
     of = {a: [dict(o, drm_steam=True) for o in l] for a, l in b.ofertas_atuais().items()}
     gg = {r["appid"]: dict(r) for r in b.q("SELECT * FROM gg")}
     marc = set(cfg["lojas"])
     atual = analise.avaliar(ctx, of, gg, marc)
-    orig_an, orig_fav, orig_rok = analise.analisar, analise.favorito, analise.raridade_ok
-    estado = {"fav": False}
-
-    def fav_(j, al):
-        estado["fav"] = orig_fav(j, al)
-        return estado["fav"]
-
-    def an_(*a, **k):
-        an = orig_an(*a, **k)
-        t = tipos_de(an)
-        if "selo" in t or (estado["fav"] and t):
-            an = dict(an, selo=True, selo_motivo=an["selo_motivo"] or "tipo " + t[0])
-        else:
-            an = dict(an, selo=False)
-        return an
-    analise.analisar, analise.favorito, analise.raridade_ok = an_, fav_, lambda *a: False
-    try:
-        so_selo = analise.avaliar(ctx, of, gg, marc)
-    finally:
-        analise.analisar, analise.favorito, analise.raridade_ok = orig_an, orig_fav, orig_rok
-    A, S = {a["appid"]: a for a in atual}, {a["appid"]: a for a in so_selo}
-    saem = [(A[x]["nome"], A[x].get("raridade"), A[x].get("selo"), A[x].get("favorito"), A[x]["corte"]) for x in A if x not in S]
-    entram = [(S[x]["nome"], S[x].get("raridade"), S[x].get("favorito"), S[x]["corte"]) for x in S if x not in A]
-    por_tag = lambda L: {k: sum(1 for a in L if (a.get("tag") if a.get("tag") in ("keyshop", "completo") else "oficial") == k)
-                         for k in ("oficial", "keyshop", "completo")}
-    res["1.2_avisos"] = {"atual": len(atual), "atual_por": por_tag(atual), "so_selo": len(so_selo),
-                         "so_selo_por": por_tag(so_selo), "deixam": saem, "passam": entram}
-    print("1.2 avisos: regra atual %d %s · só Selo %d %s" % (len(atual), por_tag(atual), len(so_selo), por_tag(so_selo)))
-    print("    deixam de avisar (%d):" % len(saem))
-    for n, r, s, f, c in sorted(saem, key=lambda x: x[0].lower()):
-        print("      - %s (%s%s, -%d%%)" % (n, r, ", favorito" if f else "", c))
-    print("    passam a avisar (%d):" % len(entram))
-    for n, r, f, c in entram:
-        print("      - %s (%s%s, -%d%%)" % (n, r, ", favorito" if f else "", c))
+    res["1.2_avisos"] = {"avisos": len(atual), "jogos": [[x["nome"], x.get("tipo_oferta") or x.get("tag"), x["corte"]] for x in atual]}
+    print("1.2 avisos (tipos ligados: %s): %d %s" % (", ".join(analise.tipos_ligados(cfg["alerta"])), len(atual),
+                                                    [x["nome"] for x in atual][:10]))
 
     # ---- 1.3 userdata.json (so numeros)
     caminhos.RAIZ_DADOS = raiz_real

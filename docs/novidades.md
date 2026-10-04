@@ -12,6 +12,8 @@ Texto para a descrição do release (aparece na janela de atualização). A seç
 - **"Lista de desejos" virou "Promoções"**, um explorador como o da SteamDB: filtros que se combinam (relação com o jogo com ✓/✕, Mostrar só, Tipo, Outros, preço, análises, nota, desconto, lançamento), chips com × para tirar cada filtro, tabela com ordenação por coluna (Shift+clique soma critérios), 50/100/250 por página e grade. Abre com "Desconto ≥ 50%" e "Análises ≥ 5.000"; "Restaurar padrão" volta a eles.
 - A ficha mostra **"Termina em"** sempre que há data, o "Costuma voltar" e, quando só a Steam tem o recorde, uma linha como "Na Steam, é o menor preço já registrado. Nas suas lojas, Nuuvem já teve R$ 4,74 (07/2025)."
 - Biblioteca → **"DLCs em promoção"**: as DLCs que faltam nos seus jogos e estão com desconto agora.
+- O motivo do aviso cita a data do preço de verdade: "o menor anterior era R$ 4,74, 07/2025" (antes podia sair a data de um preço de centavos diferente, que só conta como o mesmo nível).
+- `py radar.py testar-notificacao --tipo novo|igual|24m` mostra um aviso de cada tipo com um jogo real do seu banco (além do `--selo`).
 - Correção: no ícone da bandeja, "Abrir pasta dos dados" e "Ver log" não faziam nada. Agora abrem (o log é criado vazio se ainda não existir).
 
 ## 0.14.0 (publicada em 2026-10-04)

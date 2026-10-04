@@ -111,8 +111,6 @@ button{font-family:inherit}
 .hero-info h3{margin:0;color:#fff;font-size:23px;font-weight:400;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero-why{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12px;color:var(--muted)}
 .hero-why b{color:var(--text);font-weight:400}
-.meter{height:6px;background:#0b141e;border-radius:1px;overflow:hidden;align-self:center}
-.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--blue-dk),var(--blue))}
 .hero-next{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:auto}
 .hero-next button{padding:0;border:0;background:none;cursor:pointer;opacity:.6;box-shadow:0 0 4px #000}
 .hero-next button:hover,.hero-next button:focus-visible{opacity:1}
@@ -163,7 +161,6 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .srow:hover .tt div{color:#fff}
 .srow .tt .flags{margin-top:4px}
 .srow .rel{color:var(--muted);font-size:11px;text-align:right}
-.thumb{width:18px;height:18px;display:block}
 .srow .pb{justify-self:end}
 
 /* compact table */
@@ -179,8 +176,6 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 /* grid view */
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px}
 
-.more{display:block;width:100%;margin-top:10px;background:rgba(103,193,245,.12);color:var(--blue);border:0;padding:11px;cursor:pointer;font-size:13px;border-radius:2px}
-.more:hover{background:var(--blue);color:#fff}
 .empty{padding:40px 16px;text-align:center;color:var(--muted);background:rgba(0,0,0,.2)}
 
 /* sidebar filter blocks (search page) */
@@ -198,8 +193,6 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .tick input:checked::after{content:"";width:8px;height:4px;border:2px solid #0b2235;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .tick .c{margin-left:auto;color:var(--dim);font-size:11px}
 .tick.off{opacity:.4;pointer-events:none}
-.range{width:100%;accent-color:var(--blue)}
-.rangev{color:#fff;font-size:12px;margin-bottom:6px}
 
 /* ---------- hover card (Steam game_hover) ---------- */
 #hv{position:fixed;z-index:50;width:310px;pointer-events:none;opacity:0;transform:translateY(3px);transition:opacity .12s,transform .12s;
@@ -317,7 +310,7 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
   .hero-stage .hero-art .art{min-height:0;aspect-ratio:460/215;height:auto}
   .srow{grid-template-columns:96px minmax(0,1fr) auto;gap:8px}
   .srow .art{width:96px}
-  .srow .rel,.srow .thumb{display:none}
+  .srow .rel{display:none}
   .shelfwin{grid-template-columns:1fr;height:auto}
   .llist{max-height:44vh}
   .lstats{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -326,10 +319,6 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ---------- painel: extras ---------- */
-.rr{font-size:10.5px;padding:2px 7px;border-radius:2px;white-space:nowrap;font-weight:700;letter-spacing:.02em}
-.rr-comum{background:#3d4450;color:#c7d5e0}.rr-incomum{background:#4c6b22;color:#d9f99d}.rr-raro{background:#1f5fa8;color:#fff}
-.rr-ultrarraro{background:linear-gradient(90deg,#6a3fc0,#9b59ff);color:#fff;box-shadow:0 0 6px #9b59ff88}
-.rr-lendario{background:linear-gradient(90deg,#c9711a,#f5b83d,#c9711a);color:#1b1205;box-shadow:0 0 8px #f5b83daa;text-transform:uppercase}
 .selo{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;padding:1px 7px 1px 3px;border-radius:2px;white-space:nowrap;font-weight:700;
   letter-spacing:.06em;background:linear-gradient(180deg,#2a2210,#14110a);color:#f5c75b;border:1px solid #c9a03f;box-shadow:0 0 6px #f5b83d55}
 .selo svg{width:13px;height:13px}
@@ -340,10 +329,6 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .ppwrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .porque{background:rgba(0,0,0,.25);padding:8px 10px;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
 .porque b{color:var(--text);font-weight:400}
-.tg{font-size:10.5px;padding:2px 6px;border-radius:2px;white-space:nowrap;font-weight:700}
-.tg-sempre{background:#d6492f;color:#fff}.tg-1a{background:#e2a635;color:#1b2838}.tg-9m{background:#c9b458;color:#1b2838}
-.tg-6m{background:#7fa650;color:#10200a}.tg-3m{background:#4f7f8f;color:#e9f6fb}.tg-perto{background:#3e76cb;color:#fff}
-.tg-completo{background:#6b56b8;color:#fff}.tg-keyshop{background:#8a6d2b;color:#fff}
 .pisos{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:10px}
 .pisos div{background:rgba(0,0,0,.25);padding:6px 8px;font-size:11.5px;color:var(--muted)}
 .pisos b{display:block;color:#fff;font-weight:400;font-size:14px}
@@ -665,17 +650,13 @@ function priceBlock(o,lg){
   return `<span class="pb full${lg?' lg':''}"><span class="prs tnum"><span class="f">${brl(o.preco)}</span></span></span>`;
 }
 const ksBarata=o=>o.keyshop!=null&&o.preco!=null&&o.keyshop<o.preco*0.6;
-const ORDEM={sempre:5,'1a':4,'9m':3,'6m':2,'3m':1,perto:0};
-const TAGTXT={sempre:'Menor de sempre','1a':'Menor em 1 ano','9m':'Menor em 9 meses','6m':'Menor em 6 meses','3m':'Menor em 3 meses',perto:'Perto do menor',completo:'Completo no menor',keyshop:'Keyshop barata'};
 const SELO_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#14110a" stroke="#f5c75b" stroke-width="5"/><path d="M22 38a11 11 0 0 1 20 0" stroke="#f5c75b" stroke-width="4" fill="none"/><path d="M32 32 50 16" stroke="#f5c75b" stroke-width="5"/><circle cx="32" cy="32" r="7" fill="#f5c75b"/></svg>';
 function seloBadge(o){return o.selo?`<span class="selo" title="${esc('Selo Kurokami: '+(o.selo_motivo||'o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade'))}">${SELO_SVG}SELO KUROKAMI</span>`:'';}
-const PPTXT={novo:'Novo recorde',raro:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
 function mesAno(iso){if(!iso)return '';const d=new Date(iso);return String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
-function pisoRefTxt(r){return r?`${brl(r.preco)}${r.corte?' a -'+r.corte+'%':''} (${mesAno(r.quando)})`:'';}
+function pisoRefTxt(r){return r?`${brl(r.preco)}${r.corte?' a -'+r.corte+'%':''} (${mesAno(r.quando_preco||r.quando)})`:'';}
 function pisoPill(o){const p=recPill(o);if(p)return p;const r=o.piso_ref;
   return o.corte>0&&r&&o.tipo_oferta!=='selo'?`<span class="pp pp-ref">menor: ${esc(pisoRefTxt(r))}</span>`:'';}
 function precoComPiso(o){const p=pisoPill(o);return p?`<span class="ppwrap">${priceBlock(o)}${p}</span>`:priceBlock(o);}
-function tagPill(o){if(!o.tag)return '';const extra=o.tag==='perto'&&o.acima!=null?` +${brl(o.acima)}`:'';return `<span class="tg tg-${o.tag}" title="${esc(o.tag_texto||'')}">${TAGTXT[o.tag]||o.tag}${extra}</span>`;}
 function fimTxt(t){if(!t)return '';const h=(t*1000-Date.now())/36e5;if(h<=0||h>72)return '';return h<1?'termina em minutos':h<24?`termina em ${Math.round(h)}h`:`termina em ${Math.round(h/24)}d`;}
 function flags(o){
   const f=[];
@@ -691,8 +672,6 @@ function flags(o){
   if(ksBarata(o))f.push(`<span class="flag ks">Keyshop ${brl(o.keyshop)}</span>`);
   return f.join('');
 }
-function thumb(o){const rc=revClass(o.rpos,o.rcount);const c={'rv-pos':'#66c0f4','rv-mix':'#b9a074','rv-neg':'#a34c25','rv-non':'#3d4b58'}[rc];
-  return `<svg class="thumb" viewBox="0 0 18 18"><rect width="18" height="18" rx="2" fill="${c}" opacity=".9"/><path d="M5 8h2v6H5zM8 14V8l2.5-4c.9 0 1.4.6 1.2 1.6L11.3 7.5H14c.7 0 1.1.6 1 1.2l-.9 4.4c-.1.5-.6.9-1.1.9z" fill="#0e1c25"/></svg>`;}
 function revText(o){return o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo||o.rpos+'%')}</span> <span style="color:var(--dim)">(${fmtK(o.rcount)})</span>`:'<span class="rv-non">Sem análises</span>';}
 function cartBtnB(id){const on=CARR.some(c=>c.bundle===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cartb="${id}" title="${on?'Tirar o bundle do carrinho':'Pôr o bundle no carrinho'}">${on?'✓':'+'}</span>`;}
 function cartBtn(id){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}" title="${on?'Tirar do carrinho':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}

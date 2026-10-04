@@ -11,7 +11,6 @@ LOJA_GG_KEYSHOP = "GG.deals keyshop"
 
 JANELAS = [(0, "sempre", "menor preço de todos os tempos"), (365, "1a", "menor preço em 1 ano"),
            (270, "9m", "menor preço em 9 meses"), (180, "6m", "menor preço em 6 meses"), (90, "3m", "menor preço em 3 meses")]
-ORDEM_TAG = {"sempre": 5, "1a": 4, "9m": 3, "6m": 2, "3m": 1, "perto": 0}
 
 
 def etiqueta(preco, cheio, pisos, cfg_alerta, flag=None):
@@ -41,7 +40,6 @@ def etiqueta(preco, cheio, pisos, cfg_alerta, flag=None):
 
 
 RARIDADES = ["comum", "incomum", "raro", "ultrarraro", "lendario"]
-NOME_RARIDADE = {"comum": "Comum", "incomum": "Incomum", "raro": "Raro", "ultrarraro": "Ultrarraro", "lendario": "Lendário"}
 
 
 DIA = 86400.0
@@ -189,7 +187,9 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
             rec = min(antes, key=lambda s: (s[2], -s[0]))
             recorde = rec[2]
             ultima_rec = max(s[1] for s in antes if _igual(s[2], recorde))
-            out["piso_ref"] = {"preco": recorde, "corte": rec[3], "quando": _iso(ultima_rec)}
+            # quando = ultima vez no NIVEL do recorde (com a folga de centavos; decide os 18 meses);
+            # quando_preco = quando o preco do recorde em si apareceu (o que os textos "era R$ X em mm/aaaa" citam)
+            out["piso_ref"] = {"preco": recorde, "corte": rec[3], "quando": _iso(ultima_rec), "quando_preco": _iso(rec[0])}
             jan = [s for s in antes if s[1] >= agora_ - JANELA_RARIDADE * DIA]
             menor24 = min((s[2] for s in jan), default=None)
             if preco < recorde - max(10, recorde * 0.01):
@@ -246,7 +246,7 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     minimo_selo = ((cfg_alerta or {}).get("selo_corte_minimo") or 0)
     ref = out["piso_ref"]
     if corte >= minimo_selo and out["piso_tipo"] == "raro" and anteriores and ref:
-        quando = time.strftime("%m/%Y", time.gmtime(_ts(ref["quando"])))
+        quando = time.strftime("%m/%Y", time.gmtime(_ts(ref["quando_preco"])))
         if _metade(preco, ref["preco"]):
             out["selo_motivo"] = "preço caiu pela metade ou mais (o menor anterior era %s, %s)" % (_brl(ref["preco"]), quando)
         else:
@@ -332,7 +332,8 @@ def motivo_tipo(an, tipo):
     """O motivo do aviso pelo tipo (A.7 da spec 04). piso_ref e o menor antes do episodio atual (de sempre,
     inclusive no 24m: o menor dos 24 meses so decide o tipo)."""
     ref = an.get("piso_ref") or {}
-    quando = ("%s/%s" % (ref["quando"][5:7], ref["quando"][:4])) if ref.get("quando") else "?"
+    q = ref.get("quando_preco") or ref.get("quando")
+    quando = ("%s/%s" % (q[5:7], q[:4])) if q else "?"
     if tipo == "selo":
         return "Selo Kurokami: " + (an.get("selo_motivo") or "")
     if tipo == "novo":
@@ -403,23 +404,8 @@ def texto_outras(a):
     return " · ".join(partes)
 
 
-def raridade_ok(nivel, minimo):
-    return nivel in RARIDADES and RARIDADES.index(nivel) >= RARIDADES.index(minimo if minimo in RARIDADES else "raro")
-
-
 def _brl(c):
     return "R$ %s" % ("%.2f" % ((c or 0) / 100)).replace(".", ",")
-
-
-def tag_minima_ok(tag, cfg_alerta):
-    """A etiqueta atinge o minimo que o usuario pediu para 'valer a pena'?"""
-    if tag is None:
-        return False
-    if tag == "perto":
-        return (cfg_alerta.get("perto") or {}).get("ativo", True)
-    jan = cfg_alerta.get("janela_dias") or 0
-    minimo = {0: "sempre", 365: "1a", 270: "9m", 180: "6m", 90: "3m"}.get(jan, "3m")
-    return ORDEM_TAG[tag] >= ORDEM_TAG[minimo]
 
 
 class Contexto:
