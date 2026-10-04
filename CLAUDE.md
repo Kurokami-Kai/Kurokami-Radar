@@ -22,7 +22,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Comece tarefas de código pela skill **`kurokami-code`** (ela diz qual outra skill abrir; não carrega todas).
 - `py tools/mapa.py <arquivo> [termo]` → seções/funções com linhas; leia só o intervalo. Nunca abra `radar/painel.html` inteiro.
 - `py tools/checar.py` → checagens finais (sintaxe, JS, versão, `--add-data`, `tools/testar_piso.py`, dados pessoais e `.gitignore`: falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`). Precisa dar `ok`.
-- `tools\exportar_docs.bat` (ou `py tools/exportar_docs.py`) → copia os docs para `Área de Trabalho\kurokami-docs`, separa o que mudou desde a última exportação e só registra depois que o usuário confirma o envio ao Projeto do claude.ai (ver `docs/processo.md`). Arquivo novo em `docs/` entra sozinho; `referencia.md` fica de fora. `--listar` só mostra o que mudou desde a última exportação confirmada (não copia nem registra).
+- `tools\exportar_docs.py` → **reserva, fora do fluxo**: o Projeto do claude.ai lê os docs direto do GitHub. Só use se o dono pedir.
 - Skills em `.claude/skills/`: `kurokami-code`, `economia-de-contexto`, `editar-painel`, `coleta-e-apis`, `banco-e-migracao`, `depurar`, `testar-sem-rede`, `revisar-mudanca`, `publicar-versao`.
 
 ## Regras do projeto
@@ -35,4 +35,4 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Visual do painel segue a loja da Steam (ver `docs/decisoes.md`, "Produto").
 - Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança.
 - Ao terminar cada tarefa, depois de `py tools/checar.py` dar `ok`: faça o commit e o push **sem perguntar**. Só pergunte antes de comandos que reescrevem histórico (`reset`, `rebase`, `push --force`) ou que apagam arquivos fora do projeto.
-- No resumo final de cada tarefa, rode `py tools/exportar_docs.py --listar`; se houver algo novo, alterado ou apagado, termine com "Docs para atualizar no Projeto: …" (os nomes listados).
+- **Publicar = você cria e envia a tag `vX.Y.Z`**, só quando o dono disser "publique". Antes: `VERSAO`/`VERSAO_PAGINA` iguais e a seção `## X.Y.Z` em `docs/novidades.md` (vira a descrição do release; sem ela o workflow falha). Ver skill `publicar-versao`.

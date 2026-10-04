@@ -34,7 +34,7 @@ Kurokami Radar/
 │   ├── gerar_icone.py       # assets/radar.ico para o .exe/instalador
 │   ├── gerar_referencia.py  # regenera docs/referencia.md
 │   ├── mapa.py              # mapa de seções/funções com linhas (ler só o trecho)
-│   ├── exportar_docs.py/.bat # docs → Área de Trabalho\kurokami-docs (só o que mudou) para o Projeto do claude.ai
+│   ├── exportar_docs.py/.bat # reserva: docs → Área de Trabalho\kurokami-docs (o Projeto do claude.ai já lê do GitHub)
 │   ├── backtest_selo.py     # backtest do Selo e variantes sobre uma cópia temporária do banco (só números agregados)
 │   ├── testar_piso.py       # testes sintéticos da raridade (Lendário) e da pílula de piso, sem rede nem banco
 │   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais, .gitignore, testar_piso)

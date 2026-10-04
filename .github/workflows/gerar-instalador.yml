@@ -28,6 +28,34 @@ jobs:
           "RADAR_VERSAO=$v" >> $env:GITHUB_ENV
           Write-Host "Versao $v"
 
+      # descricao do release = secao "## X.Y.Z" de docs/novidades.md (sem o titulo, ate o proximo "## ")
+      - name: Novidades do release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}" -replace '^v', ''
+          if ($v -ne $env:RADAR_VERSAO) {
+            Write-Host "::error::A tag v$v nao bate com VERSAO = $env:RADAR_VERSAO em radar/__init__.py."
+            exit 1
+          }
+          $linhas = @(Get-Content docs/novidades.md -Encoding utf8)
+          $titulo = '^## ' + [regex]::Escape($v) + '(\s|$)'
+          $ini = -1
+          for ($i = 0; $i -lt $linhas.Count; $i++) { if ($linhas[$i] -match $titulo) { $ini = $i; break } }
+          if ($ini -lt 0) {
+            Write-Host "::error::docs/novidades.md nao tem a secao '## $v'. Escreva as novidades da versao antes de criar a tag."
+            exit 1
+          }
+          $fim = $linhas.Count
+          for ($i = $ini + 1; $i -lt $linhas.Count; $i++) { if ($linhas[$i] -match '^## ') { $fim = $i; break } }
+          $corpo = if ($fim -gt $ini + 1) { ($linhas[($ini + 1)..($fim - 1)] -join "`n").Trim() } else { "" }
+          if (-not $corpo) {
+            Write-Host "::error::A secao '## $v' de docs/novidades.md esta vazia."
+            exit 1
+          }
+          Set-Content -Path release_notes.md -Value $corpo -Encoding utf8
+          Write-Host $corpo
+
       - name: Icone
         run: python tools/gerar_icone.py
 
@@ -56,3 +84,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: output/*.exe
+          body_path: release_notes.md

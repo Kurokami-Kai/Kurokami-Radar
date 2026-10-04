@@ -11,7 +11,6 @@ Texto para a descrição do release (aparece na janela de atualização). A seç
 - **Análises da Steam não decidem mais alertas** (o jogo já está na sua lista). Saíram das Configurações "Score mínimo", "Análises positivas mínimas" e "Ignorar sem análises".
 - Os avisos de **"termina em breve"** respeitam o limite por rodada: o resto vira um resumo ("+N terminando em breve").
 - **Notificação mais limpa:** sem score; com Selo, o texto começa direto no motivo; lojas com o mesmo preço aparecem como "mesmo preço na Nuuvem" (ou "na GOG por +R$ 0,45", até R$ 1 a mais).
-- `py radar.py testar-notificacao --selo` mostra como fica um alerta com Selo.
 - Correção: quem nunca ordenou a lista de desejos na Steam tinha **todos** os jogos tratados como favoritos.
 
 ## 0.13.0 (publicada em 2026-10-03)

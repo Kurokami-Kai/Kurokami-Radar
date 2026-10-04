@@ -21,5 +21,5 @@ Regra de ouro (de `verification-before-completion`, obra/superpowers, se instala
 8. Resposta final ao usuário (curta):
    - o que mudou (3 a 6 itens);
    - **como testar no Windows** (passos);
-   - o que você **não** conseguiu testar (notificação, bandeja, ponte, instalador…);
-   - rode `py tools/exportar_docs.py --listar` (só leitura); se listar NOVOS/ALTERADOS/APAGADOS, termine com **"Docs para atualizar no Projeto: …"** com esses nomes. Se disser "Nada mudou", não acrescente nada.
+   - o que você **não** conseguiu testar (notificação, bandeja, ponte, instalador…).
+   (Não há mais passo de "Docs para atualizar no Projeto": o Projeto do claude.ai lê os docs do GitHub.)

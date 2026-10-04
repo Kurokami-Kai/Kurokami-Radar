@@ -10,6 +10,7 @@ description: Prepara uma versão nova do Kurokami Radar para o GitHub Releases (
 3. `py tools/gerar_referencia.py` se funções mudaram.
 4. `py tools/checar.py` → `ok`.
 5. README/docs coerentes com o que mudou.
-6. Commit e push (`git add -A && git commit -m "vX.Y.Z: resumo" && git push`).
-7. Diga ao usuário: **Releases → Draft a new release → tag `vX.Y.Z` → Publish**. O workflow gera o `Setup.exe` e anexa; os Radars instalados avisam ao abrir ou em até 24 h.
-8. Entregue 3 a 6 linhas de novidades (parta de `docs/novidades.md`) para a descrição do release (aparecem na janela de atualização).
+6. `docs/novidades.md` tem a seção `## X.Y.Z` com o texto do release (é a descrição publicada e aparece na janela de atualização; escreva para o usuário, sem comandos de desenvolvedor).
+7. Commit e push (`git add -A && git commit -m "vX.Y.Z: resumo" && git push`).
+8. **Só se o dono disse "publique":** `git tag vX.Y.Z && git push origin vX.Y.Z`. O workflow confere tag × `VERSAO` e a seção das novidades (falha com mensagem clara se faltar), gera o `Setup.exe` e publica o release com a descrição e o instalador.
+9. Acompanhe o workflow até o fim (página Actions/Releases do repositório) e confirme ao dono que o release tem a descrição e o `Setup.exe`. Os Radars instalados avisam ao abrir ou em até 24 h.

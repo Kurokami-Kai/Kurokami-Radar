@@ -26,20 +26,23 @@ Com o Radar instalado aberto, feche-o antes (porta 80 e trava 47811 são compart
 1. Mudar `VERSAO` em `radar/__init__.py` **e** `VERSAO_PAGINA` em `radar/painel.html` (mesmo número).
 2. Se mudou função pública: `py tools/gerar_referencia.py`.
 3. Atualizar `README.md`/docs se o comportamento mudou para o usuário.
-4. Commit/push no GitHub.
-5. Release com tag `vX.Y.Z` igual à `VERSAO` → o workflow gera o `Setup.exe` e anexa ao release.
-6. Os Radars instalados avisam ao abrir ou em até 24 h.
+4. Escrever a seção `## X.Y.Z` em `docs/novidades.md` (o título pode ter complemento, ex.: `## 0.14.0 (publicada em 2026-10-04)`). O texto dela, sem o título e até o próximo `## `, vira a **descrição do release** — é o que aparece na janela de atualização.
+5. Commit/push no GitHub.
+6. **Só quando o dono disser "publique":** o Claude Code cria e envia a tag (`git tag vX.Y.Z && git push origin vX.Y.Z`). O workflow `gerar-instalador.yml`:
+   - falha com mensagem clara se a tag não bate com `VERSAO` ou se `docs/novidades.md` não tem a seção `## X.Y.Z` (ou ela está vazia);
+   - gera o `Setup.exe` e publica o release com a descrição e o instalador anexado.
+7. Os Radars instalados avisam ao abrir ou em até 24 h.
 
 Arquivos novos que o `.exe` precisa ler (como `painel.html`, `ponte.user.js`) devem entrar no `--add-data` do workflow **e** do `gerar_setup.bat`.
 
-## Exportar a documentação para o Projeto do claude.ai
-O Projeto "Kurokami Radar" no claude.ai usa os docs como contexto. Para atualizá-lo:
+## Exportar a documentação (reserva)
+O Projeto "Kurokami Radar" no claude.ai lê os docs **direto do GitHub**: não é preciso atualizá-lo à mão, e o fim de cada tarefa não tem mais o passo "Docs para atualizar no Projeto". O `tools/exportar_docs.py` fica no repositório só como reserva (por exemplo, se o Projeto voltar a usar arquivos enviados):
 1. Dois cliques em `tools\exportar_docs.bat` (ou `py tools/exportar_docs.py`).
 2. Ele copia `CLAUDE.md`, `README.md`, `docs/*.md` (menos `referencia.md`) e `docs/specs/*.md` para `Área de Trabalho\kurokami-docs\todos`. Só o que é **novo ou mudou** desde a última exportação vai para `...\enviar`. Os nomes ficam achatados, como `docs-decisoes.md` e `spec-02-....md`.
 3. A tela lista os arquivos NOVOS, ALTERADOS e APAGADOS. No Projeto, remova as versões antigas dos alterados e apagados e envie a pasta `enviar`.
 4. Digite **S** para registrar a exportação (em `kurokami-docs\.ultima_exportacao.json`). Sem o S, nada é registrado e a próxima exportação mostra as mesmas mudanças.
 
-`py tools/exportar_docs.py --listar` só lê: mostra o que mudou desde a última exportação **confirmada**, sem copiar, perguntar nem registrar. O Claude Code roda esse comando no fim de cada tarefa e avisa "Docs para atualizar no Projeto: …".
+`py tools/exportar_docs.py --listar` só lê: mostra o que mudou desde a última exportação **confirmada**, sem copiar, perguntar nem registrar. Não faz parte do fluxo obrigatório.
 
 ## Convenções de código
 - Python 3.12, só stdlib + keyring/pystray/Pillow. Sem frameworks.
