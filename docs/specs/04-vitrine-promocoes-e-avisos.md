@@ -397,6 +397,11 @@ Só a descrição e a quantidade de avisos. O "em X de 10" fica só em `docs/dec
 5. Monte as 4 frases finais do item 7 com os números.
 6. Registre tudo na spec e **PARE**.
 
+## Ajuste antes de publicar (04/10): folga de centavos na "metade" do Selo
+- A condição "preço ≤ 50% do recorde anterior" ganha a folga do "igual": + R$ 0,10 ou 1% da metade (o que for maior) (`analise._metade`). Vale também na régua da Steam (`regua_steam` usa `analisar`).
+- Caso real: WRC 7 a R$ 2,39 com recorde de R$ 4,74 (Nuuvem, 07/2025; metade R$ 2,37) agora ganha Selo.
+- Backtest (`tools/backtest_tipos.py`, variante `selo`): 47 eventos, 74,5% não ficou mais barato (R$), média 0,2 / 0,7 aviso por semana normal / grande; hoje 1 jogo da lista com Selo (WRC 7). Casos em `tools/testar_piso.py`.
+
 ## Decisão final (04/10, depois da Etapa 1c)
 - **A régua das lojas marcadas continua decidindo tudo** (avisos, vitrine, filtros). A régua só da Steam ("Steam (direto)" + Steam da ITAD) vira **uma linha informativa na ficha**, sem aviso e sem filtro.
 - **Quando aparece:** o jogo é Novo recorde ou Selo pela régua só da Steam e **não** é pela régua das lojas marcadas (ou é um tipo menor: Selo na Steam, Novo recorde nas marcadas).

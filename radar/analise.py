@@ -68,6 +68,12 @@ def _igual(preco, ref):
     return preco <= ref + max(10, ref * 0.01)
 
 
+def _metade(preco, recorde):
+    """Preco pela metade do recorde anterior, com a mesma folga de centavos do "igual" (R$ 0,10 ou 1% da metade).
+    Ex.: WRC 7 a R$ 2,39 com recorde de R$ 4,74 (metade R$ 2,37) conta como metade."""
+    return _igual(preco, recorde * 0.5)
+
+
 def linha_do_tempo(linhas, agora_=None):
     """Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
     Cada registro vale ate o proximo da mesma loja; promocao sem fim registrado vence em 45 dias;
@@ -187,7 +193,7 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
             jan = [s for s in antes if s[1] >= agora_ - JANELA_RARIDADE * DIA]
             menor24 = min((s[2] for s in jan), default=None)
             if preco < recorde - max(10, recorde * 0.01):
-                raro = (agora_ - ultima_rec) >= 548 * DIA or preco <= recorde * 0.5
+                raro = (agora_ - ultima_rec) >= 548 * DIA or _metade(preco, recorde)
                 out["piso_tipo"] = "raro" if raro else "novo"
             elif _igual(preco, recorde):
                 out["piso_tipo"] = "igual"
@@ -241,7 +247,7 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     ref = out["piso_ref"]
     if corte >= minimo_selo and out["piso_tipo"] == "raro" and anteriores and ref:
         quando = time.strftime("%m/%Y", time.gmtime(_ts(ref["quando"])))
-        if preco <= ref["preco"] * 0.5:
+        if _metade(preco, ref["preco"]):
             out["selo_motivo"] = "preço caiu pela metade ou mais (o menor anterior era %s, %s)" % (_brl(ref["preco"]), quando)
         else:
             meses = int((agora_ - _ts(ref["quando"])) / (30.44 * DIA))
@@ -355,7 +361,8 @@ def regua_steam(linhas, preco, corte, linhas_steam, preco_s, corte_s, agora_=Non
     """Regua so da Steam ("Steam (direto)" + Steam da ITAD) x lojas marcadas. Informativo, nunca avisa.
     Devolve {"steam": tipo, "radar": tipo, "loja", "preco", "quando", "texto"} quando a Steam sozinha da Novo recorde
     ou Selo e as lojas marcadas nao (ou dao um tipo menor); senao None. loja/preco/quando = o registro das lojas
-    marcadas que impediu. Ex.: WRC 7 em 04/10/2026, Steam R$ 2,39 = Selo so na Steam; a Nuuvem teve R$ 4,74 em 07/2025."""
+    marcadas que impediu (ex.: Street Fighter 6 em 04/10/2026: Novo recorde na Steam; a Nuuvem teve R$ 68,99 em 08/2026).
+    Usa analisar nas duas reguas, entao a folga de centavos da "metade" (_metade) vale nas duas."""
     if preco_s is None or not corte_s:
         return None
     an_s = analisar(linhas_steam, preco_s, corte_s, agora_=agora_, cfg_alerta=cfg_alerta)

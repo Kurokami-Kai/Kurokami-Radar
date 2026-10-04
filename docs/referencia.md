@@ -35,6 +35,7 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
 - `_ts(q)`
 - `_iso(t)`
 - `_igual(preco, ref)` — Centavos de diferenca (<= R$ 0,10 ou 1%) contam como igual.
+- `_metade(preco, recorde)` — Preco pela metade do recorde anterior, com a mesma folga de centavos do "igual" (R$ 0,10 ou 1% da metade).
 - `linha_do_tempo(linhas, agora_)` — Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
 - `episodios(segs, folga)` — Promocoes como episodios: [(ini, fim, maior_corte)]. Um intervalo sem desconto menor que `folga`
 - `analisar(linhas, preco, corte, agora_, cfg_alerta)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.

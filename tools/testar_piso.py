@@ -43,6 +43,13 @@ CASOS = [
     ("recorde visto pela ultima vez ha 17 meses", promo(17, 5000, 50), 4500, 55, "piso_tipo", "novo", 40),
     ("preco atual = 50% do recorde", promo(2, 5000, 50), 2500, 75, "piso_tipo", "raro", 40),
     ("preco atual = 51% do recorde", promo(2, 5000, 50), 2550, 74, "piso_tipo", "novo", 40),
+    # folga de centavos na metade (R$ 0,10 ou 1% da metade), como no "igual": caso real WRC 7 (04/10/2026)
+    ("WRC 7: R$ 2,39 com recorde R$ 4,74 (metade R$ 2,37) -> raro", promo(2, 474, 90), 239, 95, "piso_tipo", "raro", 40),
+    ("WRC 7: R$ 2,39 com recorde R$ 4,74 -> Selo", promo(2, 474, 90), 239, 95, "selo", True, 40),
+    ("WRC 7: R$ 2,40 ainda e metade", promo(2, 474, 90), 240, 95, "selo", True, 40),
+    ("metade + R$ 0,11 nao e metade", promo(2, 474, 90), 248, 95, "piso_tipo", "novo", 40),
+    ("folga de 1% da metade (R$ 45,00 + 0,45): R$ 45,40 e metade", promo(2, 9000, 10), 4540, 55, "piso_tipo", "raro", 40),
+    ("folga de 1% da metade: R$ 45,50 nao e", promo(2, 9000, 10), 4550, 55, "piso_tipo", "novo", 40),
     ("recorde de 30 meses revisto ha 17", promo(30, 5000, 50) + promo(17, 5000, 50), 4500, 55, "piso_tipo", "novo", 40),
     ("recorde de 30 meses revisto ha 19", promo(30, 5000, 50) + promo(19, 5000, 50), 4500, 55, "piso_tipo", "raro", 40),
     ("revisto ha 17 com centavos de diferenca", promo(30, 5000, 50) + promo(17, 5030, 50), 4500, 55, "piso_tipo", "novo", 40),
