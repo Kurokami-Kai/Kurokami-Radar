@@ -38,7 +38,8 @@ Kurokami Radar/
 │   ├── backtest_selo.py     # backtest do Selo e variantes sobre uma cópia temporária do banco (só números agregados)
 │   ├── backtest_tipos.py    # spec 04: backtest por tipo de recorde (Selo, novo, igual, 24m), métrica "não ficou mais barato em 12 meses"
 │   ├── medir_spec04.py      # spec 04: vitrine, avisos de hoje (regra atual × só Selo), userdata, DLCs em promoção, tempo do /api/lista
-│   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê
+│   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê; --retrato grava os preços
+│   ├── regua_steam.py       # spec 04 (1c): o Radar × "só a Steam" nos recordes raros, storeLow da ITAD e custo do histórico da Steam inteira
 │   ├── testar_piso.py       # testes sintéticos da raridade (Lendário) e da pílula de piso, sem rede nem banco
 │   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais, .gitignore, testar_piso)
 ├── docs/                    # esta documentação

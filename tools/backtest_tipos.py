@@ -1,7 +1,8 @@
 """Backtest por tipo de recorde (spec 04, Etapas 1.1 e 1b): Selo (so G), novo recorde, igual ao recorde e menor em 24 meses,
 cada um medido sozinho, como se fosse a unica opcao de aviso ligada.
 
-Uso: py tools/backtest_tipos.py [--banco CAMINHO] [--config CAMINHO] [--de 2022-10-06] [--ate 2025-10-02]
+Uso: py tools/backtest_tipos.py [--banco CAMINHO] [--config CAMINHO] [--de 2022-10-06] [--ate 2025-10-02] [--so-steam]
+--so-steam: so a loja Steam (Steam da ITAD + "Steam (direto)"), inclusive na metrica em R$.
 Le uma COPIA temporaria do banco (apagada no fim) e imprime so numeros agregados; o resultado bruto vai para
 dados/sonda/backtest_tipos.json (fora do Git). Reaproveita as funcoes de tools/backtest_selo.py.
 
@@ -49,6 +50,7 @@ def variantes(dmin):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--banco"); ap.add_argument("--config")
+    ap.add_argument("--so-steam", action="store_true", help="so a loja Steam (regua da SteamDB, Etapa 1c)")
     ap.add_argument("--de", default="2022-10-06"); ap.add_argument("--ate", default="2025-10-02")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
@@ -57,7 +59,8 @@ def main():
     try:
         copia = os.path.join(tmp, "radar.sqlite3")
         shutil.copy2(origem, copia)
-        rodar(Banco(copia), *ler_config(cfg_arq or args.config), args)
+        marc, dmin = ler_config(cfg_arq or args.config)
+        rodar(Banco(copia), {"steam"} if args.so_steam else marc, dmin, args)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -161,7 +164,7 @@ def rodar(b, marc, dmin, args):
                            "media_novos_normal": mn, "media_novos_grande": mg, "estoque_semana_normal": est,
                            "hoje": hoje[nome], "texto": texto})
     os.makedirs(caminhos.SONDA, exist_ok=True)
-    with open(os.path.join(caminhos.SONDA, "backtest_tipos.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(caminhos.SONDA, "backtest_tipos%s.json" % ("_steam" if args.so_steam else "")), "w", encoding="utf-8") as f:
         json.dump({"gerado": datetime.now(timezone.utc).isoformat(), "de": args.de, "ate": args.ate,
                    "desconto_minimo": dmin, "jogos": len(linhas), "linhas": linhas_out}, f, ensure_ascii=False, indent=1)
 

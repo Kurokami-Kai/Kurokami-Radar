@@ -1,6 +1,7 @@
 """Teste de viabilidade de "promocoes da Steam inteira" no Brasil (spec 04, Etapa 1.6). So LE: nao grava no banco.
 
 Uso: py tools/teste_promocoes_steam.py [--fontes itad,itad_todas,steam,busca] [--max-chamadas 1000] [--max-min 15]
+                                      [--retrato retrato_1.json]  (com --fontes steam: guarda os precos para comparar)
 Feche o Radar antes (a chave da ITAD e a mesma). Usa rede.http_json (ritmo e backoff) e a chave do keyring.
 Fontes, nesta ordem:
   itad        ITAD deals/v2, country=BR, so a loja Steam (shops=61), 200 por chamada; + lookup/shop/61/id/v1 (appids)
@@ -157,6 +158,7 @@ def fonte_itad(chave, so_steam, a):
 
 
 def fonte_steam(a):
+    retrato = {} if a.retrato else None
     f = Fonte("steam", a.max_chamadas, a.max_min * 60)
     n, start = 1000, 0
     # sem "sort" a ordem muda entre chamadas e a paginacao repete/pula itens; 1, 2 e 13 deram ordem estavel
@@ -185,6 +187,10 @@ def fonte_steam(a):
         for it in its:
             f.itens += 1; f.tipos[it.get("type")] += 1; f.appids.add(it.get("appid") or it.get("id"))
             b = it.get("best_purchase_option") or {}
+            if retrato is not None:
+                retrato[it.get("appid") or it.get("id")] = [
+                    b.get("final_price_in_cents"), b.get("original_price_in_cents"), b.get("discount_pct"),
+                    max([d.get("discount_end_date") or 0 for d in b.get("active_discounts") or []] or [0]) or None]
             cortes["com_corte" if b.get("discount_pct") else "sem_corte"] += 1
             fim["com_fim"] += any(d.get("discount_end_date") for d in b.get("active_discounts") or [])
         if not its:
@@ -197,6 +203,12 @@ def fonte_steam(a):
     f.obs.append("tipos: 0=jogo, 4=DLC (EStoreAppType); %s · %s" % (dict(cortes), dict(fim)))
     out = f.resumo()
     out["appids"] = sorted(x for x in f.appids if x)
+    if retrato is not None:  # {appid: [final, cheio, corte, fim]} para medir quantos precos mudam entre duas consultas
+        arq = os.path.join(caminhos.BASE, "dados", "sonda", a.retrato)
+        os.makedirs(os.path.dirname(arq), exist_ok=True)
+        with open(arq, "w", encoding="utf-8") as fp:
+            json.dump({"quando": datetime.now(timezone.utc).isoformat(), "precos": retrato}, fp)
+        out["retrato"] = arq
     return out
 
 
@@ -233,6 +245,7 @@ def main():
     ap.add_argument("--fontes", default="itad,itad_todas,steam,busca")
     ap.add_argument("--max-chamadas", type=int, default=1000)
     ap.add_argument("--max-min", type=int, default=15)
+    ap.add_argument("--retrato", help="(fonte steam) grava os precos em dados/sonda/<nome>.json")
     a = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
     res = {"gerado": datetime.now(timezone.utc).isoformat(), "fontes": []}

@@ -1,6 +1,6 @@
 # Spec 04 — Vitrine, aba Promoções e avisos por tipo de recorde
 
-Status: **Etapas 1 e 1b feitas em 04/10/2026 (resultados no fim); Etapa 2 aguarda o ok do dono** · Emenda de 04/10 incorporada ao corpo (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
+Status: **Etapas 1, 1b e 1c feitas em 04/10/2026 (resultados no fim); Etapa 2 aguarda o ok do dono** · Emenda e decisões de 04/10 incorporadas ao corpo (substitui a spec 04 anterior, "Filtros, colunas e DLCs em promoção") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `testar-sem-rede`, `coleta-e-apis` (Etapa 1), `editar-painel` (Etapa 2)
 
 **Duas etapas. Faça a Etapa 1, entregue o relatório e PARE. A Etapa 2 só começa depois do ok do dono, que pode mudar números desta spec com base na Etapa 1.**
 
@@ -160,7 +160,7 @@ Relatório de cada fonte:
    - Na Relação, os "exigir" se combinam com E (ou com OU se `qualquer_um`), e os "excluir" sempre excluem.
    - Um item sem o valor de uma faixa ativa (ex.: sem data de lançamento com o filtro de lançamento ligado) fica fora.
 4. **Ordenação.**
-   - Campos permitidos: `nome`, `corte`, `preco`, `volta` (por `volta_ordem`: "nunca teve esse desconto" primeiro, depois do mais raro ao mais frequente; "primeira promoção", "histórico curto" e vazio no fim, como os nulos), `nota` (rpos/rcount), `analises` (rcount), `lancamento`, `fim`, `inicio`.
+   - Campos permitidos: `nome`, `corte`, `preco`, `volta` (por `volta_ordem`: "nunca teve esse desconto" primeiro, depois "não teve nos últimos 2 anos", depois do mais raro ao mais frequente; "primeira promoção", "histórico curto" e vazio no fim, como os nulos), `nota` (rpos/rcount), `analises` (rcount), `lancamento`, `fim`, `inicio`.
    - Valores nulos ficam sempre por último; o desempate final é o appid.
    - Padrão: corte desc, depois nome asc.
 5. **Validação:** campo ou valor desconhecido → 400 com mensagem em português; campos ausentes = sem filtro.
@@ -328,14 +328,15 @@ O Radar responde duas perguntas separadas:
   |---|---|
   | `rar_info.curto` (histórico < 6 meses) | "histórico curto" |
   | nenhuma promoção anterior nas lojas marcadas | "primeira promoção" |
-  | `eps_nivel == 0` | "nunca teve esse desconto" |
+  | nenhum episódio no histórico **inteiro** (desde o 1º registro nas lojas marcadas) com corte ≥ atual − 5 | "nunca teve esse desconto" |
+  | teve, mas só antes dos últimos 24 meses (`eps_nivel == 0`) | "não teve nos últimos 2 anos" |
   | X < 1,5 (X = 12 / `por_ano` meses) | "todo mês" |
   | 1,5 ≤ X < 10,5 | "a cada ~N meses" (N = round(X)) |
   | 10,5 ≤ X < 18 | "1 vez por ano" |
   | X ≥ 18 | "1 vez em 2 anos" |
 
-- **Ordenação (`volta_ordem`):** "nunca teve esse desconto" primeiro, depois do mais raro ao mais frequente (menor `por_ano` primeiro), "todo mês" por último. "Primeira promoção", "histórico curto" e vazio ficam sempre no fim, como os nulos.
-- **Dica ao passar o mouse** (tocar, no celular): "Nos últimos 2 anos: N vezes com -Y% ou mais (última em mm/aaaa) · maior desconto que já teve: -Z%". Y = corte atual − 5; N = `eps_nivel`; Z = `corte_max`.
+- **Ordenação (`volta_ordem`):** "nunca teve esse desconto" primeiro, depois "não teve nos últimos 2 anos", depois do mais raro ao mais frequente (menor `por_ano` primeiro), "todo mês" por último. "Primeira promoção", "histórico curto" e vazio ficam sempre no fim, como os nulos.
+- **Dica ao passar o mouse** (tocar, no celular): "Nos últimos 2 anos: N vezes com -Y% ou mais (última em mm/aaaa) · maior desconto que já teve: -Z%". Y = corte atual − 5; N = `eps_nivel`; Z = `corte_max`. Singular quando for 1: "1 vez", "1 mês" (vale para a dica e para "a cada ~N meses").
 - **Ficha (D3):** o bloco "Por que <raridade>" vira "Costuma voltar: <texto>", com a mesma linha da dica embaixo. O bloco do Selo continua acima dele, quando houver.
 - **Onde aparece:** na tabela de Promoções (coluna "Costuma voltar", entre "%" e "Preço") e na ficha. Na vitrine não aparece.
 
@@ -376,12 +377,12 @@ Só a descrição e a quantidade de avisos. O "em X de 10" fica só em `docs/dec
 - **Nas Configurações**, depois da descrição: " · ~N avisos por semana (M em grandes promoções)". Use a **média** de avisos novos por semana (não a mediana), com o `desconto_minimo` padrão, e uma casa decimal quando for < 1.
 - **Na vitrine**, o subtítulo do bloco é só a descrição.
 - O tipo `24m` passa a ser exibido como "Menor em 2 anos" em todos os textos do usuário.
-- Só o Selo vem ligado.
+- Só o Selo vem ligado. "Igual ao recorde" continua desligado por padrão (decisão de 04/10, depois da 1b: ~14 avisos por semana).
 
 ### Aceite (trocas)
 - **Aceite 2:** com só o Selo ligado, uma rodada no banco de hoje avisa só jogos com Selo G (imprima quantos e quais). Não avisa ninguém por raridade nem por favorito.
 - **Aceite 6:** sai o caso "marcar só Ultrarraro". Entram estes:
-  - ordenar por "Costuma voltar" põe "nunca teve esse desconto" primeiro e "histórico curto", "primeira promoção" e vazios por último;
+  - ordenar por "Costuma voltar" põe "nunca teve esse desconto" primeiro, depois "não teve nos últimos 2 anos", e "histórico curto", "primeira promoção" e vazios por último;
   - nenhuma tela mostra Comum/Incomum/Raro/Ultrarraro/Lendário (`grep` no `painel.html` e no `notificador.py`).
 
 ### Etapa 1b — medir e parar
@@ -504,7 +505,7 @@ O que dá para calcular **sem baixar histórico**:
 
 Exemplo de dica: "Nos últimos 2 anos: 14 vezes com -70% ou mais (última em 09/2026) · maior desconto que já teve: -90%" (Dragon Age Inquisition).
 
-Para decidir na Etapa 2:
+Decidido em 04/10 (aplicado na emenda 2): "nunca teve esse desconto" só sem episódio no nível no histórico inteiro; senão "não teve nos últimos 2 anos"; singular nas dicas; "Igual ao recorde" desligado por padrão. O que motivou:
 - **"nunca teve esse desconto" nem sempre é verdade:** `eps_nivel` conta só os últimos 24 meses. Em 5 dos 32 casos o jogo já teve esse nível antes disso. Exemplo: Valdis Story está a -50%, já teve -75% e esteve nesse nível pela última vez em 03/2024. Sugestão: usar "nunca teve esse desconto" só quando não há episódio no nível em todo o histórico (`ultima` vazio); senão, "não teve nos últimos 2 anos".
 - A dica precisa do singular: "1 vez", não "1 vezes".
 
@@ -515,6 +516,74 @@ Para decidir na Etapa 2:
 - **Menor em 2 anos:** "No menor preço dos últimos 2 anos · ~2 avisos por semana (3 em grandes promoções)"
 
 Para `docs/decisoes.md` (não vai para a tela), com desconto ≥ 50% e a métrica em R$: Selo em 7 de 10 · Novo recorde em 5 de 10 · Igual em 6 de 10 · Menor em 2 anos em 7 de 10.
+
+## Resultado da Etapa 1c — régua da Steam (04/10/2026; `py tools/regua_steam.py --itad`, `py tools/backtest_tipos.py --so-steam`)
+
+### 1. Os 5 rare deals da SteamDB (só preço Steam, BR)
+4 dos 5 você **já tem** e não estão na lista de desejos. O Radar não coleta preço de jogos possuídos, então não tem nenhum histórico deles. Para o teste, o histórico veio da ITAD só em memória (nada gravado). Só o WRC 7 está na lista.
+
+| Jogo | a) Agora (marcadas / Steam) | b) piso_tipo · Selo (F ou G) · só G | c) Menor antes do episódio, marcadas (loja, data) · última vez no nível | d) Só Steam: menor anterior · piso_tipo | e) Promoções anteriores · 1º registro |
+|---|---|---|---|---|---|
+| Ori and the Will of the Wisps (tem) | Steam R$ 12,90 / R$ 12,90 | raro · sim · **sim** | R$ 25,80 (Steam, 20/04/2023) · 04/05/2023 | R$ 25,80 · raro | 41 · 05/10/2021 |
+| FINAL FANTASY XV (tem) | Steam R$ 37,50 / R$ 37,50 | novo · sim (F) · não | R$ 50,00 (Nuuvem 26/08/2026, Steam 04/08/2026, GMG 26/06/2026) · 15/09/2026 | R$ 50,00 (11/08/2026) · novo | 37 · 05/10/2021 |
+| CrossCode (tem) | Steam R$ 12,00 / R$ 12,00 | raro · sim · **sim** | R$ 12,94 (Steam, 22/12/2022) · 05/01/2023 | R$ 12,94 · raro | 28 · 05/10/2021 |
+| The Escapists (tem) | Steam R$ 9,49 / R$ 9,49 (SteamDB R$ 4,59) | 24m · não · não | R$ 3,59 (Steam, 28/03/2023) · 28/03/2023 | R$ 3,59 · 24m | 66 · 05/10/2021 |
+| WRC 7 (lista, carrinho) | Steam R$ 2,39 / R$ 2,39 | novo · não · não | R$ 4,74 (Nuuvem, 15/07/2025) · 01/10/2026 | R$ 4,79 (19/09/2026) · **raro** | 46 · 04/10/2021 |
+
+Por que o Radar dá ou não dá recorde raro:
+- **Ori:** daria (se estivesse na lista): R$ 12,90 ≤ 50% de R$ 25,80, e o recorde anterior tem 41 meses.
+- **CrossCode:** daria (se estivesse na lista): R$ 12,00 < R$ 12,94, e esse nível não aparecia havia 45 meses (≥ 18).
+- **FINAL FANTASY XV:** nem só com a Steam dá. R$ 37,50 > 50% de R$ 50,00, e R$ 50,00 foi há 1,8 mês. A SteamDB usa outra regra. Pela regra antiga (F, "maior desconto da história", -70%), o Radar dava Selo.
+- **The Escapists:** não é defeito. A Steam vende o jogo sozinho (pacote 60584) a R$ 9,49. O R$ 4,59 que a SteamDB mostra é a "melhor opção de compra", o pacote 80013 "The Escapists + The Escapists: The Walking Dead Deluxe". O Radar usa o pacote com o nome do jogo (regra de `decisoes.md`). Mesmo a R$ 4,59, não bateria o recorde de R$ 3,59 de 03/2023.
+- **WRC 7:** é outra loja, por R$ 0,02. Só com a Steam dá (R$ 2,39 ≤ 50% de R$ 4,79 = R$ 2,40). Nas marcadas, a Nuuvem teve R$ 4,74 em 07/2025, então o limite cai para R$ 2,37, e o nível de R$ 4,74–4,79 apareceu em 10/2026 (a menos de 18 meses).
+
+### 2. Selo da Steam (regra G só com a loja Steam)
+- **Hoje, na lista:** 1 jogo, o WRC 7. Ele **não** é Selo G do Radar: a Nuuvem teve R$ 4,74 em 15/07/2025 (ver acima).
+- **Backtest só com a Steam** (mesmo período; "não ficou mais barato" medido só na Steam):
+
+| Variante | Eventos | Não ficou mais barato (R$) | Não batido +5 / +10 | Não voltou 6m | Média de avisos novos/sem. normal / grande | Hoje |
+|---|---|---|---|---|---|---|
+| Selo da Steam (G) | 55 | 78,2% | 87,3% / 90,9% | 34,5% | 0,2 / 0,8 | 1 |
+| Selo do Radar (G, lojas marcadas; 1b) | 47 | 74,5% | 89,4% / 93,6% | 31,9% | 0,2 / 0,7 | 0 |
+| Novo recorde na Steam ≥ 50% | 464 | 52,2% | 55,8% / 70,7% | 11,4% | 2,1 / 6,2 | 31 |
+| Igual na Steam ≥ 50% | 3.110 | 66,3% | 67,1% / 79,6% | 6,3% | 13,8 / 43,2 | 180 |
+| Menor em 2 anos na Steam ≥ 50% | 319 | 73,0% | 74,3% / 81,5% | 7,5% | 1,6 / 3,5 | 70 |
+
+### 3. Novo recorde na Steam hoje
+- **77 jogos**; 8 deles não são Novo recorde do Radar. Em todos, uma loja marcada teve preço menor ou igual antes.
+- **Igual no Radar:**
+  - POSTAL 4: Steam R$ 14,99; GMG R$ 15,00 em 03/2026, diferença ≤ R$ 0,10.
+  - Invincible VS: Nuuvem R$ 119,40 em 08/2026.
+  - Mixtape: Nuuvem R$ 47,99 em 09/2026.
+- **Sem tipo no Radar:**
+  - Street Fighter 6: Nuuvem R$ 68,99 em 08/2026.
+  - The Alters: GMG R$ 45,39 em 08/2026.
+  - DRAGON BALL: Sparking! ZERO: Nuuvem R$ 119,99 em 09/2026.
+  - Escape from Ever After: GMG R$ 44,09 em 08/2026.
+- **Menor em 2 anos no Radar:** Starfield, GMG R$ 99,00 em 2022/2023.
+
+### 4. ITAD: menor preço da Steam sem baixar histórico (4 chamadas)
+- **`deals/v2`** (só Steam) traz `storeLow` em 200 de 200 itens. É só o preço, **sem data**; em 5 de 200 difere do `historyLow`.
+- **`games/storelow/v2`** traz o menor por loja **com data** (`timestamp`), 200 jogos por chamada. Exemplo: Steam R$ 2,96, -67%, 27/05/2024.
+- **Dá para saber "o menor preço na Steam" dos ~65 mil jogos** sem histórico: as ~333+ chamadas do `deals/v2`, mais ~330 do `storelow/v2` para ter a data. Isso basta para Novo recorde e Igual ao recorde na Steam.
+- **Não basta para o Selo (G)** nem para Menor em 2 anos:
+  - o menor que vem pode ser o próprio preço de agora (falta o menor **antes** do episódio atual);
+  - não há "última vez nesse nível", só uma data;
+  - não há o menor dos últimos 24 meses (só `historyLow_1y` e `historyLow_3m`, de todas as lojas).
+
+### 5. Custo de o Radar montar o histórico da Steam inteira (1 `Query` por dia, gravando só o que mudou)
+- **Consulta:** 108 chamadas, ~2,5 min, ~126 MB baixados por dia (só os itens com desconto).
+- **Duas consultas com 1 h de intervalo** (14:18 e 15:20 UTC, no meio da promoção de outono): 107.935 → 107.941 itens. **Mudaram 0 preços**, entraram 9 e saíram 3, ou seja, 12 registros. Dos itens, 106.288 terminam juntos em 08/10.
+- **Tamanho:** 126 B por registro na tabela `preco` do Radar, com o índice (medido com 100 mil registros reais).
+- **Estimativa** (a medição de 1 h no meio de uma promoção não mostra o dia típico):
+  - 1º dia: ~108 mil registros ≈ **14 MB**.
+  - Dia comum: provavelmente milhares de registros (< 1 MB).
+  - Começo e fim de grande promoção: ~100 mil registros cada (≈ 13 MB). Com 4 grandes promoções por ano, ~0,8 milhão.
+  - Com ~5 promoções por jogo por ano (o ritmo da lista no backtest, que tende a ser mais alto que o da Steam inteira), ~1,1 milhão.
+  - **Por ano: ~1 a 1,5 milhão de registros, ≈ 130–190 MB.**
+- **Limites:**
+  - a `Query` só traz itens com desconto: a volta ao preço cheio é inferida pela saída da lista ou pelo `discount_end_date`;
+  - o histórico começa do zero: o Selo (G) só fica confiável depois de ≥ 18 meses, a menos que se importe o passado da ITAD.
 
 ## Fora desta spec
 - Veredito na ficha, keyshop "decente" e limpeza do resto das Configurações → **spec 05**.
@@ -533,7 +602,7 @@ Para `docs/decisoes.md` (não vai para a tela), com desconto ≥ 50% e a métric
    - "✓ Monitorado por você" + "✕ Silenciado" funcionam combinados;
    - com "Qualquer um", "✓ Monitorado por você" + "✓ No carrinho" mostra a união;
    - as contagens batem com o total ao marcar a caixa;
-   - ordenar por "Costuma voltar" põe "nunca teve esse desconto" primeiro e "histórico curto", "primeira promoção" e vazios por último;
+   - ordenar por "Costuma voltar" põe "nunca teve esse desconto" primeiro, depois "não teve nos últimos 2 anos", e "histórico curto", "primeira promoção" e vazios por último;
    - nenhuma tela mostra Comum/Incomum/Raro/Ultrarraro/Lendário (`grep` no `painel.html` e no `notificador.py`);
    - sem estado salvo, a aba abre com os chips "Desconto ≥ 50%" e "Análises ≥ 5.000"; "Restaurar padrão" volta a eles.
 7. Os chips refletem exatamente os filtros ativos, o × remove só aquele filtro e o estado volta igual ao recarregar.

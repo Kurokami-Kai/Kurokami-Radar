@@ -2,7 +2,7 @@
 
 ## Especificações prontas para implementar
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
-- [04 — Vitrine, aba Promoções e avisos por tipo de recorde](specs/04-vitrine-promocoes-e-avisos.md) — Etapas 1 e 1b feitas (04/10), com a emenda; Etapa 2 aguarda o ok
+- [04 — Vitrine, aba Promoções e avisos por tipo de recorde](specs/04-vitrine-promocoes-e-avisos.md) — Etapas 1, 1b e 1c feitas (04/10), com a emenda; Etapa 2 aguarda o ok
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
 - 06 — Login Steam por QR, começando por teste (a escrever)
 - 07 — Promoções da Steam inteira, com base no teste da 04 (a escrever)

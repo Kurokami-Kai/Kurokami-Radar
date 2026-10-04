@@ -200,13 +200,13 @@ def costuma_voltar(it, linhas):
     ant = eps[:-1] if eps and eps[-1][1] >= time.time() - 1 else eps
     if not ant:
         return "primeira promoção", None
-    if not ri.get("eps_nivel"):
-        return "nunca teve esse desconto", 0
+    if not ri.get("eps_nivel"):  # decisao de 04/10: "nunca" so se nao houve o nivel no historico inteiro
+        return ("não teve nos últimos 2 anos", 0.5) if ri.get("ultima") else ("nunca teve esse desconto", 0)
     x = 12 / ri["por_ano"]
     if x < 1.5:
         txt = "todo mês"
     elif x < 10.5:
-        txt = "a cada ~%d meses" % round(x)
+        txt = "a cada ~%d %s" % (round(x), "mês" if round(x) == 1 else "meses")
     elif x < 18:
         txt = "1 vez por ano"
     else:
@@ -217,8 +217,9 @@ def costuma_voltar(it, linhas):
 def dica(it):
     ri = it.get("rar_info") or {}
     ult = ri.get("ultima")
-    return "nos últimos 2 anos: %s vezes com -%d%% ou mais%s · maior desconto que já teve: -%s%%" % (
-        ri.get("eps_nivel") or 0, max(0, it["corte"] - 5),
+    n = ri.get("eps_nivel") or 0
+    return "nos últimos 2 anos: %d %s com -%d%% ou mais%s · maior desconto que já teve: -%s%%" % (
+        n, "vez" if n == 1 else "vezes", max(0, it["corte"] - 5),
         " (última em %s/%s)" % (ult[5:7], ult[:4]) if ult else "", ri.get("corte_max"))
 
 
