@@ -282,6 +282,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
   - `_pagina_pin(erro)`
   - `_entrar()`
   - `_json(obj, code)`
+  - `_steam_openid(u)` — Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Radar.
   - `do_GET()`
   - `do_POST()`
 - `iniciar(abrir)`
@@ -357,6 +358,16 @@ Steam: lista de desejos, biblioteca, detalhes da loja, DLCs e opcoes de compra.
 - `dlcs_dos_jogos(chave, steamid, appids, pais, log)` — {appid_dlc: appid_pai} via GetDLCForApps (leitura tolerante, como no KurokamiPrecos).
 - `_appids_em(no)`
 - `normalizar_opcao(it, tipo)` — Bundle ou pacote (edicao) com a lista de apps que ele inclui.
+
+## `radar/steam_openid.py`
+Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.
+
+- **class `LoginInvalido`** — 
+- `_limpar(agora)`
+- `_retorno(base, state)`
+- `url_de_entrada(base)` — URL da pagina de login da Steam. `base` = http://localhost[:porta], montada pelo servidor (nunca pelo cabecalho Host).
+- `_confirmar_na_steam(params)`
+- `concluir(query, base, confirmar, agora)` — Valida a volta da Steam e devolve o SteamID (17 digitos). `query` = dict de listas (parse_qs).
 
 ## `radar/validar.py`
 Testa cada chave com uma chamada real e explica o resultado.

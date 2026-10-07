@@ -85,6 +85,11 @@ r = subprocess.run([sys.executable, os.path.join("tools", "testar_piso.py")], ca
 if r.returncode:
     falhas += [l for l in r.stdout.splitlines() if l.startswith("FALHOU")] or ["testar_piso: %s" % (r.stderr.strip()[-160:] or "?")]
 
+# 8. validacao do "Entrar pela Steam" (OpenID), sem rede
+r = subprocess.run([sys.executable, os.path.join("tools", "testar_openid.py")], capture_output=True, text=True, encoding="utf-8")
+if r.returncode:
+    falhas += [l for l in r.stdout.splitlines() if l.startswith("FALHA")] or ["testar_openid: %s" % (r.stderr.strip()[-160:] or "?")]
+
 print("versao %s" % v)
 for a in avisos:
     print("aviso: " + a)
@@ -93,4 +98,4 @@ if falhas:
     for f in falhas:
         print("  - " + f)
     sys.exit(1)
-print("ok: sintaxe, JS, versao, --add-data, dados pessoais, .gitignore e testar_piso")
+print("ok: sintaxe, JS, versao, --add-data, dados pessoais, .gitignore, testar_piso e testar_openid")

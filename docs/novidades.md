@@ -2,6 +2,9 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.16.0 (a publicar)
+- **Entrar pela Steam**, como no ITAD, na GG.deals e na SteamDB: em Configurações → "Conta Steam" você confirma na página da própria Steam e o Radar passa a usar o seu perfil, sem digitar nada. O Radar só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel neste PC. A lista de desejos continua exigindo perfil com "Detalhes dos jogos" público.
+
 ## 0.15.0 (publicada em 2026-10-04)
 - **Você escolhe o que te avisa.** Em Configurações → "O que te avisa", quatro tipos de preço: **Selo Kurokami** (ligado), **Novo recorde**, **Igual ao recorde** e **Menor em 2 anos**. Cada um mostra quantos avisos costuma dar por semana. Fora o Selo, só avisam com o desconto mínimo.
 - **Selo Kurokami mais exigente:** agora é "o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade". "Pela metade" aceita centavos de diferença (até R$ 0,10 ou 1%), como o "igual ao recorde". O "maior desconto da história" deixou de dar Selo (jogos que sobem o desconto um pouco a cada ano ganhavam Selo todo ano). **Os Selos de hoje, todos desse tipo, deixam de ser Selo.** Nos dados de 2022–2025, em cerca de 7 de 10 Selos o jogo não ficou mais barato nos 12 meses seguintes.

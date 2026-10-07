@@ -14,6 +14,8 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | `GET /kurokami/acao?silenciar=<appid>` | botão "Não avisar mais" das notificações (só local) |
 | `GET /kurokami/acao?atualizar=1` | abre a janela de atualização (só local) |
 | `POST /entrar` | formulário do PIN (form-urlencoded `pin=`) |
+| `GET /kurokami/steam/entrar` | "Entrar pela Steam": redireciona (303) para a página de login da Steam (OpenID 2.0). **Só do próprio PC** (outro aparelho recebe 403) |
+| `GET /kurokami/steam/retorno?s=…&openid.*` | volta da Steam: valida (state de uso único, endereço, assinatura, nonce, confirmação na Steam), grava só o SteamID em `config.perfil_steam` e vai para `/kurokami?steam=ok`. Erro: página 400 com mensagem curta. Só do próprio PC |
 
 ## GET
 

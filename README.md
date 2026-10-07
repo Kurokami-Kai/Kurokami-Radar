@@ -33,6 +33,8 @@ As chaves ficam guardadas no **Gerenciador de Credenciais do Windows** (nunca nu
 2. Copie o endereço. Fica como `https://steamcommunity.com/id/seunome` ou `https://steamcommunity.com/profiles/7656119...`.
 3. Cole no campo **Seu perfil Steam**.
 
+**Ou entre pela Steam** (como no ITAD ou na SteamDB): no painel, *Configurações → Conta Steam → Entrar pela Steam*. Você confirma na página da própria Steam e o Radar só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel no próprio PC.
+
 **A lista de desejos precisa estar pública.** Na Steam: *Perfil → Editar perfil → Configurações de privacidade → Detalhes dos jogos = Público*. Se estiver privada, a janela avisa "a lista de desejos veio vazia".
 
 ### Chave da IsThereAnyDeal (obrigatória, gratuita)

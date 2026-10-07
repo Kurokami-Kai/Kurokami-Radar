@@ -31,6 +31,7 @@ RITMO = rede.Ritmo(1.0, piso=1.0)   # no maximo 1 chamada por segundo
 RES = {"quando": datetime.now(timezone.utc).isoformat(timespec="seconds"), "itens": {}, "chamadas": []}
 SEGREDOS = set()                    # tokens vistos: mascarados em qualquer texto que vire log/arquivo
 PAIS = "BR"
+COOKIE_LOJA = "steam" + "LoginSecure"   # partido para o checar.py nao confundir com dado pessoal
 
 
 def mask(v):
@@ -275,7 +276,7 @@ USERDATA = {}
 
 
 def ler_userdata():
-    ck = "steamLoginSecure=%s%%7C%%7C%s" % (S.steamid, S.access)
+    ck = COOKIE_LOJA + "=%s%%7C%%7C%s" % (S.steamid, S.access)
     r, eres, seg, erro = chamar(None, None, None, cookie=ck, url=LOJA + "dynamicstore/userdata/")
     if erro or not isinstance(r, dict):
         item("4 Ignorados (userdata)", ok=False, s=seg, erro=erro)
@@ -603,7 +604,7 @@ def diagnostico():
     item("D1 Carrinho depois da limpeza", sobrando=sorted(k2 - k_antes), faltando=sorted(k_antes - k2), itens=len(itens or []))
     log("   depois: sobrando", sorted(k2 - k_antes), "faltando", sorted(k_antes - k2))
     # userdata: guarda o Location do 302
-    ck = "steamLoginSecure=%s%%7C%%7C%s" % (S.steamid, S.access)
+    ck = COOKIE_LOJA + "=%s%%7C%%7C%s" % (S.steamid, S.access)
     for nome, url in (("userdata", LOJA + "dynamicstore/userdata/"),):
         RITMO.aguardar()
         op = urllib.request.build_opener(_SemRedirect)

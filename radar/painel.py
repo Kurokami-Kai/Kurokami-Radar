@@ -1070,6 +1070,41 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(dados)
 
+    def _steam_openid(self, u):
+        """Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Radar."""
+        from . import steam_openid
+        if not self._local():
+            return self._json({"erro": "so pelo proprio PC"}, 403)
+        base = _base("localhost")   # nunca montar a URL com o cabecalho Host
+        if u.path.endswith("/entrar"):
+            if self.headers.get("Sec-Fetch-Site") not in (None, "none", "same-origin"):   # nao deixa outro site disparar o login
+                return self._json({"erro": "origem recusada"}, 403)
+            destino = steam_openid.url_de_entrada(base)
+        else:
+            try:
+                sid = steam_openid.concluir(parse_qs(u.query), base)
+                cfg = config.carregar()
+                cfg["perfil_steam"] = sid
+                config.salvar(cfg)
+                invalidar_linhas()
+                destino = CAMINHO + "?steam=ok"
+            except steam_openid.LoginInvalido as e:
+                import html
+                dados = ("<!doctype html><meta charset=utf-8><body style='background:#1b2838;color:#c7d5e0;font:15px Arial;padding:30px'>"
+                         "<h3 style='color:#fff'>Não consegui entrar pela Steam</h3><p>%s</p>"
+                         "<p><a style='color:#66c0f4' href='%s'>Voltar ao painel</a></p>" % (html.escape(str(e)), CAMINHO)).encode("utf-8")
+                self.send_response(400)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(dados)))
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+                self.wfile.write(dados)
+                return
+        self.send_response(303)
+        self.send_header("Location", destino)
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+
     def do_GET(self):
         u = urlparse(self.path)
         ok = self._autorizado(u)
@@ -1114,6 +1149,8 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(dados)
             return
+        if u.path in (CAMINHO + "/steam/entrar", CAMINHO + "/steam/retorno"):
+            return self._steam_openid(u)
         if u.path in (CAMINHO, CAMINHO + "/"):
             with open(HTML, "rb") as f:
                 dados = f.read()

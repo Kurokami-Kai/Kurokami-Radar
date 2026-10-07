@@ -80,6 +80,11 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 - Toasts: XML montado com escape + `-EncodedCommand`; o `$` de "R$" quebrava a interpolação do PowerShell.
 - Ponte: o navegador não deixa `localhost` usar a sessão da Steam. Só um userscript **na própria Steam** consegue, sem expor cookies.
 
+## Login Steam e segurança dos usuários (spec 06)
+- **"Entrar pela Steam" = OpenID 2.0** (como ITAD, GG.deals e SteamDB): confirma na página da Steam; o Radar só guarda o SteamID em `config.perfil_steam`. Nada de senha, token ou cookie. O OpenID só prova quem é: não dá acesso ao carrinho nem a lista privada.
+- **Regras do retorno (`steam_openid.py`, testadas em `tools/testar_openid.py`):** `state` aleatório de uso único (5 min) dentro do `return_to` (impede alguém forçar a troca de conta), `return_to` e `op_endpoint` exatos, `claimed_id` de 17 dígitos igual a `identity`, campos obrigatórios assinados, nonce recente e nunca repetido, e confirmação `check_authentication` na própria Steam. A URL de retorno é montada pelo servidor (`localhost`), nunca pelo cabeçalho `Host`. As rotas só respondem ao próprio PC; página de erro escapa o texto e não repete o que veio na URL.
+- **Login por QR (API da Steam) continua só como proposta opcional** (Etapa 2, nível 2): refresh token no cofre do Windows, access token só em memória, `platform_type=3` (único que renova; refresh ~30 dias), nunca em arquivo, log, banco ou Git. Testes que mexem na conta: fotografar, agir, desfazer e conferir; o teste guarda o conteúdo (não só ids) depois de cada passo.
+
 ## Produto (preferências do usuário)
 - Visual da **loja Steam** (cores Valve, caixas de preço com desconto verde, hover estilo Steam).
 - Avisar **pouco e bem**: raridade, linha de base, um alerta por jogo, limite por rodada.

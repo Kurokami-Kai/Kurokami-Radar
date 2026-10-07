@@ -30,6 +30,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 ## Regras do projeto
 
 - Versão: `VERSAO` em `radar/__init__.py` e `VERSAO_PAGINA` em `radar/painel.html` mudam **juntas**.
+- Login Steam: só o OpenID ("Entrar pela Steam"), que guarda o SteamID; nunca senha, token ou cookie da Steam em arquivo, log, banco ou Git (ver `docs/decisoes.md`, "Login Steam").
 - "Preço de agora" vem de `oferta_atual`/`Banco.ofertas_atuais()`, nunca do último registro de `preco`.
 - Dinheiro em centavos; datas em UTC ISO.
 - Nada pessoal no repositório: `config.json`, `userdata.json` e `dados/` estão no `.gitignore`. Chaves só no keyring.

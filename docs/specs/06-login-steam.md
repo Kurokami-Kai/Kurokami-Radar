@@ -1,6 +1,6 @@
 # Spec 06 — Login Steam por QR (opcional)
 
-Status: **Etapa 1 feita (07/10/2026); Etapa 2 escrita, a implementar** · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `coleta-e-apis`
+Status: **Etapa 1 feita (07/10/2026); Etapa 2: Nível 1 (OpenID) implementado, ainda não publicado; Nível 2 (QR) a implementar** · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `coleta-e-apis`
 
 **Duas etapas. Faça a Etapa 1 (teste), entregue o relatório e PARE. A Etapa 2 é escrita depois, com base no teste.**
 
