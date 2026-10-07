@@ -2,7 +2,7 @@
 
 Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tudo em JSON UTF-8.
 
-**Acesso.** Requisições de `127.0.0.1`/`::1` são sempre aceitas. De outros IPs: só com `painel.rede_local = true` e cookie `kr=<PIN>` (obtido em `POST /entrar`, 8 tentativas por 10 min). **POST** exige `Origin` igual a `http://<Host>` (proteção contra sites de fora), exceto `/api/ponte/feito` vindo do próprio PC (o Tampermonkey não manda Origin do Radar). `/api/acesso` e `/api/sair` só aceitam o próprio PC.
+**Acesso.** Requisições de `127.0.0.1`/`::1` são sempre aceitas. De outros IPs: só com `painel.rede_local = true` e cookie `kr=<PIN>` (obtido em `POST /entrar`, 8 tentativas por 10 min). **POST** exige `Origin` igual a `http://<Host>` (proteção contra sites de fora), exceto `/api/ponte/feito` vindo do próprio PC (o Tampermonkey não manda Origin do Radar). `/api/acesso` e `/api/sair` só aceitam o próprio PC. `/api/steam/*` (POST) e `/kurokami/steam/*` exigem, além disso, `Host` = `localhost`/`127.0.0.1`/`[::1]` (barra DNS rebinding) e, nos POST, `Origin` presente.
 
 ## Páginas
 
@@ -29,6 +29,7 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | `/api/alertas` | último resultado de `avaliar` (`quando, itens[], novos[]`) |
 | `/api/notificacoes` | `itens[]` da tabela `alerta` (200 mais recentes) |
 | `/api/config` | `config, lojas_itad[], classes` |
+| `/api/steam/conta` | `{conectado, steamid_final (4 dígitos), dias, vence_em_breve, erro?}`; nunca devolve token |
 | `/api/carrinho` | `itens[]` (com `lojas[]`, `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `ponte_vista, ponte_falhas[], sem_pacote[]` |
 | `/api/buscar?q=` | busca na loja (nome, appid ou link) → `itens[{appid,nome,capa,preco,corte,tipo,na_lista,possuido}]` |
 | `/api/biblioteca` | `jogos[]` (valor, DLCs que contam, faltantes com preço/menor, bundles), `total{hoje,cheio,menor,falta_*}`, `franquias[]` (séries), `sem_lista_dlc, sem_dados, atualizado, falta_ids`, `dlcs_promo[]` (DLCs que contam, que você não tem, de jogos que você tem, com desconto agora: `appid, nome, capa, pai, pai_nome, preco, cheio, corte, loja, so_steam` (preço só do catálogo da Steam), `fim, tipo_oferta, piso_ref`) |
@@ -55,4 +56,8 @@ Todo POST bem-sucedido invalida o cache das linhas de Promoções (refeito na pr
 | `/api/ponte/feito` | `{lista:[{appid,acao,ok}], carrinho:{enviados,falhas,itens_falhos[]}}` | retorno da ponte |
 | `/api/acesso` | `{rede_local?, novo_codigo?}` | liga/desliga rede local (reinicia o servidor), troca o PIN |
 | `/api/atualizar_app` | — | abre a janela de atualização |
+| `/api/steam/qr/iniciar` | — | **só o próprio PC.** Pede um QR à Steam (`BeginAuthSessionViaQR`, `platform_type=3`); devolve `{ok, url}` (o painel desenha) |
+| `/api/steam/qr/consultar` | — | **só o próprio PC.** Um Poll: `{estado: aguardando\|ok\|expirou\|nenhum\|erro, url?, erro?}`; em `ok` o refresh token vai para o cofre do Windows. Recusa conta diferente do `perfil_steam` |
+| `/api/steam/carrinho` | — | **só o próprio PC.** Manda os itens da Steam do carrinho (pacote/bundle) para o carrinho da conta (`AddItemsToCart`) e confere lendo de volta: `{ok, entraram, faltaram[], sem_pacote[]}`. Só adiciona |
+| `/api/steam/sair` | — | **só o próprio PC.** Revoga a sessão na Steam e apaga do cofre |
 | `/api/sair` | — | fecha o Radar (usado pelo instalador .bat) |

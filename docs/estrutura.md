@@ -21,6 +21,7 @@ Kurokami Radar/
 │   ├── analise.py           # raridade v2 (episódios), piso, Selo, score, etiquetas, caminhos/combinação de compra, avaliar()
 │   ├── notificar.py         # toast do Windows via PowerShell; capa do jogo
 │   ├── notificador.py       # regras de envio (linha de base, tipo recém-ligado vira resumo, rearme, silêncio, fim de promoção)
+│   ├── steam_sessao.py      # conta Steam por QR (opcional): login, renovação, carrinho da conta; refresh token só no cofre
 │   ├── steam_openid.py      # "Entrar pela Steam" (OpenID 2.0): state de uso único, valida a volta e devolve só o SteamID
 │   ├── conta_steam.py       # seguidos e ignorados da conta Steam (userdata.json); único leitor de rgFollowedApps/rgIgnoredApps
 │   ├── servico.py           # ciclo() e thread Servico (agenda, completa periódica)
@@ -40,6 +41,7 @@ Kurokami Radar/
 │   ├── backtest_selo.py     # backtest do Selo e variantes sobre uma cópia temporária do banco (só números agregados)
 │   ├── backtest_tipos.py    # spec 04: backtest por tipo de recorde (Selo, novo, igual, 24m), métrica "não ficou mais barato em 12 meses"
 │   ├── medir_spec04.py      # spec 04: vitrine, avisos de hoje (regra atual × só Selo), userdata, DLCs em promoção, tempo do /api/lista
+│   ├── testar_sessao.py     # testes sem rede da sessão por QR (cofre e Steam simulados); entra no checar.py
 │   ├── testar_openid.py     # testes sem rede da validação do OpenID (recusas: state, endereço, assinatura, nonce); entra no checar.py
 │   ├── teste_login_steam.py # spec 06 (Etapa 1): login por QR na API da Steam, carrinho, lista, família; usa a conta de verdade (`--diag`, `--mobile`)
 │   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê; --retrato grava os preços

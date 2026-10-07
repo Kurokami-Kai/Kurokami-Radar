@@ -35,6 +35,8 @@ As chaves ficam guardadas no **Gerenciador de Credenciais do Windows** (nunca nu
 
 **Ou entre pela Steam** (como no ITAD ou na SteamDB): no painel, botão *Entrar pela Steam* no canto superior direito (em qualquer aba). Você confirma na página da própria Steam e o Radar só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel no próprio PC.
 
+**Carrinho direto (opcional):** na aba *Carrinho*, *Conectar com QR* (leia com o app da Steam e aprove). Aí o botão *Enviar ao carrinho da Steam* funciona sem o Tampermonkey. A sessão fica no cofre do Windows e vale ~30 dias; *Desconectar* revoga na Steam.
+
 **A lista de desejos precisa estar pública.** Na Steam: *Perfil → Editar perfil → Configurações de privacidade → Detalhes dos jogos = Público*. Se estiver privada, a janela avisa "a lista de desejos veio vazia".
 
 ### Chave da IsThereAnyDeal (obrigatória, gratuita)

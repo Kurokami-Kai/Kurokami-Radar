@@ -4,6 +4,7 @@ Texto para a descrição do release (aparece na janela de atualização). A seç
 
 ## 0.16.0 (a publicar)
 - **Entrar pela Steam**, como no ITAD, na GG.deals e na SteamDB: o botão "Entrar pela Steam" fica no canto superior direito do painel, em qualquer aba. Você confirma na página da própria Steam e o Radar passa a usar o seu perfil, sem digitar nada. O Radar só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel neste PC. A lista de desejos continua exigindo perfil com "Detalhes dos jogos" público.
+- **Carrinho direto, sem Tampermonkey (opcional).** Na aba Carrinho, "Conectar com QR": leia o QR com o app da Steam e aprove. Depois, "Enviar N item(ns) ao carrinho da Steam" põe os itens no carrinho da sua conta e confere. O Radar nunca vê a sua senha; guarda só uma chave de sessão no cofre do Windows (vale ~30 dias, depois é só ler o QR de novo) e dá para desconectar quando quiser. Só adiciona: não tira nada que você já tinha no carrinho. A ponte do Tampermonkey continua funcionando para quem não conectar.
 
 ## 0.15.0 (publicada em 2026-10-04)
 - **Você escolhe o que te avisa.** Em Configurações → "O que te avisa", quatro tipos de preço: **Selo Kurokami** (ligado), **Novo recorde**, **Igual ao recorde** e **Menor em 2 anos**. Cada um mostra quantos avisos costuma dar por semana. Fora o Selo, só avisam com o desconto mínimo.

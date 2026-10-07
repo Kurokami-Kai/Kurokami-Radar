@@ -989,15 +989,67 @@ def post_pausar(_d):
     return {"ok": True, "pausado": bool(v)}
 
 
+# ------------------------------------------------------------------ conta Steam por QR (opcional; spec 06, nivel 2)
+def api_steam_conta(_q):
+    from . import steam_sessao
+    return steam_sessao.estado()
+
+
+def _sessao(f):
+    from . import steam_sessao
+    try:
+        return f(steam_sessao)
+    except steam_sessao.SessaoErro as e:
+        return {"ok": False, "erro": str(e)}
+
+
+def post_steam_qr_iniciar(_d):
+    return _sessao(lambda s: {"ok": True, "url": s.iniciar_qr()})
+
+
+def post_steam_qr_consultar(_d):
+    return _sessao(lambda s: s.consultar_qr())
+
+
+def post_steam_sair(_d):
+    return _sessao(lambda s: s.sair())
+
+
+def post_steam_carrinho(_d):
+    """Manda o carrinho do Radar (itens da Steam) direto para o carrinho da conta e confere lendo de volta."""
+    itens = api_ponte({}).get("carrinho") or []
+    nomes = {}
+    pacotes, bundles, sem = [], [], []
+    for i in itens:
+        if i.get("tipo") == "bundle" and i.get("bundleid"):
+            bundles.append(i["bundleid"])
+            nomes[("bundle", i["bundleid"])] = i.get("nome")
+        elif i.get("subid"):
+            pacotes.append(i["subid"])
+            nomes[("pacote", i["subid"])] = i.get("nome")
+        else:
+            sem.append(i.get("nome") or str(i.get("appid")))
+    if not pacotes and not bundles:
+        return {"ok": False, "erro": "Nada para enviar: o carrinho não tem item da Steam com pacote conhecido.", "sem_pacote": sem}
+    r = _sessao(lambda s: s.carrinho_adicionar(pacotes, bundles))
+    if "faltaram" in r:
+        r["faltaram"] = [nomes.get(tuple(x)) or str(x[1]) for x in r["faltaram"]]
+        r["entraram"] = len(r["entraram"])
+        r["sem_pacote"] = sem
+    return r
+
+
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso, "/api/ponte": api_ponte,
-       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine}
+       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/steam/conta": api_steam_conta}
 POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,
-        "/api/ponte/feito": post_ponte_feito, "/api/lista_steam": post_lista_steam, "/api/atualizar_app": post_atualizar_app}
+        "/api/ponte/feito": post_ponte_feito, "/api/lista_steam": post_lista_steam, "/api/atualizar_app": post_atualizar_app,
+        "/api/steam/qr/iniciar": post_steam_qr_iniciar, "/api/steam/qr/consultar": post_steam_qr_consultar,
+        "/api/steam/sair": post_steam_sair, "/api/steam/carrinho": post_steam_carrinho}
 
 
 def _log_erro(rota, e):
@@ -1009,6 +1061,12 @@ def _log_erro(rota, e):
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
+
+    def _host_local(self):
+        """Host do cabecalho precisa ser o do proprio PC (barra DNS rebinding: um site com nome seu apontando para 127.0.0.1)."""
+        h = (self.headers.get("Host") or "").lower()
+        nome = h[:h.index("]") + 1] if h.startswith("[") and "]" in h else h.split(":")[0]
+        return nome in ("localhost", "127.0.0.1", "[::1]")
 
     def _local(self):
         return self.client_address[0] in ("127.0.0.1", "::1", "::ffff:127.0.0.1")
@@ -1073,7 +1131,7 @@ class Handler(BaseHTTPRequestHandler):
     def _steam_openid(self, u):
         """Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Radar."""
         from . import steam_openid
-        if not self._local():
+        if not self._local() or not self._host_local():
             return self._json({"erro": "so pelo proprio PC"}, 403)
         base = _base("localhost")   # nunca montar a URL com o cabecalho Host
         if u.path.endswith("/entrar"):
@@ -1183,8 +1241,10 @@ class Handler(BaseHTTPRequestHandler):
             t = token()
             if ("kr=%s" % t) not in (self.headers.get("Cookie") or ""):
                 return self._json({"erro": "nao autorizado"}, 401)
-            if urlparse(self.path).path in ("/api/acesso", "/api/sair"):
+            if urlparse(self.path).path in ("/api/acesso", "/api/sair") or urlparse(self.path).path.startswith("/api/steam/"):
                 return self._json({"erro": "so pelo proprio PC"}, 403)
+        if urlparse(self.path).path.startswith("/api/steam/") and not (self._local() and self._host_local() and origem):
+            return self._json({"erro": "so pelo proprio painel, neste PC"}, 403)
         f = POST.get(urlparse(self.path).path)
         if not f:
             return self._json({"erro": "o Radar aberto (versao %s) nao tem %s. Reinicie o Radar pela bandeja." % (VERSAO, self.path)}, 404)

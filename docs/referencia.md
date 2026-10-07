@@ -274,9 +274,16 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `post_modo(d)`
 - `post_verificar(_d)`
 - `post_pausar(_d)`
+- `api_steam_conta(_q)`
+- `_sessao(f)`
+- `post_steam_qr_iniciar(_d)`
+- `post_steam_qr_consultar(_d)`
+- `post_steam_sair(_d)`
+- `post_steam_carrinho(_d)` — Manda o carrinho do Radar (itens da Steam) direto para o carrinho da conta e confere lendo de volta.
 - `_log_erro(rota, e)`
 - **class `Handler`** — 
   - `log_message()`
+  - `_host_local()` — Host do cabecalho precisa ser o do proprio PC (barra DNS rebinding: um site com nome seu apontando para 127.0.0.1).
   - `_local()`
   - `_autorizado(u)` — Do proprio PC: sempre. De outro aparelho: so depois de digitar o PIN (fica lembrado por 1 ano).
   - `_pagina_pin(erro)`
@@ -368,6 +375,27 @@ Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.
 - `url_de_entrada(base)` — URL da pagina de login da Steam. `base` = http://localhost[:porta], montada pelo servidor (nunca pelo cabecalho Host).
 - `_confirmar_na_steam(params)`
 - `concluir(query, base, confirmar, agora)` — Valida a volta da Steam e devolve o SteamID (17 digitos). `query` = dict de listas (parse_qs).
+
+## `radar/steam_sessao.py`
+Conta Steam por QR (opcional; spec 06, Nivel 2). Sem entrar, o Radar funciona como sempre.
+
+- **class `SessaoErro`** — 
+- `_jwt(tok)`
+- `_servico(servico, metodo, entrada, token, post)`
+- `_guardar_access(access)`
+- `_sid_do_perfil()`
+- `iniciar_qr()` — Pede um QR novo. Devolve a URL do desafio (o painel desenha). Substitui qualquer QR pendente.
+- `consultar_qr()` — Uma consulta ao Poll. {estado: aguardando|ok|expirou|nenhum|erro, url?, erro?}. O painel chama a cada ~3 s.
+- `_concluir(refresh, access)`
+- `_revogar(refresh)` — True se a Steam confirmou a revogacao.
+- `_pais()`
+- `_renovar()`
+- `access_token()` — Access token valido (renova sozinho). Levanta SessaoErro se nao ha sessao ou ela venceu.
+- `estado()` — Para o painel (sem segredo): conectado?, final do SteamID, dias que faltam.
+- `sair()` — Revoga na Steam e apaga do cofre e da memoria.
+- `_cart(token)`
+- `carrinho_ler()` — [(packageid, bundleid, line_item_id)] do carrinho da conta.
+- `carrinho_adicionar(pacotes, bundles)` — Adiciona e CONFERE lendo o carrinho de volta. Devolve {ok, entraram: [...], faltaram: [...]}.
 
 ## `radar/validar.py`
 Testa cada chave com uma chamada real e explica o resultado.

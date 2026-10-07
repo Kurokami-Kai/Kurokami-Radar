@@ -579,6 +579,7 @@ details.blk[open]>summary h4::after{content:"▴"}
       <button class="lk" id="carrOtim">Loja mais barata em tudo</button>
       <button class="lk" id="carrLimpa">Limpar</button>
     </div>
+    <div class="meta-col" id="diretoBox"></div>
     <div class="meta-col" id="ponteBox"></div>
     <div class="shead"><h2>Adicionar jogo</h2><span class="aside">nome, appid ou link da loja Steam</span></div>
     <div class="addbox"><label class="search" style="flex:1;margin:0"><span class="sr">Buscar jogo</span><input id="busca" type="search" placeholder="ex.: Hollow Knight, 367520 ou https://store.steampowered.com/app/..." autocomplete="off"></label>
@@ -1133,6 +1134,7 @@ async function renderCarr(){
       'A ponte precisa da extensão <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> (grátis). Instale a extensão, clique em "Instalar a ponte" e confirme. Ela roda só nas páginas da Steam, usa o seu login de lá e não manda nada para fora do seu PC.'}</div>`;
   $('#abrirAbas').onclick=()=>{const urls=CD.itens.filter(c=>!c.loja||c.loja==='Steam').map(c=>storeUrl(c.appid)).concat(CD.bundles.map(b=>`https://store.steampowered.com/bundle/${b.bundle}/`));
     let bloqueou=false;urls.forEach(u=>{if(!window.open(u,'_blank'))bloqueou=true;});if(bloqueou)toast('O navegador bloqueou algumas abas: permita pop-ups para localhost.');};
+  renderDireto();
   $('#carrSteam').style.display=(CD.steam||[]).length?'':'none';$('#carrSteam').textContent=`Trazer o carrinho da Steam (${(CD.steam||[]).length})`;
 }
 $('#carrBundles').addEventListener('click',async e=>{const t=e.target.closest('[data-trocar]');if(!t)return;const [bid,ids]=t.dataset.trocar.split('|');const rem=new Set(ids.split(',').map(Number));
@@ -1232,7 +1234,7 @@ async function renderAcesso(){
   $('#rl').addEventListener('change',async e=>{await post('/api/acesso',{rede_local:e.target.checked});toast(e.target.checked?'Liberado na rede local':'Só neste PC');setTimeout(renderAcesso,1500);});
   if($('#novoCod'))$('#novoCod').addEventListener('click',async()=>{await post('/api/acesso',{novo_codigo:true});toast('Código novo gerado');renderAcesso();});
   if(a.rede_local&&a.links.length&&$('#qr')){const desenhar=()=>{try{new QRCode($('#qr'),{text:a.links[0],width:160,height:160});}catch(e){}};
-    if(window.QRCode)desenhar();else{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.onload=desenhar;document.head.appendChild(sc);}}
+    comQR(desenhar);}
 }
 function setPath(o,p,v){const k=p.split('.');let x=o;k.slice(0,-1).forEach(s=>{x[s]=x[s]||{};x=x[s];});x[k[k.length-1]]=v;}
 async function salvarCfg(){
@@ -1245,12 +1247,66 @@ async function salvarCfg(){
 /* ================= conta Steam (topo) ================= */
 async function carregarConta(){
   const el=$('#contaSteam');if(!el)return;
+  await carregarContaQR();
   let c;try{c=(await api('/api/config')).config;}catch(e){return;}
   const p=String(c.perfil_steam||''),local=['localhost','127.0.0.1'].includes(location.hostname),id=/^\d{17}$/.test(p);
   const dica='Você confirma na página da própria Steam. O Radar só recebe o seu SteamID: nunca a senha, token ou cookie.';
   el.innerHTML=(p?`<span class="chip-steam" title="Perfil em uso: ${esc(p)}">Steam ${id?'…'+esc(p.slice(-4)):esc(p.slice(0,18))}</span>`:'')+
-    (local?`<a class="${p?'btn-ghost':'btn-imp'}" href="/kurokami/steam/entrar" title="${esc(dica)}">${p?'Trocar':'Entrar pela Steam'}</a>`:(p?'':'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>'));
+    (CQ&&CQ.conectado?`<span class="chip-steam" title="Carrinho direto conectado (QR); vale mais ${CQ.dias} dia(s)">Carrinho ✓</span>`:'')+(local?`<a class="${p?'btn-ghost':'btn-imp'}" href="/kurokami/steam/entrar" title="${esc(dica)}">${p?'Trocar':'Entrar pela Steam'}</a>`:(p?'':'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>'));
 }
+/* ================= conta Steam por QR (carrinho direto) ================= */
+let CQ=null;
+async function carregarContaQR(){try{CQ=await api('/api/steam/conta');}catch(e){CQ=null;}}
+function comQR(fn){if(window.QRCode)return fn();const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.integrity='sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU';sc.crossOrigin='anonymous';sc.onload=fn;document.head.appendChild(sc);}
+async function renderDireto(){
+  const el=$('#diretoBox');if(!el)return;
+  await carregarContaQR();
+  const steamN=(CD?CD.itens.filter(c=>!c.loja||c.loja==='Steam').length+CD.bundles.length:0);
+  if(CQ&&CQ.conectado){
+    el.innerHTML=`<div class="l"><span><b>Carrinho direto da Steam</b> · <span style="color:#a1cd44">conectado ✓</span> (conta …${esc(CQ.steamid_final)}) · a sessão vale mais ${CQ.dias} dia(s)</span></div>
+      ${CQ.vence_em_breve?'<div class="hint" style="color:#e2a635;font-size:11.5px">A sessão vence em breve: depois disso é preciso ler o QR de novo.</div>':''}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn-imp" id="diretoEnviar" type="button" ${steamN?'':'disabled'}>Enviar ${steamN} item(ns) ao carrinho da Steam</button>
+      <a class="btn-ghost" href="https://store.steampowered.com/cart/" target="_blank" rel="noopener" style="text-decoration:none;padding:7px 12px">Abrir o carrinho da Steam</a>
+      <button class="btn-ghost" id="diretoSair" type="button">Desconectar</button></div>
+      <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">Só adiciona; não tira nada que você já tenha no carrinho da Steam. Depois de enviar, o Radar lê o carrinho de volta para conferir.</div>`;
+    $('#diretoEnviar').onclick=async e=>{e.target.disabled=true;const r=await post('/api/steam/carrinho');e.target.disabled=false;
+      if(r.erro&&!r.faltaram){toast('Erro: '+r.erro);return;}
+      toast(r.ok?`${r.entraram} item(ns) no carrinho da Steam.`:`${r.entraram} entraram. Não entraram: ${(r.faltaram||[]).join(', ')}.`);};
+    $('#diretoSair').onclick=async()=>{if(!confirm('Desconectar? A sessão é revogada na Steam e apagada deste PC.'))return;const rs=await post('/api/steam/sair');toast(rs.revogado===false?'Desconectado deste PC, mas NÃO consegui revogar na Steam: remova o dispositivo em Steam → Segurança → Dispositivos autorizados.':'Desconectado da Steam (sessão revogada).');renderDireto();carregarConta();};
+  }else{
+    el.innerHTML=`<div class="l"><span><b>Carrinho direto da Steam</b> · sem Tampermonkey (opcional)</span></div>
+      ${CQ&&CQ.erro?`<div class="hint" style="color:#ff9b8a;font-size:11.5px">${esc(CQ.erro)}</div>`:''}
+      <div class="hint" style="color:var(--dim);font-size:11.5px;margin:6px 0">Leia um QR com o app da Steam no celular e aprove. O Radar nunca vê a sua senha: guarda só uma chave de sessão (dura ~30 dias) no cofre do Windows, e você pode desconectar quando quiser. Só funciona abrindo o painel neste PC.</div>
+      ${['localhost','127.0.0.1'].includes(location.hostname)?'<button class="btn-imp" id="diretoQR" type="button">Conectar com QR</button>':'<div class="hint">Abra o painel no próprio PC (localhost) para conectar.</div>'}`;
+    if($('#diretoQR'))$('#diretoQR').onclick=abrirQR;
+  }
+}
+async function abrirQR(){
+  const ov=document.createElement('div');
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99;display:flex;align-items:center;justify-content:center';
+  ov.innerHTML=`<div style="background:#171a21;padding:22px;max-width:340px;width:92%;text-align:center;box-shadow:0 0 24px #000"><h3 style="margin:0 0 6px;color:#fff">Conectar com QR</h3>
+    <div class="hint" id="qrMsg">Abra o app da Steam no celular → Steam Guard → <b>Ler QR</b> e aprove.</div>
+    <div id="qrBox" style="background:#fff;display:inline-block;padding:10px;margin:12px 0;min-height:160px;min-width:160px"></div>
+    <div><button class="btn-ghost" id="qrFechar" type="button">Cancelar</button></div></div>`;
+  document.body.appendChild(ov);
+  let timer=null,url='',fim=false;
+  const esc_=e=>{if(e.key==='Escape')fechar();};document.addEventListener('keydown',esc_);
+  const fechar=()=>{fim=true;clearInterval(timer);document.removeEventListener('keydown',esc_);ov.remove();};
+  ov.addEventListener('click',e=>{if(e.target===ov)fechar();});
+  $('#qrFechar').onclick=fechar;
+  const desenhar=u=>{if(u===url)return;url=u;comQR(()=>{const b=$('#qrBox');if(!b)return;b.innerHTML='';try{new QRCode(b,{text:u,width:200,height:200});}catch(e){}});};
+  const r=await post('/api/steam/qr/iniciar');
+  if(!r.ok){$('#qrMsg').textContent=r.erro||'Não consegui pedir o QR.';return;}
+  if(fim)return;desenhar(r.url);
+  timer=setInterval(async()=>{
+    if(fim)return;const c=await post('/api/steam/qr/consultar');if(fim)return;
+    if(c.estado==='ok'){fechar();toast('Conectado à Steam: carrinho direto liberado.');renderDireto();carregarConta();}
+    else if(c.estado==='expirou'||c.estado==='nenhum'){clearInterval(timer);$('#qrMsg').textContent='O QR expirou (3 minutos). Feche e tente de novo.';}
+    else if(c.estado==='erro'||c.ok===false){clearInterval(timer);$('#qrMsg').textContent=c.erro||'Não deu certo.';}
+    else if(c.url)desenhar(c.url);
+  },3000);
+}
+
 /* ================= status / ações ================= */
 const VERSAO_PAGINA='0.15.0';
 function nVitrine(){return VIT?['selo','novo','igual','24m'].reduce((s,t)=>s+((VIT[t]||{}).total||0),0):null;}
