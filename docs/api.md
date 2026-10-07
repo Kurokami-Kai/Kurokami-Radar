@@ -2,7 +2,7 @@
 
 Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tudo em JSON UTF-8.
 
-**Acesso.** Requisições de `127.0.0.1`/`::1` são sempre aceitas. De outros IPs: só com `painel.rede_local = true` e cookie `kr=<PIN>` (obtido em `POST /entrar`, 8 tentativas por 10 min). **POST** exige `Origin` igual a `http://<Host>` (proteção contra sites de fora), exceto `/api/ponte/feito` vindo do próprio PC (o Tampermonkey não manda Origin do Radar). `/api/acesso` e `/api/sair` só aceitam o próprio PC. `/api/steam/*` (POST) e `/kurokami/steam/*` exigem, além disso, `Host` = `localhost`/`127.0.0.1`/`[::1]` (barra DNS rebinding) e, nos POST, `Origin` presente.
+**Acesso.** Requisições de `127.0.0.1`/`::1` são sempre aceitas. De outros IPs: só com `painel.rede_local = true` e cookie `kr=<PIN>` (obtido em `POST /entrar`, 8 tentativas por 10 min). **POST** exige `Origin` igual a `http://<Host>` (proteção contra sites de fora). `/api/acesso` e `/api/sair` só aceitam o próprio PC. `/api/steam/*` (POST) e `/kurokami/steam/*` exigem, além disso, `Host` = `localhost`/`127.0.0.1`/`[::1]` (barra DNS rebinding) e, nos POST, `Origin` presente.
 
 ## Páginas
 
@@ -10,7 +10,6 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 |---|---|
 | `GET /` | redireciona para `/kurokami` |
 | `GET /kurokami` | `painel.html` |
-| `GET /kurokami/ponte.user.js` | userscript da ponte (Tampermonkey instala ao abrir) |
 | `GET /kurokami/acao?silenciar=<appid>` | botão "Não avisar mais" das notificações (só local) |
 | `GET /kurokami/acao?atualizar=1` | abre a janela de atualização (só local) |
 | `POST /entrar` | formulário do PIN (form-urlencoded `pin=`) |
@@ -25,16 +24,15 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | `/api/lista` | do cache das linhas (ver `/api/promocoes`) · `itens[]`: `appid, nome, tipo, capa, rpos, rcount, rotulo, lancamento, preco, cheio, corte, loja, url, piso, piso_geral, pisos{3m,6m,9m,1a,sempre}, tag, tag_texto, acima, raridade, raridade_texto, no_piso, selo, selo_motivo (por que é Selo, ou null), piso_tipo (novo\|raro\|igual\|24m\|null), piso_ref{preco,corte,quando (última vez no nível do recorde, com folga de centavos),quando_preco (quando o preço do recorde em si apareceu)}, rar_info{corte_max,eps_nivel,por_ano,ultima,meses,curto,inicio}, score, keyshop, hist_keyshop, gg_url, vale, novo, motivo, base_tenho, bundles, n_dlcs, modo, extra, fim, prioridade, mudo, favorito` + desde a 0.15: `inicio` (início da promoção, ISO), `tipos[]` (selo/novo/igual/24m, não exclusivos), `tipo_oferta` (o mais importante, ou null), `volta_texto`/`volta_ordem`/`volta_dica` ("Costuma voltar"), `na_lista` (na lista da Steam; monitorado sem posição = falso), `tenho`, `no_carrinho`, `em_bundle`, `seguido`, `ignorado_steam` (de `conta_steam.relacao`), `keyshop_barata` (keyshop < 60% do preço). `vale` = avisaria agora. `raridade*`, `score` e `favorito` ficam na API mas o painel não mostra |
 | `/api/promocoes?q=<JSON>` | explorador da aba Promoções, filtrado no Radar. `q`: `busca`, `relacao{campo:"exigir"\|"excluir"}` (campos `na_lista, extra, no_carrinho, seguido, ignorado_steam, mudo, tenho, base_tenho`), `qualquer_um` (os "exigir" com OU), `mostrar_so[]` (`tipo_oferta`), `tipo[]` (jogo/dlc), `outros[]` (`promo, bundle, completo, keyshop`), `preco_de/preco_ate` (centavos), `analises_de/analises_ate`, `nota_min`, `desconto_min`, `lanc_de/lanc_ate` (aaaa-mm-dd), `em_breve`, `ordem` (`[[campo,"asc"\|"desc"],...]`; campos `nome, corte, preco, volta, nota, analises, lancamento, fim, inicio`; padrão corte desc, nome asc; nulos sempre por último; desempate appid), `pagina` (a partir de 1), `por_pagina` (50, 100 ou 250). Grupos combinam com E; caixas dentro do grupo com OU; item sem o valor de uma faixa ligada fica fora. Resposta: `total, pagina, por_pagina, itens[]` (linhas como as de `/api/lista`), `contagens{mostrar_so{selo,novo,igual,24m}, tipo{jogo,dlc}}` (cada grupo contado com os outros filtros, sem o dele), `conta{tem_dados, quando}`. Campo ou valor desconhecido → **400** com `{erro}` em português. Com o cache pronto: ~3 ms no banco de 04/10 (808 linhas) |
 | `/api/vitrine` | aba "Vale a pena": `selo{total, itens≤10}, novo{total, itens≤8}, igual{…}, "24m"{…}` (bloco = `tipo_oferta`, exclusivo; sem os que você tem; fora o Selo, só com corte ≥ `desconto_minimo`; corte desc, preço asc), `avisa{selo,novo,igual,24m}`, `desconto_minimo`, `na_lista` |
-| `/api/jogo?appid=` | `jogo{}, historico{loja:[[iso,preco]]}, lojas[{loja,atual,cheio,corte,url,menor,marcada,vende}], dlcs[], dlcs_estado (só sem DLCs: `{motivo: pendente\|sem_dlcs\|falhou, quando?, fila?{atual,total}}`), caminhos[], combo, raridade, raridade_texto, selo, selo_motivo, no_piso, piso_tipo, piso_ref, rar_info, score, gg, modo, classes, tenho, tenho_manual, mudo, na_lista, fila, ponte_vista` + `tipos, tipo_oferta, volta_texto, volta_dica, fim, corte` e `regua_steam` (null, ou `{steam, radar, loja, preco, quando, texto}` quando só a Steam dá Novo recorde/Selo: a linha informativa da ficha) |
+| `/api/jogo?appid=` | `jogo{}, historico{loja:[[iso,preco]]}, lojas[{loja,atual,cheio,corte,url,menor,marcada,vende}], dlcs[], dlcs_estado (só sem DLCs: `{motivo: pendente\|sem_dlcs\|falhou, quando?, fila?{atual,total}}`), caminhos[], combo, raridade, raridade_texto, selo, selo_motivo, no_piso, piso_tipo, piso_ref, rar_info, score, gg, modo, classes, tenho, tenho_manual, mudo, na_lista` + `tipos, tipo_oferta, volta_texto, volta_dica, fim, corte` e `regua_steam` (null, ou `{steam, radar, loja, preco, quando, texto}` quando só a Steam dá Novo recorde/Selo: a linha informativa da ficha) |
 | `/api/alertas` | último resultado de `avaliar` (`quando, itens[], novos[]`) |
 | `/api/notificacoes` | `itens[]` da tabela `alerta` (200 mais recentes) |
 | `/api/config` | `config, lojas_itad[], classes` |
 | `/api/steam/conta` | `{conectado, steamid_final (4 dígitos), dias, vence_em_breve, erro?}`; nunca devolve token |
-| `/api/carrinho` | `itens[]` (com `lojas[]`, `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `ponte_vista, ponte_falhas[], sem_pacote[]` |
+| `/api/carrinho` | `itens[]` (com `lojas[]`, `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `sem_pacote[]` |
 | `/api/buscar?q=` | busca na loja (nome, appid ou link) → `itens[{appid,nome,capa,preco,corte,tipo,na_lista,possuido}]` |
 | `/api/biblioteca` | `jogos[]` (valor, DLCs que contam, faltantes com preço/menor, bundles), `total{hoje,cheio,menor,falta_*}`, `franquias[]` (séries), `sem_lista_dlc, sem_dados, atualizado, falta_ids`, `dlcs_promo[]` (DLCs que contam, que você não tem, de jogos que você tem, com desconto agora: `appid, nome, capa, pai, pai_nome, preco, cheio, corte, loja, so_steam` (preço só do catálogo da Steam), `fim, tipo_oferta, piso_ref`) |
 | `/api/acesso` | `rede_local, porta, ips[], pin, links[]` (só local) |
-| `/api/ponte` | para o userscript: `carrinho[{tipo:app|bundle, appid/subid ou bundleid, nome, url}]` (só itens da Steam; busca na hora o pacote que faltar), `fila[{appid,acao}]` |
 
 ## POST
 
@@ -52,8 +50,6 @@ Todo POST bem-sucedido invalida o cache das linhas de Promoções (refeito na pr
 | `/api/extra` | `{appid, remover?}` | monitora/para de monitorar jogo fora da wishlist (`config.extras`) |
 | `/api/tenho` | `{appid, tenho}` | "já tenho" manual (tabela `tenho_manual`), tira do carrinho |
 | `/api/silenciar` | `{appid, mudo}` | sem notificações para o jogo |
-| `/api/lista_steam` | `{appid, acao:add|remove|cancelar}` | fila para a ponte aplicar na lista de desejos da Steam |
-| `/api/ponte/feito` | `{lista:[{appid,acao,ok}], carrinho:{enviados,falhas,itens_falhos[]}}` | retorno da ponte |
 | `/api/acesso` | `{rede_local?, novo_codigo?}` | liga/desliga rede local (reinicia o servidor), troca o PIN |
 | `/api/atualizar_app` | — | abre a janela de atualização |
 | `/api/steam/qr/iniciar` | — | **só o próprio PC.** Pede um QR à Steam (`BeginAuthSessionViaQR`, `platform_type=3`); devolve `{ok, url}` (o painel desenha) |

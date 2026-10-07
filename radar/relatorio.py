@@ -1,4 +1,4 @@
-"""Pagina local com os alertas atuais (ponte ate o painel da etapa 3). Abre no navegador."""
+"""Pagina local com os alertas atuais. Abre no navegador."""
 import html
 import json
 from datetime import datetime

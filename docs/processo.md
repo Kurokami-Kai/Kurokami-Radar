@@ -25,7 +25,7 @@ Com o Radar instalado aberto, feche-o antes (porta 80 e trava 47811 são compart
 - JS do painel: extrair o `<script>` de `painel.html` e rodar `new Function(js)` no Node.
 - Lógica sem rede: copiar um `dados/radar.sqlite3` real e chamar `painel.api_lista({})`, `api_jogo`, `api_carrinho`, `analise.avaliar` com `b.ofertas_atuais()`.
 - Visual: subir `py radar.py painel` e tirar prints com Playwright em `http://127.0.0.1/kurokami`.
-- O que só dá para testar no Windows real: notificações, bandeja, instalador, ponte na Steam, atualização silenciosa.
+- O que só dá para testar no Windows real: notificações, bandeja, instalador, carrinho direto na Steam, atualização silenciosa.
 
 ## Publicar uma versão
 1. Mudar `VERSAO` em `radar/__init__.py` **e** `VERSAO_PAGINA` em `radar/painel.html` (mesmo número).
@@ -38,7 +38,7 @@ Com o Radar instalado aberto, feche-o antes (porta 80 e trava 47811 são compart
    - gera o `Setup.exe` e publica o release com a descrição e o instalador anexado.
 7. Os Radars instalados avisam ao abrir ou em até 24 h.
 
-Arquivos novos que o `.exe` precisa ler (como `painel.html`, `ponte.user.js`) devem entrar no `--add-data` do workflow **e** do `gerar_setup.bat`.
+Arquivos novos que o `.exe` precisa ler (como `painel.html`) devem entrar no `--add-data` do workflow **e** do `gerar_setup.bat`.
 
 ## Exportar a documentação (reserva)
 O Projeto "Kurokami Radar" no claude.ai lê os docs **direto do GitHub**: não é preciso atualizá-lo à mão, e o fim de cada tarefa não tem mais o passo "Docs para atualizar no Projeto". O `tools/exportar_docs.py` fica no repositório só como reserva (por exemplo, se o Projeto voltar a usar arquivos enviados):

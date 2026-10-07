@@ -111,7 +111,7 @@ Dois níveis, o segundo opcional.
 - "Entrar com QR": o painel mostra o QR e **troca a imagem a cada ~20 s** (o servidor guarda o `client_id` atual e o painel consulta). "Conectado como …" e "Sair da Steam" (`RevokeToken` + apagar do cofre).
 - **Usar `platform_type=3`** (único que renova). O refresh token (30 dias) fica no cofre do Windows via `radar/credenciais.py`; o access token só em memória, renovado ao expirar (`GenerateAccessTokenForApp`, ~24 h). Passados os 30 dias, avisar "entre de novo" (novo QR), sem erro silencioso.
 - **Primeiro uso do QR:** lista de desejos de perfil privado e jogos da família ("Na família" na relação com o jogo, aba Promoções; se contam como "tenho" nos avisos, decidir com os números: 8 de 806 na lista do dono).
-- **Carrinho direto pela conta** (`AddItemsToCart`) só depois de repetir o teste de "voltar ao estado de antes" com um carrinho não vazio; a ponte do Tampermonkey continua como alternativa.
+- **Carrinho direto pela conta** (`AddItemsToCart`) só depois de repetir o teste de "voltar ao estado de antes" com um carrinho não vazio; a ponte do Tampermonkey foi removida a pedido do dono.
 - **Escrita na lista de desejos e ignorados:** exigem endpoints da loja web, ainda não testados; ficam fora até haver teste.
 - Registrar em `docs/decisoes.md` a mudança de segurança ("o Radar nunca recebe cookies da Steam" passa a valer só sem o Nível 2) e o que fica no cofre. Guardar nada de login em `dados/`, banco, log ou `config.json`.
 

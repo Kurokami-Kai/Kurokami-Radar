@@ -17,14 +17,14 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `consulta_lenta` | cache das consultas lentas da loja (`pacote`, `dlcs`; `dlcs_falha` = última falha do plano B, não conta como consultado) com data |
 | `alerta` | notificações enviadas |
 | `notificado` | estado por jogo para não repetir aviso (preço avisado, ativo) |
-| `tenho_manual`, `silenciado`, `fila_lista` | ações do usuário no painel |
+| `tenho_manual`, `silenciado` | ações do usuário no painel |
 | `meta` | chave→JSON (abaixo) |
 
 Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__`; mudanças de dados usam `meta.esquema` (`_migrar`).
 
 ## Chaves de `meta`
 
-`steamid`, `steamid_perfil`, `itad_ids` (cache appid→id ITAD), `lojas_itad`, `ult_steam`, `ult_itad`, `ult_gg`, `ult_biblioteca`, `ult_completa`, `ultimos_alertas` (para o painel; itens com `tipos`, `tipo_oferta`, `avisa_por`), `linha_de_base`, `tipos_ligados` (tipos de aviso da última rodada; ligar um tipo novo registra quem já estava assim sem toast), `pausado`, `pendentes` (silêncio), `avisos_fim`, `carrinho` (da Steam, via userdata), `dlcforapps_bloqueado`, `edicoes_manuais`, `ponte_vista`, `ponte_ultimo_envio`, `esquema`.
+`steamid`, `steamid_perfil`, `itad_ids` (cache appid→id ITAD), `lojas_itad`, `ult_steam`, `ult_itad`, `ult_gg`, `ult_biblioteca`, `ult_completa`, `ultimos_alertas` (para o painel; itens com `tipos`, `tipo_oferta`, `avisa_por`), `linha_de_base`, `tipos_ligados` (tipos de aviso da última rodada; ligar um tipo novo registra quem já estava assim sem toast), `pausado`, `pendentes` (silêncio), `avisos_fim`, `carrinho` (da Steam, via userdata), `dlcforapps_bloqueado`, `edicoes_manuais`, `esquema` (restos antigos: `ponte_vista`, `ponte_ultimo_envio` e a tabela `fila_lista`, da ponte removida na 0.16, não são mais lidos nem criados).
 
 ## `config.json` (padrões em `config.PADRAO`)
 

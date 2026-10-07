@@ -74,9 +74,9 @@ Linha de base na primeira vez (não dispara nada em massa) → ao **ligar um tip
 
 **Cache das linhas** (`painel.linhas_promocoes`): uma linha por jogo da lista, montada em ~0,5 s e guardada em memória com trava; filtrar/ordenar nele custa milissegundos. É refeito quando termina uma coleta (`servico.ciclo`), em qualquer POST do painel, quando o config ou o `userdata.json` muda (assinatura) e, por segurança, a cada 10 min. `/api/lista` também usa o cache. Seguidos/ignorados vêm de `conta_steam.relacao` (único leitor do `userdata.json` para isso). Localhost sempre liberado; outros aparelhos só com PIN (cookie `kr`) e se `painel.rede_local` estiver ligado. Porta 80 com reserva na 8787.
 
-## Ponte com a Steam (`ponte.user.js`)
+## Conta Steam (opcional)
 
-Userscript do Tampermonkey que roda em `store.steampowered.com`, lê `/api/ponte` do Radar local e, usando a sessão do usuário **dentro do navegador**, adiciona itens ao carrinho (`/cart/addtocart`, com plano B de clicar no botão da página e passar a verificação de idade) e aplica a fila da lista de desejos (`/api/addtowishlist`, `/api/removefromwishlist`). O Radar nunca recebe cookies da Steam.
+Dois níveis, ambos opcionais. **Entrar pela Steam** (`steam_openid.py`, OpenID 2.0): só o SteamID, gravado em `perfil_steam`. **QR** (`steam_sessao.py`): o botão "Conectar carrinho" no topo mostra um popover com o QR (a Steam o troca a cada ~20 s); o refresh token (~30 dias) vai para o cofre do Windows e o access token fica em memória, renovado sozinho. Com a sessão, **Finalizar pedido** (aba Carrinho) manda os itens da Steam para o carrinho da conta (`IAccountCartService/AddItemsToCart`), confere lendo de volta e abre `store.steampowered.com/cart/`. Só adiciona, nunca remove. Ver `docs/decisoes.md`, "Login Steam". Não há mais userscript (a ponte do Tampermonkey foi removida).
 
 ## Distribuição
 

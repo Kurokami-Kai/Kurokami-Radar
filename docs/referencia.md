@@ -261,9 +261,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `post_tenho(d)` — Marca/desmarca "ja tenho" (para compras feitas depois do userdata.json).
 - `post_silenciar(d)`
 - `post_atualizar_tudo(_d)`
-- `api_ponte(_q)` — Para a ponte (Tampermonkey) nas paginas da Steam: o que mandar para o carrinho e a fila da lista de desejos.
-- `post_ponte_feito(d)`
-- `post_lista_steam(d)` — Enfileira adicionar/tirar da lista de desejos da Steam (a ponte executa na proxima pagina da Steam).
+- `_itens_para_steam()` — Itens da Steam do carrinho do Radar (pacote ou bundle) para mandar ao carrinho da conta; descobre na hora o pacote que falta.
 - `post_atualizar_app(_d)`
 - `post_sair(_d)`
 - `api_notificacoes(_q)`
@@ -321,7 +319,7 @@ HTTP com JSON, backoff em 429/5xx e ritmo adaptativo (mesma logica do KurokamiPr
 - `de_reais(v)` — Valor decimal (ITAD amount, GG.deals "9.99" ou "10") para centavos.
 
 ## `radar/relatorio.py`
-Pagina local com os alertas atuais (ponte ate o painel da etapa 3). Abre no navegador.
+Pagina local com os alertas atuais. Abre no navegador.
 
 - `gerar(alertas, capas, novos_ids)`
 

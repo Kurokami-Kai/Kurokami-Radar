@@ -18,4 +18,4 @@ description: Testa mudanças do Kurokami Radar (API do painel, avaliação, rari
    ```
    Imprima contagens e amostras, não listas inteiras.
 3. Visual: `py radar.py painel` → `http://127.0.0.1/kurokami`. Para prints e cliques automatizados, use a skill **`webapp-testing`** (anthropics/skills) apontando para essa URL; veja o console.
-4. Diga o que **não** dá para testar assim (notificações, bandeja, ponte na Steam, instalador, atualização) e peça o log ao usuário.
+4. Diga o que **não** dá para testar assim (notificações, bandeja, carrinho direto na Steam, instalador, atualização) e peça o log ao usuário.

@@ -475,8 +475,7 @@ def api_jogo(q):
          "gg":dict(gg) if gg else None, "modo": config.modo_do_jogo(cfg, a), "classes": dlcmod.CLASSES,
          "tenho": a in ctx.possuidos, "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
          "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a)),
-         "na_lista": a in ctx.lista, "fila": (lambda r: r["acao"] if r else None)(b.um("SELECT acao FROM fila_lista WHERE appid=?", a)),
-         "ponte_vista": b.meta("ponte_vista")}
+         "na_lista": a in ctx.lista}
     b.con.close()
     return r
 
@@ -508,7 +507,7 @@ def api_carrinho(_q):
     apps = [int(i["appid"]) for i in itens if i.get("appid")]
     bids = [int(i["bundle"]) for i in itens if i.get("bundle")]
     if not itens:
-        r0 = {"itens": [], "bundles": [], "sugestoes": [], "steam": b.meta("carrinho") or [], "ponte_vista": b.meta("ponte_vista")}
+        r0 = {"itens": [], "bundles": [], "sugestoes": [], "steam": b.meta("carrinho") or []}
         b.con.close()
         return r0
     ctx = analise.Contexto(b, cfg)
@@ -569,10 +568,8 @@ def api_carrinho(_q):
                     "extras": [nome(a) for a in extras],
                     "extras_valor": sum((ctx.jogos.get(a) or {}).get("cheio_steam") or 0 for a in extras)})
     sug.sort(key=lambda x: (x["diferenca"] > 0, x["diferenca"], -len(x["comuns"])))
-    ult = b.meta("ponte_ultimo_envio") or {}
     sem_pacote = [x["nome"] for x in out if (not x["loja"] or x["loja"] == "Steam") and not (ctx.jogos.get(x["appid"]) or {}).get("pacote")]
-    r = {"itens": out, "bundles": bl, "sugestoes": sug[:10], "steam": b.meta("carrinho") or [], "ponte_vista": b.meta("ponte_vista"),
-         "ponte_falhas": ult.get("itens_falhos") or [], "sem_pacote": sem_pacote}
+    r = {"itens": out, "bundles": bl, "sugestoes": sug[:10], "steam": b.meta("carrinho") or [], "sem_pacote": sem_pacote}
     b.con.close()
     return r
 
@@ -831,8 +828,8 @@ def post_atualizar_tudo(_d):
     return {"ok": True}
 
 
-def api_ponte(_q):
-    """Para a ponte (Tampermonkey) nas paginas da Steam: o que mandar para o carrinho e a fila da lista de desejos."""
+def _itens_para_steam():
+    """Itens da Steam do carrinho do Radar (pacote ou bundle) para mandar ao carrinho da conta; descobre na hora o pacote que falta."""
     cfg = config.carregar()
     b = Banco()
     # quem ainda nao tem o pacote (subid) conhecido: pergunta a Steam agora, numa consulta so
@@ -846,7 +843,7 @@ def api_ponte(_q):
                     b.con.execute("UPDATE jogo SET pacote=? WHERE appid=?", (j["pacote"], j["appid"]))
             b.commit()
         except Exception as e:
-            _log_erro("/api/ponte (pacotes)", e)
+            _log_erro("carrinho (pacotes)", e)
     itens = []
     for it in carr:
         if it.get("bundle"):
@@ -860,47 +857,8 @@ def api_ponte(_q):
             itens.append({"tipo": "app", "appid": int(it["appid"]), "subid": j["pacote"] if j else None,
                           "nome": j["nome"] if j else str(it["appid"]),
                           "url": "https://store.steampowered.com/app/%d/" % int(it["appid"])})
-    fila = [dict(r) for r in b.q("SELECT appid, acao FROM fila_lista ORDER BY quando")]
     b.con.close()
-    return {"ok": True, "versao": VERSAO, "carrinho": itens, "fila": fila}
-
-
-def post_ponte_feito(d):
-    b = Banco()
-    for f in d.get("lista") or []:
-        if f.get("ok"):
-            b.con.execute("DELETE FROM fila_lista WHERE appid=? AND acao=?", (int(f["appid"]), f.get("acao")))
-            if f.get("acao") == "remove":
-                b.con.execute("UPDATE jogo SET na_lista=0 WHERE appid=?", (int(f["appid"]),))
-            else:
-                b.con.execute("UPDATE jogo SET na_lista=1 WHERE appid=?", (int(f["appid"]),))
-    c = d.get("carrinho")
-    if c:
-        b.meta("ponte_ultimo_envio", {"quando": datetime.now(timezone.utc).isoformat(), **c})
-    b.meta("ponte_vista", datetime.now(timezone.utc).isoformat())
-    b.commit()
-    b.con.close()
-    return {"ok": True}
-
-
-def post_lista_steam(d):
-    """Enfileira adicionar/tirar da lista de desejos da Steam (a ponte executa na proxima pagina da Steam)."""
-    a, acao = int(d["appid"]), d.get("acao")
-    b = Banco()
-    if acao == "cancelar":
-        b.con.execute("DELETE FROM fila_lista WHERE appid=?", (a,))
-    elif acao in ("add", "remove"):
-        b.con.execute("INSERT OR REPLACE INTO fila_lista VALUES(?,?,?)", (a, acao, datetime.now(timezone.utc).isoformat()))
-        if acao == "add":  # passa a monitorar ja, sem esperar a Steam
-            cfg = config.carregar()
-            ex = [int(x) for x in (cfg.get("extras") or [])]
-            if a not in ex:
-                ex.append(a)
-                cfg["extras"] = ex
-                config.salvar(cfg)
-    b.commit()
-    b.con.close()
-    return {"ok": True}
+    return itens
 
 
 def post_atualizar_app(_d):
@@ -1017,7 +975,7 @@ def post_steam_sair(_d):
 
 def post_steam_carrinho(_d):
     """Manda o carrinho do Radar (itens da Steam) direto para o carrinho da conta e confere lendo de volta."""
-    itens = api_ponte({}).get("carrinho") or []
+    itens = _itens_para_steam()
     nomes = {}
     pacotes, bundles, sem = [], [], []
     for i in itens:
@@ -1041,13 +999,13 @@ def post_steam_carrinho(_d):
 
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
-       "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso, "/api/ponte": api_ponte,
+       "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
        "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/steam/conta": api_steam_conta}
 POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,
-        "/api/ponte/feito": post_ponte_feito, "/api/lista_steam": post_lista_steam, "/api/atualizar_app": post_atualizar_app,
+        "/api/atualizar_app": post_atualizar_app,
         "/api/steam/qr/iniciar": post_steam_qr_iniciar, "/api/steam/qr/consultar": post_steam_qr_consultar,
         "/api/steam/sair": post_steam_sair, "/api/steam/carrinho": post_steam_carrinho}
 
@@ -1173,15 +1131,6 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Location", CAMINHO)
             self.end_headers()
             return
-        if u.path in (CAMINHO + "/ponte.user.js", "/ponte.user.js"):
-            with open(os.path.join(os.path.dirname(HTML), "ponte.user.js"), "rb") as f:
-                dados = f.read()
-            self.send_response(200)
-            self.send_header("Content-Type", "text/javascript; charset=utf-8")
-            self.send_header("Content-Length", str(len(dados)))
-            self.end_headers()
-            self.wfile.write(dados)
-            return
         if u.path == CAMINHO + "/acao":
             q = parse_qs(u.query)
             if not self._local() or not ("silenciar" in q or "atualizar" in q):
@@ -1234,8 +1183,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._entrar()
         # so aceita chamadas do proprio painel (protege contra sites tentando mexer no seu config)
         origem = self.headers.get("Origin") or ""
-        ponte = urlparse(self.path).path == "/api/ponte/feito" and self._local()
-        if origem and origem != "http://%s" % (self.headers.get("Host") or "") and not ponte:
+        if origem and origem != "http://%s" % (self.headers.get("Host") or ""):
             return self._json({"erro": "origem recusada"}, 403)
         if not self._local():
             t = token()

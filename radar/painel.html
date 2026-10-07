@@ -51,6 +51,10 @@ button{font-family:inherit}
 .btn-imp:hover{filter:brightness(1.12)}
 .btn-ghost{background:rgba(103,193,245,.2);color:var(--blue);border:0;border-radius:2px;padding:6px 11px;font-size:12px;cursor:pointer}
 .btn-ghost:hover{background:var(--blue);color:#fff}
+.cart-head{display:flex;align-items:baseline;gap:12px;margin:6px 0 10px}.cart-head h1{margin:0;font-size:26px;font-weight:300;color:#fff;letter-spacing:.02em}
+#qrPop{position:fixed;top:56px;right:14px;z-index:60;width:210px;background:#171a21;border:1px solid #2f4d64;box-shadow:0 8px 24px rgba(0,0,0,.6);padding:12px;text-align:center}
+#qrPop h4{margin:0 0 6px;color:#fff;font-size:13px;letter-spacing:.04em}#qrPop .qx{position:absolute;top:2px;right:6px;background:none;border:0;color:#8f98a0;font-size:18px;cursor:pointer}
+#qrBox{background:#fff;display:inline-block;padding:6px;margin:8px 0;min-width:150px;min-height:150px}
 #contaSteam{display:inline-flex;align-items:center;gap:6px;margin-left:8px}#contaSteam a{text-decoration:none;display:inline-block}.chip-steam{font-size:12px;color:var(--blue);background:rgba(103,193,245,.12);padding:5px 9px;border-radius:2px}
 
 /* ---------- store subnav ---------- */
@@ -573,21 +577,21 @@ details.blk[open]>summary h4::after{content:"▴"}
   </section>
 
   <section id="tab-carr" class="wrap tabsec" hidden>
+    <div class="cart-head"><h1>Seu carrinho de compras</h1><span class="aside" id="carrNote"></span></div>
     <div class="subnav">
-      <span class="lk" style="cursor:default">Simule a compra: escolha a loja de cada jogo, veja o total e se algum bundle sai mais barato</span>
+      <span class="lk" style="cursor:default">Escolha a loja de cada jogo, veja o total e se algum bundle sai mais barato</span>
       <button class="lk" id="carrSteam">Trazer o carrinho da Steam</button>
       <button class="lk" id="carrOtim">Loja mais barata em tudo</button>
       <button class="lk" id="carrLimpa">Limpar</button>
     </div>
-    <div class="meta-col" id="diretoBox"></div>
-    <div class="meta-col" id="ponteBox"></div>
+    <div class="carr-grid">
+      <div><div id="carrLista"></div><div id="carrBundles"></div>
     <div class="shead"><h2>Adicionar jogo</h2><span class="aside">nome, appid ou link da loja Steam</span></div>
     <div class="addbox"><label class="search" style="flex:1;margin:0"><span class="sr">Buscar jogo</span><input id="busca" type="search" placeholder="ex.: Hollow Knight, 367520 ou https://store.steampowered.com/app/..." autocomplete="off"></label>
       <button class="btn-imp" id="buscaBtn" type="button">Buscar</button></div>
     <div id="buscaRes"></div>
-    <div class="carr-grid">
-      <div><div class="shead"><h2>No carrinho</h2><span class="aside" id="carrNote"></span></div><div id="carrLista"></div><div id="carrBundles"></div></div>
-      <aside class="side"><div class="blk"><h4>Resumo</h4><div class="in" id="carrResumo"></div></div>
+      </div>
+      <aside class="side"><div class="blk"><h4>Resumo do pedido</h4><div class="in" id="carrResumo"></div></div>
         <div class="blk"><h4>Orçamento</h4><div class="in"><label class="f" style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px">Quanto quero gastar (R$)
           <input type="number" id="orc" min="0" step="10" style="width:90px;background:#0e141b;border:0;color:#fff;padding:6px 8px;border-radius:2px;box-shadow:inset 0 0 0 1px #2f4d64"></label>
           <div id="orcBar"></div></div></div></aside>
@@ -946,9 +950,6 @@ function renderModal(){
         ${o.extra?`<button class="btn-ghost" data-desmonitorar="${j.appid}" style="padding:8px 12px">Parar de monitorar</button>`:''}
         <button class="btn-ghost" data-tenho="1" style="padding:8px 12px">${MJ.tenho_manual?'Desfazer "já tenho"':(MJ.tenho?'Está na sua biblioteca':'Já tenho')}</button>
         <button class="btn-ghost" data-mudo="${MJ.mudo?0:1}" style="padding:8px 12px">${MJ.mudo?'Voltar a avisar':'Não avisar deste jogo'}</button>
-        ${(()=>{const naSteam=MJ.na_lista&&!o.extra;if(MJ.tenho)return '';
-          if(MJ.fila)return `<button class="btn-ghost" data-ls="cancelar" style="padding:8px 12px" title="A ponte aplica na próxima página da Steam que você abrir">${MJ.fila==='add'?'Entrando na lista da Steam…':'Saindo da lista da Steam…'} (cancelar)</button>`;
-          return `<button class="btn-ghost" data-ls="${naSteam?'remove':'add'}" style="padding:8px 12px">${naSteam?'Tirar da lista de desejos da Steam':'Pôr na lista de desejos da Steam'}</button>`;})()}
         ${MJ.dlcs.length?`<span class="seg" role="group" aria-label="Alertar por"><button data-modo="base" aria-pressed="${MJ.modo!=='completo'}">Alertar pelo base</button><button data-modo="completo" aria-pressed="${MJ.modo==='completo'}">Pelo completo</button></span>`:''}
       </div></div></div>
     <div class="msec">${o.pisos?`<h4>Menor preço nas lojas que alertam</h4><div class="pisos tnum">${[['3m','3 meses'],['6m','6 meses'],['9m','9 meses'],['1a','1 ano'],['sempre','De sempre']].map(([k,t])=>`<div class="${o.preco!=null&&o.pisos[k]!=null&&o.preco<=o.pisos[k]?'on':''}">${t}<b>${brl(o.pisos[k])}</b></div>`).join('')}</div>`:''}
@@ -966,9 +967,6 @@ $('#mbody').addEventListener('click',async e=>{
     toast(novo?'Marcado como seu: sai dos alertas e do carrinho':'Desmarcado');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();BD=null;return;}
   const mu=e.target.closest('[data-mudo]');if(mu){await post('/api/silenciar',{appid:MJ.jogo.appid,mudo:mu.dataset.mudo==='1'});toast(mu.dataset.mudo==='1'?'Sem alertas para este jogo':'Alertas de volta');
     MJ.mudo=mu.dataset.mudo==='1';const it=IDX.get(MJ.jogo.appid);if(it)it.mudo=MJ.mudo;renderModal();return;}
-  const ls_=e.target.closest('[data-ls]');if(ls_){await post('/api/lista_steam',{appid:MJ.jogo.appid,acao:ls_.dataset.ls});
-    toast(ls_.dataset.ls==='cancelar'?'Cancelado':(MJ.ponte_vista?'Feito na próxima página da Steam que você abrir (pela ponte)':'Precisa da ponte: veja na aba Carrinho como instalar'));
-    MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();return;}
   const mc=e.target.closest('[data-mcart]');if(mc){await alternarCarr(+mc.dataset.mcart);renderModal();return;}
   const dm=e.target.closest('[data-desmonitorar]');if(dm){await post('/api/extra',{appid:+dm.dataset.desmonitorar,remover:true});toast('Não é mais monitorado (sai da lista na próxima checagem)');return;}
   const m=e.target.closest('[data-modo]');if(m){await post('/api/modo',{appid:MJ.jogo.appid,modo:m.dataset.modo});toast('Modo salvo: vale a partir da próxima checagem');MJ.modo=m.dataset.modo;
@@ -1105,13 +1103,15 @@ async function renderCarr(){
   CD.bundles.forEach(b=>{if(b.preco==null){semPreco++;return;}total+=b.preco;cheio+=b.cheio||b.preco;pisoTot+=b.preco;});
   it.forEach(c=>{const sel=c.lojas.find(l=>l.loja===c.loja)||c.lojas[0];if(!sel||sel.preco==null){semPreco++;return;}
     total+=sel.preco;cheio+=sel.cheio||sel.preco;pisoTot+=Math.min(sel.preco,c.piso??sel.preco);});
-  $('#carrResumo').innerHTML=`<div class="tot big"><span>Total</span><b>${brl(total)}</b></div>
+  $('#carrResumo').innerHTML=`<div class="tot big"><span>Valor total estimado</span><b>${(it.length||CD.bundles.length)?brl(total):'R$ 0,00'}</b></div>
+    <button class="btn-go green" id="btnFinalizar" type="button" style="width:100%;margin:8px 0 4px;padding:11px;font-size:15px">Finalizar pedido</button><div id="finalNota"></div><a href="#lista" style="display:block;text-align:center;color:var(--blue);font-size:12px;margin:2px 0 8px">Continuar comprando</a>
     <div class="tot"><span>Preço cheio</span><b>${brl(cheio)}</b></div>
     <div class="tot"><span>Você economiza</span><b style="color:var(--disc-fg)">${brl(cheio-total)}${cheio?` (${Math.round(100*(1-total/cheio))}%)`:''}</b></div>
     <div class="tot"><span>Se cada um estivesse no menor de sempre</span><b>${brl(pisoTot)}</b></div>
     <div class="tot"><span>Diferença para os pisos</span><b>${brl(total-pisoTot)}</b></div>
     ${semPreco?`<div class="hint" style="color:var(--dim);font-size:11px">${semPreco} jogo(s) sem preço ainda (chega na próxima checagem).</div>`:''}
     ${CD.sugestoes.some(x=>x.diferenca<0)?`<div class="hint" style="color:var(--disc-fg);font-size:11.5px;margin-top:6px">Há bundle mais barato para parte do carrinho ↓</div>`:''}`;
+  $('#btnFinalizar').onclick=finalizar;
   const orc=ls.get('orc',0);$('#orc').value=orc||'';
   $('#orcBar').innerHTML=orc?`<div class="tot"><span>${total>orc*100?'Passou':'Sobra'}</span><b>${brl(Math.abs(orc*100-total))}</b></div><div class="bar${total>orc*100?' over':''}"><i style="width:${Math.min(100,total/(orc*100)*100)}%"></i></div>`:'<div class="hint" style="color:var(--dim);font-size:11px">Defina um valor para ver quanto sobra.</div>';
   $('#carrBundles').innerHTML=CD.sugestoes.length?`<div class="shead"><h2>Bundles com itens do seu carrinho</h2><span class="aside">preço já descontando o que você tem</span></div>
@@ -1121,20 +1121,6 @@ async function renderCarr(){
       <div class="motivo">${b.diferenca<0?`<b style="color:var(--disc-fg)">economiza ${brl(-b.diferenca)}</b>`:`custa ${brl(b.diferenca)} a mais`} que os ${b.comuns.length} separados (${brl(b.separado)})</div></span>
       ${priceBlock({preco:b.preco,cheio:b.separado,corte:b.diferenca<0?Math.round(100*(1-b.preco/b.separado)):0})}
       <span style="display:flex;flex-direction:column;gap:4px"><button class="btn-imp" data-trocar="${b.bundle}|${b.comuns_ids.join(',')}" style="font-size:11.5px;padding:5px 8px">Trocar pelos itens</button><button class="btn-ghost" data-cartb="${b.bundle}" style="font-size:11.5px">Só adicionar</button></span></div>`).join('')}</div>`:'';
-  const pv=CD.ponte_vista;const steamN=CD.itens.filter(c=>!c.loja||c.loja==='Steam').length+CD.bundles.length;
-  $('#ponteBox').innerHTML=`<div class="l"><span><b>Levar para o carrinho da Steam</b> · ${steamN} item(ns) da Steam no carrinho${CD.itens.length+CD.bundles.length>steamN?' (os de outras lojas abrem pelo link de cada oferta)':''}</span>
-      <span>${pv?`<span style="color:#a1cd44">ponte instalada ✓</span> · vista ${fmtISO(pv)}`:'<span style="color:#e2a635">ponte ainda não instalada</span>'}</span></div>
-    ${(CD.ponte_falhas||[]).length?`<div class="hint" style="color:#ff9b8a;font-size:11.5px;margin-top:6px">No último envio não entraram: ${CD.ponte_falhas.map(f=>`<b>${esc(f.nome||f.appid)}</b> (${esc(f.motivo||'?')})`).join(' · ')}</div>`:''}
-    ${CD.sem_pacote&&CD.sem_pacote.length?`<div class="hint" style="color:#e2a635;font-size:11.5px;margin-top:4px">Sem pacote conhecido (vão pela aba da página): ${CD.sem_pacote.map(esc).join(', ')}. "Atualizar tudo" em Configurações resolve.</div>`:''}
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-      ${pv?'':`<a class="btn-imp" href="/kurokami/ponte.user.js" target="_blank" style="text-decoration:none;padding:7px 12px">1. Instalar a ponte</a>`}
-      <a class="btn-imp" href="https://store.steampowered.com/" target="_blank" rel="noopener" style="text-decoration:none;padding:7px 12px;${pv?'':'background:#3d4450'}">${pv?'':'2. '}Abrir a Steam e enviar</a>
-      <button class="btn-ghost" id="abrirAbas" type="button">Ou abrir as páginas em abas</button></div>
-    <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">${pv?'Na loja da Steam aparece o botão verde "Trazer o carrinho do Kurokami Radar" no canto da tela.':
-      'A ponte precisa da extensão <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> (grátis). Instale a extensão, clique em "Instalar a ponte" e confirme. Ela roda só nas páginas da Steam, usa o seu login de lá e não manda nada para fora do seu PC.'}</div>`;
-  $('#abrirAbas').onclick=()=>{const urls=CD.itens.filter(c=>!c.loja||c.loja==='Steam').map(c=>storeUrl(c.appid)).concat(CD.bundles.map(b=>`https://store.steampowered.com/bundle/${b.bundle}/`));
-    let bloqueou=false;urls.forEach(u=>{if(!window.open(u,'_blank'))bloqueou=true;});if(bloqueou)toast('O navegador bloqueou algumas abas: permita pop-ups para localhost.');};
-  renderDireto();
   $('#carrSteam').style.display=(CD.steam||[]).length?'':'none';$('#carrSteam').textContent=`Trazer o carrinho da Steam (${(CD.steam||[]).length})`;
 }
 $('#carrBundles').addEventListener('click',async e=>{const t=e.target.closest('[data-trocar]');if(!t)return;const [bid,ids]=t.dataset.trocar.split('|');const rem=new Set(ids.split(',').map(Number));
@@ -1251,60 +1237,65 @@ async function carregarConta(){
   let c;try{c=(await api('/api/config')).config;}catch(e){return;}
   const p=String(c.perfil_steam||''),local=['localhost','127.0.0.1'].includes(location.hostname),id=/^\d{17}$/.test(p);
   const dica='Você confirma na página da própria Steam. O Radar só recebe o seu SteamID: nunca a senha, token ou cookie.';
-  el.innerHTML=(p?`<span class="chip-steam" title="Perfil em uso: ${esc(p)}">Steam ${id?'…'+esc(p.slice(-4)):esc(p.slice(0,18))}</span>`:'')+
-    (CQ&&CQ.conectado?`<span class="chip-steam" title="Carrinho direto conectado (QR); vale mais ${CQ.dias} dia(s)">Carrinho ✓</span>`:'')+(local?`<a class="${p?'btn-ghost':'btn-imp'}" href="/kurokami/steam/entrar" title="${esc(dica)}">${p?'Trocar':'Entrar pela Steam'}</a>`:(p?'':'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>'));
+  el.innerHTML=(p?`<span class="chip-steam" title="Perfil em uso: ${esc(p)}">Steam ${id?'…'+esc(p.slice(-4)):esc(p.replace(/\/+$/,'').split('/').pop().slice(0,16))}</span>`:'')+
+    (local?`<button class="btn-ghost" id="btnQR" type="button" title="Carrinho direto da Steam, sem extensão: leia um QR com o app da Steam">${CQ&&CQ.conectado?'Carrinho ✓':'Conectar carrinho'}</button>`:'')+(local?`<a class="${p?'btn-ghost':'btn-imp'}" href="/kurokami/steam/entrar" title="${esc(dica)}">${p?'Trocar':'Entrar pela Steam'}</a>`:(p?'':'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>'));
+  if($('#btnQR'))$('#btnQR').onclick=alternarPop;
 }
-/* ================= conta Steam por QR (carrinho direto) ================= */
-let CQ=null;
+/* ================= conta Steam por QR: popover no canto (carrinho direto) ================= */
+let CQ=null,POP={timer:null,url:'',aberto:false};
 async function carregarContaQR(){try{CQ=await api('/api/steam/conta');}catch(e){CQ=null;}}
 function comQR(fn){if(window.QRCode)return fn();const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.integrity='sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU';sc.crossOrigin='anonymous';sc.onload=fn;document.head.appendChild(sc);}
-async function renderDireto(){
-  const el=$('#diretoBox');if(!el)return;
-  await carregarContaQR();
-  const steamN=(CD?CD.itens.filter(c=>!c.loja||c.loja==='Steam').length+CD.bundles.length:0);
+function fecharPop(){POP.aberto=false;clearInterval(POP.timer);POP.timer=null;const p=$('#qrPop');if(p)p.remove();}
+async function alternarPop(){if(POP.aberto){fecharPop();return;}await abrirPop();}
+async function abrirPop(){
+  await carregarContaQR();fecharPop();POP.aberto=true;POP.url='';
+  const p=document.createElement('div');p.id='qrPop';p.setAttribute('role','dialog');
+  p.innerHTML='<button class="qx" id="qrX" type="button" aria-label="Fechar">×</button><div id="qrCorpo"></div>';
+  document.body.appendChild(p);$('#qrX').onclick=fecharPop;
   if(CQ&&CQ.conectado){
-    el.innerHTML=`<div class="l"><span><b>Carrinho direto da Steam</b> · <span style="color:#a1cd44">conectado ✓</span> (conta …${esc(CQ.steamid_final)}) · a sessão vale mais ${CQ.dias} dia(s)</span></div>
-      ${CQ.vence_em_breve?'<div class="hint" style="color:#e2a635;font-size:11.5px">A sessão vence em breve: depois disso é preciso ler o QR de novo.</div>':''}
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn-imp" id="diretoEnviar" type="button" ${steamN?'':'disabled'}>Enviar ${steamN} item(ns) ao carrinho da Steam</button>
-      <a class="btn-ghost" href="https://store.steampowered.com/cart/" target="_blank" rel="noopener" style="text-decoration:none;padding:7px 12px">Abrir o carrinho da Steam</a>
-      <button class="btn-ghost" id="diretoSair" type="button">Desconectar</button></div>
-      <div class="hint" style="color:var(--dim);font-size:11px;margin-top:6px">Só adiciona; não tira nada que você já tenha no carrinho da Steam. Depois de enviar, o Radar lê o carrinho de volta para conferir.</div>`;
-    $('#diretoEnviar').onclick=async e=>{e.target.disabled=true;const r=await post('/api/steam/carrinho');e.target.disabled=false;
-      if(r.erro&&!r.faltaram){toast('Erro: '+r.erro);return;}
-      toast(r.ok?`${r.entraram} item(ns) no carrinho da Steam.`:`${r.entraram} entraram. Não entraram: ${(r.faltaram||[]).join(', ')}.`);};
-    $('#diretoSair').onclick=async()=>{if(!confirm('Desconectar? A sessão é revogada na Steam e apagada deste PC.'))return;const rs=await post('/api/steam/sair');toast(rs.revogado===false?'Desconectado deste PC, mas NÃO consegui revogar na Steam: remova o dispositivo em Steam → Segurança → Dispositivos autorizados.':'Desconectado da Steam (sessão revogada).');renderDireto();carregarConta();};
-  }else{
-    el.innerHTML=`<div class="l"><span><b>Carrinho direto da Steam</b> · sem Tampermonkey (opcional)</span></div>
-      ${CQ&&CQ.erro?`<div class="hint" style="color:#ff9b8a;font-size:11.5px">${esc(CQ.erro)}</div>`:''}
-      <div class="hint" style="color:var(--dim);font-size:11.5px;margin:6px 0">Leia um QR com o app da Steam no celular e aprove. O Radar nunca vê a sua senha: guarda só uma chave de sessão (dura ~30 dias) no cofre do Windows, e você pode desconectar quando quiser. Só funciona abrindo o painel neste PC.</div>
-      ${['localhost','127.0.0.1'].includes(location.hostname)?'<button class="btn-imp" id="diretoQR" type="button">Conectar com QR</button>':'<div class="hint">Abra o painel no próprio PC (localhost) para conectar.</div>'}`;
-    if($('#diretoQR'))$('#diretoQR').onclick=abrirQR;
+    $('#qrCorpo').innerHTML=`<h4>Carrinho direto</h4><div class="hint"><span style="color:#a1cd44">Conectado ✓</span> (conta …${esc(CQ.steamid_final)})<br>A sessão vale mais ${CQ.dias} dia(s).${CQ.vence_em_breve?' <b style="color:#e2a635">Vence em breve:</b> depois é só ler o QR de novo.':''}</div>
+      <button class="btn-ghost" id="qrSair" type="button" style="margin-top:8px">Desconectar</button>`;
+    $('#qrSair').onclick=async()=>{if(!confirm('Desconectar? A sessão é revogada na Steam e apagada deste PC.'))return;const rs=await post('/api/steam/sair');
+      toast(rs.revogado===false?'Desconectado deste PC, mas NÃO consegui revogar na Steam: remova o dispositivo em Steam → Segurança → Dispositivos autorizados.':'Desconectado da Steam (sessão revogada).');fecharPop();carregarConta();};
+    return;
   }
-}
-async function abrirQR(){
-  const ov=document.createElement('div');
-  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:99;display:flex;align-items:center;justify-content:center';
-  ov.innerHTML=`<div style="background:#171a21;padding:22px;max-width:340px;width:92%;text-align:center;box-shadow:0 0 24px #000"><h3 style="margin:0 0 6px;color:#fff">Conectar com QR</h3>
-    <div class="hint" id="qrMsg">Abra o app da Steam no celular → Steam Guard → <b>Ler QR</b> e aprove.</div>
-    <div id="qrBox" style="background:#fff;display:inline-block;padding:10px;margin:12px 0;min-height:160px;min-width:160px"></div>
-    <div><button class="btn-ghost" id="qrFechar" type="button">Cancelar</button></div></div>`;
-  document.body.appendChild(ov);
-  let timer=null,url='',fim=false;
-  const esc_=e=>{if(e.key==='Escape')fechar();};document.addEventListener('keydown',esc_);
-  const fechar=()=>{fim=true;clearInterval(timer);document.removeEventListener('keydown',esc_);ov.remove();};
-  ov.addEventListener('click',e=>{if(e.target===ov)fechar();});
-  $('#qrFechar').onclick=fechar;
-  const desenhar=u=>{if(u===url)return;url=u;comQR(()=>{const b=$('#qrBox');if(!b)return;b.innerHTML='';try{new QRCode(b,{text:u,width:200,height:200});}catch(e){}});};
+  $('#qrCorpo').innerHTML=`<h4>Carrinho direto</h4>${CQ&&CQ.erro?`<div class="hint" style="color:#ff9b8a">${esc(CQ.erro)}</div>`:''}
+    <div class="hint" id="qrMsg">No app da Steam: <b>Steam Guard → Ler QR</b> e aprove.</div><div id="qrBox"></div>
+    <div class="hint" style="font-size:10.5px">O Radar nunca vê a sua senha; guarda só uma chave (~30 dias) no cofre do Windows.</div>`;
+  const desenhar=u=>{if(u===POP.url)return;POP.url=u;comQR(()=>{const b=$('#qrBox');if(!b)return;b.innerHTML='';try{new QRCode(b,{text:u,width:150,height:150});}catch(e){}});};
   const r=await post('/api/steam/qr/iniciar');
+  if(!POP.aberto)return;
   if(!r.ok){$('#qrMsg').textContent=r.erro||'Não consegui pedir o QR.';return;}
-  if(fim)return;desenhar(r.url);
-  timer=setInterval(async()=>{
-    if(fim)return;const c=await post('/api/steam/qr/consultar');if(fim)return;
-    if(c.estado==='ok'){fechar();toast('Conectado à Steam: carrinho direto liberado.');renderDireto();carregarConta();}
-    else if(c.estado==='expirou'||c.estado==='nenhum'){clearInterval(timer);$('#qrMsg').textContent='O QR expirou (3 minutos). Feche e tente de novo.';}
-    else if(c.estado==='erro'||c.ok===false){clearInterval(timer);$('#qrMsg').textContent=c.erro||'Não deu certo.';}
+  desenhar(r.url);
+  POP.timer=setInterval(async()=>{
+    if(!POP.aberto)return;const c=await post('/api/steam/qr/consultar');if(!POP.aberto)return;
+    if(c.estado==='ok'){fecharPop();toast('Conectado à Steam: carrinho direto liberado.');carregarConta();}
+    else if(c.estado==='expirou'||c.estado==='nenhum'){clearInterval(POP.timer);$('#qrMsg').textContent='O QR expirou (3 min). Clique em "Conectar carrinho" de novo.';}
+    else if(c.estado==='erro'||c.ok===false){clearInterval(POP.timer);$('#qrMsg').textContent=c.erro||'Não deu certo.';}
     else if(c.url)desenhar(c.url);
   },3000);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharPop();});
+/* ---- Finalizar pedido: manda o carrinho para a conta Steam e abre o carrinho da loja ---- */
+async function finalizar(){
+  if(!CD)return;
+  const stm=CD.itens.filter(c=>(!c.loja||c.loja==='Steam')&&!c.possuido).length+CD.bundles.length;
+  const outras=CD.itens.filter(c=>c.loja&&c.loja!=='Steam');
+  const nota=$('#finalNota');nota.innerHTML='';
+  if(!stm&&!outras.length){toast('O carrinho está vazio.');return;}
+  if(stm){
+    await carregarContaQR();
+    if(!(CQ&&CQ.conectado)){await abrirPop();toast('Conecte a Steam pelo QR (canto superior direito) e clique em Finalizar pedido de novo.');return;}
+    const w=window.open('about:blank','_blank');   // abre já, no clique, para o navegador não bloquear
+    const b=$('#btnFinalizar');b.disabled=true;const r=await post('/api/steam/carrinho');b.disabled=false;
+    if(r.erro&&!r.faltaram){if(w)w.close();toast('Erro: '+r.erro);return;}
+    const url='https://store.steampowered.com/cart/';
+    if(w)w.location=url;else nota.innerHTML=`<a class="btn-ghost" href="${url}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir o carrinho da Steam</a>`;
+    toast(r.ok?`${r.entraram} item(ns) no carrinho da Steam. Conclua o pagamento lá.`:`${r.entraram} entraram. Não entraram: ${(r.faltaram||[]).join(', ')}.`);
+    if((r.sem_pacote||[]).length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#e2a635;font-size:11.5px">Sem pacote conhecido (abra a página): ${r.sem_pacote.map(esc).join(', ')}</div>`);
+  }
+  if(outras.length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="font-size:11.5px;margin-top:6px">De outras lojas (compre pelo link):</div>`+outras.map(c=>{const s=c.lojas.find(l=>l.loja===c.loja)||{};
+    return s.url?`<div style="font-size:12px"><a href="${esc(s.url)}" target="_blank" rel="noopener" style="color:var(--blue)">${esc(c.nome)} · ${esc(c.loja)} · ${brl(s.preco)}</a></div>`:'';}).join(''));
 }
 
 /* ================= status / ações ================= */

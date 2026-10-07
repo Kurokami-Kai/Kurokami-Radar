@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS meta(chave TEXT PRIMARY KEY, valor TEXT);
 CREATE TABLE IF NOT EXISTS oferta_atual(
   appid INTEGER, loja TEXT, preco INTEGER, cheio INTEGER, corte INTEGER, url TEXT,
   drm_steam INTEGER, flag TEXT, quando TEXT, PRIMARY KEY(appid, loja));
-CREATE TABLE IF NOT EXISTS fila_lista(appid INTEGER PRIMARY KEY, acao TEXT, quando TEXT);
 CREATE TABLE IF NOT EXISTS tenho_manual(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS silenciado(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS consulta_lenta(tipo TEXT, id INTEGER, quando TEXT, PRIMARY KEY(tipo, id));

@@ -18,10 +18,10 @@ for f in glob.glob("radar/*.py") + glob.glob("tools/*.py") + ["radar.py"]:
     except SyntaxError as e:
         falhas.append("sintaxe %s:%s %s" % (f, e.lineno, e.msg))
 
-# 2. JavaScript do painel e da ponte
+# 2. JavaScript do painel
 node = shutil.which("node")
 if node:
-    for arq, extrair in (("radar/painel.html", True), ("radar/ponte.user.js", False)):
+    for arq, extrair in (("radar/painel.html", True),):
         txt = open(arq, encoding="utf-8").read()
         js = txt[txt.index("<script>") + 8:txt.rindex("</script>")] if extrair else txt
         r = subprocess.run([node, "-e", "new Function(require('fs').readFileSync(0,'utf8'))"], input=js,
@@ -38,7 +38,7 @@ if not vp or vp.group(1) != v:
     falhas.append("VERSAO (%s) != VERSAO_PAGINA (%s)" % (v, vp.group(1) if vp else "?"))
 
 # 4. arquivos que o .exe precisa ler estao no --add-data
-for dado in ("painel.html", "ponte.user.js"):
+for dado in ("painel.html",):
     for build in (".github/workflows/gerar-instalador.yml", "gerar_setup.bat"):
         if os.path.isfile(build) and dado not in open(build, encoding="utf-8").read():
             falhas.append("%s fora do --add-data de %s" % (dado, build))

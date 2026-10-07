@@ -27,9 +27,8 @@ Kurokami Radar/
 │   ├── servico.py           # ciclo() e thread Servico (agenda, completa periódica)
 │   ├── progresso.py         # estado da checagem em andamento (painel e tooltip)
 │   ├── relatorio.py         # dados/alertas.html (página estática de reserva)
-│   ├── painel.py            # servidor HTTP + API JSON + PIN + rotas da ponte
+│   ├── painel.py            # servidor HTTP + API JSON + PIN + conta Steam (QR/OpenID)
 │   ├── painel.html          # o painel inteiro (HTML/CSS/JS inline)
-│   ├── ponte.user.js        # userscript Tampermonkey (servido em /kurokami/ponte.user.js)
 │   ├── bandeja.py           # ícone, menu, threads, verificação de versão
 │   ├── inicio.py            # iniciar com o Windows (versão pelo código)
 │   └── atualizador.py       # GitHub Releases: verificar, baixar, instalar silencioso; janela Tk
