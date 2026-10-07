@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-07 — spec 06, Etapa 1 (teste do login Steam)
+- **Gasto:** ~92 mil tokens de contexto ao fim (Sonnet 5.5, 9% da janela); o `/usage` em dinheiro o dono confere. Onde foi maior: o relatório do subagente de protobufs (114 mil tokens dele) e as 4 rodadas por causa do QR.
+- **O QR da Steam troca a cada ~20 s:** mostre numa janela que se atualiza (tkinter), não num PNG fixo. PNG aberto no visualizador trava a regravação (Errno 22).
+- **Teste que mexe na conta precisa guardar o conteúdo, não só ids, depois de CADA passo:** o carrinho do dono (9 itens) terminou vazio e não deu para saber em que passo.
+
 ## 2026-10-04 — spec 04 inteira (Etapas 1, 1b, 1c e 2; v0.15.0)
 - **Heredoc no Bash quebra com aspas, crases e `\`** (3 vezes: script cortado ou `\\` virando `\`). Para scripts de edição, use a ferramenta Write num arquivo `.py` no scratchpad e rode com `py -X utf8`; para trocas, `assert s.count(a) == 1` antes do `replace` (pegou todos os textos que não batiam).
 - **Corte por índice apagou a `class Contexto` inteira** (fim = "próximo `\ndef`", mas o próximo era uma `class`). Corte só entre dois marcadores nomeados e rode `git diff --stat` logo depois: o −177 entregou o erro na hora.
