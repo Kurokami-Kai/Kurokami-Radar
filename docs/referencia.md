@@ -393,7 +393,7 @@ Conta Steam por QR (opcional; spec 06, Nivel 2). Sem entrar, o Radar funciona co
 - `sair()` — Revoga na Steam e apaga do cofre e da memoria.
 - `_cart(token)`
 - `carrinho_ler()` — [(packageid, bundleid, line_item_id)] do carrinho da conta.
-- `carrinho_adicionar(pacotes, bundles)` — Adiciona e CONFERE lendo o carrinho de volta. Devolve {ok, entraram: [...], faltaram: [...]}.
+- `carrinho_adicionar(pacotes, bundles)` — Adiciona SO o que ainda nao esta no carrinho (clicar duas vezes nao duplica) e CONFERE lendo de volta.
 
 ## `radar/validar.py`
 Testa cada chave com uma chamada real e explica o resultado.

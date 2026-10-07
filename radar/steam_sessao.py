@@ -213,16 +213,20 @@ def carrinho_ler():
 
 
 def carrinho_adicionar(pacotes=(), bundles=()):
-    """Adiciona e CONFERE lendo o carrinho de volta. Devolve {ok, entraram: [...], faltaram: [...]}.
-    Nao remove nada que o usuario ja tinha no carrinho."""
+    """Adiciona SO o que ainda nao esta no carrinho (clicar duas vezes nao duplica) e CONFERE lendo de volta.
+    Devolve {ok, entraram: [...novos], ja_estavam: n, faltaram: [...]}. Nao remove nada que o usuario ja tinha."""
     tok = access_token()
-    itens = [{"packageid": int(p)} for p in pacotes] + [{"bundleid": int(b)} for b in bundles]
-    if not itens:
-        return {"ok": True, "entraram": [], "faltaram": []}
-    _servico("IAccountCartService", "AddItemsToCart", {"user_country": _pais(), "items": itens}, tok)
-    depois = {(i.get("packageid") or 0, i.get("bundleid") or 0) for i in _cart(tok)}
-    entraram = [("pacote" if "packageid" in x else "bundle", x.get("packageid") or x.get("bundleid")) for x in itens
-                if (x.get("packageid") or 0, x.get("bundleid") or 0) in depois]
-    faltaram = [("pacote" if "packageid" in x else "bundle", x.get("packageid") or x.get("bundleid")) for x in itens
-                if (x.get("packageid") or 0, x.get("bundleid") or 0) not in depois]
-    return {"ok": not faltaram, "entraram": entraram, "faltaram": faltaram}
+    pedidos = [("pacote", int(p)) for p in pacotes] + [("bundle", int(b)) for b in bundles]
+    if not pedidos:
+        return {"ok": True, "entraram": [], "ja_estavam": 0, "faltaram": []}
+    chave = lambda i: (i.get("packageid") or 0, i.get("bundleid") or 0)
+    antes = {chave(i) for i in _cart(tok)}
+    par = lambda x: (x[1], 0) if x[0] == "pacote" else (0, x[1])
+    novos = [x for x in pedidos if par(x) not in antes]
+    if novos:
+        itens = [{"packageid": x[1]} if x[0] == "pacote" else {"bundleid": x[1]} for x in novos]
+        _servico("IAccountCartService", "AddItemsToCart", {"user_country": _pais(), "items": itens}, tok)
+    depois = {chave(i) for i in _cart(tok)}
+    faltaram = [x for x in pedidos if par(x) not in depois]
+    return {"ok": not faltaram, "entraram": [x for x in novos if par(x) in depois],
+            "ja_estavam": len(pedidos) - len(novos), "faltaram": faltaram}

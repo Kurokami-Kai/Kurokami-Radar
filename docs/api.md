@@ -54,6 +54,6 @@ Todo POST bem-sucedido invalida o cache das linhas de Promoções (refeito na pr
 | `/api/atualizar_app` | — | abre a janela de atualização |
 | `/api/steam/qr/iniciar` | — | **só o próprio PC.** Pede um QR à Steam (`BeginAuthSessionViaQR`, `platform_type=3`); devolve `{ok, url}` (o painel desenha) |
 | `/api/steam/qr/consultar` | — | **só o próprio PC.** Um Poll: `{estado: aguardando\|ok\|expirou\|nenhum\|erro, url?, erro?}`; em `ok` o refresh token vai para o cofre do Windows. Recusa conta diferente do `perfil_steam` |
-| `/api/steam/carrinho` | — | **só o próprio PC.** Manda os itens da Steam do carrinho (pacote/bundle) para o carrinho da conta (`AddItemsToCart`) e confere lendo de volta: `{ok, entraram, faltaram[], sem_pacote[]}`. Só adiciona |
+| `/api/steam/carrinho` | — | **só o próprio PC.** Manda os itens da Steam do carrinho (pacote/bundle) para o carrinho da conta (`AddItemsToCart`) e confere lendo de volta: `{ok, entraram (novos), ja_estavam, faltaram[], sem_pacote[]}`. Só adiciona o que ainda não está no carrinho (clicar de novo não duplica); nunca remove |
 | `/api/steam/sair` | — | **só o próprio PC.** Revoga a sessão na Steam e apaga do cofre |
 | `/api/sair` | — | fecha o Radar (usado pelo instalador .bat) |
