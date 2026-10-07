@@ -51,6 +51,7 @@ button{font-family:inherit}
 .btn-imp:hover{filter:brightness(1.12)}
 .btn-ghost{background:rgba(103,193,245,.2);color:var(--blue);border:0;border-radius:2px;padding:6px 11px;font-size:12px;cursor:pointer}
 .btn-ghost:hover{background:var(--blue);color:#fff}
+#contaSteam{display:inline-flex;align-items:center;gap:6px;margin-left:8px}#contaSteam a{text-decoration:none;display:inline-block}.chip-steam{font-size:12px;color:var(--blue);background:rgba(103,193,245,.12);padding:5px 9px;border-radius:2px}
 
 /* ---------- store subnav ---------- */
 .subnav{margin-top:14px;background:linear-gradient(90deg,rgba(62,103,150,.92) 11.38%,rgba(58,120,177,.8) 25.23%,rgb(15,33,110) 100%);box-shadow:0 0 3px rgba(0,0,0,.4);display:flex;align-items:center;gap:6px;padding:5px;flex-wrap:wrap}
@@ -525,6 +526,7 @@ details.blk[open]>summary h4::after{content:"▴"}
       <div class="status" id="status">carregando…</div>
       <button class="btn-ghost" id="btnPausa" type="button">Pausar</button>
       <button class="btn-imp" id="btnVerif" type="button" title="Verificação rápida: preços em todas as lojas. A completa fica em Configurações.">Verificar agora</button>
+      <span id="contaSteam"></span>
     </div>
   </div>
 </header>
@@ -1214,10 +1216,6 @@ async function renderCfg(){
      <label class="f">Verificação completa a cada (dias) ${num('verificacao_completa_dias',c.verificacao_completa_dias??7,1,0,90)}</label>
      <button class="btn-ghost" id="btnTudo" type="button">Fazer a verificação completa agora</button>
      <div class="hint">Rápida (a cada ${iv.itad} min e no "Verificar agora"): preços em todas as lojas. Completa: também catálogo da Steam, biblioteca, listas de DLC, edições, bundles e histórico, sem limite de ritmo. A primeira é sempre completa. 0 = completa só quando você pedir.</div></div></div>
-   <div class="blk"><h4>Conta Steam</h4><div class="in">
-     ${c.perfil_steam?`<div class="hint">Perfil em uso: <b>${esc(/^\d{17}$/.test(c.perfil_steam)?'SteamID …'+c.perfil_steam.slice(-4):c.perfil_steam)}</b></div>`:'<div class="hint">Nenhum perfil definido.</div>'}
-     ${['localhost','127.0.0.1'].includes(location.hostname)?'<a class="btn-ghost" style="display:inline-block;text-decoration:none" href="/kurokami/steam/entrar">Entrar pela Steam</a>':'<div class="hint">Para entrar pela Steam, abra o painel no próprio PC (localhost).</div>'}
-     <div class="hint">Você confirma na página da própria Steam, como no ITAD ou na SteamDB. O Radar só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel neste PC. A lista de desejos continua exigindo perfil público (Detalhes dos jogos).</div></div></div>
    <div class="blk"><h4>Acesso pelo celular / outros PCs</h4><div class="in" id="acesso">carregando…</div></div>
   </div><div class="savebar"><button class="btn-go2" id="cfgSave">Salvar configurações</button></div>`;
   $('#cfgSave').addEventListener('click',salvarCfg);renderAcesso();
@@ -1244,6 +1242,15 @@ async function salvarCfg(){
   const r=await post('/api/config',{config:c});toast(r.ok?'Salvo. Vale a partir da próxima checagem (use "Verificar agora").':'Erro: '+(r.erro||'?'));
 }
 
+/* ================= conta Steam (topo) ================= */
+async function carregarConta(){
+  const el=$('#contaSteam');if(!el)return;
+  let c;try{c=(await api('/api/config')).config;}catch(e){return;}
+  const p=String(c.perfil_steam||''),local=['localhost','127.0.0.1'].includes(location.hostname),id=/^\d{17}$/.test(p);
+  const dica='Você confirma na página da própria Steam. O Radar só recebe o seu SteamID: nunca a senha, token ou cookie.';
+  el.innerHTML=(p?`<span class="chip-steam" title="Perfil em uso: ${esc(p)}">Steam ${id?'…'+esc(p.slice(-4)):esc(p.slice(0,18))}</span>`:'')+
+    (local?`<a class="${p?'btn-ghost':'btn-imp'}" href="/kurokami/steam/entrar" title="${esc(dica)}">${p?'Trocar':'Entrar pela Steam'}</a>`:(p?'':'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>'));
+}
 /* ================= status / ações ================= */
 const VERSAO_PAGINA='0.15.0';
 function nVitrine(){return VIT?['selo','novo','igual','24m'].reduce((s,t)=>s+((VIT[t]||{}).total||0),0):null;}
@@ -1296,6 +1303,7 @@ async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&
   const h=location.hash.slice(1);  // #vale, #lista... (o resumo "Tipo ligado" abre a vitrine com #vale)
   setTab(['vale','lista','bib','carr','notif','cfg'].includes(h)?h:['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();
   if(!VIT){try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}}setTimeout(pollResumo,3000);
+  carregarConta();
   if(location.search.includes('steam=ok')){history.replaceState(null,'',location.pathname+location.hash);setTab('cfg');toast('Entrou pela Steam: perfil atualizado. A lista e a biblioteca passam para este perfil na próxima verificação (use "Verificar agora").');}})();
 
 </script>
