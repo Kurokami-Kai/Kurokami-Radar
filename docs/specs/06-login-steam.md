@@ -1,6 +1,6 @@
 # Spec 06 — Login Steam por QR (opcional)
 
-Status: **Etapa 1 a fazer** · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `coleta-e-apis`
+Status: **Etapa 1 feita (07/10/2026); Etapa 2 escrita, a implementar** · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `coleta-e-apis`
 
 **Duas etapas. Faça a Etapa 1 (teste), entregue o relatório e PARE. A Etapa 2 é escrita depois, com base no teste.**
 
@@ -88,10 +88,35 @@ Status: **Etapa 1 a fazer** · Pedido do dono em 04/10/2026 · Skills: `kurokami
 - Anote em `docs/aprendizados.md` (até 5 linhas) o gasto de `/usage` da tarefa e onde foi maior.
 - **PARE.**
 
-## Etapa 2 — a escrever depois do teste
-Itens previstos, para orientar o teste (números e detalhes saem da Etapa 1):
-- **Configurações:** bloco "Conta Steam" com "Entrar com QR" (o QR aparece no painel), "Conectado como <nome>" e "Sair da Steam".
-- **Carrinho direto pela conta,** com a ponte do Tampermonkey continuando como alternativa para quem não entrar.
-- **Lista de desejos pela conta,** inclusive com perfil privado.
-- **Seguidos e ignorados:** passam a vir de `conta_steam.relacao`. É a única função que muda, como foi preparado na spec 04.
-- **Família:** uma linha nova "Na família" na relação com o jogo da aba Promoções. Se os jogos da família contam como "tenho" para os avisos fica para decidir com os números do item 5.
+## Resultado da Etapa 1 (07/10/2026)
+Medido com a conta do dono; ids e tokens não ficam no repositório. Script: `tools/teste_login_steam.py` (`--diag`, `--mobile`).
+- **Login por QR funciona** (`BeginAuthSessionViaQR` + `PollAuthSessionStatus`, 0,3 s). Com `platform_type=2` (web) o refresh token vale ~212 dias e o access ~24 h, **mas `GenerateAccessTokenForApp` dá eresult 15**: não renova. Com `platform_type=3` (MobileApp) renova (0,25 s, novo access ~24 h; `renewal_type=1` não devolve refresh novo), **mas o refresh vale só ~30 dias**. O QR **troca a cada ~20 s**: o painel precisa trocar a imagem sozinho.
+- **Carrinho:** `GetCart` (GET), `AddItemsToCart` (`items:[{packageid}]` ou `{bundleid}`), `RemoveItemFromCart` (`line_item_id`): ~0,3 s cada; aceitou 1 item, lote de 3 e 1 bundle. Uma remoção deu eresult 42 (não explicado). Não medidos: verificação de idade, lotes maiores, se a aba da loja atualiza na hora. O teste não conseguiu provar o "voltar ao estado de antes" (o dono esvaziou o carrinho antes); **repetir esse passo com cuidado antes de ligar a escrita**.
+- **Lista de desejos:** leitura com token = leitura pública (806 itens, mesma ordem e prioridades). **Escrita pelo `api.steampowered.com` falhou** (`AddToWishlist` eresult 2): precisa testar o endpoint da loja web. Perfil privado: não testado.
+- **Seguidos:** `GetGamesFollowed` funciona (a conta tem 0). **Ignorados:** `/dynamicstore/userdata/` com cookie redireciona para si mesmo (302); sem método de API achado.
+- **Família:** funciona (`GetFamilyGroupForUser` + `GetSharedLibraryApps`): 6 membros, 580 jogos compartilhados (25 só de outros), 8 jogos da lista de desejos já na família.
+- **Sair:** `RevokeToken {token: refresh, revoke_action: 1}` revoga; a renovação passa a falhar e a sessão some de `EnumerateTokens`.
+- **Link do desafio no celular:** não testável à mão (o link troca a cada ~20 s).
+- **Decisão do dono (07/10):** o login principal deve ser como o do ITAD, GG.deals e SteamDB ("Entrar pela Steam": confirma na página da própria Steam).
+
+## Etapa 2 — a implementar
+Dois níveis, o segundo opcional.
+
+### Nível 1 — Entrar pela Steam (OpenID), padrão
+- Botão em Configurações e na primeira abertura: leva à página de login da Steam (`https://steamcommunity.com/openid/login`, OpenID 2.0), `return_to` = `http://localhost/kurokami/...`. O Radar confere a resposta (`openid.mode=check_authentication` na Steam) e guarda **só o SteamID** em `config.json` (hoje `perfil_steam`). Nenhum token, nenhum cookie.
+- Substitui digitar o perfil. Os dados continuam vindo do perfil público, do `userdata.json` e da ponte do Tampermonkey.
+- Rotas novas em `docs/api.md`; segurança: aceitar só retorno vindo do `localhost`, validar `openid.claimed_id` (17 dígitos) e rejeitar repetição (nonce).
+
+### Nível 2 — Conta Steam por QR (opcional, bloco "Conta Steam")
+- "Entrar com QR": o painel mostra o QR e **troca a imagem a cada ~20 s** (o servidor guarda o `client_id` atual e o painel consulta). "Conectado como …" e "Sair da Steam" (`RevokeToken` + apagar do cofre).
+- **Usar `platform_type=3`** (único que renova). O refresh token (30 dias) fica no cofre do Windows via `radar/credenciais.py`; o access token só em memória, renovado ao expirar (`GenerateAccessTokenForApp`, ~24 h). Passados os 30 dias, avisar "entre de novo" (novo QR), sem erro silencioso.
+- **Primeiro uso do QR:** lista de desejos de perfil privado e jogos da família ("Na família" na relação com o jogo, aba Promoções; se contam como "tenho" nos avisos, decidir com os números: 8 de 806 na lista do dono).
+- **Carrinho direto pela conta** (`AddItemsToCart`) só depois de repetir o teste de "voltar ao estado de antes" com um carrinho não vazio; a ponte do Tampermonkey continua como alternativa.
+- **Escrita na lista de desejos e ignorados:** exigem endpoints da loja web, ainda não testados; ficam fora até haver teste.
+- Registrar em `docs/decisoes.md` a mudança de segurança ("o Radar nunca recebe cookies da Steam" passa a valer só sem o Nível 2) e o que fica no cofre. Guardar nada de login em `dados/`, banco, log ou `config.json`.
+
+### Critérios de aceite
+- Sem entrar, tudo funciona como hoje.
+- Nenhum token ou cookie em arquivo, log, banco ou Git; teste automático procurando JWT em `dados/` e no log.
+- Entrar, fechar o Radar, abrir e continuar conectado; "Sair" revoga e a renovação passa a falhar.
+- QR atualiza sozinho no painel; token expirado vira aviso claro.

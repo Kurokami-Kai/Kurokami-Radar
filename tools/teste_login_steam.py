@@ -207,9 +207,9 @@ def aguardar(r, limite=180, ao_renovar=None):
     return None
 
 
-def login():
+def login(plataformas=(2, 1, 3)):
     plat_ok = None
-    for plataforma in (2, 1, 3):   # 2 = WebBrowser (o que a loja aceita)
+    for plataforma in plataformas:   # 2 = WebBrowser (o que a loja aceita)
         r, seg, erro = iniciar_qr(plataforma)
         item("1 Login: BeginAuthSessionViaQR platform_type=%s" % plataforma, ok=not erro, s=seg, erro=erro,
              campos=sorted(r.keys()) if r else None)
@@ -655,10 +655,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--celular", action="store_true")
     ap.add_argument("--diag", action="store_true")
+    ap.add_argument("--mobile", action="store_true", help="login com platform_type=3 e teste de renovacao")
     a = ap.parse_args()
     try:
         if a.celular:
             passo("Celular", celular)
+            return
+        if a.mobile:
+            passo("1 Login por QR (MobileApp)", lambda: login((3,)))
+            if S.refresh:
+                passo("M Renovacao", lambda: (renovar(), renovar({"renewal_type": 1})))
             return
         if a.diag:
             passo("1 Login por QR", login)
