@@ -207,26 +207,49 @@ def _cart(token):
     return (r.get("cart") or {}).get("line_items") or []
 
 
+MODOS = ("conta", "presente", "privado")   # para a conta | presente (is_gift) | compra privada (is_private)
+
+
+def _flags(modo):
+    return {"is_gift": True} if modo == "presente" else {"is_private": True} if modo == "privado" else {}
+
+
+def _modo_da_linha(i):
+    f = i.get("flags") or {}
+    return "presente" if f.get("is_gift") else "privado" if f.get("is_private") else "conta"
+
+
 def carrinho_ler():
     """[(packageid, bundleid, line_item_id)] do carrinho da conta."""
     return [(i.get("packageid") or 0, i.get("bundleid") or 0, i.get("line_item_id")) for i in _cart(access_token())]
 
 
 def carrinho_adicionar(pacotes=(), bundles=()):
-    """Adiciona SO o que ainda nao esta no carrinho (clicar duas vezes nao duplica) e CONFERE lendo de volta.
-    Devolve {ok, entraram: [...novos], ja_estavam: n, faltaram: [...]}. Nao remove nada que o usuario ja tinha."""
+    """pacotes/bundles: ids ou (id, modo) com modo em MODOS. Adiciona SO o que ainda nao esta no carrinho, em qualquer modo
+    (clicar duas vezes ou ter o mesmo item la nao duplica) e CONFERE lendo de volta, inclusive o modo.
+    Devolve {ok, entraram: [...novos], ja_estavam: n, faltaram: [...], modo_diferente: [...]}. Nao remove nem altera nada que ja estava."""
     tok = access_token()
-    pedidos = [("pacote", int(p)) for p in pacotes] + [("bundle", int(b)) for b in bundles]
+    par_modo = lambda x: (x, "conta") if not isinstance(x, (tuple, list)) else (x[0], x[1] if x[1] in MODOS else "conta")
+    vistos, pedidos = set(), []   # o mesmo item pedido duas vezes entra uma vez so
+    for tipo, lista in (("pacote", pacotes), ("bundle", bundles)):
+        for x in lista:
+            i, m = par_modo(x)
+            if (tipo, int(i)) not in vistos:
+                vistos.add((tipo, int(i)))
+                pedidos.append((tipo, int(i), m))
     if not pedidos:
-        return {"ok": True, "entraram": [], "ja_estavam": 0, "faltaram": []}
+        return {"ok": True, "entraram": [], "ja_estavam": 0, "faltaram": [], "modo_diferente": []}
     chave = lambda i: (i.get("packageid") or 0, i.get("bundleid") or 0)
     antes = {chave(i) for i in _cart(tok)}
     par = lambda x: (x[1], 0) if x[0] == "pacote" else (0, x[1])
     novos = [x for x in pedidos if par(x) not in antes]
     if novos:
-        itens = [{"packageid": x[1]} if x[0] == "pacote" else {"bundleid": x[1]} for x in novos]
+        itens = [dict({"packageid": x[1]} if x[0] == "pacote" else {"bundleid": x[1]}, **({"flags": _flags(x[2])} if x[2] != "conta" else {}))
+                 for x in novos]
         _servico("IAccountCartService", "AddItemsToCart", {"user_country": _pais(), "items": itens}, tok)
-    depois = {chave(i) for i in _cart(tok)}
-    faltaram = [x for x in pedidos if par(x) not in depois]
-    return {"ok": not faltaram, "entraram": [x for x in novos if par(x) in depois],
-            "ja_estavam": len(pedidos) - len(novos), "faltaram": faltaram}
+    linhas = _cart(tok)
+    depois = {chave(i): _modo_da_linha(i) for i in linhas}
+    faltaram = [x[:2] for x in pedidos if par(x) not in depois]
+    diferente = [x[:2] for x in novos if par(x) in depois and depois[par(x)] != x[2]]
+    return {"ok": not faltaram and not diferente, "entraram": [x[:2] for x in novos if par(x) in depois],
+            "ja_estavam": len(pedidos) - len(novos), "faltaram": faltaram, "modo_diferente": diferente}

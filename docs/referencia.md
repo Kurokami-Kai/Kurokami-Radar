@@ -251,6 +251,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_ler_carrinho()`
 - `_gravar_carrinho(itens)`
 - `api_carrinho(_q)` — Carrinho simulado: jogos/DLCs (com a loja escolhida) e bundles da Steam (com o preco para voce).
+- `_modo(m)` — Como o item entra no carrinho da Steam: para a conta, de presente ou compra privada.
 - `post_carrinho(d)` — O carrinho fica num arquivo proprio: gravar nele nunca espera a coleta liberar o banco.
 - `api_buscar(q)` — Nome, appid ou link da Steam -> resultados da loja.
 - `post_extra(d)` — Passa a monitorar um jogo fora da lista de desejos (ou para de monitorar).
@@ -392,8 +393,10 @@ Conta Steam por QR (opcional; spec 06, Nivel 2). Sem entrar, o Radar funciona co
 - `estado()` — Para o painel (sem segredo): conectado?, final do SteamID, dias que faltam.
 - `sair()` — Revoga na Steam e apaga do cofre e da memoria.
 - `_cart(token)`
+- `_flags(modo)`
+- `_modo_da_linha(i)`
 - `carrinho_ler()` — [(packageid, bundleid, line_item_id)] do carrinho da conta.
-- `carrinho_adicionar(pacotes, bundles)` — Adiciona SO o que ainda nao esta no carrinho (clicar duas vezes nao duplica) e CONFERE lendo de volta.
+- `carrinho_adicionar(pacotes, bundles)` — pacotes/bundles: ids ou (id, modo) com modo em MODOS. Adiciona SO o que ainda nao esta no carrinho, em qualquer modo
 
 ## `radar/validar.py`
 Testa cada chave com uma chamada real e explica o resultado.

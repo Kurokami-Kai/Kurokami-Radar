@@ -2,6 +2,10 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-07 — carrinho só Steam + modos (conta/presente/privado)
+- **`painel_copia.py` esquecido numa sessão anterior continuava na porta 8799** e respondia com código velho (loja "Nuuvem", `modo` nulo): antes de testar, confira `netstat -ano | findstr :8799` e mate o antigo.
+- **`GetCart` (só leitura) mostra o formato real** (`flags:{is_gift,is_private}`) sem mexer na conta; a escrita com `flags` no `AddItemsToCart` **não foi testada na conta real** (a conferência de volta avisa em `modo_diferente`).
+
 ## 2026-10-07 — spec 06, Etapa 1 (teste do login Steam)
 - **Gasto:** ~92 mil tokens de contexto ao fim (Sonnet 5.5, 9% da janela); o `/usage` em dinheiro o dono confere. Onde foi maior: o relatório do subagente de protobufs (114 mil tokens dele) e as 4 rodadas por causa do QR.
 - **O QR da Steam troca a cada ~20 s:** mostre numa janela que se atualiza (tkinter), não num PNG fixo. PNG aberto no visualizador trava a regravação (Errno 22).

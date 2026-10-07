@@ -449,7 +449,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .bar.over i{background:#d6492f}
 .cartbtn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:2px;background:rgba(103,193,245,.15);color:var(--blue);font-size:14px;cursor:pointer;flex:0 0 auto}
 .cartbtn:hover,.cartbtn.on{background:var(--disc-bg);color:var(--disc-fg)}
-@media (max-width:900px){.carr-grid{grid-template-columns:1fr}.crow{grid-template-columns:90px 1fr auto 28px}.crow .lojsel{grid-column:2}}
+@media (max-width:900px){.carr-grid{grid-template-columns:1fr}.crow{grid-template-columns:90px 1fr auto 28px}.crow .modosel{grid-column:2}}
 @media (max-width:720px){.mhead{grid-template-columns:1fr}.nrow{grid-template-columns:90px 1fr auto}.nrow .q{display:none}}
 /* ---------- 0.15: vitrine e Promoções (spec 04) ---------- */
 .vhead{align-items:flex-end}.vhead h2{margin:0}
@@ -581,9 +581,8 @@ details.blk[open]>summary h4::after{content:"▴"}
   <section id="tab-carr" class="wrap tabsec" hidden>
     <div class="cart-head"><h1>Seu carrinho de compras</h1><span class="aside" id="carrNote"></span></div>
     <div class="subnav">
-      <span class="lk" style="cursor:default">Escolha a loja de cada jogo, veja o total e se algum bundle sai mais barato</span>
+      <span class="lk" style="cursor:default">Só itens da Steam: escolha se cada um é para a sua conta, presente ou privado, veja o total e se algum bundle sai mais barato</span>
       <button class="lk" id="carrSteam">Trazer o carrinho da Steam</button>
-      <button class="lk" id="carrOtim">Loja mais barata em tudo</button>
       <button class="lk" id="carrLimpa">Limpar</button>
     </div>
     <div class="carr-grid">
@@ -710,11 +709,11 @@ addEventListener('scroll',()=>{clearTimeout(hvT);HV.classList.remove('on');hvEl=
 let CARR=[];
 async function salvarCarr(){await post('/api/carrinho',{itens:CARR});$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}
 async function alternarCarr(id,forcar){const i=CARR.findIndex(c=>c.appid===id);
-  if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}else if(i<0){CARR.push({appid:id,loja:null});toast('No carrinho');}
+  if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}else if(i<0){CARR.push({appid:id,modo:'conta'});toast('No carrinho');}
   await salvarCarr();$$(`[data-cart="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.appid===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
   if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();if(S.tab==='lista')renderLista();}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cart]');if(!c)return;e.preventDefault();e.stopPropagation();alternarCarr(+c.dataset.cart);},true);
-async function alternarBundle(id){const i=CARR.findIndex(c=>c.bundle===id);if(i>=0){CARR.splice(i,1);toast('Bundle saiu do carrinho');}else{CARR.push({bundle:id});toast('Bundle no carrinho');}
+async function alternarBundle(id){const i=CARR.findIndex(c=>c.bundle===id);if(i>=0){CARR.splice(i,1);toast('Bundle saiu do carrinho');}else{CARR.push({bundle:id,modo:'conta'});toast('Bundle no carrinho');}
   await salvarCarr();$$(`[data-cartb="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.bundle===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
   if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cartb]');if(!c)return;e.preventDefault();e.stopPropagation();alternarBundle(+c.dataset.cartb);},true);
@@ -1079,19 +1078,21 @@ $('#bibSeg').addEventListener('click',e=>{const b=e.target.closest('[data-bseg]'
 $('#bsort').addEventListener('change',e=>{S.bsort=e.target.value;save();renderBib();});
 $('#bq').addEventListener('input',e=>{S.bq=e.target.value.trim().toLowerCase();renderBib();});
 $('#bibView').addEventListener('click',async e=>{const td=e.target.closest('[data-todos]');if(td){e.stopPropagation();let n=0;
-    td.dataset.todos.split(',').map(Number).forEach(id=>{if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,loja:null});n++;}});await salvarCarr();toast(n+' no carrinho');renderBib();return;}
+    td.dataset.todos.split(',').map(Number).forEach(id=>{if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,modo:'conta'});n++;}});await salvarCarr();toast(n+' no carrinho');renderBib();return;}
   if(e.target.closest('[data-cart]')||e.target.closest('[data-cartb]'))return;const h=e.target.closest('[data-bopen]');if(!h)return;const id=+h.dataset.bopen;ABERTOS.has(id)?ABERTOS.delete(id):ABERTOS.add(id);renderBib();});
 
 /* ================= carrinho ================= */
 let CD=null;
+const MODOS=[['conta','Para a minha conta'],['presente','Presente'],['privado','Privado']];
+function modoSel(t,id,m){return `<select class="mini modosel" data-cmodo="${t}${id}" title="Como entra no carrinho da Steam">${MODOS.map(([v,n])=>`<option value="${v}"${v===(m||'conta')?' selected':''}>${n}</option>`).join('')}</select>`;}
 async function renderCarr(){
-  CD=await api('/api/carrinho');CARR=CD.itens.map(i=>({appid:i.appid,loja:i.loja})).concat(CD.bundles.map(b=>({bundle:b.bundle})));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';
+  CD=await api('/api/carrinho');CARR=CD.itens.map(i=>({appid:i.appid,modo:i.modo})).concat(CD.bundles.map(b=>({bundle:b.bundle,modo:b.modo})));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';
   const it=CD.itens;
   $('#carrNote').textContent=(it.length||CD.bundles.length)?`${it.length} item(ns)${CD.bundles.length?` + ${CD.bundles.length} bundle(s)`:''}`:'';
-  $('#carrLista').innerHTML=it.length?it.map(c=>{const sel=c.lojas.find(l=>l.loja===c.loja)||c.lojas[0]||{};
+  $('#carrLista').innerHTML=it.length?it.map(c=>{const sel=c.lojas[0]||{};
     return `<div class="crow">${art(c.appid,c.nome,c.capa,{small:true})}
       <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(c.fim)}</span>`:''}${c.tipo_oferta==='selo'?seloBadge(c):recPill(c)}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
-      <select class="mini lojsel" data-cloja="${c.appid}">${c.lojas.map(l=>`<option value="${esc(l.loja)}"${l.loja===sel.loja?' selected':''}>${esc(l.loja)} · ${brl(l.preco)}${l.corte?' (-'+l.corte+'%)':''}</option>`).join('')||'<option>sem preço</option>'}</select>
+      ${modoSel('a',c.appid,c.modo)}
       ${priceBlock({preco:sel.preco,cheio:sel.cheio,corte:sel.corte||0})}
       <button class="xbtn" data-cart="${c.appid}" title="Tirar do carrinho">×</button></div>`;}).join(''):
     (CD.bundles.length?'':'<div class="empty">Carrinho vazio. Use o + nas listas, o botão na ficha do jogo, a busca acima ou "Trazer o carrinho da Steam".</div>');
@@ -1099,11 +1100,11 @@ async function renderCarr(){
       <div><div class="nm"><a href="https://store.steampowered.com/bundle/${b.bundle}/" target="_blank" rel="noopener" style="color:#fff">📦 ${esc(b.nome)}</a></div>
         <div class="motivo">${b.itens.length} itens${b.itens.some(i=>i.tenho)?` · você já tem ${b.itens.filter(i=>i.tenho).length} (descontado)`:''}${b.itens.some(i=>i.no_carrinho)?` · <span style="color:#ff9b8a">${b.itens.filter(i=>i.no_carrinho).length} também avulso no carrinho</span>`:''}</div>
         <div class="motivo" title="${esc(b.itens.map(i=>i.nome).join(', '))}">${esc(b.itens.slice(0,4).map(i=>i.nome).join(', '))}${b.itens.length>4?'…':''}</div></div>
-      <span class="motivo">bundle da Steam</span>${priceBlock({preco:b.preco,cheio:b.cheio||b.preco,corte:b.cheio&&b.preco<b.cheio?Math.round(100*(1-b.preco/b.cheio)):0})}
+      ${modoSel('b',b.bundle,b.modo)}${priceBlock({preco:b.preco,cheio:b.cheio||b.preco,corte:b.cheio&&b.preco<b.cheio?Math.round(100*(1-b.preco/b.cheio)):0})}
       <button class="xbtn" data-cartb="${b.bundle}" title="Tirar do carrinho">×</button></div>`).join(''));
   let total=0,cheio=0,pisoTot=0,semPreco=0;
   CD.bundles.forEach(b=>{if(b.preco==null){semPreco++;return;}total+=b.preco;cheio+=b.cheio||b.preco;pisoTot+=b.preco;});
-  it.forEach(c=>{const sel=c.lojas.find(l=>l.loja===c.loja)||c.lojas[0];if(!sel||sel.preco==null){semPreco++;return;}
+  it.forEach(c=>{const sel=c.lojas[0];if(!sel||sel.preco==null){semPreco++;return;}
     total+=sel.preco;cheio+=sel.cheio||sel.preco;pisoTot+=Math.min(sel.preco,c.piso??sel.preco);});
   $('#carrResumo').innerHTML=`<div class="tot big"><span>Valor total estimado</span><b>${(it.length||CD.bundles.length)?brl(total):'R$ 0,00'}</b></div>
     <button class="btn-finalizar" id="btnFinalizar" type="button">Finalizar pedido</button><div id="finalNota"></div><a href="#lista" style="display:block;text-align:center;color:var(--blue);font-size:12px;margin:2px 0 8px">Continuar comprando</a>
@@ -1126,12 +1127,12 @@ async function renderCarr(){
   $('#carrSteam').style.display=(CD.steam||[]).length?'':'none';$('#carrSteam').textContent=`Trazer o carrinho da Steam (${(CD.steam||[]).length})`;
 }
 $('#carrBundles').addEventListener('click',async e=>{const t=e.target.closest('[data-trocar]');if(!t)return;const [bid,ids]=t.dataset.trocar.split('|');const rem=new Set(ids.split(',').map(Number));
-  CARR=CARR.filter(c=>!(c.appid&&rem.has(c.appid)));if(!CARR.some(c=>c.bundle===+bid))CARR.push({bundle:+bid});await salvarCarr();toast('Trocado pelo bundle');renderCarr();});
-$('#carrLista').addEventListener('change',async e=>{const s=e.target.closest('[data-cloja]');if(!s)return;const c=CARR.find(x=>x.appid===+s.dataset.cloja);if(c)c.loja=s.value;await salvarCarr();renderCarr();});
+  CARR=CARR.filter(c=>!(c.appid&&rem.has(c.appid)));if(!CARR.some(c=>c.bundle===+bid))CARR.push({bundle:+bid,modo:'conta'});await salvarCarr();toast('Trocado pelo bundle');renderCarr();});
+$('#carrLista').addEventListener('change',async e=>{const s=e.target.closest('[data-cmodo]');if(!s)return;const t=s.dataset.cmodo[0],id=+s.dataset.cmodo.slice(1);
+  const c=CARR.find(x=>t==='b'?x.bundle===id:x.appid===id);if(c)c.modo=s.value;await salvarCarr();renderCarr();});
 $('#orc').addEventListener('change',e=>{ls.set('orc',+e.target.value||0);renderCarr();});
 $('#carrLimpa').addEventListener('click',async()=>{CARR=[];await salvarCarr();renderCarr();});
-$('#carrOtim').addEventListener('click',async()=>{CARR=CARR.map(c=>({appid:c.appid,loja:null}));await salvarCarr();renderCarr();toast('Cada jogo na loja mais barata');});
-$('#carrSteam').addEventListener('click',async()=>{const ids=(CD&&CD.steam)||[];let n=0;ids.forEach(id=>{if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,loja:null});n++;}});
+$('#carrSteam').addEventListener('click',async()=>{const ids=(CD&&CD.steam)||[];let n=0;ids.forEach(id=>{if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,modo:'conta'});n++;}});
   await salvarCarr();renderCarr();toast(n?`${n} jogo(s) do carrinho da Steam`:'Já estavam todos aqui');});
 async function buscar(){const q=$('#busca').value.trim();if(!q)return;$('#buscaRes').innerHTML='<div class="empty" style="padding:14px">buscando…</div>';
   let d;try{d=await api('/api/buscar?q='+encodeURIComponent(q));}catch(e){$('#buscaRes').innerHTML=`<div class="empty">Erro: ${esc(e.message)}</div>`;return;}
@@ -1143,7 +1144,7 @@ $('#buscaBtn').addEventListener('click',buscar);$('#busca').addEventListener('ke
 $('#buscaRes').addEventListener('click',async e=>{const a=e.target.closest('[data-addcarr]'),m=e.target.closest('[data-addmon]');
   if(m){await post('/api/extra',{appid:+m.dataset.addmon});toast('Monitorando: os preços das outras lojas chegam na próxima checagem');m.remove();await carregarLista();return;}
   if(a){if(a.dataset.mon==='1'){await post('/api/extra',{appid:+a.dataset.addcarr});await carregarLista();}
-    if(!CARR.some(c=>c.appid===+a.dataset.addcarr)){CARR.push({appid:+a.dataset.addcarr,loja:null});await salvarCarr();}toast('No carrinho (e monitorado)');renderCarr();}});
+    if(!CARR.some(c=>c.appid===+a.dataset.addcarr)){CARR.push({appid:+a.dataset.addcarr,modo:'conta'});await salvarCarr();}toast('No carrinho (e monitorado)');renderCarr();}});
 
 /* ================= notificações ================= */
 async function renderNotif(){
@@ -1281,24 +1282,20 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharPop();});
 /* ---- Finalizar pedido: manda o carrinho para a conta Steam e abre o carrinho da loja ---- */
 async function finalizar(){
   if(!CD)return;
-  const stm=CD.itens.filter(c=>(!c.loja||c.loja==='Steam')&&!c.possuido).length+CD.bundles.length;
-  const outras=CD.itens.filter(c=>c.loja&&c.loja!=='Steam');
+  const stm=CD.itens.filter(c=>!c.possuido).length+CD.bundles.length;
   const nota=$('#finalNota');nota.innerHTML='';
-  if(!stm&&!outras.length){toast('O carrinho está vazio.');return;}
-  if(stm){
-    await carregarContaQR();
-    if(!(CQ&&CQ.conectado)){await abrirPop();toast('Conecte a Steam pelo QR (canto superior direito) e clique em Finalizar pedido de novo.');return;}
-    const w=window.open('about:blank','_blank');   // abre já, no clique, para o navegador não bloquear
-    const b=$('#btnFinalizar');b.disabled=true;const r=await post('/api/steam/carrinho');b.disabled=false;
-    if(r.erro&&!r.faltaram){if(w)w.close();toast('Erro: '+r.erro);return;}
-    const url='https://store.steampowered.com/cart/';
-    if(w)w.location=url;else nota.innerHTML=`<a class="btn-ghost" href="${url}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir o carrinho da Steam</a>`;
-    const ja=r.ja_estavam?` (${r.ja_estavam} já estava(m) lá e não foi(ram) repetido(s))`:'';
-    toast(r.ok?`${r.entraram} item(ns) novo(s) no carrinho da Steam${ja}. Conclua o pagamento lá.`:`${r.entraram} entraram${ja}. Não entraram: ${(r.faltaram||[]).join(', ')}.`);
-    if((r.sem_pacote||[]).length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#e2a635;font-size:11.5px">Sem pacote conhecido (abra a página): ${r.sem_pacote.map(esc).join(', ')}</div>`);
-  }
-  if(outras.length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="font-size:11.5px;margin-top:6px">De outras lojas (compre pelo link):</div>`+outras.map(c=>{const s=c.lojas.find(l=>l.loja===c.loja)||{};
-    return s.url?`<div style="font-size:12px"><a href="${esc(s.url)}" target="_blank" rel="noopener" style="color:var(--blue)">${esc(c.nome)} · ${esc(c.loja)} · ${brl(s.preco)}</a></div>`:'';}).join(''));
+  if(!stm){toast('O carrinho está vazio.');return;}
+  await carregarContaQR();
+  if(!(CQ&&CQ.conectado)){await abrirPop();toast('Conecte a Steam pelo QR (canto superior direito) e clique em Finalizar pedido de novo.');return;}
+  const w=window.open('about:blank','_blank');   // abre já, no clique, para o navegador não bloquear
+  const b=$('#btnFinalizar');b.disabled=true;const r=await post('/api/steam/carrinho');b.disabled=false;
+  if(r.erro&&!r.faltaram){if(w)w.close();toast('Erro: '+r.erro);return;}
+  const url='https://store.steampowered.com/cart/';
+  if(w)w.location=url;else nota.innerHTML=`<a class="btn-ghost" href="${url}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir o carrinho da Steam</a>`;
+  const ja=r.ja_estavam?` (${r.ja_estavam} já estava(m) lá e não foi(ram) repetido(s))`:'';
+  const md=(r.modo_diferente||[]).length?` Entraram sem o modo pedido (presente/privado): ${r.modo_diferente.join(', ')}; ajuste no carrinho da Steam.`:'';
+  toast(r.ok?`${r.entraram} item(ns) novo(s) no carrinho da Steam${ja}. Conclua o pagamento lá.`:`${r.entraram} entraram${ja}.${(r.faltaram||[]).length?` Não entraram: ${r.faltaram.join(', ')}.`:''}${md}`);
+  if((r.sem_pacote||[]).length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#e2a635;font-size:11.5px">Sem pacote conhecido (abra a página): ${r.sem_pacote.map(esc).join(', ')}</div>`);
 }
 
 /* ================= status / ações ================= */
@@ -1349,7 +1346,7 @@ function render(){if(S.tab==='vale')renderVale();else if(S.tab==='lista')renderL
 async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&RES.progresso)||{};
   if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;await carregarLista();try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}toast('Verificação concluída');}
   if(P.ativo)pollResumo.ativo=true;setTimeout(pollResumo,P.ativo?3000:30000);}
-(async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,loja:i.loja}));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
+(async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,modo:i.modo})).concat(c.bundles.map(b=>({bundle:b.bundle,modo:b.modo})));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
   const h=location.hash.slice(1);  // #vale, #lista... (o resumo "Tipo ligado" abre a vitrine com #vale)
   setTab(['vale','lista','bib','carr','notif','cfg'].includes(h)?h:['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();
   if(!VIT){try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}}setTimeout(pollResumo,3000);

@@ -99,6 +99,27 @@ ok("so entra o que falta", r["ok"] and r["entraram"] == [("pacote", 555)] and r[
 r = ss.carrinho_adicionar([999])
 ok("carrinho: recusado pela Steam aparece em faltaram", not r["ok"] and r["faltaram"] == [("pacote", 999)])
 
+# --- modos: para a conta, presente, privado; repetido nao duplica, nem em outro modo
+r = ss.carrinho_adicionar([(601, "presente"), (602, "privado"), (603, "conta")], [(66, "presente")])
+ok("modos: os 4 entram e conferem", r["ok"] and len(r["entraram"]) == 4 and not r["modo_diferente"])
+fl = {i.get("packageid") or i.get("bundleid"): i.get("flags") for i in CART}
+ok("modo presente manda is_gift", fl[601] == {"is_gift": True} and fl[66] == {"is_gift": True})
+ok("modo privado manda is_private", fl[602] == {"is_private": True})
+ok("modo conta nao manda flags", fl[603] is None)
+r = ss.carrinho_adicionar([(601, "privado"), (603, "presente"), (701, "conta"), (701, "conta")])
+ok("ja no carrinho (qualquer modo) nao duplica; repetido no pedido entra uma vez", r["ok"] and r["entraram"] == [("pacote", 701)] and r["ja_estavam"] == 2
+   and sum(1 for i in CART if i.get("packageid") in (601, 603, 701)) == 3)
+ok("modo que ja estava nao muda", {i["packageid"]: i.get("flags") for i in CART if i.get("packageid") in (601, 603)} == {601: {"is_gift": True}, 603: None})
+_add = falso
+def _ignora_flags(servico, metodo, entrada, token=None, post=True):   # a Steam aceita o item mas ignora o modo
+    if metodo == "AddItemsToCart":
+        entrada = {**entrada, "items": [{k: v for k, v in it.items() if k != "flags"} for it in entrada["items"]]}
+    return _add(servico, metodo, entrada, token, post)
+ss._servico = _ignora_flags
+r = ss.carrinho_adicionar([(801, "presente")])
+ok("Steam ignorou o modo: avisa em modo_diferente", not r["ok"] and r["modo_diferente"] == [("pacote", 801)] and not r["faltaram"])
+ss._servico = _add
+
 # --- sair
 RESP["RevokeToken"] = {}
 ok("sair informa que revogou", ss.sair()["revogado"] is True)

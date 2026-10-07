@@ -504,6 +504,7 @@ def api_carrinho(_q):
     cfg = config.carregar()
     b = Banco()
     itens = _ler_carrinho()
+    modos = {("b" if i.get("bundle") else "a", int(i.get("bundle") or i.get("appid") or 0)): _modo(i.get("modo")) for i in itens}
     apps = [int(i["appid"]) for i in itens if i.get("appid")]
     bids = [int(i["bundle"]) for i in itens if i.get("bundle")]
     if not itens:
@@ -522,11 +523,11 @@ def api_carrinho(_q):
     for bid in bids:
         o = ctx.opcoes.get("bundle:%d" % bid)
         if not o:
-            bl.append({"bundle": bid, "nome": "Bundle %d" % bid, "preco": None, "itens": []})
+            bl.append({"bundle": bid, "modo": modos[("b", bid)], "nome": "Bundle %d" % bid, "preco": None, "itens": []})
             continue
         for a in o["itens"]:
             cobertos.setdefault(a, []).append(o["nome"])
-        bl.append({"bundle": bid, "nome": o["nome"], "capa": o.get("capa"), "preco": ctx.preco_bundle_pra_voce(o),
+        bl.append({"bundle": bid, "modo": modos[("b", bid)], "nome": o["nome"], "capa": o.get("capa"), "preco": ctx.preco_bundle_pra_voce(o),
                    "vitrine": o["final"], "desconto": o.get("desconto_bundle") or o.get("desconto") or 0,
                    "cheio": sum((ctx.jogos.get(a) or {}).get("cheio_steam") or 0 for a in o["itens"] if a not in ctx.possuidos),
                    "itens": [{"appid": a, "nome": nome(a), "tenho": a in ctx.possuidos, "no_carrinho": a in apps} for a in o["itens"]]})
@@ -536,14 +537,14 @@ def api_carrinho(_q):
             continue
         a = int(it["appid"])
         j = ctx.jogos.get(a) or {}
-        ofs = sorted([o for o in atuais.get(a, []) if o["loja"].lower() in marc], key=lambda o: o["preco"])
+        ofs = [o for o in atuais.get(a, []) if o["loja"] == "Steam"]   # o carrinho so liga com a Steam
         ps = b.pisos(a, lojas_m) if lojas_m else {}
-        escolhida = next((o for o in ofs if o["loja"] == it.get("loja")), ofs[0] if ofs else None)
+        escolhida = ofs[0] if ofs else None
         tag, texto, acima = analise.etiqueta(escolhida["preco"], escolhida.get("cheio"), ps, cfg["alerta"]) \
             if escolhida and escolhida.get("corte") else (None, None, None)
         an = analise.analisar(b.linhas_lote(lojas_m, [a]).get(a, []), escolhida["preco"], escolhida.get("corte"),
                               cfg_alerta=cfg["alerta"]) if escolhida and escolhida.get("corte") and lojas_m else {}
-        out.append({"appid": a, "nome": j.get("nome") or str(a), "capa": j.get("capa"), "tipo": j.get("tipo"),
+        out.append({"appid": a, "modo": modos[("a", a)], "nome": j.get("nome") or str(a), "capa": j.get("capa"), "tipo": j.get("tipo"),
                     "possuido": a in ctx.possuidos, "lojas": [{k: o.get(k) for k in ("loja", "preco", "cheio", "corte", "url")} for o in ofs],
                     "loja": escolhida["loja"] if escolhida else None, "piso": ps.get(0), "fim": _fim(escolhida, j),
                     "tag": tag, "tag_texto": texto, "acima": acima, "em_bundle": cobertos.get(a, []),
@@ -568,10 +569,18 @@ def api_carrinho(_q):
                     "extras": [nome(a) for a in extras],
                     "extras_valor": sum((ctx.jogos.get(a) or {}).get("cheio_steam") or 0 for a in extras)})
     sug.sort(key=lambda x: (x["diferenca"] > 0, x["diferenca"], -len(x["comuns"])))
-    sem_pacote = [x["nome"] for x in out if (not x["loja"] or x["loja"] == "Steam") and not (ctx.jogos.get(x["appid"]) or {}).get("pacote")]
+    sem_pacote = [x["nome"] for x in out if not (ctx.jogos.get(x["appid"]) or {}).get("pacote")]
     r = {"itens": out, "bundles": bl, "sugestoes": sug[:10], "steam": b.meta("carrinho") or [], "sem_pacote": sem_pacote}
     b.con.close()
     return r
+
+
+MODOS_CARRINHO = ("conta", "presente", "privado")
+
+
+def _modo(m):
+    """Como o item entra no carrinho da Steam: para a conta, de presente ou compra privada."""
+    return m if m in MODOS_CARRINHO else "conta"
 
 
 def post_carrinho(d):
@@ -579,9 +588,9 @@ def post_carrinho(d):
     vistos, limpo = set(), []
     for i in (d.get("itens") or []):
         if i.get("bundle"):
-            k, item = ("b", int(i["bundle"])), {"bundle": int(i["bundle"])}
+            k, item = ("b", int(i["bundle"])), {"bundle": int(i["bundle"]), "modo": _modo(i.get("modo"))}
         elif i.get("appid"):
-            k, item = ("a", int(i["appid"])), {"appid": int(i["appid"]), "loja": i.get("loja")}
+            k, item = ("a", int(i["appid"])), {"appid": int(i["appid"]), "modo": _modo(i.get("modo"))}
         else:
             continue
         if k not in vistos:
@@ -834,7 +843,7 @@ def _itens_para_steam():
     b = Banco()
     # quem ainda nao tem o pacote (subid) conhecido: pergunta a Steam agora, numa consulta so
     carr = _ler_carrinho()
-    faltam = [int(i["appid"]) for i in carr if i.get("appid") and (i.get("loja") in (None, "", "Steam"))
+    faltam = [int(i["appid"]) for i in carr if i.get("appid")
               and not (b.um("SELECT pacote FROM jogo WHERE appid=?", int(i["appid"])) or {"pacote": None})["pacote"]]
     if faltam:
         try:
@@ -848,13 +857,13 @@ def _itens_para_steam():
     for it in carr:
         if it.get("bundle"):
             o = b.um("SELECT nome FROM opcao WHERE id=?", "bundle:%d" % int(it["bundle"]))
-            itens.append({"tipo": "bundle", "bundleid": int(it["bundle"]), "nome": o["nome"] if o else str(it["bundle"]),
+            itens.append({"tipo": "bundle", "bundleid": int(it["bundle"]), "modo": _modo(it.get("modo")), "nome": o["nome"] if o else str(it["bundle"]),
                           "url": "https://store.steampowered.com/bundle/%d/" % int(it["bundle"])})
-        elif it.get("appid") and (it.get("loja") in (None, "", "Steam")):
+        elif it.get("appid"):
             j = b.um("SELECT nome, pacote, possuido FROM jogo WHERE appid=?", int(it["appid"]))
             if j and j["possuido"]:
                 continue
-            itens.append({"tipo": "app", "appid": int(it["appid"]), "subid": j["pacote"] if j else None,
+            itens.append({"tipo": "app", "appid": int(it["appid"]), "modo": _modo(it.get("modo")), "subid": j["pacote"] if j else None,
                           "nome": j["nome"] if j else str(it["appid"]),
                           "url": "https://store.steampowered.com/app/%d/" % int(it["appid"])})
     b.con.close()
@@ -980,10 +989,10 @@ def post_steam_carrinho(_d):
     pacotes, bundles, sem = [], [], []
     for i in itens:
         if i.get("tipo") == "bundle" and i.get("bundleid"):
-            bundles.append(i["bundleid"])
+            bundles.append((i["bundleid"], i["modo"]))
             nomes[("bundle", i["bundleid"])] = i.get("nome")
         elif i.get("subid"):
-            pacotes.append(i["subid"])
+            pacotes.append((i["subid"], i["modo"]))
             nomes[("pacote", i["subid"])] = i.get("nome")
         else:
             sem.append(i.get("nome") or str(i.get("appid")))
@@ -992,6 +1001,7 @@ def post_steam_carrinho(_d):
     r = _sessao(lambda s: s.carrinho_adicionar(pacotes, bundles))
     if "faltaram" in r:
         r["faltaram"] = [nomes.get(tuple(x)) or str(x[1]) for x in r["faltaram"]]
+        r["modo_diferente"] = [nomes.get(tuple(x)) or str(x[1]) for x in r.get("modo_diferente") or []]
         r["entraram"] = len(r["entraram"])
         r["sem_pacote"] = sem
     return r
