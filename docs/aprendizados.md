@@ -2,6 +2,9 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-07 — busca do carrinho ao lado do resumo
+- **O `painel_copia.py` velho na 8799 continuava vivo** e o modo automático não deixa encerrar processo de outra sessão: suba a cópia em outra porta (`--porta 8801`) em vez de tentar matar.
+
 ## 2026-10-07 — carrinho só Steam + modos (conta/presente/privado)
 - **`painel_copia.py` esquecido numa sessão anterior continuava na porta 8799** e respondia com código velho (loja "Nuuvem", `modo` nulo): antes de testar, confira `netstat -ano | findstr :8799` e mate o antigo.
 - **`GetCart` (só leitura) mostra o formato real** (`flags:{is_gift,is_private}`) sem mexer na conta; a escrita com `flags` no `AddItemsToCart` **não foi testada na conta real** (a conferência de volta avisa em `modo_diferente`).

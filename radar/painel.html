@@ -431,32 +431,30 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .qr{background:#fff;padding:8px;display:inline-block;margin-top:6px}
 .lnk{word-break:break-all;font-size:11.5px;background:#0e141b;padding:6px 8px;border-radius:2px;color:#a9d4f1}
 @media (max-width:720px){.brow .h{grid-template-columns:90px 1fr}.brow .val{grid-column:2;text-align:left}.brow .det{padding-left:10px}}
-.carr-grid{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:16px;align-items:start;margin-bottom:40px}
+.carr-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start;margin-bottom:40px}
 .crow{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto 28px;gap:12px;align-items:center;background:rgba(0,0,0,.2);padding:4px 8px 4px 4px;margin-bottom:2px}
 .crow .nm{color:#fff;font-size:14px;cursor:pointer}
 .crow .nm:hover{color:var(--blue)}
 .xbtn{background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;width:28px;height:28px}
 .xbtn:hover{color:#ff8f7f}
-.cbusca{position:relative;flex:1 1 320px;max-width:560px}
-.cbusca .search{margin-left:0;width:100%;flex:none;min-width:0}
+.cbusca .search{margin:0;width:100%;flex:none;min-width:0}
 .cbusca .lupa{background:none;border:0;color:#fff;padding:0 9px;display:flex;align-items:center;cursor:pointer;align-self:stretch}
 .cbusca .lupa:hover{color:#a9d4f1}
-#buscaRes{position:absolute;z-index:40;top:calc(100% + 6px);left:0;width:min(780px,calc(100vw - 32px));max-height:min(60vh,440px);overflow-y:auto;background:#16202d;box-shadow:0 8px 28px rgba(0,0,0,.65),0 0 0 1px #2f4d64;padding:10px}
+#buscaRes{margin-top:8px;max-height:min(55vh,420px);overflow-y:auto}
 #buscaRes[hidden]{display:none}
-.rhead{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;margin:0 0 8px}
+.rhead{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11.5px;margin:0 0 6px}
 .rhead button{background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
 .rhead button:hover{color:#ff8f7f}
-.res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.ritem{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 8px;align-items:start;background:rgba(0,0,0,.28);padding:5px}
-.ritem .art{grid-row:1/3}
+.res{display:flex;flex-direction:column;gap:3px}
+.ritem{display:grid;grid-template-columns:76px minmax(0,1fr) 22px;gap:8px;align-items:center;width:100%;background:rgba(0,0,0,.28);border:0;padding:4px 6px 4px 4px;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.ritem:hover{background:#203348}
 .ritem .rb{display:flex;flex-direction:column;gap:2px;min-width:0}
-.ritem .rn{color:#fff;font-size:12.5px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.ritem .motivo{font-size:11px}
-.ritem .acts{display:flex;gap:4px;flex-wrap:wrap;align-self:end}
-.ritem .acts button{font-size:11px;padding:3px 7px}
-.ritem .acts button.feito{background:#2a475e;color:#a1cd44;cursor:default}
-@media (max-width:760px){.res{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:520px){.res{grid-template-columns:1fr}}
+.ritem .rn{color:#fff;font-size:12px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ritem .motivo{font-size:11px;margin:0}
+.ritem .rok{color:var(--blue);font-size:18px;text-align:center}
+.ritem.feito{cursor:default;opacity:.75}
+.ritem.feito:hover{background:rgba(0,0,0,.28)}
+.ritem.feito .rok{color:#a1cd44;font-size:14px}
 .tot{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0}
 .tot b{color:#fff;font-weight:400}
 .tot.big b{font-size:20px;color:var(--disc-fg)}
@@ -596,17 +594,14 @@ details.blk[open]>summary h4::after{content:"▴"}
   <section id="tab-carr" class="wrap tabsec" hidden>
     <div class="cart-head"><h1>Seu carrinho de compras</h1><span class="aside" id="carrNote"></span><span class="aside">só itens da Steam · cada um para a sua conta, presente ou privado</span></div>
     <div class="subnav">
-      <div class="cbusca" id="cbusca">
-        <label class="search"><button class="lupa" id="buscaBtn" type="button" aria-label="Buscar jogo para o carrinho" title="Buscar"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg></button><span class="sr">Buscar jogo</span><input id="busca" type="search" placeholder="Adicionar jogo: nome, appid ou link da Steam" autocomplete="off"></label>
-        <div id="buscaRes" hidden></div>
-      </div>
       <button class="lk" id="carrSteam">Trazer o carrinho da Steam</button>
       <button class="lk" id="carrLimpa">Limpar</button>
     </div>
     <div class="carr-grid">
       <div><div id="carrLista"></div><div id="carrBundles"></div>
       </div>
-      <aside class="side"><div class="blk"><h4>Resumo do pedido</h4><div class="in" id="carrResumo"></div></div>
+      <aside class="side"><div class="blk cbusca" id="cbusca"><h4>Adicionar jogo</h4><div class="in"><label class="search"><button class="lupa" id="buscaBtn" type="button" aria-label="Buscar jogo para o carrinho" title="Buscar"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg></button><span class="sr">Buscar jogo</span><input id="busca" type="search" placeholder="Nome, appid ou link da Steam" autocomplete="off"></label><div id="buscaRes" hidden></div></div></div>
+        <div class="blk"><h4>Resumo do pedido</h4><div class="in" id="carrResumo"></div></div>
         <div class="blk"><h4>Orçamento</h4><div class="in"><label class="f" style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px">Quanto quero gastar (R$)
           <input type="number" id="orc" min="0" step="10" style="width:90px;background:#0e141b;border:0;color:#fff;padding:6px 8px;border-radius:2px;box-shadow:inset 0 0 0 1px #2f4d64"></label>
           <div id="orcBar"></div></div></div></aside>
@@ -1109,7 +1104,7 @@ async function renderCarr(){
       ${modoSel('a',c.appid,c.modo)}
       ${priceBlock({preco:sel.preco,cheio:sel.cheio,corte:sel.corte||0})}
       <button class="xbtn" data-cart="${c.appid}" title="Tirar do carrinho">×</button></div>`;}).join(''):
-    (CD.bundles.length?'':'<div class="empty">Carrinho vazio. Use o + nas listas, o botão na ficha do jogo, a busca acima ou "Trazer o carrinho da Steam".</div>');
+    (CD.bundles.length?'':'<div class="empty">Carrinho vazio. Use o + nas listas, o botão na ficha do jogo, a busca ao lado ou "Trazer o carrinho da Steam".</div>');
   $('#carrLista').insertAdjacentHTML('beforeend',CD.bundles.map(b=>`<div class="crow">${art(b.bundle,b.nome,b.capa,{small:true})}
       <div><div class="nm"><a href="https://store.steampowered.com/bundle/${b.bundle}/" target="_blank" rel="noopener" style="color:#fff">📦 ${esc(b.nome)}</a></div>
         <div class="motivo">${b.itens.length} itens${b.itens.some(i=>i.tenho)?` · você já tem ${b.itens.filter(i=>i.tenho).length} (descontado)`:''}${b.itens.some(i=>i.no_carrinho)?` · <span style="color:#ff9b8a">${b.itens.filter(i=>i.no_carrinho).length} também avulso no carrinho</span>`:''}</div>
@@ -1155,20 +1150,20 @@ async function buscar(){const q=$('#busca').value.trim(),box=$('#buscaRes');if(!
   let d;try{d=await api('/api/buscar?q='+encodeURIComponent(q));}catch(e){if(n===BUSCA.n)box.innerHTML=`<div class="empty">Erro: ${esc(e.message)}</div>`;return;}
   if(n!==BUSCA.n)return;   // chegou uma busca mais nova
   const no=id=>CARR.some(c=>c.appid===id);
-  box.innerHTML=`<div class="rhead"><span>${d.itens.length?d.itens.length+' resultado(s)':'Nada encontrado.'}</span><button type="button" data-fechar title="Fechar (Esc)">×</button></div>`+(d.itens.length?`<div class="res">${d.itens.map(i=>`<div class="ritem">${art(i.appid,i.nome,i.capa,{small:true})}
-    <div class="rb"><div class="rn" title="${esc(i.nome)}">${esc(i.nome)}</div><div class="motivo" style="margin:0">${i.possuido?'você já tem · ':''}${i.na_lista?'já monitorado · ':''}${i.preco!=null?brl(i.preco)+(i.corte?' (-'+i.corte+'%)':''):''}</div></div>
-    <div class="acts">${no(i.appid)?'<button class="btn-ghost feito" type="button" disabled>✓ No carrinho</button>':`<button class="btn-imp" type="button" data-addcarr="${i.appid}" data-mon="${i.na_lista?0:1}">Carrinho</button>`}${i.na_lista?'':`<button class="btn-ghost" type="button" data-addmon="${i.appid}">Só monitorar</button>`}</div></div>`).join('')}</div>`:'');}
+  box.innerHTML=`<div class="rhead"><span>${d.itens.length?d.itens.length+' resultado(s) · clique para adicionar':'Nada encontrado.'}</span><button type="button" data-fechar title="Fechar (Esc)">×</button></div>`+(d.itens.length?`<div class="res">${d.itens.map(i=>{const ja=no(i.appid);
+    return `<button type="button" class="ritem${ja?' feito':''}" data-addcarr="${i.appid}" data-mon="${i.na_lista?0:1}" title="${ja?'Já está no carrinho':'Adicionar ao carrinho: '+esc(i.nome)}"${ja?' disabled':''}>${art(i.appid,i.nome,i.capa,{small:true})}
+    <span class="rb"><span class="rn">${esc(i.nome)}</span><span class="motivo">${i.possuido?'você já tem · ':''}${i.preco!=null?brl(i.preco)+(i.corte?' (-'+i.corte+'%)':''):''}</span></span><span class="rok">${ja?'✓':'+'}</span></button>`;}).join('')}</div>`:'');}
 $('#buscaBtn').addEventListener('click',buscar);
 $('#busca').addEventListener('keydown',e=>{if(e.key==='Enter'){clearTimeout(BUSCA.t);buscar();}else if(e.key==='Escape'){fecharBusca();}});
 $('#busca').addEventListener('input',()=>{clearTimeout(BUSCA.t);const q=$('#busca').value.trim();if(q.length<2){BUSCA.n++;fecharBusca();return;}BUSCA.t=setTimeout(buscar,450);});
 $('#busca').addEventListener('focus',()=>{if($('#buscaRes').innerHTML&&$('#busca').value.trim())$('#buscaRes').hidden=false;});
 document.addEventListener('click',e=>{if(!$('#buscaRes').hidden&&!e.target.closest('#cbusca'))fecharBusca();});
 $('#buscaRes').addEventListener('click',async e=>{if(e.target.closest('[data-fechar]')){fecharBusca();return;}
-  const a=e.target.closest('[data-addcarr]'),m=e.target.closest('[data-addmon]');
-  if(m){m.disabled=true;await post('/api/extra',{appid:+m.dataset.addmon});toast('Monitorando: os preços das outras lojas chegam na próxima checagem');m.remove();await carregarLista();return;}
-  if(a){a.disabled=true;if(a.dataset.mon==='1'){await post('/api/extra',{appid:+a.dataset.addcarr});await carregarLista();}
-    const id=+a.dataset.addcarr;if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,modo:'conta'});await salvarCarr();}
-    a.className='btn-ghost feito';a.textContent='✓ No carrinho';toast('No carrinho (e monitorado)');renderCarr();}});
+  const a=e.target.closest('[data-addcarr]');if(!a||a.disabled)return;
+  a.disabled=true;a.classList.add('feito');a.querySelector('.rok').textContent='✓';
+  const id=+a.dataset.addcarr;if(a.dataset.mon==='1'){await post('/api/extra',{appid:id});await carregarLista();}
+  if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,modo:'conta'});await salvarCarr();}
+  toast('No carrinho');renderCarr();});
 
 /* ================= notificações ================= */
 async function renderNotif(){
