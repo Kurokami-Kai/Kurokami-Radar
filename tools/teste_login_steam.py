@@ -571,8 +571,7 @@ def celular():
         log("   nao aprovou")
 
 
-ANTES_PACOTES = [205941, 251489, 458885]          # carrinho do dono antes do primeiro teste (ids, nao sao segredo)
-ANTES_BUNDLES = [231, 233, 8017, 23487, 34010, 65243]
+ANTES = os.path.join(SONDA, "antes_carrinho.json")   # {"pacotes": [...], "bundles": [...]}; fora do Git
 
 
 class _SemRedirect(urllib.request.HTTPRedirectHandler):
@@ -586,7 +585,11 @@ def diagnostico():
     for i in itens or []:
         log("   item:", {k: i.get(k) for k in ("line_item_id", "packageid", "bundleid", "type", "time_added", "is_valid")})
     k_atual = set(chaves(itens or []))
-    k_antes = {(p, 0) for p in ANTES_PACOTES} | {(0, b) for b in ANTES_BUNDLES}
+    try:
+        ant = json.load(open(ANTES, encoding="utf-8"))
+    except OSError:
+        ant = {"pacotes": [], "bundles": []}
+    k_antes = {(p, 0) for p in ant["pacotes"]} | {(0, b) for b in ant["bundles"]}
     sobrando, faltando = sorted(k_atual - k_antes), sorted(k_antes - k_atual)
     item("D1 Carrinho agora", itens=len(itens or []), sobrando=sobrando, faltando=faltando, erro=erro)
     log("   sobrando:", sobrando, "faltando:", faltando)
