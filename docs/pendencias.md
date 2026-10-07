@@ -3,8 +3,8 @@
 ## Especificações prontas para implementar
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
-- 06 — Login Steam por QR, começando por teste (a escrever)
-- 07 — Promoções da Steam inteira, com base no teste da 04 (a escrever)
+- [06 — Login Steam por QR (opcional), começando por teste](specs/06-login-steam.md)
+- 07 — Promoções da Steam inteira, com base no teste da 04 (a escrever). Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".
 - 08 — Layout em etapas: inventário, referência, base visual, uma aba por vez, celular (a escrever)
 
 ## Feitas
