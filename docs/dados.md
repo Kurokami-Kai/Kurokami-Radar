@@ -31,14 +31,15 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 - `perfil_steam`, `pais`, `userdata_json`, `pasta_kurokami_precos`
 - `lojas` (alertam), `somente_drm_steam`
 - `alerta`: `tipos{selo,novo,igual,24m}` (o que avisa; padrão só `selo`), `desconto_minimo` (vale para novo, igual e 24m), `selo_corte_minimo` (Selo só a partir desse corte; padrão 0), `dias_minimos_completo`, `tolerancia_pct`, `janela_dias`/`perto` (informativos). Ignorados, ficam por compatibilidade: `raridade_minima` e `favoritos_top` (desde a 0.15), `score_minimo`, `avaliacao_minima` e `ignorar_sem_avaliacoes` (desde a 0.14)
-- `keyshops`: `ativo`, `preco_maximo`, `pct_do_menor_oficial`
+- `keyshops`: `ativo` (padrão `false` desde a 0.16), `preco_maximo`, `pct_do_menor_oficial`
+- `migracoes[]`: mudanças de padrão já aplicadas a este arquivo (`config.MIGRACOES`, cada uma roda uma vez em `carregar()`; depois vale a escolha do usuário). Hoje: `keyshop_alerta_off`
 - `dlc`: `ignorar_cosmeticos|extras|atalhos|pacotes|gratis`
 - `completo`: `padrao`, `jogos{appid:"completo"}`
 - `bundles`, `notificacoes` (`ativas, max_por_rodada, melhora_minima_reais, silencio{}, termina_em_breve_horas`)
 - `intervalos_minutos{itad, ggdeals, steam}`, `chamadas_lentas_por_rodada`, `verificacao_completa_dias`, `historico.importar_dias`
 - `extras[]`, `painel{rede_local}`, `atualizacao{repo, verificar}`
 
-`config.carregar()` faz merge do arquivo sobre `PADRAO`, então chaves novas não exigem migração.
+`config.carregar()` faz merge do arquivo sobre `PADRAO`, então chaves novas não exigem migração. **Mudar o valor padrão de uma chave que já existe** não chega a quem já tem o arquivo (o `config.json` guarda tudo desde a 1ª vez): para isso, acrescente uma entrada em `config.MIGRACOES`. Arquivo ilegível nunca é migrado (seria sobrescrito).
 
 ## Conta Steam (seguidos e ignorados)
 

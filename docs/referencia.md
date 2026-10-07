@@ -141,6 +141,7 @@ config.json: tudo que nao e segredo. O painel web (etapa 3) vai editar este arqu
 
 - `_mesclar(base, novo)`
 - `carregar()`
+- `_migrar(cfg)`
 - `salvar(cfg)`
 - `modo_do_jogo(cfg, appid)`
 

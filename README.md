@@ -22,7 +22,7 @@ No fim, o Radar abre sozinho e mostra a janela **Perfil e chaves**. É só preen
 |---|---|---|
 | Perfil Steam | **sim** | saber qual lista de desejos e biblioteca olhar |
 | Chave da IsThereAnyDeal | **sim** | preços de dezenas de lojas e histórico |
-| Chave da GG.deals | não | preços de keyshops (só avisa quando estiver muito barato) |
+| Chave da GG.deals | não | preços de keyshops na ficha do jogo e nos filtros (o aviso de keyshop vem desligado; dá para ligar em Configurações) |
 | Chave da Steam Web API | não | ler a biblioteca quando você não tem o `userdata.json` |
 
 As chaves ficam guardadas no **Gerenciador de Credenciais do Windows** (nunca num arquivo). Dá para trocar depois pelo menu do ícone: **Chaves e perfil…**

@@ -18,6 +18,7 @@ Os usuários já têm bancos com meses de histórico. **Nenhuma mudança pode ex
 
 ## Configuração nova
 - Só adicionar em `config.PADRAO` (o `carregar()` faz merge — arquivos antigos ganham o padrão sozinhos).
+- Mudar o padrão de chave que **já existe** não chega a quem já tem o `config.json`: acrescente uma entrada em `config.MIGRACOES` (roda uma vez; depois vale a escolha do usuário).
 - Se o painel edita: campo em `renderCfg` (`painel.html`) e chave permitida em `post_config` (`painel.py`).
 - Nunca guardar segredo no config (use `credenciais`).
 

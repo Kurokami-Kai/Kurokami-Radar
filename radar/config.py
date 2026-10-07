@@ -51,7 +51,9 @@ PADRAO = {
     },
 
     "keyshops": {
-        "ativo": True,
+        # desligado por padrao (07/10/2026): 22 dos 26 avisos reais eram keyshop da GG.deals, quase todos
+        # alarme falso (classicos da Valve a R$ 7-9 de novo a cada centavo). O preco segue no painel.
+        "ativo": False,
         # keyshop so entra quando o preco e MUITO baixo:
         # abaixo de preco_maximo  OU  abaixo de X% do menor preco oficial.
         "preco_maximo": 10.0,
@@ -93,7 +95,16 @@ PADRAO = {
     # A loja da Steam so responde ~200 chamadas a cada 5 min. O que depende dela (conteudo de edicoes,
     # lista de DLCs) vai sendo completado aos poucos, sem atrasar a checagem de precos.
     "chamadas_lentas_por_rodada": 120,
-    "historico": {"importar_dias": 1825}
+    "historico": {"importar_dias": 1825},
+
+    # mudancas de padrao ja aplicadas a este config.json (cada uma roda uma vez so; ver _migrar)
+    "migracoes": []
+}
+
+# nome -> funcao que ajusta um config.json antigo. Depois de rodar, o nome entra em cfg["migracoes"]
+# e a escolha do usuario passa a valer (se ele religar, fica ligado).
+MIGRACOES = {
+    "keyshop_alerta_off": lambda cfg: cfg["keyshops"].update(ativo=False),
 }
 
 
@@ -114,10 +125,26 @@ def carregar():
                 _mesclar(cfg, json.load(f))
         except (OSError, json.JSONDecodeError) as e:
             print("!! config.json ilegivel (%s). Usando o padrao." % e)
+            return cfg  # nao migra: gravaria o padrao por cima do arquivo do usuario
     else:
         salvar(cfg)
         print("Criei o config.json com os valores padrao.")
+    _migrar(cfg)
     return cfg
+
+
+def _migrar(cfg):
+    feitas = cfg.get("migracoes") or []
+    novas = [n for n in MIGRACOES if n not in feitas]
+    if not novas:
+        return
+    for n in novas:
+        MIGRACOES[n](cfg)
+    cfg["migracoes"] = feitas + novas
+    try:
+        salvar(cfg)
+    except OSError as e:
+        print("!! nao consegui gravar o config.json (%s)" % e)
 
 
 def salvar(cfg):

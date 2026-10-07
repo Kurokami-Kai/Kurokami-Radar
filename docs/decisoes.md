@@ -19,6 +19,7 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 - O **"preço atual" sai de `oferta_atual`**, nunca do último registro do histórico (ARK aparecia "grátis" por um brinde de 2022 de uma loja que parou de vender).
 - Histórico importado é de **todas as lojas** (mesmo custo); o config só decide quais alertam.
 - GG.deals lê a edição parcial em jogos como HITMAN → seus números são ignorados nesses jogos.
+- **Aviso de keyshop desligado por padrão (07/10/2026, 0.16).** No banco do dono, 22 dos 26 avisos enviados eram "Keyshop (GG.deals)": Half-Life, HL2, CS:Source e Opposing Force a R$ 7–9 avisando de novo a cada queda de centavos (o `preco_maximo` de R$ 10 pega qualquer clássico barato, e o "menor histórico" é o da própria GG.deals, que desce aos poucos). A GG.deals fica só como informação (ficha, flag e filtro de keyshop). Migração `keyshop_alerta_off` desliga também em quem já tinha o config.
 - Não usar várias chaves da mesma API para driblar limite (termos de uso).
 
 ## Avaliação

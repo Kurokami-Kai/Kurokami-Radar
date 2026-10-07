@@ -1200,6 +1200,7 @@ async function renderCfg(){
      <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label></div></div>
    <div class="blk"><h4>Keyshops (via GG.deals)</h4><div class="in">
      ${chk('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata')}
+     <div class="hint">Desligado por padrão: a GG.deals dava muito alarme falso. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".</div>
      <label class="f">Abaixo de (R$) ${num('keyshops.preco_maximo',k.preco_maximo,1,0)}</label>
      <label class="f">ou abaixo de % do menor oficial ${num('keyshops.pct_do_menor_oficial',k.pct_do_menor_oficial,5,0,100)}</label></div></div>
    <div class="blk"><h4>DLCs no custo completo</h4><div class="in">
