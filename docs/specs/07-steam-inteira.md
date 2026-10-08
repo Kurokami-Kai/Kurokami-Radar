@@ -15,9 +15,9 @@ A aba Promoções só mostra a lista de desejos (+ monitorados). Na SteamDB dá 
 
 ## Proposta
 ### Coleta (`radar/steam_inteira.py`, etapa nova no fim de `coleta.atualizar`)
-- **[decidido]** A cada **6 h** (`meta.ult_steam_inteira`; `config.steam_inteira`, ligado por padrão, desliga em Configurações). Não roda no "Verificar agora" (pesa ~2,5 min em grande promoção); falha só registra no log e tenta na próxima rodada.
+- A cada **60 min** (`intervalos_minutos.steam_inteira`, muda em Configurações), no **"Verificar agora"** e na verificação completa (`meta.ult_steam_inteira`; `config.steam_inteira`, ligado por padrão). Falha só registra no log e tenta na próxima rodada. *(Revisão do dono em 08/10: 6 h era tempo demais e o "Verificar agora" precisa puxar.)*
 - `rede.http_json` passa a pedir e aceitar gzip (vale para todas as fontes).
-- Tabela `steam_promo` (retrato atual: uma linha por appid em promoção) e `steam_hist` (só mudanças: entrou, mudou de preço, saiu → linha com o preço cheio e corte 0). Ver `docs/dados.md`.
+- Tabela `steam_promo`: só o retrato de agora; cada coleta **substitui** tudo, sem histórico *(revisão do dono em 08/10: basta substituir; o espaço fica do tamanho de uma coleta)*. Ver `docs/dados.md`.
 - Coleta incompleta (erro no meio): não apaga quem não foi visto; só a coleta completa troca o retrato.
 
 ### Painel
@@ -29,7 +29,7 @@ A aba Promoções só mostra a lista de desejos (+ monitorados). Na SteamDB dá 
 - Desempenho: as linhas leves ficam em memória com `__slots__` (~50 MB com 108 mil); a ordenação passa a ser por chaves estáveis (era `cmp_to_key`, lento com 100 mil). Meta: `/api/promocoes` ≤ 300 ms com 108 mil itens.
 
 ## Critérios de aceite
-1. Uma coleta grava `steam_promo` com todos os itens compráveis em promoção e `meta.ult_steam_inteira`; a segunda, sem mudanças, não grava nada em `steam_hist`.
+1. Uma coleta grava `steam_promo` com todos os itens compráveis em promoção e `meta.ult_steam_inteira`; a seguinte substitui tudo; "Verificar agora" puxa mesmo dentro do intervalo.
 2. "Steam inteira" com os filtros padrão (desconto ≥ 50%, análises ≥ 5.000) lista jogos fora da lista de desejos, com preço, corte e fim certos (conferir 3 na loja).
 3. Os jogos da lista aparecem uma vez só, com a linha completa.
 4. `/api/promocoes` com `fonte: "steam"` responde em ≤ 300 ms (cache quente) com 108 mil itens sintéticos.

@@ -89,10 +89,10 @@ PADRAO = {
     # jogos monitorados que nao estao na lista de desejos da Steam (adicionados pelo painel)
     "extras": [],
 
-    # Promocoes da Steam inteira na aba Promocoes (spec 07): uma consulta a cada 6 h, ~1 MB num dia comum
+    # Promocoes da Steam inteira na aba Promocoes (spec 07): ~1 MB por consulta num dia comum, ~16 MB em grande promocao
     "steam_inteira": True,
 
-    "intervalos_minutos": {"itad": 30, "ggdeals": 60, "steam": 180},
+    "intervalos_minutos": {"itad": 30, "ggdeals": 60, "steam": 180, "steam_inteira": 60},
     # verificacao completa (tudo, sem limite de ritmo): a 1a sempre; depois a cada N dias (0 = so manual)
     "verificacao_completa_dias": 7,
     # A loja da Steam so responde ~200 chamadas a cada 5 min. O que depende dela (conteudo de edicoes,

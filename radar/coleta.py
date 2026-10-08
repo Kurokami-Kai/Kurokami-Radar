@@ -16,7 +16,7 @@ def _min_desde(banco, chave):
     return (datetime.now(timezone.utc) - datetime.fromisoformat(t)).total_seconds() / 60
 
 
-def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, log=print):
+def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, log=print, steam_agora=False):
     pais = cfg["pais"]
     k_steam, k_itad, k_gg = credenciais.ler("steam"), credenciais.ler("itad"), credenciais.ler("ggdeals")
     t0 = time.time()
@@ -132,8 +132,9 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
                 n += 1
     banco.commit()
 
-    # ---------------------------------------------------------- 6. Steam inteira (spec 07; a cada 6 h, nao no "Verificar agora")
-    if cfg.get("steam_inteira", True) and not forcar and _min_desde(banco, "ult_steam_inteira") >= 6 * 60:
+    # ---------------------------------------------------------- 6. Steam inteira (spec 07): no intervalo, no "Verificar agora" e na completa
+    if cfg.get("steam_inteira", True) and (steam_agora or forcar or _min_desde(
+            banco, "ult_steam_inteira") >= cfg["intervalos_minutos"].get("steam_inteira", 60)):
         try:
             steam_inteira.coletar(banco, cfg, log)
         except Exception as e:   # nao derruba a coleta da lista; tenta de novo na proxima rodada

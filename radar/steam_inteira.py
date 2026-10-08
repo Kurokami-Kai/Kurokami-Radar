@@ -1,7 +1,7 @@
 """Promocoes da Steam inteira (spec 07): IStoreQueryService/Query, sem chave, 1.000 itens por chamada.
 
-- So vem quem esta com desconto: o retrato fica em steam_promo; o historico (steam_hist) guarda so o que mudou
-  (entrou, mudou de preco, saiu -> linha com o preco cheio e corte 0).
+- So vem quem esta com desconto; o retrato fica em steam_promo e cada coleta substitui tudo (sem historico:
+  decisao do dono, o espaco fica sempre do tamanho de uma coleta).
 - sort 2 e obrigatorio: sem ele a paginacao repete e pula itens (spec 04, 1.6).
 - Coleta incompleta (erro no meio) nao troca o retrato: quem nao foi visto continua la ate a proxima completa."""
 import json
@@ -74,26 +74,17 @@ def baixar(pais, max_chamadas=MAX_CHAMADAS):
 
 
 def coletar(banco, cfg, log=print):
-    """Baixa as promocoes, troca o retrato e grava no historico so o que mudou. Devolve um resumo."""
+    """Baixa as promocoes e substitui o retrato. Devolve quantos itens."""
     t0 = time.time()
     progresso.etapa("Steam inteira", None)
     novos, chamadas = baixar(str(cfg.get("pais") or "BR").upper())
     quando = agora()
-    antes = {r["appid"]: (r["preco"], r["cheio"], r["corte"]) for r in banco.q("SELECT appid, preco, cheio, corte FROM steam_promo")}
-    hist = []
-    for a, n in novos.items():
-        if antes.get(a) != (n["preco"], n["cheio"], n["corte"]):
-            hist.append((a, quando, n["preco"], n["cheio"], n["corte"]))
-    sairam = set(antes) - set(novos)
-    hist += [(a, quando, antes[a][1], antes[a][1], 0) for a in sairam]   # voltou ao preco cheio (ou saiu da loja)
     cols = ("appid", "tipo", "nome", "pacote", "preco", "cheio", "corte", "fim", "rpos", "rcount", "rotulo", "lancamento", "capa")
     banco.con.execute("DELETE FROM steam_promo")
     banco.con.executemany("INSERT INTO steam_promo(%s, visto) VALUES(%s)" % (", ".join(cols), ", ".join("?" * (len(cols) + 1))),
                           [tuple(n[c] for c in cols) + (quando,) for n in novos.values()])
-    banco.con.executemany("INSERT INTO steam_hist VALUES(?,?,?,?,?)", hist)
     banco.meta("ult_steam_inteira", quando)
-    banco.meta("steam_inteira_resumo", {"itens": len(novos), "chamadas": chamadas, "mudancas": len(hist),
-                                        "segundos": round(time.time() - t0)})
+    banco.meta("steam_inteira_resumo", {"itens": len(novos), "chamadas": chamadas, "segundos": round(time.time() - t0)})
     banco.commit()
-    log("Steam inteira: %d itens em promocao (%d chamadas, %d mudancas, %.0fs)" % (len(novos), chamadas, len(hist), time.time() - t0))
+    log("Steam inteira: %d itens em promocao (%d chamadas, %.0fs)" % (len(novos), chamadas, time.time() - t0))
     return len(novos)

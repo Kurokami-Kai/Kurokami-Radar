@@ -560,7 +560,7 @@ details.blk[open]>summary h4::after{content:"▴"}
     <div class="browse pbrowse">
       <div>
         <div class="toolbar">
-          <div class="views fonte" role="group" aria-label="De onde vêm os jogos"><button data-fonte="lista" type="button" title="Sua lista de desejos e os jogos que você monitora">Lista de desejos</button><button data-fonte="steam" type="button" title="Todas as promoções da Steam (atualiza a cada 6 h)">Steam inteira</button></div>
+          <div class="views fonte" role="group" aria-label="De onde vêm os jogos"><button data-fonte="lista" type="button" title="Sua lista de desejos e os jogos que você monitora">Lista de desejos</button><button data-fonte="steam" type="button" title="Todas as promoções da Steam (atualiza a cada hora e no Verificar agora)">Steam inteira</button></div>
           <span class="count"><b id="cnt">0</b> resultados</span>
           <button class="btn-ghost pfbtn" id="pfBtn" type="button" aria-expanded="false">Filtros</button>
           <label>Por página <select id="pPP"><option value="50">50</option><option value="100">100</option><option value="250">250</option></select></label>
@@ -796,7 +796,7 @@ async function renderLista(){
   const st=r.steam||{};$$('.fonte [data-fonte]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.fonte===FONTE));
   $('#listaNote').textContent=FONTE==='steam'?(!st.ligada?'Steam inteira desligada em Configurações: mostrando só a sua lista.'
       :st.quando?`Steam inteira: ${fmtN(st.itens)} em promoção · atualizada ${relTempo(st.quando,false)} · jogos fora da lista abrem na Steam`
-      :'A Steam inteira chega na próxima checagem (leva alguns minutos). Por enquanto, só a sua lista.')
+      :'A Steam inteira chega na próxima checagem (clique em Verificar agora para puxar já). Por enquanto, só a sua lista.')
     :L.length?`${fmtN(L.filter(o=>o.corte>0).length)} em promoção de ${fmtN(L.length)} na lista`:'';
   renderSide();renderChips();
   const box=$('#results');
@@ -1207,7 +1207,8 @@ async function renderCfg(){
      <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label></div></div>
    <div class="blk"><h4>Promoções da Steam inteira</h4><div class="in">
      ${chk('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam (aba Promoções → Steam inteira)')}
-     <div class="hint">Uma consulta a cada 6 h: ~1 MB num dia comum, ~16 MB em grande promoção. Não gera avisos: os avisos continuam só para a sua lista.</div></div></div>
+     <label class="f">Atualizar a cada (minutos) ${num('intervalos_minutos.steam_inteira',iv.steam_inteira??60,15,30,1440)}</label>
+     <div class="hint">Também atualiza no "Verificar agora". Cada consulta substitui a anterior (não acumula espaço): ~1 MB num dia comum, ~16 MB e ~3 min em grande promoção. Não gera avisos: os avisos continuam só para a sua lista.</div></div></div>
    <div class="blk"><h4>Keyshops (via GG.deals)</h4><div class="in">
      ${chk('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata')}
      <div class="hint">Desligado por padrão: a GG.deals dava muito alarme falso. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".</div>

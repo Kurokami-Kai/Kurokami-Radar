@@ -81,7 +81,7 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 - Toasts: XML montado com escape + `-EncodedCommand`; o `$` de "R$" quebrava a interpolação do PowerShell.
 - **Sem ponte do Tampermonkey (removida na 0.16, pedido do dono: era remendo).** O navegador não deixa `localhost` usar a sessão da Steam; o carrinho vai pela extensão própria do Radar (abaixo). Adicionar à lista de desejos pelo painel saiu junto (dependia da ponte).
 
-- **Steam inteira (spec 07):** `IStoreQueryService/Query` exige `sort: 2` (sem ele a paginação repete e pula itens). Peça gzip (`rede.http_json` já pede): sem ele são 1,5 MB por página (126 MB numa grande promoção). Coleta incompleta não troca o retrato. Avisos continuam só para a lista (a Steam inteira daria centenas por dia).
+- **Steam inteira (spec 07):** `IStoreQueryService/Query` exige `sort: 2` (sem ele a paginação repete e pula itens). Peça gzip (`rede.http_json` já pede): sem ele são 1,5 MB por página (126 MB numa grande promoção). Coleta incompleta não troca o retrato. **Sem histórico** (decisão do dono, 08/10): cada coleta substitui o retrato; a cada hora e no "Verificar agora". Avisos continuam só para a lista (a Steam inteira daria centenas por dia).
 
 ## Login Steam e segurança dos usuários (spec 06)
 - **"Entrar pela Steam" = OpenID 2.0** (como ITAD, GG.deals e SteamDB): confirma na página da Steam; o Radar só guarda o SteamID em `config.perfil_steam`. Nada de senha, token ou cookie. O OpenID só prova quem é: não dá acesso ao carrinho nem a lista privada.

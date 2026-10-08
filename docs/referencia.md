@@ -130,7 +130,7 @@ Pastas do app.
 Orquestra a coleta: Steam (catalogo) -> ITAD (precos por loja + historico) -> GG.deals.
 
 - `_min_desde(banco, chave)`
-- `atualizar(cfg, banco, forcar, importar_hist, sem_limite, log)`
+- `atualizar(cfg, banco, forcar, importar_hist, sem_limite, log, steam_agora)`
 - `catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento)`
 - `coletar_biblioteca(cfg, banco, possuidos, k_itad, log)` — Precos, franquias e menor historico de tudo que voce tem (jogos e DLCs).
 - `_cache_itad(cfg, banco)`
@@ -340,7 +340,7 @@ O ciclo que roda sozinho: coleta -> avalia -> notifica, no intervalo do config.
 - `criar_log(eco)`
 - `_fim_iso(v)`
 - `candidatos_fim(b, alertas, cfg)` — O que esta no carrinho ou "vale a pena" e tem data de fim conhecida (ITAD ou Steam).
-- `ciclo(log, forcar, sem_limite)` — Uma rodada. forcar+sem_limite = verificacao completa. Devolve (alertas, novos).
+- `ciclo(log, forcar, sem_limite, steam_agora)` — Uma rodada. forcar+sem_limite = verificacao completa. Devolve (alertas, novos).
 - **class `Servico`** — 
   - `_precisa_completa()` — 1a checagem e sempre completa; depois, a cada N dias (config verificacao_completa_dias).
   - `agora(completo)`
@@ -374,7 +374,7 @@ Promocoes da Steam inteira (spec 07): IStoreQueryService/Query, sem chave, 1.000
 - `_capa(it)`
 - `normalizar(it)` — Item da Query -> linha de steam_promo, ou None se nao for compravel/sem desconto.
 - `baixar(pais, max_chamadas)` — {appid: linha} de todas as promocoes da Steam. Levanta excecao se nao conseguir ler tudo.
-- `coletar(banco, cfg, log)` — Baixa as promocoes, troca o retrato e grava no historico so o que mudou. Devolve um resumo.
+- `coletar(banco, cfg, log)` — Baixa as promocoes e substitui o retrato. Devolve quantos itens.
 
 ## `radar/steam_openid.py`
 Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.

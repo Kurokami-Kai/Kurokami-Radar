@@ -45,7 +45,7 @@ Kurokami Radar é um app **local** de Windows (Python 3.12) que monitora a lista
 4. **ITAD**: mapeia appid→id ITAD; importa histórico uma vez por jogo (todas as lojas); preços atuais de todas as lojas → `preco` (só quando muda) e `oferta_atual` (snapshot vigente).
 5. **GG.deals** (a cada 60 min).
 6. **Custo completo** dos jogos em modo "completo" vira uma "loja" própria no histórico (`Completo (Steam)`).
-7. **Steam inteira** (etapa 6 no código; `steam_inteira.coletar`, a cada 6 h, `config.steam_inteira`; não roda no "Verificar agora"): troca o retrato `steam_promo` e grava em `steam_hist` só o que mudou. Resposta vazia ou cortada levanta erro e não troca o retrato; falha só vai para o log. Não gera avisos.
+7. **Steam inteira** (etapa 6 no código; `steam_inteira.coletar`, a cada `intervalos_minutos.steam_inteira` (60 min), no "Verificar agora" e na verificação completa; `config.steam_inteira`): substitui o retrato `steam_promo` inteiro (sem histórico, decisão do dono). Resposta vazia ou cortada levanta erro e não troca o retrato; falha só vai para o log. Não gera avisos.
 
 Verificação **rápida** = o ciclo normal (respeita intervalos e orçamento). **Completa** = `forcar=True, sem_limite=True`; a primeira é sempre completa, depois a cada `verificacao_completa_dias`.
 

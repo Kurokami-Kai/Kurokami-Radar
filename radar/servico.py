@@ -58,7 +58,7 @@ def candidatos_fim(b, alertas, cfg):
     return out
 
 
-def ciclo(log=print, forcar=False, sem_limite=False):
+def ciclo(log=print, forcar=False, sem_limite=False, steam_agora=False):
     """Uma rodada. forcar+sem_limite = verificacao completa. Devolve (alertas, novos)."""
     cfg = config.carregar()
     b = Banco()
@@ -69,7 +69,7 @@ def ciclo(log=print, forcar=False, sem_limite=False):
         log_(msg)
     progresso.iniciar("completa" if (forcar and sem_limite) else "rapida")
     try:
-        ofertas, gg, marcadas = coleta.atualizar(cfg, b, forcar=forcar, sem_limite=sem_limite, log=log)
+        ofertas, gg, marcadas = coleta.atualizar(cfg, b, forcar=forcar, sem_limite=sem_limite, log=log, steam_agora=steam_agora)
         ctx = analise.Contexto(b, cfg)
         log("Avaliando ofertas e notificando")
         alertas = analise.avaliar(ctx, ofertas, gg, marcadas)
@@ -123,6 +123,7 @@ class Servico(threading.Thread):
 
     def agora(self, completo=False):
         self.completo = completo or getattr(self, "completo", False)
+        self.manual = True   # pedido pelo usuario: puxa a Steam inteira mesmo fora do intervalo
         self.proxima = datetime.now()
         self.acordar.set()
 
@@ -138,8 +139,9 @@ class Servico(threading.Thread):
             self.ao_mudar()
             try:
                 completo, self.completo = getattr(self, "completo", False), False
+                manual, self.manual = getattr(self, "manual", False), False
                 completo = completo or self._precisa_completa()
-                alertas, novos = ciclo(self.log, forcar=completo, sem_limite=completo)
+                alertas, novos = ciclo(self.log, forcar=completo, sem_limite=completo, steam_agora=manual)
                 self.ultimo = (datetime.now(), len(alertas), len(novos))
                 falhas = 0
                 intervalo = config.carregar()["intervalos_minutos"]["itad"]
