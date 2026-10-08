@@ -4,7 +4,7 @@
 const METODOS = { GetCart: 'GET', AddItemsToCart: 'POST' };
 
 chrome.runtime.onMessage.addListener((msg, remetente, responder) => {
-  if (!(msg && msg.metodo in METODOS) || !String(remetente.url || '').startsWith('https://store.steampowered.com/')) return;
+  if (!(msg && Object.hasOwn(METODOS, msg.metodo)) || !String(remetente.url || '').startsWith('https://store.steampowered.com/')) return;
   const url = `https://api.steampowered.com/IAccountCartService/${msg.metodo}/v1/`;
   const params = new URLSearchParams({ access_token: msg.token, input_json: JSON.stringify(msg.entrada) });
   const pedido = METODOS[msg.metodo] === 'POST' ? fetch(url, { method: 'POST', body: params }) : fetch(url + '?' + params);

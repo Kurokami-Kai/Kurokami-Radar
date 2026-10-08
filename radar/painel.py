@@ -979,8 +979,8 @@ def post_steam_carrinho(_d):
 
 
 # ProgId do navegador padrao -> (nome, pagina de extensoes). Firefox e outros: sem suporte (extensao so Chromium).
-NAVEGADORES = {"MSEdgeHTM": ("Edge", "edge://extensions"), "ChromeHTML": ("Chrome", "chrome://extensions"),
-               "BraveHTML": ("Brave", "brave://extensions"), "Opera": ("Opera", "opera://extensions"),
+NAVEGADORES = {"MSEdge": ("Edge", "edge://extensions"), "Chrome": ("Chrome", "chrome://extensions"),
+               "Brave": ("Brave", "brave://extensions"), "Opera": ("Opera", "opera://extensions"),
                "Vivaldi": ("Vivaldi", "vivaldi://extensions")}
 
 
@@ -989,13 +989,13 @@ def _navegador_padrao():
     import shlex
     import winreg
     try:
-        k = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice")
-        progid = winreg.QueryValueEx(k, "ProgId")[0]
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice") as k:
+            progid = winreg.QueryValueEx(k, "ProgId")[0]
         cmd = winreg.QueryValue(winreg.HKEY_CLASSES_ROOT, progid + r"\shell\open\command")
     except OSError:
         return None
     for prefixo, (nome, pagina) in NAVEGADORES.items():
-        if progid.startswith(prefixo):   # Opera GX = "OperaGXStable", Brave = "BraveHTML"...
+        if progid.startswith(prefixo):   # ChromeHTML, ChromeBHTML (Beta), MSEdgeHTM, OperaGXStable, BraveHTML...
             exe = shlex.split(cmd, posix=False)[0].strip('"')
             return (nome, exe, pagina) if os.path.isfile(exe) else None
     return None
@@ -1022,16 +1022,20 @@ def post_steam_extensao(d):
 def _limpar_sessao_qr():
     """O login por QR saiu na 0.16 (a Steam o tratava como celular novo). Quem tinha a sessao no cofre:
     revoga na Steam e apaga, uma vez. Falha de rede: tenta de novo na proxima abertura."""
+    import logging
+    import urllib.error
     from . import credenciais
-    from .rede import http_json
     refresh = credenciais.ler("steam_refresh")
     if not refresh:
         return
     try:
         http_json("https://api.steampowered.com/IAuthenticationService/RevokeToken/v1/", tentativas=2,
                   form={"input_json": json.dumps({"token": refresh, "revoke_action": 1})})
+    except urllib.error.HTTPError as e:
+        if not 400 <= e.code < 500:   # 4xx: a Steam recusou (token vencido ou invalido): nao ha o que revogar; apaga
+            logging.getLogger("radar").warning("Painel: nao revoguei a sessao QR antiga (HTTP %s); tento na proxima abertura", e.code)
+            return
     except Exception as e:   # so o tipo do erro: nada que possa carregar o token
-        import logging
         logging.getLogger("radar").warning("Painel: nao revoguei a sessao QR antiga (%s); tento na proxima abertura", type(e).__name__)
         return
     credenciais.gravar("steam_refresh", "")

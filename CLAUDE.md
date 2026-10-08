@@ -10,7 +10,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - `docs/aprendizados.md` — leia no início de toda tarefa; atualize no fim.
 - `docs/decisoes.md` — **sempre leia antes de mexer em coleta, preços, avaliação ou instalador.** Lista armadilhas que já foram bugs reais (preço "atual", fusos, pacote base, GG.deals, versão da página etc.) e as preferências de produto.
 - `docs/estrutura.md` — o que cada arquivo e pasta contém e onde ficam os dados. Consulte para achar onde ler, editar ou criar algo.
-- `docs/arquitetura.md` — como as peças conversam: threads, ciclo de coleta, fontes de dados e seus limites, avaliação, notificação, painel, carrinho direto (QR), distribuição e atualização.
+- `docs/arquitetura.md` — como as peças conversam: threads, ciclo de coleta, fontes de dados e seus limites, avaliação, notificação, painel, carrinho pela extensão do navegador, distribuição e atualização.
 - `docs/api.md` — rotas HTTP do painel (GET/POST), campos e regras de acesso. Consulte ao mexer em `painel.py` ou `painel.html`.
 - `docs/dados.md` — tabelas SQLite, chaves de `meta`, `config.json` e onde ficam os segredos.
 - `docs/referencia.md` — assinaturas e docstrings de todas as funções (gerado; rode `py tools/gerar_referencia.py` depois de mudar funções).

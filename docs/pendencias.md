@@ -3,11 +3,11 @@
 ## Especificações prontas para implementar
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
-- [06 — Login Steam por QR (opcional), começando por teste](specs/06-login-steam.md)
 - 07 — Promoções da Steam inteira, com base no teste da 04 (a escrever). Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".
 - 08 — Layout em etapas: inventário, referência, base visual, uma aba por vez, celular (a escrever)
 
 ## Feitas
+- [06 — Login Steam: "Entrar pela Steam" (OpenID) feito em v0.16.0; o QR foi descartado e o carrinho vai pela extensão do Radar](specs/06-login-steam.md)
 - [04 — Vitrine, aba Promoções e avisos por tipo de recorde (feito em v0.15.0)](specs/04-vitrine-promocoes-e-avisos.md)
 - [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica (feito em v0.14.0)](specs/01-selo-kurokami-e-raridade.md)
 - [02 — DLCs não aparecem (feito em v0.13.0)](specs/02-dlcs-nao-aparecem.md)

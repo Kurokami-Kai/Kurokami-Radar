@@ -1,7 +1,7 @@
 """Relacao da sua conta Steam com os jogos: seguidos e ignorados (spec 04, B).
 
 Fonte unica desses dados no Radar: nenhum outro modulo le rgFollowedApps nem rgIgnoredApps.
-Hoje vem do userdata.json (opcional, manual); a spec 06 (login por QR) troca so esta funcao."""
+Hoje vem do userdata.json (opcional, manual); se um dia vier da conta Steam, so esta funcao muda."""
 import json
 import os
 import threading
@@ -21,7 +21,7 @@ def relacao(cfg):
     """{"seguidos": set[int], "ignorados": set[int], "fonte": "userdata" | None, "quando": iso | None}.
     Le o userdata.json achado por caminhos.achar_userdata, com cache pela data de modificacao do arquivo.
     Nunca grava no banco; em qualquer falha devolve conjuntos vazios e fonte None.
-    A spec 06 (login por QR) troca so esta funcao."""
+    Se um dia vier da conta Steam, so esta funcao muda."""
     try:
         arq = caminhos.achar_userdata(cfg)
         if not arq:

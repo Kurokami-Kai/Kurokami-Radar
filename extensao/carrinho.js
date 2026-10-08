@@ -101,7 +101,7 @@
         (faltaram || outroModo ? '.' : '. Confira e conclua o pagamento.');
       const aviso = { texto, tipo: faltaram || outroModo ? 'aviso' : 'ok' };
       if (novos.length - faltaram > 0) {   // recarrega para a pagina mostrar os itens novos
-        sessionStorage.setItem(AVISO, JSON.stringify(aviso));
+        try { sessionStorage.setItem(AVISO, JSON.stringify(aviso)); } catch (e) { /* recarrega sem a faixa */ }
         location.reload();
       } else faixa(aviso.texto, aviso.tipo);
     } catch (e) {

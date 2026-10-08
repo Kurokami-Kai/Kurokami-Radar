@@ -1304,7 +1304,7 @@ async function finalizar(){
   const nota=$('#finalNota');nota.innerHTML='';
   if(!(CD.itens.filter(c=>!c.possuido).length+CD.bundles.length)){toast('O carrinho está vazio.');return;}
   if(!temExt()){faixaExt(true);window.scrollTo(0,0);toast('Instale a extensão do Radar (faixa no topo) e clique em Finalizar pedido de novo.');return;}
-  const w=window.open('about:blank','_blank');   // abre já, no clique, para o navegador não bloquear
+  const w=window.open('about:blank','_blank');if(w)w.opener=null;   // abre já, no clique (o navegador não bloqueia); a Steam não alcança o painel
   const b=$('#btnFinalizar');b.disabled=true;let r;try{r=await post('/api/steam/carrinho');}finally{b.disabled=false;}
   if(!r.ok){if(w)w.close();toast('Erro: '+(r.erro||'?'));}
   else{

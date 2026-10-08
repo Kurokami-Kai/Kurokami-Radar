@@ -43,7 +43,7 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 
 ## Conta Steam (seguidos e ignorados)
 
-`conta_steam.relacao(cfg)` lê `rgFollowedApps` e `rgIgnoredApps` do `userdata.json` (cache pela data do arquivo) e nunca grava no banco. É o único leitor dessas chaves; a spec 06 (login por QR) troca só essa função.
+`conta_steam.relacao(cfg)` lê `rgFollowedApps` e `rgIgnoredApps` do `userdata.json` (cache pela data do arquivo) e nunca grava no banco. É o único leitor dessas chaves; se um dia vier da conta Steam, só essa função muda.
 
 ## Segredos
 
