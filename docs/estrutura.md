@@ -35,9 +35,11 @@ Kurokami Radar/
 │   ├── manifest.json
 │   ├── carrinho.js          # na página do carrinho: lê #kurokami=…, token da página, adiciona, confere, recarrega
 │   ├── fundo.js             # service worker: GetCart/AddItemsToCart em api.steampowered.com (sem CORS)
-│   └── painel.js            # no painel (localhost): só marca data-kurokami-ext
+│   ├── painel.js            # no painel (localhost): só marca data-kurokami-ext
+│   └── icones/              # 16/32/48/128 px, gerados por tools/gerar_extensao.py
 ├── tools/
 │   ├── gerar_icone.py       # assets/radar.ico para o .exe/instalador
+│   ├── gerar_extensao.py    # ícones da extensão + ZIP e logo para a loja do Edge (output/); roteiro em docs/loja-edge.md
 │   ├── gerar_referencia.py  # regenera docs/referencia.md
 │   ├── mapa.py              # mapa de seções/funções com linhas (ler só o trecho)
 │   ├── exportar_docs.py/.bat # reserva: docs → Área de Trabalho\kurokami-docs (o Projeto do claude.ai já lê do GitHub)
