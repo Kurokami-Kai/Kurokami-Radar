@@ -1,4 +1,5 @@
 """HTTP com JSON, backoff em 429/5xx e ritmo adaptativo (mesma logica do KurokamiPrecos)."""
+import gzip
 import json
 import threading
 import time
@@ -37,7 +38,7 @@ RITMO = {"steam": Ritmo(0.5), "itad": Ritmo(0.35), "gg": Ritmo(1.0), "loja": Rit
 
 
 def http_json(url, corpo=None, metodo=None, ritmo=None, tentativas=4, timeout=45, form=None):
-    cab = {"User-Agent": UA, "Accept": "application/json"}
+    cab = {"User-Agent": UA, "Accept": "application/json", "Accept-Encoding": "gzip"}
     dados = None
     if form is not None:
         dados = urllib.parse.urlencode(form).encode()
@@ -53,13 +54,19 @@ def http_json(url, corpo=None, metodo=None, ritmo=None, tentativas=4, timeout=45
         req = urllib.request.Request(url, data=dados, headers=cab, method=metodo)
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                txt = r.read().decode("utf-8", "replace")
+                bruto = r.read()
+                if (r.headers.get("Content-Encoding") or "").lower() in ("gzip", "x-gzip"):   # Steam Query: 1,5 MB -> 150 KB por pagina
+                    bruto = gzip.decompress(bruto)
+                txt = bruto.decode("utf-8", "replace")
             if ritmo:
                 ritmo.ok()
             return json.loads(txt) if txt.strip() else None
         except urllib.error.HTTPError as e:
             try:
-                e.corpo = e.read().decode("utf-8", "replace")[:300].strip()
+                bruto_erro = e.read()
+                if (e.headers.get("Content-Encoding") or "").lower() in ("gzip", "x-gzip"):
+                    bruto_erro = gzip.decompress(bruto_erro)
+                e.corpo = bruto_erro.decode("utf-8", "replace")[:300].strip()
             except Exception:
                 e.corpo = ""
             if e.code == 429:
@@ -76,7 +83,7 @@ def http_json(url, corpo=None, metodo=None, ritmo=None, tentativas=4, timeout=45
                 espera *= 2
                 continue
             raise
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, EOFError, OSError):   # OSError: gzip cortado/invalido
             if n < tentativas:
                 time.sleep(espera)
                 espera *= 2

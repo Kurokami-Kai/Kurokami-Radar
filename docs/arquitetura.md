@@ -34,6 +34,7 @@ Kurokami Radar é um app **local** de Windows (Python 3.12) que monitora a lista
 | Steam Web API (chave opcional) | `ResolveVanityURL` (plano B), `GetOwnedGames` | — |
 | `userdata.json` (opcional, manual) | DLCs que o usuário possui, carrinho da Steam | é um retrato; envelhece |
 | IsThereAnyDeal (chave obrigatória) | preços em ~34 lojas BR (com DRM), histórico (`history/v2`), menor histórico, expiração da oferta | limita ritmo; 200 ids por chamada de preços |
+| Steam `IStoreQueryService/Query` (sem chave) | **Steam inteira** (spec 07): todas as promoções, 1.000 por chamada, com preço, pacote, fim, análises, lançamento e capa | `sort: 2` obrigatório (sem ele a paginação repete); só vem o que tem desconto; ~108 chamadas em grande promoção, ~7 num dia comum; gzip (150 KB por página) |
 | GG.deals (chave opcional) | melhor preço oficial e keyshop + mínimos | atualiza 1x/h; não diz a loja; erra em jogos com "edição parcial" |
 
 ## Ciclo de coleta (`coleta.atualizar`)
@@ -44,6 +45,7 @@ Kurokami Radar é um app **local** de Windows (Python 3.12) que monitora a lista
 4. **ITAD**: mapeia appid→id ITAD; importa histórico uma vez por jogo (todas as lojas); preços atuais de todas as lojas → `preco` (só quando muda) e `oferta_atual` (snapshot vigente).
 5. **GG.deals** (a cada 60 min).
 6. **Custo completo** dos jogos em modo "completo" vira uma "loja" própria no histórico (`Completo (Steam)`).
+7. **Steam inteira** (etapa 6 no código; `steam_inteira.coletar`, a cada 6 h, `config.steam_inteira`; não roda no "Verificar agora"): troca o retrato `steam_promo` e grava em `steam_hist` só o que mudou. Resposta vazia ou cortada levanta erro e não troca o retrato; falha só vai para o log. Não gera avisos.
 
 Verificação **rápida** = o ciclo normal (respeita intervalos e orçamento). **Completa** = `forcar=True, sem_limite=True`; a primeira é sempre completa, depois a cada `verificacao_completa_dias`.
 
@@ -71,6 +73,8 @@ Linha de base na primeira vez (não dispara nada em massa) → ao **ligar um tip
 ## Painel
 
 `painel.html` é um SPA único (HTML+CSS+JS inline, sem build), visual da loja Steam. Lê tudo via `/api/*` (ver `api.md`). Abas: **Vale a pena** = vitrine (`/api/vitrine`: carrossel do Selo e prateleiras Novo recorde, Igual ao recorde, Menor em 2 anos), **Promoções** = explorador com filtros **no servidor** (`/api/promocoes`, pensando na Steam inteira, spec 07), Biblioteca (com "DLCs em promoção"), Carrinho, Notificações, Configurações ("O que te avisa"). O endereço guarda a aba (`#vale`, `#lista`…).
+
+**Steam inteira na aba Promoções** (`fonte: "steam"`): às linhas da lista somam-se `LinhaSteam` leves (de `steam_promo`, sem quem já está na lista; `__slots__`, ~50 MB com 108 mil), refeitas quando há coleta nova; a relação (tenho, carrinho, seguido, ignorado) é refeita junto com o cache da lista. Os mesmos filtros servem às duas (campo que a linha leve não tem vale None). A ordenação é por ordenações estáveis, do último critério ao primeiro (o `cmp_to_key` levava segundos). Medido: ~150–300 ms com 108 mil itens e cache quente; ~3,5 s na primeira vez. Linha de fora da lista abre a loja (sem ficha); o + põe no carrinho e monitora.
 
 **Cache das linhas** (`painel.linhas_promocoes`): uma linha por jogo da lista, montada em ~0,5 s e guardada em memória com trava; filtrar/ordenar nele custa milissegundos. É refeito quando termina uma coleta (`servico.ciclo`), em qualquer POST do painel, quando o config ou o `userdata.json` muda (assinatura) e, por segurança, a cada 10 min. `/api/lista` também usa o cache. Seguidos/ignorados vêm de `conta_steam.relacao` (único leitor do `userdata.json` para isso). Localhost sempre liberado; outros aparelhos só com PIN (cookie `kr`) e se `painel.rede_local` estiver ligado. Porta 80 com reserva na 8787.
 

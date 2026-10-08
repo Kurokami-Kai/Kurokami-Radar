@@ -1,6 +1,6 @@
 """Sobe o painel numa COPIA do banco real, sem coleta e sem rede (para ver o visual e tirar prints).
 
-Uso: py tools/painel_copia.py [--porta 8799] [--banco CAMINHO] [--config CAMINHO]
+Uso: py tools/painel_copia.py [--porta 8799] [--banco CAMINHO] [--config CAMINHO] [--steam]
 Abre em http://127.0.0.1:<porta>/kurokami (use #vale ou #lista no fim para abrir uma aba). Ctrl+C encerra e apaga a copia.
 Prints sem instalar nada (Edge headless):
   msedge --headless --disable-gpu --virtual-time-budget=15000 --window-size=1280,2200 --screenshot=ARQ.png URL"""
@@ -20,6 +20,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--porta", type=int, default=8799)
     ap.add_argument("--banco"); ap.add_argument("--config")
+    ap.add_argument("--steam", action="store_true", help="coleta a Steam inteira na copia antes (rede, ~10 s fora de promocao)")
     a = ap.parse_args()
     origem, cfg_arq = (a.banco, a.config) if a.banco else achar_banco()
     tmp = tempfile.mkdtemp(prefix="kr-painel-")
@@ -34,6 +35,13 @@ def main():
         if os.path.isfile(carr):
             shutil.copy2(carr, caminhos.ARQ_CARRINHO)
         from radar import painel
+        if a.steam:
+            from radar import config, steam_inteira
+            from radar.banco import Banco
+            b = Banco()
+            steam_inteira.coletar(b, config.carregar())
+            b.con.close()
+        painel._limpar_sessao_qr = lambda: None   # a copia nao mexe no cofre do Windows
         painel.ARQ_TOKEN = os.path.join(tmp, "painel_token.txt")
         painel.PORTAS = (a.porta,)
         painel.rede_local = lambda: False  # so neste PC

@@ -38,6 +38,12 @@ CREATE TABLE IF NOT EXISTS oferta_atual(
 CREATE TABLE IF NOT EXISTS tenho_manual(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS silenciado(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS consulta_lenta(tipo TEXT, id INTEGER, quando TEXT, PRIMARY KEY(tipo, id));
+-- spec 07: Steam inteira. Retrato das promocoes de agora e historico so do que mudou (entrou, mudou, saiu).
+CREATE TABLE IF NOT EXISTS steam_promo(
+  appid INTEGER PRIMARY KEY, tipo TEXT, nome TEXT, pacote INTEGER, preco INTEGER, cheio INTEGER, corte INTEGER,
+  fim INTEGER, rpos INTEGER, rcount INTEGER, rotulo TEXT, lancamento INTEGER, capa TEXT, visto TEXT);
+CREATE TABLE IF NOT EXISTS steam_hist(appid INTEGER, quando TEXT, preco INTEGER, cheio INTEGER, corte INTEGER);
+CREATE INDEX IF NOT EXISTS steam_hist_idx ON steam_hist(appid, quando);
 """
 
 

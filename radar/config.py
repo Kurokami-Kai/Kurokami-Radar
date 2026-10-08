@@ -89,6 +89,9 @@ PADRAO = {
     # jogos monitorados que nao estao na lista de desejos da Steam (adicionados pelo painel)
     "extras": [],
 
+    # Promocoes da Steam inteira na aba Promocoes (spec 07): uma consulta a cada 6 h, ~1 MB num dia comum
+    "steam_inteira": True,
+
     "intervalos_minutos": {"itad": 30, "ggdeals": 60, "steam": 180},
     # verificacao completa (tudo, sem limite de ritmo): a 1a sempre; depois a cada N dias (0 = so manual)
     "verificacao_completa_dias": 7,

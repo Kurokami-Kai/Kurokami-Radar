@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime, timezone
 
-from . import analise, caminhos, credenciais, dlc as dlcmod, ggdeals, itad, progresso, steam
+from . import analise, caminhos, credenciais, dlc as dlcmod, ggdeals, itad, progresso, rede, steam, steam_inteira
 from .banco import agora
 from .config import modo_do_jogo
 
@@ -131,6 +131,13 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
             if m and banco.registrar_preco(a, analise.LOJA_COMPLETO, m["custo_completo"], None, None, "calculado"):
                 n += 1
     banco.commit()
+
+    # ---------------------------------------------------------- 6. Steam inteira (spec 07; a cada 6 h, nao no "Verificar agora")
+    if cfg.get("steam_inteira", True) and not forcar and _min_desde(banco, "ult_steam_inteira") >= 6 * 60:
+        try:
+            steam_inteira.coletar(banco, cfg, log)
+        except Exception as e:   # nao derruba a coleta da lista; tenta de novo na proxima rodada
+            log("   Steam inteira falhou (%s), tento na proxima" % rede.explicar(e))
     log("Coleta concluida em %.0fs" % (time.time() - t0))
     return ofertas, gg, lojas_marcadas
 

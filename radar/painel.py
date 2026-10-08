@@ -234,6 +234,58 @@ def api_lista(_q):
     return {"itens": itens, "lojas": cfg["lojas"]}
 
 
+# ------------------------------------------------------------------ Steam inteira (spec 07)
+# Quem esta em promocao na Steam e fora da lista vira uma LinhaSteam (leve, __slots__: ~50 MB com 108 mil).
+# Os filtros leem o["campo"] como nas linhas da lista; campo que a linha leve nao tem vale None (fica fora do
+# filtro que o exige). A relacao (tenho, carrinho, seguido, ignorado) vem de _STEAM["rel"], refeita junto com
+# o cache da lista (qualquer POST, coleta, config).
+class LinhaSteam:
+    """Linha leve da Steam inteira: o["campo"] como nas linhas da lista; o que ela nao tem vale None (False na relacao)."""
+    __slots__ = ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento", "preco", "cheio", "corte", "fim")
+
+    def __getitem__(self, k):
+        rel = _STEAM["rel"]
+        if k in rel:
+            return self.appid in rel[k]
+        return getattr(self, k, None) if k in LinhaSteam.__slots__ else (False if k in RELACAO else None)
+
+    def como_dict(self):
+        d = {k: getattr(self, k) for k in LinhaSteam.__slots__}
+        d.update({k: self[k] for k in RELACAO}, loja="Steam", steam_inteira=True, modo="base", tipos=[],
+                 url="https://store.steampowered.com/app/%d/" % self.appid, pisos={}, em_bundle=False, bundles=0)
+        return d
+
+
+_STEAM = {"itens": [], "sig": None, "rel": {}, "rel_sig": None}
+_TRAVA_STEAM = threading.Lock()
+
+
+def linhas_steam(itens_lista):
+    """Linhas leves da Steam inteira (sem quem ja esta na lista) e quando foi a coleta. Refaz quando ha coleta nova."""
+    b = Banco()
+    try:
+        sig = b.meta("ult_steam_inteira")
+        with _TRAVA_STEAM:
+            if _STEAM["sig"] != sig:
+                cols = LinhaSteam.__slots__
+                novas = []
+                for r in b.con.execute("SELECT %s FROM steam_promo" % ", ".join(cols)):
+                    o = LinhaSteam()
+                    for k, v in zip(cols, r):
+                        setattr(o, k, v)
+                    novas.append(o)
+                _STEAM.update(itens=novas, sig=sig)
+            if _STEAM["rel_sig"] is not itens_lista:   # o cache da lista foi refeito: relacao pode ter mudado
+                conta = conta_steam.relacao(config.carregar())
+                tenho = {r[0] for r in b.con.execute("SELECT appid FROM jogo WHERE possuido=1 UNION SELECT appid FROM tenho_manual")}
+                _STEAM.update(rel={"tenho": tenho, "no_carrinho": {int(i["appid"]) for i in _ler_carrinho() if i.get("appid")},
+                                   "seguido": conta["seguidos"], "ignorado_steam": conta["ignorados"]}, rel_sig=itens_lista)
+            na_lista = {o["appid"] for o in itens_lista}
+            return [o for o in _STEAM["itens"] if o.appid not in na_lista], sig
+    finally:
+        b.con.close()
+
+
 # ------------------------------------------------------------------ /api/promocoes e /api/vitrine
 class PedidoInvalido(Exception):
     """Vira HTTP 400 com a mensagem (em portugues)."""
@@ -249,7 +301,7 @@ ORDEM = {"nome": lambda o: (o["nome"] or "").lower(), "corte": lambda o: o["cort
          "preco": lambda o: o["preco"], "volta": lambda o: o["volta_ordem"],
          "nota": lambda o: o["rpos"] if o["rcount"] else None, "analises": lambda o: o["rcount"] or None,
          "lancamento": lambda o: o["lancamento"], "fim": lambda o: o["fim"], "inicio": lambda o: o["inicio"]}
-CAMPOS_Q = {"busca", "relacao", "qualquer_um", "mostrar_so", "tipo", "outros", "preco_de", "preco_ate", "analises_de",
+CAMPOS_Q = {"fonte", "busca", "relacao", "qualquer_um", "mostrar_so", "tipo", "outros", "preco_de", "preco_ate", "analises_de",
             "analises_ate", "nota_min", "desconto_min", "lanc_de", "lanc_ate", "em_breve", "ordem", "pagina", "por_pagina"}
 
 
@@ -304,10 +356,12 @@ def _ler_q(qs):
     for campo in ("qualquer_um", "em_breve"):
         if campo in q and not isinstance(q[campo], bool):
             raise PedidoInvalido("%s deve ser true ou false" % campo)
+    if q.get("fonte", "lista") not in ("lista", "steam"):
+        raise PedidoInvalido("fonte aceita só lista ou steam")
     busca = q.get("busca") or ""
     if not isinstance(busca, str):
         raise PedidoInvalido("busca deve ser texto")
-    return {"busca": busca.strip().lower(), "relacao": rel, "qualquer_um": bool(q.get("qualquer_um")),
+    return {"fonte": q.get("fonte", "lista"), "busca": busca.strip().lower(), "relacao": rel, "qualquer_um": bool(q.get("qualquer_um")),
             "mostrar_so": lista("mostrar_so", analise.TIPOS), "tipo": lista("tipo", TIPO_ITEM),
             "outros": lista("outros", list(OUTROS)),
             "faixas": [("preco", numero("preco_de"), numero("preco_ate")),
@@ -348,25 +402,28 @@ def _filtros(f):
 
 
 def _ordenar(itens, ordem):
-    import functools
-
-    def cmp(x, y):
-        for campo, dir_ in ordem:
-            a, b_ = ORDEM[campo](x), ORDEM[campo](y)
-            if a is None or b_ is None:
-                if a is None and b_ is None:
-                    continue
-                return 1 if a is None else -1  # sem valor: sempre por ultimo
-            if a != b_:
-                return (-1 if a < b_ else 1) * (1 if dir_ == "asc" else -1)
-        return (x["appid"] > y["appid"]) - (x["appid"] < y["appid"])
-    return sorted(itens, key=functools.cmp_to_key(cmp))
+    """Ordena pelos campos na ordem dada; sem valor sempre por ultimo; empate final pelo appid.
+    Ordenacoes estaveis do ultimo criterio ao primeiro (com 100 mil linhas o cmp_to_key levava segundos)."""
+    out = sorted(itens, key=lambda o: o["appid"])
+    for campo, dir_ in reversed(ordem):
+        f = ORDEM[campo]
+        com, sem = [], []
+        for o in out:
+            (sem if f(o) is None else com).append(o)
+        com.sort(key=f, reverse=dir_ == "desc")   # reverse mantem a estabilidade no Python
+        out = com + sem
+    return out
 
 
 def api_promocoes(qs):
     """Explorador da aba Promocoes: filtra, conta e pagina no Radar (pensando na Steam inteira, spec 07)."""
     f = _ler_q(qs)
-    itens, _cfg, conta = linhas_promocoes()
+    itens, cfg, conta = linhas_promocoes()
+    steam_info = {"ligada": bool(cfg.get("steam_inteira", True)), "quando": None, "itens": 0}
+    if f["fonte"] == "steam" and steam_info["ligada"]:
+        leves, steam_info["quando"] = linhas_steam(itens)
+        steam_info["itens"] = len(leves) + sum(1 for o in itens if o["corte"])
+        itens = itens + leves
     filt = _filtros(f)
     passa = lambda o, sem=None: all(p(o) for g, p in filt.items() if g != sem)
     sel = [o for o in itens if passa(o)]
@@ -378,8 +435,9 @@ def api_promocoes(qs):
             contagens["tipo"][o["tipo"]] += 1
     sel = _ordenar(sel, f["ordem"])
     pp, pg = f["por_pagina"], f["pagina"]
-    return {"total": len(sel), "pagina": pg, "por_pagina": pp, "itens": sel[(pg - 1) * pp:pg * pp],
-            "contagens": contagens, "conta": conta}
+    pagina = [o if isinstance(o, dict) else o.como_dict() for o in sel[(pg - 1) * pp:pg * pp]]
+    return {"total": len(sel), "pagina": pg, "por_pagina": pp, "itens": pagina,
+            "contagens": contagens, "conta": conta, "steam": steam_info}
 
 
 def api_vitrine(_q):
@@ -863,8 +921,10 @@ def _itens_para_steam():
             j = b.um("SELECT nome, pacote, possuido FROM jogo WHERE appid=?", int(it["appid"]))
             if j and j["possuido"]:
                 continue
-            itens.append({"tipo": "app", "appid": int(it["appid"]), "modo": _modo(it.get("modo")), "subid": j["pacote"] if j else None,
-                          "nome": j["nome"] if j else str(it["appid"]),
+            sp = dict(b.um("SELECT nome, pacote FROM steam_promo WHERE appid=?", int(it["appid"])) or {})   # Steam inteira (spec 07)
+            itens.append({"tipo": "app", "appid": int(it["appid"]), "modo": _modo(it.get("modo")),
+                          "subid": (j["pacote"] if j else None) or sp.get("pacote"),
+                          "nome": j["nome"] if j else sp.get("nome") or str(it["appid"]),
                           "url": "https://store.steampowered.com/app/%d/" % int(it["appid"])})
     b.con.close()
     return itens

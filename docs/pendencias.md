@@ -3,7 +3,7 @@
 ## Especificações prontas para implementar
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md)
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
-- 07 — Promoções da Steam inteira, com base no teste da 04 (a escrever). Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".
+- [07 — Promoções da Steam inteira](specs/07-steam-inteira.md): implementada em 08/10, falta o teste do dono antes de publicar. Ideia original: Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".
 - 08 — Layout em etapas: inventário, referência, base visual, uma aba por vez, celular (a escrever)
 
 ## Feitas
@@ -25,5 +25,4 @@ Em ordem aproximada de valor. Nada aqui foi iniciado.
 - **Guia em PDF** para usuários: ainda não cobre o carrinho direto, a raridade v2 nem o Selo.
 - **Faixa do evento da Steam com data de fim** (falta fonte).
 - **Keyshops depois de bundles:** quando um jogo entra num bundle (ex.: Humble Choice, que muda na 1ª terça do mês), as keyshops costumam baixar alguns dias depois, quando os revendedores reabastecem. A GG.deals tem API de bundles com histórico; avaliar o aviso "entrou no Humble Choice; keyshops costumam cair nos dias seguintes".
-- **Promoções fora da lista de desejos** (a SteamDB mostra a Steam inteira): exigiria outra fonte de dados e mudaria o tamanho da coleta. Só ideia.
 - ~~Decidir se Raro/Ultrarraro sem Selo continuam alertando~~ — resolvido na 0.15 (spec 04): não avisam mais; a raridade só informa ("Costuma voltar").

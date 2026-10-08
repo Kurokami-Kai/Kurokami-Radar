@@ -152,6 +152,7 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .views button{background:rgba(0,0,0,.25);border:0;color:var(--muted);width:30px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px}
 .views button:hover{color:#fff}
 .views button[aria-pressed="true"]{background:var(--blue);color:#0b2235}
+.views.fonte{margin-left:0}.views.fonte button{width:auto;padding:0 10px;white-space:nowrap;font-size:12px}
 .sum{color:var(--muted);font-size:12px;padding:2px 2px 8px}
 .sum b{color:var(--disc-fg);font-weight:400}
 
@@ -559,6 +560,7 @@ details.blk[open]>summary h4::after{content:"▴"}
     <div class="browse pbrowse">
       <div>
         <div class="toolbar">
+          <div class="views fonte" role="group" aria-label="De onde vêm os jogos"><button data-fonte="lista" type="button" title="Sua lista de desejos e os jogos que você monitora">Lista de desejos</button><button data-fonte="steam" type="button" title="Todas as promoções da Steam (atualiza a cada 6 h)">Steam inteira</button></div>
           <span class="count"><b id="cnt">0</b> resultados</span>
           <button class="btn-ghost pfbtn" id="pfBtn" type="button" aria-expanded="false">Filtros</button>
           <label>Por página <select id="pPP"><option value="50">50</option><option value="100">100</option><option value="250">250</option></select></label>
@@ -688,9 +690,10 @@ function flags(o){
 }
 function revText(o){return o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo||o.rpos+'%')}</span> <span style="color:var(--dim)">(${fmtK(o.rcount)})</span>`:'<span class="rv-non">Sem análises</span>';}
 function cartBtnB(id){const on=CARR.some(c=>c.bundle===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cartb="${id}" title="${on?'Tirar o bundle do carrinho':'Pôr o bundle no carrinho'}">${on?'✓':'+'}</span>`;}
-function cartBtn(id){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}" title="${on?'Tirar do carrinho':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
-function capCard(o){return `<a class="cap" href="#" data-open="${o.appid}" data-hv="${o.appid}">${art(o.appid,o.nome,o.capa)}
-  <div class="meta"><div class="nm">${esc(o.nome)}</div><div class="row"><span class="rvs">${revText(o)}</span><span style="display:flex;gap:5px;align-items:center">${cartBtn(o.appid)}${precoComPiso(o)}</span></div></div></a>`;}
+function cartBtn(id,mon){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}"${mon?' data-mon="1"':''} title="${on?'Tirar do carrinho':mon?'Pôr no carrinho (e monitorar)':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
+const abre=o=>o.steam_inteira?`data-steamapp="${o.appid}"`:`data-open="${o.appid}" data-hv="${o.appid}"`;   // Steam inteira: sem ficha (não há histórico)
+function capCard(o){return `<a class="cap" href="#" ${abre(o)}>${art(o.appid,o.nome,o.capa)}
+  <div class="meta"><div class="nm">${esc(o.nome)}</div><div class="row"><span class="rvs">${revText(o)}</span><span style="display:flex;gap:5px;align-items:center">${cartBtn(o.appid,o.steam_inteira)}${precoComPiso(o)}</span></div></div></a>`;}
 
 /* ================= hover ================= */
 const HV=$('#hv');let hvT=null,hvEl=null;
@@ -714,11 +717,13 @@ document.addEventListener('mouseover',e=>{const el=e.target.closest('[data-hv]')
 addEventListener('scroll',()=>{clearTimeout(hvT);HV.classList.remove('on');hvEl=null;},{passive:true});
 let CARR=[];
 async function salvarCarr(){await post('/api/carrinho',{itens:CARR});$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}
-async function alternarCarr(id,forcar){const i=CARR.findIndex(c=>c.appid===id);
-  if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}else if(i<0){CARR.push({appid:id,modo:'conta'});toast('No carrinho');}
+async function alternarCarr(id,forcar,mon){const i=CARR.findIndex(c=>c.appid===id);
+  if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}
+  else if(i<0){if(mon){const r=await post('/api/extra',{appid:id});if(!r||r.ok===false||r.erro){toast('Não consegui monitorar: '+((r&&r.erro)||'?'));return;}}CARR.push({appid:id,modo:'conta'});toast(mon?'No carrinho e monitorado (entra na lista na próxima checagem)':'No carrinho');}
   await salvarCarr();$$(`[data-cart="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.appid===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
   if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();if(S.tab==='lista')renderLista();}
-document.addEventListener('click',e=>{const c=e.target.closest('[data-cart]');if(!c)return;e.preventDefault();e.stopPropagation();alternarCarr(+c.dataset.cart);},true);
+document.addEventListener('click',e=>{const c=e.target.closest('[data-cart]');if(!c)return;e.preventDefault();e.stopPropagation();alternarCarr(+c.dataset.cart,false,c.dataset.mon==='1');},true);
+document.addEventListener('click',e=>{const o=e.target.closest('[data-steamapp]');if(!o)return;e.preventDefault();window.open(storeUrl(+o.dataset.steamapp),'_blank','noopener');});
 async function alternarBundle(id){const i=CARR.findIndex(c=>c.bundle===id);if(i>=0){CARR.splice(i,1);toast('Bundle saiu do carrinho');}else{CARR.push({bundle:id,modo:'conta'});toast('Bundle no carrinho');}
   await salvarCarr();$$(`[data-cartb="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.bundle===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
   if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();}
@@ -771,7 +776,7 @@ $('#hero').addEventListener('click',e=>{const a=e.target.closest('[data-hero]'),
 
 /* ================= promoções (explorador; filtros no Radar: /api/promocoes) ================= */
 const P_PADRAO={desconto_min:50,analises_de:5000};
-let P=ls.get('promo',null)||JSON.parse(JSON.stringify(P_PADRAO)), PG=1, PP=ls.get('pp',100), PR=null, pSeq=0;
+let P=ls.get('promo',null)||JSON.parse(JSON.stringify(P_PADRAO)), PG=1, PP=ls.get('pp',100), PR=null, pSeq=0, FONTE=ls.get('fonte','steam');
 const salvarP=()=>{ls.set('promo',P);ls.set('pp',PP);};
 const REL=[['na_lista','Na lista de desejos'],['extra','Monitorado por você'],['no_carrinho','No carrinho'],['seguido','Seguido na Steam'],
   ['ignorado_steam','Ignorado na Steam'],['mudo','Silenciado'],['tenho','Tenho'],['base_tenho','Tenho o jogo base']];
@@ -779,7 +784,7 @@ const OUTROS_TXT={promo:'Só em promoção',bundle:'Em bundle',completo:'Modo co
 const COLS=[['nome','Jogo','asc'],['corte','%','desc'],['volta','Costuma voltar','asc'],['preco','Preço','asc'],['nota','Análises','desc'],
   ['lancamento','Lançamento','desc'],['fim','Termina','asc'],['inicio','Começou','desc']];
 const COLNOME=Object.fromEntries(COLS.map(c=>[c[0],c[1]]));
-function qPromo(){const q={pagina:PG,por_pagina:PP};
+function qPromo(){const q={pagina:PG,por_pagina:PP,fonte:FONTE};
   for(const [k,v] of Object.entries(P)){if(v==null||v===''||v===false)continue;if(Array.isArray(v)&&!v.length)continue;
     if(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)continue;q[k]=v;}return q;}
 async function renderLista(){
@@ -788,7 +793,11 @@ async function renderLista(){
   if(seq!==pSeq)return;PR=r;
   const maxPg=Math.max(1,Math.ceil(r.total/PP));if(PG>maxPg){PG=maxPg;return renderLista();}
   $('#cnt').textContent=fmtN(r.total);
-  $('#listaNote').textContent=L.length?`${fmtN(L.filter(o=>o.corte>0).length)} em promoção de ${fmtN(L.length)} na lista`:'';
+  const st=r.steam||{};$$('.fonte [data-fonte]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.fonte===FONTE));
+  $('#listaNote').textContent=FONTE==='steam'?(!st.ligada?'Steam inteira desligada em Configurações: mostrando só a sua lista.'
+      :st.quando?`Steam inteira: ${fmtN(st.itens)} em promoção · atualizada ${relTempo(st.quando,false)} · jogos fora da lista abrem na Steam`
+      :'A Steam inteira chega na próxima checagem (leva alguns minutos). Por enquanto, só a sua lista.')
+    :L.length?`${fmtN(L.filter(o=>o.corte>0).length)} em promoção de ${fmtN(L.length)} na lista`:'';
   renderSide();renderChips();
   const box=$('#results');
   if(!r.itens.length)box.innerHTML='<div class="empty">Nenhum jogo com esses filtros.</div>';
@@ -814,13 +823,13 @@ function tabelaPromo(it){const ord=P.ordem||[['corte','desc'],['nome','asc']];
   const th=(k,cls)=>{const i=ord.findIndex(x=>x[0]===k);const seta=i<0?'':(ord[i][1]==='asc'?'▲':'▼')+(ord.length>1?`<sup>${i+1}</sup>`:'');
     return `<th class="srt${cls?' '+cls:''}${i>=0?' on':''}" data-sort="${k}" title="Clique ordena; Shift+clique soma critérios">${COLNOME[k]} ${seta}</th>`;};
   return `<div class="ctab-wrap ptab-wrap"><table class="ctab ptab tnum"><thead><tr><th></th><th></th>${th('nome')}${th('corte','n')}${th('volta')}${th('preco','n')}${th('nota','n')}${th('lancamento','n')}${th('fim','n')}${th('inicio','n')}<th></th></tr></thead><tbody>
-  ${it.map(o=>`<tr data-open="${o.appid}" data-hv="${o.appid}"><td class="icos">${icones(o)}</td><td class="pcap">${art(o.appid,o.nome,o.capa,{small:true})}</td>
+  ${it.map(o=>`<tr ${abre(o)}><td class="icos">${icones(o)}</td><td class="pcap">${art(o.appid,o.nome,o.capa,{small:true})}</td>
     <td class="t"><span class="pnm">${esc(o.nome)}</span> ${o.selo?seloBadge(o):''}${recPill(o)}</td>
     <td class="n">${o.corte>0?`<span class="pct">-${o.corte}%</span>`:''}</td>
     <td class="volta"${o.volta_dica?` title="${esc(o.volta_dica)}"`:''}>${o.volta_texto?esc(o.volta_texto):''}</td>
     <td class="n">${brl(o.preco)}</td><td class="n ${revClass(o.rpos,o.rcount)}" title="${o.rcount?fmtN(o.rcount)+' análises':''}">${o.rcount?o.rpos+'%':'—'}</td>
     <td class="n">${o.lancamento?new Date(o.lancamento*1000).toLocaleDateString('pt-BR'):(o.em_breve?'em breve':'')}</td><td class="n">${relTempo(o.fim,true)}</td><td class="n">${relTempo(o.inicio,false)}</td>
-    <td>${cartBtn(o.appid)}</td></tr>`).join('')}</tbody></table></div>`;}
+    <td>${cartBtn(o.appid,o.steam_inteira)}</td></tr>`).join('')}</tbody></table></div>`;}
 function ordenarPor(k,somar){const padrao=(COLS.find(c=>c[0]===k)||[])[2]||'asc';let o=(P.ordem||[['corte','desc'],['nome','asc']]).map(x=>[...x]);
   const i=o.findIndex(x=>x[0]===k);
   if(somar){if(i>=0)o[i][1]=o[i][1]==='asc'?'desc':'asc';else o.push([k,padrao]);}
@@ -898,6 +907,7 @@ $('#pPager').addEventListener('click',e=>{const b=e.target.closest('[data-pg]');
 $('#pPP').addEventListener('change',e=>{PP=+e.target.value;PG=1;salvarP();renderLista();});
 $('#pOrd').addEventListener('change',e=>{const [k,d]=e.target.value.split(':');P.ordem=[[k,d]];PG=1;salvarP();renderLista();});
 $$('.views [data-view]').forEach(b=>b.addEventListener('click',()=>{S.pview=b.dataset.view;save();renderLista();}));
+$$('.fonte [data-fonte]').forEach(b=>b.addEventListener('click',()=>{FONTE=b.dataset.fonte;ls.set('fonte',FONTE);PG=1;renderLista();}));
 $('#pfBtn').addEventListener('click',()=>{const s=$('#pSide');s.classList.toggle('open');$('#pfBtn').setAttribute('aria-expanded',s.classList.contains('open'));});
 
 /* ================= modal do jogo ================= */
@@ -1195,6 +1205,9 @@ async function renderCfg(){
      <div class="hint">Ligar um tipo não dispara avisos de tudo o que já está assim: você recebe um resumo e, daí em diante, só os próximos. Análises da Steam não decidem avisos.</div>
      <label class="f">Tolerância acima do menor histórico (%) ${num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50)}</label>
      <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label></div></div>
+   <div class="blk"><h4>Promoções da Steam inteira</h4><div class="in">
+     ${chk('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam (aba Promoções → Steam inteira)')}
+     <div class="hint">Uma consulta a cada 6 h: ~1 MB num dia comum, ~16 MB em grande promoção. Não gera avisos: os avisos continuam só para a sua lista.</div></div></div>
    <div class="blk"><h4>Keyshops (via GG.deals)</h4><div class="in">
      ${chk('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata')}
      <div class="hint">Desligado por padrão: a GG.deals dava muito alarme falso. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".</div>

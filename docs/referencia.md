@@ -240,10 +240,13 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `linhas_promocoes()` — (linhas, cfg, conta) do cache, montando de novo se preciso.
 - `_montar_linhas(cfg, conta)`
 - `api_lista(_q)`
+- **class `LinhaSteam`** — Linha leve da Steam inteira: o["campo"] como nas linhas da lista; o que ela nao tem vale None (False na relacao).
+  - `como_dict()`
+- `linhas_steam(itens_lista)` — Linhas leves da Steam inteira (sem quem ja esta na lista) e quando foi a coleta. Refaz quando ha coleta nova.
 - **class `PedidoInvalido`** — Vira HTTP 400 com a mensagem (em portugues).
 - `_ler_q(qs)` — Valida o q= de /api/promocoes. Campo ou valor desconhecido -> PedidoInvalido; ausente = sem filtro.
 - `_filtros(f)` — {grupo: predicado}; as contagens de um grupo usam todos os outros.
-- `_ordenar(itens, ordem)`
+- `_ordenar(itens, ordem)` — Ordena pelos campos na ordem dada; sem valor sempre por ultimo; empate final pelo appid.
 - `api_promocoes(qs)` — Explorador da aba Promocoes: filtra, conta e pagina no Radar (pensando na Steam inteira, spec 07).
 - `api_vitrine(_q)` — Prateleiras da aba "Vale a pena": um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
 - `_rar_info(an)` — O 'por que essa raridade' da ficha.
@@ -363,6 +366,15 @@ Steam: lista de desejos, biblioteca, detalhes da loja, DLCs e opcoes de compra.
 - `dlcs_dos_jogos(chave, steamid, appids, pais, log)` — {appid_dlc: appid_pai} via GetDLCForApps (leitura tolerante, como no KurokamiPrecos).
 - `_appids_em(no)`
 - `normalizar_opcao(it, tipo)` — Bundle ou pacote (edicao) com a lista de apps que ele inclui.
+
+## `radar/steam_inteira.py`
+Promocoes da Steam inteira (spec 07): IStoreQueryService/Query, sem chave, 1.000 itens por chamada.
+
+- `_pedido(start, pais)`
+- `_capa(it)`
+- `normalizar(it)` — Item da Query -> linha de steam_promo, ou None se nao for compravel/sem desconto.
+- `baixar(pais, max_chamadas)` — {appid: linha} de todas as promocoes da Steam. Levanta excecao se nao conseguir ler tudo.
+- `coletar(banco, cfg, log)` — Baixa as promocoes, troca o retrato e grava no historico so o que mudou. Devolve um resumo.
 
 ## `radar/steam_openid.py`
 Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.
