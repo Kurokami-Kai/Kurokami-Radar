@@ -32,7 +32,7 @@ Kurokami Radar é um app **local** de Windows (Python 3.12) que monitora a lista
 | Steam `GetWishlist` (sem chave) | lista de desejos e prioridade | perfil precisa ter "Detalhes dos jogos" público |
 | Loja Steam (`appdetails`, `packagedetails`) | lista de DLCs de cada jogo; conteúdo das edições | ~200 chamadas / 5 min (ritmo 1,6 s); `GetDLCForApps` exige chave de parceiro, por isso este plano B |
 | Steam Web API (chave opcional) | `ResolveVanityURL` (plano B), `GetOwnedGames` | — |
-| `userdata.json` (opcional, manual) | DLCs que o usuário possui, carrinho da Steam | é um retrato; envelhece |
+| `userdata.json` (opcional; a extensão 1.1 grava sozinha, ou manual) | DLCs que o usuário possui, seguidos, ignorados, carrinho da Steam | é um retrato; pela extensão, renova a cada visita à loja (no máximo a cada 10 min) |
 | IsThereAnyDeal (chave obrigatória) | preços em ~34 lojas BR (com DRM), histórico (`history/v2`), menor histórico, expiração da oferta | limita ritmo; 200 ids por chamada de preços |
 | Steam `IStoreQueryService/Query` (sem chave) | **Steam inteira** (spec 07): todas as promoções, 1.000 por chamada, com preço, pacote, fim, análises, lançamento e capa | `sort: 2` obrigatório (sem ele a paginação repete); só vem o que tem desconto; ~108 chamadas em grande promoção, ~7 num dia comum; gzip (150 KB por página) |
 | GG.deals (chave opcional) | melhor preço oficial e keyshop + mínimos | atualiza 1x/h; não diz a loja; erra em jogos com "edição parcial" |

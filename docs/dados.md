@@ -46,7 +46,7 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 
 ## Conta Steam (seguidos e ignorados)
 
-`conta_steam.relacao(cfg)` lê `rgFollowedApps` e `rgIgnoredApps` do `userdata.json` (cache pela data do arquivo) e nunca grava no banco. É o único leitor dessas chaves; se um dia vier da conta Steam, só essa função muda.
+`conta_steam.relacao(cfg)` lê `rgFollowedApps` e `rgIgnoredApps` do `userdata.json` (cache pela data do arquivo) e nunca grava no banco. Desde a extensão 1.1, o arquivo pode vir de `POST /api/steam/conta` (traz também `kurokami: {fonte: "extensao", steamid, quando}`). É o único leitor dessas chaves; se um dia vier da conta Steam, só essa função muda.
 
 ## Segredos
 

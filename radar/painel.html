@@ -770,7 +770,7 @@ function vitCard(o){const ft=fimTxt(o.fim);
   return `<a class="cap vcard" href="#" data-open="${o.appid}" data-hv="${o.appid}">${art(o.appid,o.nome,o.capa)}
   <div class="meta"><div class="nm">${esc(o.nome)}</div>${ft?`<div class="vfim">⏳ ${ft}</div>`:''}
     <div class="row"><span>${cartBtn(o.appid)}</span>${priceBlock(o)}</div></div></a>`;}
-function verTudo(t){const P0={mostrar_so:[t],relacao:{na_lista:'exigir',extra:'exigir',tenho:'excluir'},qualquer_um:true};if(t!=='selo'&&VIT&&VIT.desconto_minimo)P0.desconto_min=VIT.desconto_minimo;
+function verTudo(t){const P0={mostrar_so:[t],relacao:{na_lista:'exigir',tenho:'excluir'}};if(t!=='selo'&&VIT&&VIT.desconto_minimo)P0.desconto_min=VIT.desconto_minimo;
   aplicarP(P0);setTab('lista');}
 async function renderVale(){
   try{VIT=await api('/api/vitrine');}catch(e){return;}
@@ -808,6 +808,7 @@ const salvarP=()=>{ls.set('promo',P);ls.set('pp',PP);};
 function aplicarP(p){P=JSON.parse(JSON.stringify(p));PG=1;salvarP();}
 try{localStorage.removeItem('kr:promo_antes');}catch(e){}  // do antigo atalho (até 08/10)
 if(!ls.get('promo_v3',false)){aplicarP(P_PADRAO);ls.set('promo_v3',true);}  // 08/10: 500 análises e ✕ Tenho ao abrir
+if(!ls.get('promo_v4',false)){if(P.relacao&&P.relacao.extra==='exigir'&&P.qualquer_um){delete P.relacao.extra;P.qualquer_um=false;salvarP();}ls.set('promo_v4',true);}  // o Ver tudo marcava Monitorado (até 08/10)
 const REL=[['na_lista','Na lista de desejos'],['extra','Monitorado por você'],['no_carrinho','No carrinho'],['seguido','Seguido na Steam'],
   ['ignorado_steam','Ignorado na Steam'],['mudo','Silenciado'],['tenho','Tenho'],['base_tenho','Tenho o jogo base']];
 const OUTROS_TXT={promo:'Só em promoção',bundle:'Em bundle',completo:'Modo completo',keyshop:'Keyshop bem mais barata'};
@@ -847,7 +848,7 @@ function relTempo(t,futuro){if(!t)return '';const ms=futuro?t*1000-Date.now():Da
   const txt=h<1?'menos de 1h':h<24?`${Math.round(h)}h`:`${d} dia${d>1?'s':''}`;return futuro?'em '+txt:'há '+txt;}
 function recPill(o){const t=o.tipo_oferta;if(!t||t==='selo'||!(o.corte>0))return '';const r=o.piso_ref;
   return `<span class="pp pp-${t}" title="${esc(r?((t==='novo'?'recorde anterior: ':'menor de sempre: ')+pisoRefTxt(r)):'')}">${TIPO_NOME[t]}</span>`;}
-function icones(o){return `${o.no_carrinho?'<span class="ico ico-carr" title="No carrinho">🛒</span>':''}${o.na_lista?'<span class="ico ico-lista" title="Na lista de desejos">☰</span>':''}`;}
+function icones(o){return `${o.no_carrinho?'<span class="ico ico-carr" title="No carrinho">🛒</span>':''}${o.na_lista?'<span class="ico ico-lista" title="Na sua lista (desejos ou monitorado)">☰</span>':''}`;}
 function tabelaPromo(it){const ord=P.ordem||[['corte','desc'],['nome','asc']];
   const th=(k,cls)=>{const i=ord.findIndex(x=>x[0]===k);const seta=i<0?'':(ord[i][1]==='asc'?'▲':'▼')+(ord.length>1?`<sup>${i+1}</sup>`:'');
     return `<th class="srt${cls?' '+cls:''}${i>=0?' on':''}" data-sort="${k}" title="Clique ordena; Shift+clique soma critérios">${COLNOME[k]} ${seta}</th>`;};
@@ -880,7 +881,7 @@ function renderSide(){const r=PR||{contagens:{mostrar_so:{},tipo:{}},conta:{tem_
   $('#pSide').innerHTML=`<div class="blk"><h4>Buscar por nome</h4><div class="in"><input type="search" class="pin" id="pBusca" placeholder="nome do jogo" value="${esc(P.busca||'')}" style="width:100%"></div></div>
     <div class="blk"><h4>Sua relação com o jogo</h4><div class="in">${REL.map(([k,l])=>tri(k,l)).join('')}
       <label class="tick"><input type="checkbox" id="pQq" ${P.qualquer_um?'checked':''}>Qualquer um (os ✓ valem com OU)</label>
-      ${sem?'<div class="hint">Seguido e Ignorado precisam dos dados da sua conta Steam (userdata.json).</div>':''}</div></div>
+      ${sem?`<div class="hint">Seguido e Ignorado vêm da sua conta Steam: ${temExt()&&parseFloat(document.documentElement.dataset.kurokamiExt)>=1.1?'abra qualquer página da loja da Steam (logado) e volte aqui':'precisa da extensão do Radar 1.1 ou mais nova (instale, ou recarregue-a em chrome://extensions) e de uma visita à loja da Steam logado'}.</div>`:''}</div></div>
     <div class="blk"><h4>Conteúdo adulto (+18)</h4><div class="in"><span class="seg" role="group" aria-label="Conteúdo adulto">${[['','Ocultar'],['mostrar','Mostrar'],['so','Só +18']].map(([v,t])=>`<button data-adulto="${v}" aria-pressed="${(P.adulto||'')===v}">${t}</button>`).join('')}</span>
       <div class="hint">Pela classificação da Steam (conteúdo sexual). Jogos da sua lista nunca são ocultados.</div></div></div>
     <div class="blk"><h4>Mostrar só</h4><div class="in">${['selo','novo','igual','24m'].map(t=>caixa('mostrar_so',t,TIPO_NOME[t],ct.mostrar_so[t],TIPO_COR[t])).join('')}</div></div>
@@ -1317,6 +1318,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharBusca();});
 /* assistente da extensão: neste PC, sem a extensão, uma faixa no topo pede permissão e conduz a instalação.
    O navegador não deixa programa nenhum instalar extensão sozinho; o usuário liga o Modo do desenvolvedor e arrasta a pasta. */
 const temExt=()=>!!document.documentElement.dataset.kurokamiExt;
+// a extensão entrega o que leu da sua conta na loja da Steam (seguidos, ignorados, biblioteca com DLCs) e avisa aqui
+document.addEventListener('kurokami-conta',e=>{let d={};try{d=JSON.parse(e.detail)||{};}catch(x){}
+  if(d.ok){toast(`Conta Steam atualizada pela extensão: ${fmtN(d.seguidos)} seguidos, ${fmtN(d.ignorados)} ignorados, ${fmtN(d.possuidos)} na biblioteca`);carregarLista().catch(()=>{});}
+  else if(d.erro)toast('Extensão: '+d.erro);});
 function faixaExt(forcar){
   if(temExt()||$('#aviso-ext')||!['localhost','127.0.0.1'].includes(location.hostname))return;
   let depois=false;try{depois=!!sessionStorage.getItem('kr:ext_depois');}catch(e){}
@@ -1373,7 +1378,7 @@ async function carregarResumo(){
   RES=await api('/api/resumo');$('#ver').textContent=RES.versao;
   if(RES.userdata_dias!=null&&RES.userdata_dias>30&&!$('#aviso-ud')){const d=document.createElement('div');d.id='aviso-ud';
     d.style.cssText='background:#3e76cb;color:#fff;padding:8px 16px;text-align:center;font-size:12.5px';
-    d.innerHTML=`Seu <b>userdata.json</b> tem ${RES.userdata_dias} dias: DLCs compradas depois disso não aparecem como suas. Atualize-o (store.steampowered.com/dynamicstore/userdata/, salvar como) ou use "Já tenho" no jogo.`;
+    d.innerHTML=`Seu <b>userdata.json</b> tem ${RES.userdata_dias} dias: DLCs compradas depois disso não aparecem como suas. Abra a loja da Steam logado (com a extensão do Radar 1.1 ou mais nova ele se atualiza sozinho) ou use "Já tenho" no jogo.`;
     document.body.prepend(d);}
   const at=RES.atualizacao;if(at&&at.tem_nova&&!$('#aviso-att')){const d=document.createElement('div');d.id='aviso-att';
     d.style.cssText='background:#4c6b22;color:#fff;padding:8px 16px;text-align:center;font-size:13px';

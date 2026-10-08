@@ -65,9 +65,13 @@ Clique em **Salvar**. Cada campo é testado na hora: ✓ verde está certo; ✗ 
 
 ---
 
-## 3. Opcional: suas DLCs (`userdata.json`)
+## 3. Opcional: suas DLCs, seguidos e ignorados (`userdata.json`)
 
-A Steam só informa publicamente os **jogos** que você tem, não as **DLCs**. Sem elas, o Radar não sabe quais DLCs você já comprou (afeta a aba Biblioteca e o preço de bundles). Para incluir:
+A Steam só informa publicamente os **jogos** que você tem, não as **DLCs**, nem os jogos que você **segue** ou **ignorou** na loja. Sem isso, o Radar não sabe quais DLCs você já comprou (afeta a aba Biblioteca e o preço de bundles) e os filtros "Seguido" e "Ignorado" de Promoções ficam desligados.
+
+**Jeito automático (recomendado):** com a extensão do Radar instalada (a mesma do carrinho, versão 1.1 ou mais nova), abra qualquer página da loja da Steam logado e depois o painel. A extensão lê esses dados com a sessão do próprio navegador (o Radar nunca vê senha, token ou cookie) e o Radar guarda no `userdata.json`. Só vale se a conta aberta no navegador for a do seu perfil no Radar. Se você já tinha a extensão, recarregue-a em `chrome://extensions` depois de atualizar o Radar.
+
+**Jeito manual:**
 
 1. No navegador, **logado na Steam**, abra: `https://store.steampowered.com/dynamicstore/userdata/`
 2. Aparece um texto grande. Salve com **Ctrl+S** com o nome **`userdata.json`**.

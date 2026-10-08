@@ -32,7 +32,7 @@ Kurokami Radar/
 │   ├── bandeja.py           # ícone, menu, threads, verificação de versão
 │   ├── inicio.py            # iniciar com o Windows (versão pelo código)
 │   └── atualizador.py       # GitHub Releases: verificar, baixar, instalar silencioso; janela Tk
-├── extensao/              # extensão do navegador (MV3) que põe o pedido no carrinho da Steam; o instalador copia para {app}\extensao
+├── extensao/              # extensão do navegador (MV3): põe o pedido no carrinho da Steam (carrinho.js, fundo.js) e leva ao painel o userdata da conta (conta.js → painel.js); o instalador copia para {app}\extensao
 │   ├── manifest.json
 │   ├── carrinho.js          # na página do carrinho: lê #kurokami=…, token da página, adiciona, confere, recarrega
 │   ├── fundo.js             # service worker: GetCart/AddItemsToCart em api.steampowered.com (sem CORS)
@@ -74,7 +74,7 @@ Pelo código ficam ao lado do `radar.py`; instalado, em `%LOCALAPPDATA%\Kurokami
 
 ```
 config.json            preferências (sem segredos)
-userdata.json          retrato da conta Steam (DLCs possuídas, carrinho) — pessoal
+userdata.json          retrato da conta Steam (DLCs possuídas, seguidos, ignorados, carrinho; a extensão grava) — pessoal
 dados/radar.sqlite3    banco (WAL)
 dados/radar.log        log rotativo (1 MB × 3)
 dados/carrinho.json    carrinho simulado (arquivo próprio para não disputar lock com a coleta)

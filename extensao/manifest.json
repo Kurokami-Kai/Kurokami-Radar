@@ -1,13 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Kurokami Radar - carrinho da Steam",
-  "version": "1.0.0",
-  "description": "Coloca no carrinho da Steam os jogos separados no Kurokami Radar. Só age na página do carrinho da Steam, em pedidos do Radar (Finalizar pedido), e só adiciona.",
+  "version": "1.1.0",
+  "description": "Coloca no carrinho da Steam os jogos separados no Kurokami Radar e leva ao Radar o que a sua conta segue, ignora e tem. Só lê a loja com a sua sessão; nada sai do seu PC.",
   "icons": {"16": "icones/16.png", "32": "icones/32.png", "48": "icones/48.png", "128": "icones/128.png"},
   "background": {"service_worker": "fundo.js"},
+  "permissions": ["storage"],
   "host_permissions": ["https://api.steampowered.com/*"],
   "content_scripts": [
     {"matches": ["https://store.steampowered.com/cart*"], "js": ["carrinho.js"], "run_at": "document_idle"},
+    {"matches": ["https://store.steampowered.com/*"], "js": ["conta.js"], "run_at": "document_idle"},
     {"matches": ["http://localhost/*", "http://127.0.0.1/*"], "js": ["painel.js"], "run_at": "document_end"}
   ]
 }

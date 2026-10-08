@@ -246,8 +246,8 @@ def _montar_linhas(cfg, conta):
             # spec 04 (0.15)
             "inicio": an["inicio"], "tipos": tipos, "tipo_oferta": analise.tipo_oferta(tipos),
             "volta_texto": volta, "volta_ordem": volta_ordem, "volta_dica": analise.dica_volta(an, corte),
-            # monitorado por voce sem estar na lista da Steam: extra sem posicao vinda da lista de desejos
-            "na_lista": a not in extras or j.get("prioridade") is not None,
+            # toda linha daqui e da sua lista: desejos da Steam ou monitorado por voce ("extra" distingue os dois)
+            "na_lista": True,
             "tenho": a in ctx.possuidos, "no_carrinho": a in carrinho, "em_bundle": nb.get(a, 0) > 0,
             "seguido": a in conta["seguidos"], "ignorado_steam": a in conta["ignorados"],
             "adulto": False,   # a lista e sua: +18 so se marca na Steam inteira
@@ -1199,6 +1199,44 @@ def post_steam_extensao(d):
     return r
 
 
+def post_steam_conta(d):
+    """Dados da sua conta Steam que a extensao leu na loja, com a sessao da pagina (senha, token e cookie nunca chegam
+    aqui): biblioteca com DLCs, lista de desejos, seguidos, ignorados e carrinho. So se o SteamID for o do perfil do
+    Radar: grava como userdata.json na pasta de dados (o formato do arquivo salvo a mao) e marca ja os possuidos."""
+    sid = str(d.get("steamid") or "")
+    b = Banco()
+    try:
+        meu = str(b.meta("steamid") or "")
+        if not meu:
+            return {"ok": False, "erro": "Configure o seu perfil Steam no Radar antes."}
+        if sid != meu:
+            return {"ok": False, "erro": "A Steam aberta no navegador é de outra conta: o Radar não usou os dados dela."}
+
+        def ids(k):
+            v = d.get(k) or []
+            if not isinstance(v, list) or len(v) > 500000:
+                raise ValueError("lista invalida: %s" % k)
+            return sorted({x for x in v if type(x) is int and x > 0})
+        if not ids("possuidos"):
+            return {"ok": False, "erro": "A Steam devolveu a biblioteca vazia: o Radar manteve a anterior."}
+        u = {"rgOwnedApps": ids("possuidos"), "rgWishlist": ids("desejos"), "rgFollowedApps": ids("seguidos"),
+             "rgIgnoredApps": ids("ignorados"), "rgAppsInCart": ids("carrinho"),
+             "kurokami": {"fonte": "extensao", "steamid": sid, "quando": datetime.now(timezone.utc).isoformat(timespec="seconds")}}
+        arq = os.path.join(caminhos.RAIZ_DADOS, "userdata.json")
+        with open(arq + ".tmp", "w", encoding="utf-8") as f:
+            json.dump(u, f)
+        os.replace(arq + ".tmp", arq)
+        # a coleta refaz a biblioteca inteira; ate la, o que voce tem ja sai das Promocoes
+        for i in range(0, len(u["rgOwnedApps"]), 500):
+            lote = u["rgOwnedApps"][i:i + 500]
+            b.con.execute("UPDATE jogo SET possuido=1 WHERE appid IN (%s)" % ",".join("?" * len(lote)), lote)
+        b.commit()
+        return {"ok": True, "possuidos": len(u["rgOwnedApps"]), "seguidos": len(u["rgFollowedApps"]),
+                "ignorados": len(u["rgIgnoredApps"])}
+    finally:
+        b.con.close()
+
+
 def _limpar_sessao_qr():
     """O login por QR saiu na 0.16 (a Steam o tratava como celular novo). Quem tinha a sessao no cofre:
     revoga na Steam e apaga, uma vez. Falha de rede: tenta de novo na proxima abertura."""
@@ -1230,7 +1268,8 @@ POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,
         "/api/atualizar_app": post_atualizar_app,
-        "/api/steam/carrinho": post_steam_carrinho, "/api/steam/extensao": post_steam_extensao}
+        "/api/steam/carrinho": post_steam_carrinho, "/api/steam/extensao": post_steam_extensao,
+        "/api/steam/conta": post_steam_conta}
 
 
 def _log_erro(rota, e):

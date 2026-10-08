@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-08 (fim da noite) — filtro Monitorado, seguidos/ignorados pela extensão
+- **"Until Then aparece" de novo era o banco com `possuido=1` em 0 jogos** (os 401 de 07–08/10 zeraram antes da correção). Testar a chave pelo próprio `steam.biblioteca_api` (script no scratchpad, sem imprimir a chave) respondeu em 1 chamada.
+- **Formato da Steam sem login dá para conferir no navegador do app:** `#application_config` tem `data-userinfo` (`logged_in`, país) e `/dynamicstore/userdata/` devolve as chaves `rg*` vazias. O `steamid` logado não deu para ver.
+- **Rota nova testada chamando a função direto** numa cópia do banco (`caminhos.RAIZ_DADOS/ARQ_BANCO` trocados no script): mais barato que subir o `painel_copia.py`.
+
 ## 2026-10-08 (madrugada) — Ofertas, +18, ficha da Steam inteira, biblioteca com 401
 - **"Jogo que eu tenho aparece" era a biblioteca vazia, não filtro:** o log mostrou `HTTP Error 401` desde 07/10 20:31 e `biblioteca: 0 itens`. Antes de mexer em filtro, `grep "biblioteca:" radar.log`.
 - **A Query da Steam já devolve `content_descriptorids`** sem pedir nada no `data_request` (3 e 4 = sexual): medir com 1 chamada antes de planejar etapa extra.
@@ -50,9 +55,5 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Releia a skill antes do último passo:** `novidades.md` ia com um comando de desenvolvedor; a skill `publicar-versao` proíbe. `gh` não existe aqui: acompanhe o workflow pela API pública (`api.github.com/repos/<repo>/actions/runs`).
 - **Ao remover código morto, procure quem o usa também em `tools/`** (o `medir_spec04.py` quebrou com `raridade_ok` removido).
 
-## 2026-10-04 — economia de tokens (configuração)
-- **Criados:** `.claude/settings.json` (`model: opusplan`), subagentes `explorador` (Haiku, effort low) e `revisor` (Sonnet) e a skill do projeto `economia-de-contexto` (complementa a global).
-- **Agente novo não carrega na sessão aberta** ("Agent type not found"): teste com `claude -p "..." --agent explorador --output-format json` (o prompt vem antes de `--allowedTools`, que engole argumentos).
-- **Medido (explorador, "funções da aba Promoções"):** Haiku 4.5, 10 turnos, ~127 mil tokens de entrada (109 mil de cache) + 2,4 mil de saída, US$ 0,059. Achou `painel.html` 758–888 (22 funções).
-- **O resumo veio com 28 linhas (tabela)**, não 15: a instrução do agente agora proíbe tabela e manda agrupar. Ainda não remedido.
-- **ccusage e rtk:** `npm i -g ccusage` funciona (no PowerShell; `npx` pelo Git Bash falha). rtk 0.51.0 tem binário Windows (`%LOCALAPPDATA%\Programs\rtk`, checksum ok, telemetria desligada), mas o hook global (`rtk init -g`) mexe em `~/.claude/settings.json` e o modo automático bloqueia: o dono roda.
+## Antigas, resumidas (até 04/10)
+- **Economia de tokens (04/10):** `.claude/settings.json` (`opusplan`), subagentes `explorador` (Haiku) e `revisor` (Sonnet), skill `economia-de-contexto`. Agente novo só carrega em sessão nova (teste com `claude -p ... --agent explorador`). `ccusage` instala pelo PowerShell; o hook global do rtk o dono roda.
