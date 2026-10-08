@@ -275,8 +275,8 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `post_verificar(_d)`
 - `post_pausar(_d)`
 - `post_steam_carrinho(_d)` — Monta o endereco do carrinho da Steam com o pedido (#kurokami=PAIS:p<subid>[-modo],b<bundleid>[-modo]).
-- `api_extensao(_q)`
-- `post_steam_extensao(_d)` — Abre a pasta da extensao no Explorador (para o "Carregar sem compactacao" do navegador).
+- `_navegador_padrao()` — (nome, exe, pagina de extensoes) do navegador padrao do Windows, ou None se nao for um que a extensao aceita.
+- `post_steam_extensao(d)` — Abre a pasta da extensao no Explorador e, com {navegador: true}, a pagina de extensoes do navegador padrao
 - `_limpar_sessao_qr()` — O login por QR saiu na 0.16 (a Steam o tratava como celular novo). Quem tinha a sessao no cofre:
 - `_log_erro(rota, e)`
 - **class `Handler`** — 

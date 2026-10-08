@@ -28,7 +28,6 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | `/api/alertas` | último resultado de `avaliar` (`quando, itens[], novos[]`) |
 | `/api/notificacoes` | `itens[]` da tabela `alerta` (200 mais recentes) |
 | `/api/config` | `config, lojas_itad[], classes` |
-| `/api/extensao` | `{pasta, existe}`: onde está a extensão do navegador (para o passo a passo do painel) |
 | `/api/carrinho` | `itens[]` (só a Steam: `lojas[]` tem 1 oferta; `modo`; `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `sem_pacote[]` |
 | `/api/buscar?q=` | busca na loja (nome, appid ou link) → `itens[{appid,nome,capa,preco,corte,tipo,na_lista,possuido}]` |
 | `/api/biblioteca` | `jogos[]` (valor, DLCs que contam, faltantes com preço/menor, bundles), `total{hoje,cheio,menor,falta_*}`, `franquias[]` (séries), `sem_lista_dlc, sem_dados, atualizado, falta_ids`, `dlcs_promo[]` (DLCs que contam, que você não tem, de jogos que você tem, com desconto agora: `appid, nome, capa, pai, pai_nome, preco, cheio, corte, loja, so_steam` (preço só do catálogo da Steam), `fim, tipo_oferta, piso_ref`) |
@@ -53,5 +52,5 @@ Todo POST bem-sucedido invalida o cache das linhas de Promoções (refeito na pr
 | `/api/acesso` | `{rede_local?, novo_codigo?}` | liga/desliga rede local (reinicia o servidor), troca o PIN |
 | `/api/atualizar_app` | — | abre a janela de atualização |
 | `/api/steam/carrinho` | — | **só o próprio PC.** Monta o pedido para a extensão: `{ok, n, url, sem_pacote[]}`, com `url = https://store.steampowered.com/cart/#kurokami=PAIS:p<subid>[-presente\|-privado],b<bundleid>[-modo]` (sem repetidos). Descobre na hora o pacote que falta. Não fala com a conta: quem adiciona é a extensão |
-| `/api/steam/extensao` | — | **só o próprio PC.** Abre a pasta da extensão no Explorador: `{ok, pasta}` |
+| `/api/steam/extensao` | `{navegador?}` | **só o próprio PC.** Assistente da extensão: abre a pasta dela no Explorador e, com `navegador: true`, a página de extensões do navegador padrão (Edge, Chrome, Brave, Opera, Vivaldi; pelo `UserChoice` do registro). Devolve `{ok, pasta, navegador?, pagina?, aviso?}` (`aviso` quando o padrão não aceita a extensão, ex.: Firefox) |
 | `/api/sair` | — | fecha o Radar (usado pelo instalador .bat) |

@@ -978,16 +978,45 @@ def post_steam_carrinho(_d):
             "url": "https://store.steampowered.com/cart/#kurokami=%s:%s" % (pais, ",".join(dict.fromkeys(partes)))}
 
 
-def api_extensao(_q):
-    return {"pasta": caminhos.PASTA_EXTENSAO, "existe": os.path.isfile(os.path.join(caminhos.PASTA_EXTENSAO, "manifest.json"))}
+# ProgId do navegador padrao -> (nome, pagina de extensoes). Firefox e outros: sem suporte (extensao so Chromium).
+NAVEGADORES = {"MSEdgeHTM": ("Edge", "edge://extensions"), "ChromeHTML": ("Chrome", "chrome://extensions"),
+               "BraveHTML": ("Brave", "brave://extensions"), "Opera": ("Opera", "opera://extensions"),
+               "Vivaldi": ("Vivaldi", "vivaldi://extensions")}
 
 
-def post_steam_extensao(_d):
-    """Abre a pasta da extensao no Explorador (para o "Carregar sem compactacao" do navegador)."""
-    if not os.path.isdir(caminhos.PASTA_EXTENSAO):
+def _navegador_padrao():
+    """(nome, exe, pagina de extensoes) do navegador padrao do Windows, ou None se nao for um que a extensao aceita."""
+    import shlex
+    import winreg
+    try:
+        k = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice")
+        progid = winreg.QueryValueEx(k, "ProgId")[0]
+        cmd = winreg.QueryValue(winreg.HKEY_CLASSES_ROOT, progid + r"\shell\open\command")
+    except OSError:
+        return None
+    for prefixo, (nome, pagina) in NAVEGADORES.items():
+        if progid.startswith(prefixo):   # Opera GX = "OperaGXStable", Brave = "BraveHTML"...
+            exe = shlex.split(cmd, posix=False)[0].strip('"')
+            return (nome, exe, pagina) if os.path.isfile(exe) else None
+    return None
+
+
+def post_steam_extensao(d):
+    """Abre a pasta da extensao no Explorador e, com {navegador: true}, a pagina de extensoes do navegador padrao
+    (o assistente do painel: o usuario liga o Modo do desenvolvedor e arrasta a pasta para a pagina)."""
+    import subprocess
+    if not os.path.isfile(os.path.join(caminhos.PASTA_EXTENSAO, "manifest.json")):
         return {"ok": False, "erro": "Pasta da extensão não encontrada: reinstale o Radar."}
+    r = {"ok": True, "pasta": caminhos.PASTA_EXTENSAO}
+    if d.get("navegador"):
+        nav = _navegador_padrao()
+        if nav:
+            subprocess.Popen([nav[1], nav[2]])
+            r.update(navegador=nav[0], pagina=nav[2])
+        else:
+            r["aviso"] = "Seu navegador padrão não aceita a extensão. Abra o Chrome ou o Edge e digite chrome://extensions (ou edge://extensions)."
     os.startfile(caminhos.PASTA_EXTENSAO)
-    return {"ok": True, "pasta": caminhos.PASTA_EXTENSAO}
+    return r
 
 
 def _limpar_sessao_qr():
@@ -1011,7 +1040,7 @@ def _limpar_sessao_qr():
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
-       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/extensao": api_extensao}
+       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine}
 POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,

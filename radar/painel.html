@@ -1263,21 +1263,47 @@ async function carregarConta(){
 function comQR(fn){if(window.QRCode)return fn();const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.integrity='sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU';sc.crossOrigin='anonymous';sc.onload=fn;document.head.appendChild(sc);}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharBusca();});
 /* ---- Finalizar pedido: abre o carrinho da Steam com o pedido no endereço; a extensão do Radar põe os itens lá ---- */
-async function mostrarExtensao(){
-  const nota=$('#finalNota');let ex={};try{ex=await api('/api/extensao');}catch(e){}
-  nota.innerHTML=`<div class="hint" style="text-align:left;font-size:12px;margin-top:8px">Para o <b>Finalizar</b> pôr tudo no carrinho da Steam sozinho, instale a extensão do Radar <b>uma vez</b> (Chrome, Edge, Brave ou Opera):
-    <ol style="margin:6px 0 6px 18px;padding:0"><li>Abra <b>chrome://extensions</b> (no Edge, <b>edge://extensions</b>) numa aba nova.</li>
-    <li>Ligue o <b>Modo do desenvolvedor</b>.</li><li>Clique em <b>Carregar sem compactação</b> e escolha a pasta:<br><code style="user-select:all;word-break:break-all">${esc(ex.pasta||'extensao')}</code></li>
-    <li>Recarregue esta página e clique em Finalizar pedido.</li></ol>
-    <button class="btn-ghost" id="abrirExt" type="button">Abrir a pasta da extensão</button>
-    <div style="font-size:10.5px;margin-top:6px;color:var(--dim)">Ela só age na página do carrinho da Steam e usa a sessão que o navegador já tem: o Radar nunca vê senha, token ou cookie.</div></div>`;
-  $('#abrirExt').onclick=async()=>{const r=await post('/api/steam/extensao');if(!r.ok)toast(r.erro||'Não consegui abrir a pasta.');};
+/* assistente da extensão: neste PC, sem a extensão, uma faixa no topo pede permissão e conduz a instalação.
+   O navegador não deixa programa nenhum instalar extensão sozinho; o usuário liga o Modo do desenvolvedor e arrasta a pasta. */
+const temExt=()=>!!document.documentElement.dataset.kurokamiExt;
+function faixaExt(forcar){
+  if(temExt()||$('#aviso-ext')||!['localhost','127.0.0.1'].includes(location.hostname))return;
+  let depois=false;try{depois=!!sessionStorage.getItem('kr:ext_depois');}catch(e){}
+  if(!forcar&&(ls.get('ext_nao',0)||depois))return;
+  const d=document.createElement('div');d.id='aviso-ext';
+  d.style.cssText='background:#2a475e;color:#fff;padding:10px 16px;text-align:center;font-size:12.5px;line-height:1.7';
+  d.innerHTML=`O <b>Finalizar pedido</b> põe os jogos no carrinho da Steam sozinho com a <b>extensão do Radar</b>. Instalar agora? É uma vez só e leva menos de um minuto.
+    <button class="btn-imp" id="extSim" type="button" style="margin-left:8px">Instalar</button> <button class="btn-ghost" id="extDepois" type="button">Agora não</button> <button class="btn-ghost" id="extNunca" type="button">Não perguntar mais</button>`;
+  document.body.prepend(d);
+  $('#extSim').onclick=instalarExt;
+  $('#extDepois').onclick=()=>{try{sessionStorage.setItem('kr:ext_depois','1');}catch(e){}d.remove();};
+  $('#extNunca').onclick=()=>{ls.set('ext_nao',1);d.remove();toast('Certo. Se mudar de ideia, clique em Finalizar pedido no Carrinho.');};
+}
+async function instalarExt(){
+  const d=$('#aviso-ext');if(!d)return;
+  const r=await post('/api/steam/extensao',{navegador:true});
+  if(!r.ok){toast(r.erro||'Não consegui abrir a pasta da extensão.');return;}
+  let copiado=false;try{await navigator.clipboard.writeText(r.pasta);copiado=true;}catch(e){}
+  d.innerHTML=`<div style="text-align:left;max-width:780px;margin:0 auto">${r.aviso?`<b style="color:#ffd27a">${esc(r.aviso)}</b>`:`Abri as extensões do <b>${esc(r.navegador)}</b> (${esc(r.pagina)}) e a pasta da extensão no Explorador.`}
+    <ol style="margin:4px 0 6px 18px;padding:0"><li>Na página de extensões, ligue o <b>Modo do desenvolvedor</b>.</li>
+    <li><b>Arraste a pasta <code>extensao</code></b> do Explorador para a página de extensões. Ou clique em <b>Carregar sem compactação</b> e escolha a pasta${copiado?' (o caminho já está copiado: cole na barra de endereço da janela)':''}: <code style="user-select:all;word-break:break-all">${esc(r.pasta)}</code></li>
+    <li>Volte aqui e clique em <b>Pronto</b>.</li></ol>
+    <button class="btn-imp" id="extPronto" type="button">Pronto</button> <button class="btn-ghost" id="extFechar" type="button">Fechar</button>
+    <span style="font-size:11px;color:#c7d5e0;margin-left:8px">Ela só age na página do carrinho da Steam; o Radar nunca vê senha, token ou cookie.</span></div>`;
+  $('#extPronto').onclick=()=>{try{sessionStorage.setItem('kr:ext_conferir','1');}catch(e){}location.reload();};
+  $('#extFechar').onclick=()=>d.remove();
+}
+function conferirExt(){   // depois do "Pronto": a página recarregou; a extensão marcou o <html>?
+  let conferir=false;try{conferir=!!sessionStorage.getItem('kr:ext_conferir');sessionStorage.removeItem('kr:ext_conferir');}catch(e){}
+  if(conferir&&temExt()){toast('Extensão do Radar instalada ✓ O Finalizar pedido já põe os jogos no carrinho da Steam.');return;}
+  if(conferir){faixaExt(true);toast('Ainda não encontrei a extensão. Clique em Instalar para ver os passos de novo.');return;}
+  faixaExt(false);
 }
 async function finalizar(){
   if(!CD)return;
   const nota=$('#finalNota');nota.innerHTML='';
   if(!(CD.itens.filter(c=>!c.possuido).length+CD.bundles.length)){toast('O carrinho está vazio.');return;}
-  if(!document.documentElement.dataset.kurokamiExt){mostrarExtensao();return;}
+  if(!temExt()){faixaExt(true);window.scrollTo(0,0);toast('Instale a extensão do Radar (faixa no topo) e clique em Finalizar pedido de novo.');return;}
   const w=window.open('about:blank','_blank');   // abre já, no clique, para o navegador não bloquear
   const b=$('#btnFinalizar');b.disabled=true;let r;try{r=await post('/api/steam/carrinho');}finally{b.disabled=false;}
   if(!r.ok){if(w)w.close();toast('Erro: '+(r.erro||'?'));}
@@ -1340,7 +1366,7 @@ async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&
   const h=location.hash.slice(1);  // #vale, #lista... (o resumo "Tipo ligado" abre a vitrine com #vale)
   setTab(['vale','lista','bib','carr','notif','cfg'].includes(h)?h:['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();
   if(!VIT){try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}}setTimeout(pollResumo,3000);
-  carregarConta();
+  carregarConta();setTimeout(conferirExt,600);   // a extensão marca o <html> no fim do carregamento
   if(location.search.includes('steam=ok')){history.replaceState(null,'',location.pathname+location.hash);setTab('cfg');toast('Entrou pela Steam: perfil atualizado. A lista e a biblioteca passam para este perfil na próxima verificação (use "Verificar agora").');}})();
 
 </script>
