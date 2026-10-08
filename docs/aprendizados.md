@@ -6,6 +6,7 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Os 126 MB/dia da spec 04 eram falta de gzip:** a Steam comprime se pedir (1,5 MB → 150 KB por página). Meça o tamanho com `Accept-Encoding: gzip` antes de concluir que algo é pesado.
 - **`cmp_to_key` com 100 mil linhas leva segundos;** ordenações estáveis do último critério ao primeiro (nulos separados) dão o mesmo resultado em ~100 ms.
 - **Teste de desempenho barato:** cópia do banco + 100 mil linhas sintéticas em `steam_promo` + `painel.api_promocoes` chamado direto (sem servidor).
+- **Reescrever histórico (e-mail pessoal, 08/10):** `git filter-branch --env-filter ... --tag-name-filter cat -- --all` (o filter-repo não está instalado), backup com `git bundle` antes, e as 4 tags num push só: com mais de 3 tags por push o GitHub não dispara o workflow de instalador.
 - **O hook que mostra o `painel.html` no navegador do app troca a aba ativa:** depois de editar o HTML, navegue de novo para a porta da cópia (a aba nova vem com outro `tabId`).
 
 ## 2026-10-08 — QR trocado pela extensão do Radar
