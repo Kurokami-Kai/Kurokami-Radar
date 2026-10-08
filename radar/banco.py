@@ -43,6 +43,14 @@ CREATE TABLE IF NOT EXISTS steam_promo(
   appid INTEGER PRIMARY KEY, tipo TEXT, nome TEXT, pacote INTEGER, preco INTEGER, cheio INTEGER, corte INTEGER,
   fim INTEGER, rpos INTEGER, rcount INTEGER, rotulo TEXT, lancamento INTEGER, capa TEXT, visto TEXT);
 DROP TABLE IF EXISTS steam_hist;
+-- Steam inteira com historico (08/10, pedido do dono): id ITAD de cada item e o historico (lojas marcadas) so de
+-- quem esta perto do recorde, baixado aos poucos (steam_inteira.historicos). O retrato acima continua substituido.
+-- flag/hl/hl1: marca e menores da ITAD, guardados (so reconsulta quando o preco muda ou 1x por dia: cota da ITAD)
+CREATE TABLE IF NOT EXISTS promo_estado(
+  appid INTEGER PRIMARY KEY, gid TEXT, mapeado TEXT, baixado TEXT, preco_baixado INTEGER, visto TEXT,
+  flag TEXT, hl INTEGER, hl1 INTEGER, menores_preco INTEGER, menores_quando TEXT);
+CREATE TABLE IF NOT EXISTS promo_hist(
+  appid INTEGER, loja TEXT, preco INTEGER, cheio INTEGER, corte INTEGER, quando TEXT, PRIMARY KEY(appid, loja, quando));
 """
 
 
@@ -80,7 +88,11 @@ class Banco:
                     "ALTER TABLE jogo ADD COLUMN fim_desconto INTEGER",
                     "ALTER TABLE jogo ADD COLUMN prioridade INTEGER",
                     "ALTER TABLE oferta_atual ADD COLUMN expira TEXT",
-                    "ALTER TABLE jogo ADD COLUMN pacote INTEGER"):
+                    "ALTER TABLE jogo ADD COLUMN pacote INTEGER",
+                    # Steam inteira: marca e menor de 1 ano da ITAD e a avaliacao (como as linhas da lista)
+                    "ALTER TABLE steam_promo ADD COLUMN flag TEXT",
+                    "ALTER TABLE steam_promo ADD COLUMN hl1 INTEGER",
+                    "ALTER TABLE steam_promo ADD COLUMN aval TEXT"):
             try:
                 self.con.execute(sql)
             except sqlite3.OperationalError:

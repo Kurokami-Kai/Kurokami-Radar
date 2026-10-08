@@ -37,6 +37,26 @@ def resolver_steamid(chave, perfil):
     raise RuntimeError("Nao consegui achar o SteamID de '%s'. Ponha o SteamID64 (17 digitos) em perfil_steam no config.json." % perfil)
 
 
+def perfil_publico(steamid):
+    """{"nome", "avatar"} do perfil (XML da comunidade, sem chave), para o icone no topo do painel. None se falhar."""
+    import html
+    import urllib.request
+    try:
+        req = urllib.request.Request("https://steamcommunity.com/profiles/%s/?xml=1" % int(steamid),
+                                     headers={"User-Agent": "KurokamiRadar/0.1"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            x = r.read().decode("utf-8", "replace")
+    except Exception:
+        return None
+    def campo(nome):
+        m = re.search(r"<%s>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</%s>" % (nome, nome), x, re.S)
+        return html.unescape(m.group(1).strip()) if m else None
+    av = campo("avatarMedium") or campo("avatarIcon")
+    if not av or not av.startswith("https://"):
+        return None
+    return {"nome": campo("steamID") or "", "avatar": av}
+
+
 ULTIMA_PRIORIDADE = {}  # appid -> posicao na lista de desejos (0 = topo), da ultima leitura
 
 

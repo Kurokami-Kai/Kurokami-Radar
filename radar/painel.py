@@ -101,6 +101,32 @@ def _idade_userdata():
     return int((time.time() - os.path.getmtime(arq)) / 86400) if arq else None
 
 
+_PERFIL_PEDIDO = set()
+
+
+def _perfil_info(b):
+    """Nome e avatar do perfil Steam em uso (meta perfil_info). Se faltar ou for de outro SteamID, busca numa thread
+    (uma vez por SteamID) e a proxima consulta ja traz."""
+    sid = b.meta("steamid")
+    info = b.meta("perfil_info") or {}
+    if not sid or info.get("steamid") == sid:
+        return info.get("avatar") and info or None
+    if sid not in _PERFIL_PEDIDO:
+        _PERFIL_PEDIDO.add(sid)
+
+        def buscar():
+            p = steam.perfil_publico(sid)
+            if not p:   # rede fora: tenta de novo na proxima consulta
+                _PERFIL_PEDIDO.discard(sid)
+                return
+            b2 = Banco()
+            b2.meta("perfil_info", dict(p, steamid=sid))
+            b2.commit()
+            b2.con.close()
+        threading.Thread(target=buscar, daemon=True).start()
+    return None
+
+
 def api_resumo(_q):
     b = Banco()
     s = CONTROLE["servico"]
@@ -112,7 +138,7 @@ def api_resumo(_q):
          "proxima": s.proxima.isoformat() if s else None, "estado": s.estado if s else None,
          "userdata_dias": _idade_userdata(), "atualizacao": CONTROLE.get("atualizacao"),
          "progresso": __import__("radar.progresso", fromlist=["x"]).foto(), "ult_completa": b.meta("ult_completa"),
-         "completa_dias": config.carregar().get("verificacao_completa_dias", 7)}
+         "completa_dias": config.carregar().get("verificacao_completa_dias", 7), "perfil": _perfil_info(b)}
     b.con.close()
     return r
 
@@ -241,7 +267,10 @@ def api_lista(_q):
 # o cache da lista (qualquer POST, coleta, config).
 class LinhaSteam:
     """Linha leve da Steam inteira: o["campo"] como nas linhas da lista; o que ela nao tem vale None (False na relacao)."""
-    __slots__ = ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento", "preco", "cheio", "corte", "fim")
+    __slots__ = ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento", "preco", "cheio", "corte", "fim",
+                 # avaliacao (steam_promo.aval): a mesma da lista com historico; so a marca da ITAD sem ele
+                 "tipos", "tipo_oferta", "selo", "selo_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio")
+    COLUNAS = __slots__[:12]
 
     def __getitem__(self, k):
         rel = _STEAM["rel"]
@@ -251,7 +280,7 @@ class LinhaSteam:
 
     def como_dict(self):
         d = {k: getattr(self, k) for k in LinhaSteam.__slots__}
-        d.update({k: self[k] for k in RELACAO}, loja="Steam", steam_inteira=True, modo="base", tipos=[],
+        d.update({k: self[k] for k in RELACAO}, loja="Steam", steam_inteira=True, modo="base",
                  url="https://store.steampowered.com/app/%d/" % self.appid, pisos={}, em_bundle=False, bundles=0)
         return d
 
@@ -264,15 +293,22 @@ def linhas_steam(itens_lista):
     """Linhas leves da Steam inteira (sem quem ja esta na lista) e quando foi a coleta. Refaz quando ha coleta nova."""
     b = Banco()
     try:
-        sig = b.meta("ult_steam_inteira")
+        quando = b.meta("ult_steam_inteira")
+        sig = (quando, b.meta("promo_avaliado"))
         with _TRAVA_STEAM:
             if _STEAM["sig"] != sig:
-                cols = LinhaSteam.__slots__
+                cols = LinhaSteam.COLUNAS
                 novas = []
-                for r in b.con.execute("SELECT %s FROM steam_promo" % ", ".join(cols)):
+                for r in b.con.execute("SELECT %s, aval FROM steam_promo" % ", ".join(cols)):
                     o = LinhaSteam()
                     for k, v in zip(cols, r):
                         setattr(o, k, v)
+                    av = json.loads(r[-1]) if r[-1] else {}
+                    o.tipos = av.get("tipos") or []
+                    o.tipo_oferta = analise.tipo_oferta(o.tipos)
+                    o.selo = "selo" in o.tipos
+                    for k in ("selo_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio"):
+                        setattr(o, k, av.get(k))
                     novas.append(o)
                 _STEAM.update(itens=novas, sig=sig)
             if _STEAM["rel_sig"] is not itens_lista:   # o cache da lista foi refeito: relacao pode ter mudado
@@ -281,7 +317,7 @@ def linhas_steam(itens_lista):
                 _STEAM.update(rel={"tenho": tenho, "no_carrinho": {int(i["appid"]) for i in _ler_carrinho() if i.get("appid")},
                                    "seguido": conta["seguidos"], "ignorado_steam": conta["ignorados"]}, rel_sig=itens_lista)
             na_lista = {o["appid"] for o in itens_lista}
-            return [o for o in _STEAM["itens"] if o.appid not in na_lista], sig
+            return [o for o in _STEAM["itens"] if o.appid not in na_lista], quando
     finally:
         b.con.close()
 

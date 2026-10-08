@@ -66,6 +66,17 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
     banco.meta("carrinho", ud.get("carrinho") or [])
     log("Lista de desejos: %d itens (%s) | biblioteca: %d itens" % (len(wl), fonte_wl, len(possuidos)))
 
+    # ---------------------------------------------------------- 1b. Steam inteira (spec 07): logo no comeco (~10 s + ITAD em
+    # lote), para nao esperar a coleta da lista; o historico de quem esta perto do recorde fica para o fim (etapa 6)
+    banco.commit()   # nada de transacao aberta durante a rede (o painel tambem grava)
+    steam_ligada = cfg.get("steam_inteira", True)
+    if steam_ligada and (steam_agora or forcar or _min_desde(
+            banco, "ult_steam_inteira") >= cfg["intervalos_minutos"].get("steam_inteira", 60)):
+        try:
+            steam_inteira.coletar(banco, cfg, log, k_itad)
+        except Exception as e:   # nao derruba a coleta da lista; tenta de novo na proxima rodada
+            log("   Steam inteira falhou (%s), tento na proxima" % rede.explicar(e))
+
     # ---------------------------------------------------------- 2. catalogo Steam (mais pesado, intervalo maior)
     if forcar or _min_desde(banco, "ult_steam") >= cfg["intervalos_minutos"]["steam"]:
         orc = None if sem_limite else cfg.get("chamadas_lentas_por_rodada", 120)
@@ -132,13 +143,12 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
                 n += 1
     banco.commit()
 
-    # ---------------------------------------------------------- 6. Steam inteira (spec 07): no intervalo, no "Verificar agora" e na completa
-    if cfg.get("steam_inteira", True) and (steam_agora or forcar or _min_desde(
-            banco, "ult_steam_inteira") >= cfg["intervalos_minutos"].get("steam_inteira", 60)):
+    # ---------------------------------------------------------- 6. historico da Steam inteira (so quem esta perto do recorde, aos poucos)
+    if steam_ligada and k_itad and banco.meta("ult_steam_inteira"):
         try:
-            steam_inteira.coletar(banco, cfg, log)
-        except Exception as e:   # nao derruba a coleta da lista; tenta de novo na proxima rodada
-            log("   Steam inteira falhou (%s), tento na proxima" % rede.explicar(e))
+            steam_inteira.historicos(banco, cfg, k_itad, log, cfg.get("steam_inteira_hist_por_rodada", 60))
+        except Exception as e:
+            log("   historico da Steam inteira falhou (%s), tento na proxima" % rede.explicar(e))
     log("Coleta concluida em %.0fs" % (time.time() - t0))
     return ofertas, gg, lojas_marcadas
 

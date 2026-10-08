@@ -81,7 +81,9 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 - Toasts: XML montado com escape + `-EncodedCommand`; o `$` de "R$" quebrava a interpolação do PowerShell.
 - **Sem ponte do Tampermonkey (removida na 0.16, pedido do dono: era remendo).** O navegador não deixa `localhost` usar a sessão da Steam; o carrinho vai pela extensão própria do Radar (abaixo). Adicionar à lista de desejos pelo painel saiu junto (dependia da ponte).
 
-- **Steam inteira (spec 07):** `IStoreQueryService/Query` exige `sort: 2` (sem ele a paginação repete e pula itens). Peça gzip (`rede.http_json` já pede): sem ele são 1,5 MB por página (126 MB numa grande promoção). Coleta incompleta não troca o retrato. **Sem histórico** (decisão do dono, 08/10): cada coleta substitui o retrato; a cada hora e no "Verificar agora". Avisos continuam só para a lista (a Steam inteira daria centenas por dia).
+- **Steam inteira (spec 07):** `IStoreQueryService/Query` exige `sort: 2` (sem ele a paginação repete e pula itens). Peça gzip (`rede.http_json` já pede): sem ele são 1,5 MB por página (126 MB numa grande promoção). Coleta incompleta não troca o retrato. Cada coleta substitui o retrato; a cada hora e no "Verificar agora", **logo depois das listas** (no fim ela esperava 7 min atrás do catálogo). Avisos continuam só para a lista (a Steam inteira daria centenas por dia).
+- **Recordes da Steam inteira (08/10, noite; o dono pediu Selo e histórico também fora da lista):** marca da ITAD em lote (`prices/v3`, oferta da Steam: N novo recorde, H igual) para todos, guardada e só repedida quando o preço muda ou passou 1 dia; histórico (`history/v2`) só de quem está perto do recorde, 60 por rodada, e com ele a avaliação é a mesma da lista. **A ITAD tem cota de ~100 chamadas a cada 5 min:** no primeiro 429 o histórico para (sem esperar) e segue na próxima rodada; mapeamento e marcas no máximo 20 lotes por rodada (a lista usa a ITAD logo depois). A marca sem histórico é das lojas da ITAD (todas), não só das marcadas: é provisória.
+- **A SteamDB mostra mais promoções que existem** quando a fila de atualização dela está cheia (aviso amarelo): em 08/10, 40.046 contra 6.905 da Steam; os de fora já tinham voltado ao preço cheio. Não comparar contagens com ela nesses dias.
 
 ## Login Steam e segurança dos usuários (spec 06)
 - **"Entrar pela Steam" = OpenID 2.0** (como ITAD, GG.deals e SteamDB): confirma na página da Steam; o Radar só guarda o SteamID em `config.perfil_steam`. Nada de senha, token ou cookie. O OpenID só prova quem é: não dá acesso ao carrinho nem a lista privada.
@@ -90,6 +92,7 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 
 ## Produto (preferências do usuário)
 - Visual da **loja Steam** (cores Valve, caixas de preço com desconto verde, hover estilo Steam).
+- **Topo (08/10):** Promoções ▾ (Vale a pena, Promoções, Lista de desejos), Biblioteca, Configurações ▾ (Configurações, Notificações), Carrinho por último, avatar da Steam no canto direito. Promoções abre sem DLCs; sem botão de "fonte" (o filtro "Na lista de desejos" faz isso). Barra de filtros compacta, como a da SteamDB.
 - Avisar **pouco e bem**: raridade, linha de base, um alerta por jogo, limite por rodada.
 - Interface e mensagens em **português**; termos como score, bundle, keyshop ficam como estão.
 - Nada pessoal no repositório (perfil, chaves, userdata). O projeto é público e usado por amigos.

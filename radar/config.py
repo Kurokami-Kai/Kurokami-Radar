@@ -91,6 +91,9 @@ PADRAO = {
 
     # Promocoes da Steam inteira na aba Promocoes (spec 07): ~1 MB por consulta num dia comum, ~16 MB em grande promocao
     "steam_inteira": True,
+    # historico (para Selo, Menor em 2 anos, Costuma voltar) de quem esta perto do recorde: N jogos por rodada
+    # (a ITAD aceita ~100 chamadas a cada 5 min, e a lista tambem usa)
+    "steam_inteira_hist_por_rodada": 60,
 
     "intervalos_minutos": {"itad": 30, "ggdeals": 60, "steam": 180, "steam_inteira": 60},
     # verificacao completa (tudo, sem limite de ritmo): a 1a sempre; depois a cada N dias (0 = so manual)

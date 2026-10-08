@@ -21,7 +21,7 @@ Kurokami Radar/
 │   ├── analise.py           # raridade v2 (episódios), piso, Selo, score, etiquetas, caminhos/combinação de compra, avaliar()
 │   ├── notificar.py         # toast do Windows via PowerShell; capa do jogo
 │   ├── notificador.py       # regras de envio (linha de base, tipo recém-ligado vira resumo, rearme, silêncio, fim de promoção)
-│   ├── steam_inteira.py     # spec 07: promoções da Steam inteira (IStoreQueryService/Query) → steam_promo (substituído a cada coleta)
+│   ├── steam_inteira.py     # spec 07: promoções da Steam inteira (IStoreQueryService/Query) → steam_promo (substituído a cada coleta), marca/menores da ITAD, histórico aos poucos (promo_hist) e avaliação
 │   ├── steam_openid.py      # "Entrar pela Steam" (OpenID 2.0): state de uso único, valida a volta e devolve só o SteamID
 │   ├── conta_steam.py       # seguidos e ignorados da conta Steam (userdata.json); único leitor de rgFollowedApps/rgIgnoredApps
 │   ├── servico.py           # ciclo() e thread Servico (agenda, completa periódica)

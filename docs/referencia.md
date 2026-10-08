@@ -195,7 +195,8 @@ IsThereAnyDeal: lojas, mapeamento de ids, precos por loja (com DRM) e historico.
 - `mapear(chave, appids, cache, log)`
 - `_drm_steam(deal)` — A oferta da propria Steam vem com drm vazio; nas outras lojas, vazio = DRM desconhecido.
 - `precos(chave, pais, gids, shop_ids, log)` — {gid: {"ofertas": [...], "hist_all": centavos, "hist_y1": ..}} com TODAS as lojas pedidas,
-- `historico(chave, pais, gid, shop_ids, dias)` — [(loja, preco, cheio, corte, quando)] do log de precos da ITAD.
+- `menores(chave, pais, gids, log)` — Steam inteira (spec 07): {gid: {"flag", "hl", "hl1"}} em lotes de 200. flag e a marca da ITAD na oferta da
+- `historico(chave, pais, gid, shop_ids, dias, desde, tentativas)` — [(loja, preco, cheio, corte, quando)] do log de precos da ITAD. desde (ISO): so o que veio depois.
 
 ## `radar/janela_chaves.py`
 Janela de primeiro uso para as chaves. Campo de texto do Windows: Ctrl+V e o botao direito funcionam.
@@ -235,6 +236,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_ultimos_por_loja(b, appids)`
 - `_minimos(b, appids)`
 - `_idade_userdata()`
+- `_perfil_info(b)` — Nome e avatar do perfil Steam em uso (meta perfil_info). Se faltar ou for de outro SteamID, busca numa thread
 - `api_resumo(_q)`
 - `invalidar_linhas()`
 - `linhas_promocoes()` — (linhas, cfg, conta) do cache, montando de novo se preciso.
@@ -350,6 +352,7 @@ O ciclo que roda sozinho: coleta -> avalia -> notifica, no intervalo do config.
 Steam: lista de desejos, biblioteca, detalhes da loja, DLCs e opcoes de compra.
 
 - `resolver_steamid(chave, perfil)` — SteamID64 a partir do perfil. Tenta primeiro sem chave (perfil publico, XML da comunidade).
+- `perfil_publico(steamid)` — {"nome", "avatar"} do perfil (XML da comunidade, sem chave), para o icone no topo do painel. None se falhar.
 - `wishlist(chave, steamid)`
 - `biblioteca_api(chave, steamid)`
 - `ler_userdata(arquivo)`
@@ -374,7 +377,12 @@ Promocoes da Steam inteira (spec 07): IStoreQueryService/Query, sem chave, 1.000
 - `_capa(it)`
 - `normalizar(it)` — Item da Query -> linha de steam_promo, ou None se nao for compravel/sem desconto.
 - `baixar(pais, max_chamadas)` — {appid: linha} de todas as promocoes da Steam. Levanta excecao se nao conseguir ler tudo.
-- `coletar(banco, cfg, log)` — Baixa as promocoes e substitui o retrato. Devolve quantos itens.
+- `_mapear(banco, chave, appids, log)` — {appid: gid} pela ITAD, guardado em promo_estado (gid '' = a ITAD nao conhece; tenta de novo em 30 dias).
+- `_marcas(banco, chave, pais, novos, log)` — Preenche gid, flag, hl, hl1 de cada item. A marca e os menores ficam em promo_estado e so sao pedidos de novo
+- `avaliar(banco, cfg, itens)` — Preenche it["aval"] (JSON) de cada item {appid: {preco, corte, flag}}: com historico, a mesma avaliacao da
+- `coletar(banco, cfg, log, chave_itad)` — Baixa as promocoes, junta a marca e os menores da ITAD, avalia com o historico que ja tem e substitui o
+- `_perto(r)` — Pode ser recorde (vale baixar o historico): marca da ITAD ou preco no menor de 1 ano.
+- `historicos(banco, cfg, chave, log, por_rodada)` — Baixa o historico (lojas marcadas, pela ITAD) de quem esta perto do recorde, aos poucos (`por_rodada` jogos;
 
 ## `radar/steam_openid.py`
 Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.

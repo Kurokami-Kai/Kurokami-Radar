@@ -119,10 +119,32 @@ def precos(chave, pais, gids, shop_ids, log=print):
     return saida
 
 
-def historico(chave, pais, gid, shop_ids, dias):
-    """[(loja, preco, cheio, corte, quando)] do log de precos da ITAD."""
-    desde = (datetime.now(timezone.utc) - timedelta(days=dias)).replace(microsecond=0).isoformat()
-    r = _get("games/history/v2", chave, tentativas=8, id=gid, country=pais,
+def menores(chave, pais, gids, log=print):
+    """Steam inteira (spec 07): {gid: {"flag", "hl", "hl1"}} em lotes de 200. flag e a marca da ITAD na oferta da
+    Steam (N = novo recorde, H = igual ao recorde, S = menor da loja); hl/hl1 = menor de sempre e de 1 ano em todas as
+    lojas da ITAD (centavos)."""
+    saida = {}
+    for n, lote in enumerate(lotes(gids, 200), 1):
+        try:
+            r = _post("games/prices/v3", chave, lote, country=pais, shops=str(SHOP_STEAM), vouchers="false") or []
+        except ChaveRecusada:
+            raise
+        except Exception as e:   # quase sempre a cota (429): para aqui, quem ficou sem resposta tenta na proxima
+            log("   menores da ITAD pararam no lote %d (%s)" % (n, explicar(e)))
+            break
+        for g in r:
+            hl = g.get("historyLow") or {}
+            st = next((d for d in g.get("deals") or [] if (d.get("shop") or {}).get("id") == SHOP_STEAM), {})
+            saida[g.get("id")] = {"flag": st.get("flag"), "hl": de_reais((hl.get("all") or {}).get("amount")),
+                                  "hl1": de_reais((hl.get("y1") or {}).get("amount"))}
+    return saida
+
+
+def historico(chave, pais, gid, shop_ids, dias, desde=None, tentativas=8):
+    """[(loja, preco, cheio, corte, quando)] do log de precos da ITAD. desde (ISO): so o que veio depois.
+    tentativas=1: no limite de ritmo (429) falha na hora em vez de esperar (a ITAD tem cota de ~100 chamadas em 5 min)."""
+    desde = desde or (datetime.now(timezone.utc) - timedelta(days=dias)).replace(microsecond=0).isoformat()
+    r = _get("games/history/v2", chave, tentativas=tentativas, id=gid, country=pais,
              shops=",".join(map(str, shop_ids)), since=desde) or []
     out = []
     for e in r:

@@ -14,7 +14,9 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `oferta_atual` | snapshot das ofertas vigentes (última resposta da ITAD) com `drm_steam`, `flag` (H/N/S), `expira`. **Usar esta tabela para "preço de agora"**, nunca o último registro do histórico |
 | `gg` | última leitura da GG.deals |
 | `historico_importado` | jogos cujo histórico da ITAD já foi importado (`escopo='todas'`) |
-| `steam_promo` | spec 07: retrato das promoções da Steam inteira (`appid` PK, `tipo` jogo/dlc/outro, `nome`, `pacote`, `preco`, `cheio`, `corte`, `fim` epoch, `rpos`, `rcount`, `rotulo`, `lancamento` epoch, `capa`, `visto`); substituído inteiro a cada coleta, sem histórico (o espaço fica do tamanho de uma coleta: ~15 MB em grande promoção) |
+| `steam_promo` | spec 07: retrato das promoções da Steam inteira (`appid` PK, `tipo` jogo/dlc/outro, `nome`, `pacote`, `preco`, `cheio`, `corte`, `fim` epoch, `rpos`, `rcount`, `rotulo`, `lancamento` epoch, `capa`, `visto`, `flag` marca da ITAD na oferta da Steam N/H/S, `hl1` menor de 1 ano em todas as lojas da ITAD, `aval` JSON `{tipos, selo_motivo, piso_ref, volta_texto, volta_ordem, volta_dica, inicio}` ou `{tipos, provisorio}` só com a marca); substituído inteiro a cada coleta (~15 MB em grande promoção) |
+| `promo_estado` | Steam inteira, por appid: `gid` (`''` = a ITAD não conhece; tenta de novo em 30 dias), `mapeado`, `baixado`/`preco_baixado` (histórico), `visto` (última coleta em que estava; 60 dias fora = apagado), `flag`, `hl`, `hl1`, `menores_preco`, `menores_quando` (marca guardada: repedida quando o preço muda ou após 1 dia) |
+| `promo_hist` | histórico (lojas marcadas, pela ITAD) só de quem esteve perto do recorde na Steam inteira: `appid, loja, preco, cheio, corte, quando` (PK appid+loja+quando; ~150 linhas por jogo) |
 | `consulta_lenta` | cache das consultas lentas da loja (`pacote`, `dlcs`; `dlcs_falha` = última falha do plano B, não conta como consultado) com data |
 | `alerta` | notificações enviadas |
 | `notificado` | estado por jogo para não repetir aviso (preço avisado, ativo) |
@@ -25,7 +27,7 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 
 ## Chaves de `meta`
 
-`steamid`, `steamid_perfil`, `itad_ids` (cache appid→id ITAD), `lojas_itad`, `ult_steam`, `ult_itad`, `ult_gg`, `ult_biblioteca`, `ult_steam_inteira`, `steam_inteira_resumo` (`itens, chamadas, segundos`), `ult_completa`, `ultimos_alertas` (para o painel; itens com `tipos`, `tipo_oferta`, `avisa_por`), `linha_de_base`, `tipos_ligados` (tipos de aviso da última rodada; ligar um tipo novo registra quem já estava assim sem toast), `pausado`, `pendentes` (silêncio), `avisos_fim`, `carrinho` (da Steam, via userdata), `dlcforapps_bloqueado`, `edicoes_manuais`, `esquema` (restos antigos: `ponte_vista`, `ponte_ultimo_envio` e a tabela `fila_lista`, da ponte removida na 0.16, não são mais lidos nem criados).
+`steamid`, `steamid_perfil`, `itad_ids` (cache appid→id ITAD), `lojas_itad`, `ult_steam`, `ult_itad`, `ult_gg`, `ult_biblioteca`, `ult_steam_inteira`, `steam_inteira_resumo` (`itens, chamadas, segundos`), `promo_avaliado` (última avaliação da Steam inteira; o painel recarrega as linhas), `promo_lojas` (`{ids, nomes}` das lojas do histórico da Steam inteira; mudou = baixa de novo), `perfil_info` (`{nome, avatar, steamid}` do perfil, para o avatar no topo), `ult_completa`, `ultimos_alertas` (para o painel; itens com `tipos`, `tipo_oferta`, `avisa_por`), `linha_de_base`, `tipos_ligados` (tipos de aviso da última rodada; ligar um tipo novo registra quem já estava assim sem toast), `pausado`, `pendentes` (silêncio), `avisos_fim`, `carrinho` (da Steam, via userdata), `dlcforapps_bloqueado`, `edicoes_manuais`, `esquema` (restos antigos: `ponte_vista`, `ponte_ultimo_envio` e a tabela `fila_lista`, da ponte removida na 0.16, não são mais lidos nem criados).
 
 ## `config.json` (padrões em `config.PADRAO`)
 
@@ -37,7 +39,7 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 - `dlc`: `ignorar_cosmeticos|extras|atalhos|pacotes|gratis`
 - `completo`: `padrao`, `jogos{appid:"completo"}`
 - `bundles`, `notificacoes` (`ativas, max_por_rodada, melhora_minima_reais, silencio{}, termina_em_breve_horas`)
-- `steam_inteira` (bool, padrão true: coleta da Steam inteira), `intervalos_minutos{itad, ggdeals, steam, steam_inteira}` (Steam inteira: 60 min), `chamadas_lentas_por_rodada`, `verificacao_completa_dias`, `historico.importar_dias`
+- `steam_inteira` (bool, padrão true: coleta da Steam inteira), `steam_inteira_hist_por_rodada` (60: históricos da Steam inteira por rodada; a ITAD aceita ~100 chamadas em 5 min), `intervalos_minutos{itad, ggdeals, steam, steam_inteira}` (Steam inteira: 60 min), `chamadas_lentas_por_rodada`, `verificacao_completa_dias`, `historico.importar_dias`
 - `extras[]`, `painel{rede_local}`, `atualizacao{repo, verificar}`
 
 `config.carregar()` faz merge do arquivo sobre `PADRAO`, então chaves novas não exigem migração. **Mudar o valor padrão de uma chave que já existe** não chega a quem já tem o arquivo (o `config.json` guarda tudo desde a 1ª vez): para isso, acrescente uma entrada em `config.MIGRACOES`. Arquivo ilegível nunca é migrado (seria sobrescrito).
