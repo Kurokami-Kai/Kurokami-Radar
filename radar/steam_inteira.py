@@ -22,6 +22,8 @@ MAX_CHAMADAS = 300   # ~300 mil itens: folga sobre os ~108 mil de uma grande pro
 TIPOS = {0: "jogo", 4: "dlc"}
 LOTES_ITAD = 20      # por rodada, no mapeamento e nas marcas (4 mil itens): a ITAD aceita ~100 chamadas em 5 min e a lista vem logo depois
 CDN = "https://shared.fastly.steamstatic.com/store_item_assets/"
+# descritores de conteudo da Steam: 3 = so adultos (sexual), 4 = nudez ou sexo frequentes (os que a loja esconde por padrao)
+ADULTO = {3, 4}
 
 
 def _pedido(start, pais):
@@ -52,7 +54,7 @@ def normalizar(it):
             "fim": min(fins) if fins else None, "rpos": rv.get("percent_positive"),
             "rcount": (rv.get("review_count") or 0) if rv.get("percent_positive") is not None else 0,
             "rotulo": rv.get("review_score_label") or "", "lancamento": (it.get("release") or {}).get("steam_release_date"),
-            "capa": _capa(it)}
+            "capa": _capa(it), "adulto": 1 if ADULTO & set(it.get("content_descriptorids") or []) else 0}
 
 
 def baixar(pais, max_chamadas=MAX_CHAMADAS):
@@ -140,6 +142,19 @@ def _marcas(banco, chave, pais, novos, log):
         banco.commit()
 
 
+def _aval(linhas, preco, corte, al):
+    """Avaliacao de um item com o historico das lojas marcadas, em JSON (como as linhas da lista); None se o dado
+    for estranho (o item fica com a marca da ITAD; nao derruba o retrato)."""
+    try:
+        an = analise.analisar(linhas, preco, corte, cfg_alerta=al)
+    except Exception:
+        return None
+    volta, ordem = analise.costuma_voltar(an, corte)
+    return json.dumps({"tipos": analise.tipos_de(an), "selo_motivo": an["selo_motivo"], "piso_ref": an["piso_ref"],
+                       "volta_texto": volta, "volta_ordem": ordem, "volta_dica": analise.dica_volta(an, corte),
+                       "inicio": an["inicio"]}, separators=(",", ":"))
+
+
 def avaliar(banco, cfg, itens):
     """Preenche it["aval"] (JSON) de cada item {appid: {preco, corte, flag}}: com historico, a mesma avaliacao da
     lista (lojas marcadas); sem ele, so a marca da ITAD (N novo recorde, H igual ao recorde) ate o historico chegar.
@@ -151,14 +166,7 @@ def avaliar(banco, cfg, itens):
     def com(a, linhas):
         feitos.add(a)
         it = itens[a]
-        try:
-            an = analise.analisar(linhas, it["preco"], it["corte"], cfg_alerta=al)
-        except Exception:   # um jogo com dado estranho fica com a marca da ITAD; nao derruba o retrato
-            return
-        volta, ordem = analise.costuma_voltar(an, it["corte"])
-        it["aval"] = json.dumps({"tipos": analise.tipos_de(an), "selo_motivo": an["selo_motivo"], "piso_ref": an["piso_ref"],
-                                 "volta_texto": volta, "volta_ordem": ordem, "volta_dica": analise.dica_volta(an, it["corte"]),
-                                 "inicio": an["inicio"]}, separators=(",", ":"))
+        it["aval"] = _aval(linhas, it["preco"], it["corte"], al) or it["aval"]
     for it in itens.values():
         t = {"N": ["novo"], "H": ["igual"]}.get(it.get("flag"))
         it["aval"] = json.dumps({"tipos": t, "provisorio": True}) if t else None
@@ -201,7 +209,7 @@ def coletar(banco, cfg, log=print, chave_itad=None):
     avaliar(banco, cfg, novos)
     quando = agora()
     cols = ("appid", "tipo", "nome", "pacote", "preco", "cheio", "corte", "fim", "rpos", "rcount", "rotulo", "lancamento",
-            "capa", "flag", "hl1", "aval")
+            "capa", "flag", "hl1", "aval", "adulto")
     banco.con.execute("DELETE FROM steam_promo")
     banco.con.executemany("INSERT INTO steam_promo(%s, visto) VALUES(%s)" % (", ".join(cols), ", ".join("?" * (len(cols) + 1))),
                           [tuple(n[c] for c in cols) + (quando,) for n in novos.values()])
@@ -289,3 +297,48 @@ def historicos(banco, cfg, chave, log=print, por_rodada=60):
     banco.commit()
     log("   %d historicos baixados em %.0fs (faltam %d)" % (feitos, time.time() - t0, len(fila) - feitos))
     return feitos
+
+
+def historico_um(banco, cfg, chave, appid, log=print):
+    """Ficha de um item da Steam inteira (o dono clicou nele): baixa o historico (lojas marcadas) na hora, se ainda
+    nao tem ou se o preco mudou, e reavalia so ele. Devolve None (tem historico) ou o motivo de nao ter, em portugues."""
+    r = banco.um("SELECT appid, preco, corte FROM steam_promo WHERE appid=?", appid)
+    if not r:
+        return None
+    e = banco.um("SELECT gid, baixado, preco_baixado FROM promo_estado WHERE appid=?", appid)
+    h1 = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+    if e and e["baixado"] and (e["preco_baixado"] == r["preco"] or e["baixado"] >= h1):
+        return None
+    if not chave:
+        return "sem a chave da IsThereAnyDeal, o histórico não vem"
+    pais = str(cfg.get("pais") or "BR").upper()
+    try:
+        gid = _mapear(banco, chave, [appid], log).get(appid)
+        if not gid:
+            e = banco.um("SELECT gid FROM promo_estado WHERE appid=?", appid)
+            return "a IsThereAnyDeal não conhece este item" if e else "a IsThereAnyDeal não respondeu agora; tente de novo em alguns minutos"
+        lojas = banco.meta("promo_lojas") or {}
+        ids, nomes = lojas.get("ids"), lojas.get("nomes")
+        if not ids:
+            achadas, _faltando, _todas = itad.resolver_lojas(chave, pais, cfg["lojas"])
+            ids, nomes = sorted(achadas), sorted(achadas.values())
+            if not ids:
+                return "nenhuma das suas lojas marcadas existe na IsThereAnyDeal"
+            banco.meta("promo_lojas", {"ids": ids, "nomes": nomes})
+        desde = (datetime.fromisoformat(e["baixado"]) - timedelta(days=2)).isoformat() if e and e["baixado"] else None
+        regs = itad.historico(chave, pais, gid, ids, cfg["historico"]["importar_dias"], desde=desde, tentativas=1)
+    except itad.ChaveRecusada:
+        return "a IsThereAnyDeal recusou a chave"
+    except Exception as ex:
+        return "a IsThereAnyDeal não respondeu agora (%s); tente de novo em alguns minutos" % explicar(ex)
+    banco.con.executemany("INSERT OR IGNORE INTO promo_hist VALUES(?,?,?,?,?,?)",
+                          [(appid, g[0], g[1], g[2], g[3], utc(g[4])) for g in regs if g[1] is not None])
+    banco.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=? WHERE appid=?", (agora(), r["preco"], appid))
+    nomes = set(nomes or [])
+    linhas = [dict(x) for x in banco.q("SELECT loja, preco, corte, quando FROM promo_hist WHERE appid=? ORDER BY quando", appid)
+              if x["loja"] in nomes]
+    aval = _aval(linhas, r["preco"], r["corte"], cfg["alerta"])
+    if aval:
+        banco.con.execute("UPDATE steam_promo SET aval=? WHERE appid=?", (aval, appid))
+    banco.commit()
+    return None

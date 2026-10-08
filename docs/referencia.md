@@ -244,16 +244,18 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `api_lista(_q)`
 - **class `LinhaSteam`** — Linha leve da Steam inteira: o["campo"] como nas linhas da lista; o que ela nao tem vale None (False na relacao).
   - `como_dict()`
+- `_aplicar_aval(o, aval)` — steam_promo.aval (JSON) -> campos da avaliacao da LinhaSteam.
 - `linhas_steam(itens_lista)` — Linhas leves da Steam inteira (sem quem ja esta na lista) e quando foi a coleta. Refaz quando ha coleta nova.
 - **class `PedidoInvalido`** — Vira HTTP 400 com a mensagem (em portugues).
 - `_ler_q(qs)` — Valida o q= de /api/promocoes. Campo ou valor desconhecido -> PedidoInvalido; ausente = sem filtro.
 - `_filtros(f)` — {grupo: predicado}; as contagens de um grupo usam todos os outros.
 - `_ordenar(itens, ordem)` — Ordena pelos campos na ordem dada; sem valor sempre por ultimo; empate final pelo appid.
 - `api_promocoes(qs)` — Explorador da aba Promocoes: filtra, conta e pagina no Radar (pensando na Steam inteira, spec 07).
-- `api_vitrine(_q)` — Prateleiras da aba "Vale a pena": um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
+- `api_vitrine(_q)` — Prateleiras de Ofertas → Destaques (antiga "Vale a pena"): um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
 - `_rar_info(an)` — O 'por que essa raridade' da ficha.
 - `_estado_dlcs(b, a, j)` — Por que a ficha nao tem DLCs: falhou, a Steam nao informou ou ainda nao consultada (com a fila, se rodando).
 - `api_jogo(q)`
+- `_jogo_steam(b, cfg, ctx, a)` — Ficha de um item da Steam inteira (fora da lista): o historico das lojas marcadas pela ITAD, baixado na hora
 - `_ler_carrinho()`
 - `_gravar_carrinho(itens)`
 - `api_carrinho(_q)` — Carrinho simulado: jogos/DLCs (com a loja escolhida) e bundles da Steam (com o preco para voce).
@@ -379,10 +381,12 @@ Promocoes da Steam inteira (spec 07): IStoreQueryService/Query, sem chave, 1.000
 - `baixar(pais, max_chamadas)` — {appid: linha} de todas as promocoes da Steam. Levanta excecao se nao conseguir ler tudo.
 - `_mapear(banco, chave, appids, log)` — {appid: gid} pela ITAD, guardado em promo_estado (gid '' = a ITAD nao conhece; tenta de novo em 30 dias).
 - `_marcas(banco, chave, pais, novos, log)` — Preenche gid, flag, hl, hl1 de cada item. A marca e os menores ficam em promo_estado e so sao pedidos de novo
+- `_aval(linhas, preco, corte, al)` — Avaliacao de um item com o historico das lojas marcadas, em JSON (como as linhas da lista); None se o dado
 - `avaliar(banco, cfg, itens)` — Preenche it["aval"] (JSON) de cada item {appid: {preco, corte, flag}}: com historico, a mesma avaliacao da
 - `coletar(banco, cfg, log, chave_itad)` — Baixa as promocoes, junta a marca e os menores da ITAD, avalia com o historico que ja tem e substitui o
 - `_perto(r)` — Pode ser recorde (vale baixar o historico): marca da ITAD ou preco no menor de 1 ano.
 - `historicos(banco, cfg, chave, log, por_rodada)` — Baixa o historico (lojas marcadas, pela ITAD) de quem esta perto do recorde, aos poucos (`por_rodada` jogos;
+- `historico_um(banco, cfg, chave, appid, log)` — Ficha de um item da Steam inteira (o dono clicou nele): baixa o historico (lojas marcadas) na hora, se ainda
 
 ## `radar/steam_openid.py`
 Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.

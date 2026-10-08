@@ -92,7 +92,9 @@ class Banco:
                     # Steam inteira: marca e menor de 1 ano da ITAD e a avaliacao (como as linhas da lista)
                     "ALTER TABLE steam_promo ADD COLUMN flag TEXT",
                     "ALTER TABLE steam_promo ADD COLUMN hl1 INTEGER",
-                    "ALTER TABLE steam_promo ADD COLUMN aval TEXT"):
+                    "ALTER TABLE steam_promo ADD COLUMN aval TEXT",
+                    # +18 (descritores de conteudo 3 e 4 da Steam): fica oculto nas Promocoes por padrao
+                    "ALTER TABLE steam_promo ADD COLUMN adulto INTEGER"):
             try:
                 self.con.execute(sql)
             except sqlite3.OperationalError:

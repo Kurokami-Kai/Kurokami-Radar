@@ -44,11 +44,21 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
     # assim jogos comprados depois do retrato tambem contam.
     possuidos = set(ud.get("possuidos") or [])
     do_retrato = len(possuidos)
+    falhou = None
     if k_steam:
         try:
             possuidos |= set(steam.biblioteca_api(k_steam, sid))
         except Exception as e:
+            falhou = str(e)
             log("   biblioteca pela API falhou (%s)" % e)
+    mantida = bool(falhou and not do_retrato)
+    if mantida:
+        # sem a API e sem o retrato a biblioteca viria vazia e tudo que voce tem voltaria as Promocoes: fica a anterior
+        # (marcar_listas grava o "ja tenho" do painel como possuido=1: tira aqui, ele volta la)
+        manuais = {r["appid"] for r in banco.q("SELECT appid FROM tenho_manual")}
+        possuidos = {r["appid"] for r in banco.q("SELECT appid FROM jogo WHERE possuido=1")} - manuais
+        log("   mantida a biblioteca anterior (%d itens)" % len(possuidos))
+    banco.meta("biblioteca_falhou", {"erro": falhou, "quando": agora(), "mantida": mantida} if falhou else {})
     if arq and do_retrato:
         idade = (time.time() - os.path.getmtime(arq)) / 86400
         log("   userdata.json de %d dia(s) atras: %d itens (DLCs incluidas)%s" % (

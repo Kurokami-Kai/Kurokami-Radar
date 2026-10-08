@@ -138,7 +138,8 @@ def api_resumo(_q):
          "proxima": s.proxima.isoformat() if s else None, "estado": s.estado if s else None,
          "userdata_dias": _idade_userdata(), "atualizacao": CONTROLE.get("atualizacao"),
          "progresso": __import__("radar.progresso", fromlist=["x"]).foto(), "ult_completa": b.meta("ult_completa"),
-         "completa_dias": config.carregar().get("verificacao_completa_dias", 7), "perfil": _perfil_info(b)}
+         "completa_dias": config.carregar().get("verificacao_completa_dias", 7), "perfil": _perfil_info(b),
+         "biblioteca_falhou": b.meta("biblioteca_falhou") or None}
     b.con.close()
     return r
 
@@ -249,6 +250,7 @@ def _montar_linhas(cfg, conta):
             "na_lista": a not in extras or j.get("prioridade") is not None,
             "tenho": a in ctx.possuidos, "no_carrinho": a in carrinho, "em_bundle": nb.get(a, 0) > 0,
             "seguido": a in conta["seguidos"], "ignorado_steam": a in conta["ignorados"],
+            "adulto": False,   # a lista e sua: +18 so se marca na Steam inteira
             "keyshop_barata": g.get("keyshop") is not None and preco is not None and g["keyshop"] < preco * 0.6,
         })
     b.con.close()
@@ -267,10 +269,10 @@ def api_lista(_q):
 # o cache da lista (qualquer POST, coleta, config).
 class LinhaSteam:
     """Linha leve da Steam inteira: o["campo"] como nas linhas da lista; o que ela nao tem vale None (False na relacao)."""
-    __slots__ = ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento", "preco", "cheio", "corte", "fim",
+    __slots__ = ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento", "preco", "cheio", "corte", "fim", "adulto",
                  # avaliacao (steam_promo.aval): a mesma da lista com historico; so a marca da ITAD sem ele
                  "tipos", "tipo_oferta", "selo", "selo_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio")
-    COLUNAS = __slots__[:12]
+    COLUNAS = __slots__[:13]
 
     def __getitem__(self, k):
         rel = _STEAM["rel"]
@@ -289,6 +291,16 @@ _STEAM = {"itens": [], "sig": None, "rel": {}, "rel_sig": None}
 _TRAVA_STEAM = threading.Lock()
 
 
+def _aplicar_aval(o, aval):
+    """steam_promo.aval (JSON) -> campos da avaliacao da LinhaSteam."""
+    av = json.loads(aval) if aval else {}
+    o.tipos = av.get("tipos") or []
+    o.tipo_oferta = analise.tipo_oferta(o.tipos)
+    o.selo = "selo" in o.tipos
+    for k in ("selo_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio"):
+        setattr(o, k, av.get(k))
+
+
 def linhas_steam(itens_lista):
     """Linhas leves da Steam inteira (sem quem ja esta na lista) e quando foi a coleta. Refaz quando ha coleta nova."""
     b = Banco()
@@ -303,12 +315,7 @@ def linhas_steam(itens_lista):
                     o = LinhaSteam()
                     for k, v in zip(cols, r):
                         setattr(o, k, v)
-                    av = json.loads(r[-1]) if r[-1] else {}
-                    o.tipos = av.get("tipos") or []
-                    o.tipo_oferta = analise.tipo_oferta(o.tipos)
-                    o.selo = "selo" in o.tipos
-                    for k in ("selo_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio"):
-                        setattr(o, k, av.get(k))
+                    _aplicar_aval(o, r[-1])
                     novas.append(o)
                 _STEAM.update(itens=novas, sig=sig)
             if _STEAM["rel_sig"] is not itens_lista:   # o cache da lista foi refeito: relacao pode ter mudado
@@ -338,7 +345,9 @@ ORDEM = {"nome": lambda o: (o["nome"] or "").lower(), "corte": lambda o: o["cort
          "nota": lambda o: o["rpos"] if o["rcount"] else None, "analises": lambda o: o["rcount"] or None,
          "lancamento": lambda o: o["lancamento"], "fim": lambda o: o["fim"], "inicio": lambda o: o["inicio"]}
 CAMPOS_Q = {"fonte", "busca", "relacao", "qualquer_um", "mostrar_so", "tipo", "outros", "preco_de", "preco_ate", "analises_de",
-            "analises_ate", "nota_min", "desconto_min", "lanc_de", "lanc_ate", "em_breve", "ordem", "pagina", "por_pagina"}
+            "analises_ate", "nota_min", "desconto_min", "lanc_de", "lanc_ate", "em_breve", "ordem", "pagina", "por_pagina",
+            "adulto"}
+ADULTO = ("ocultar", "mostrar", "so")   # +18 da Steam inteira: oculto quando o campo nao vem
 
 
 def _ler_q(qs):
@@ -394,6 +403,8 @@ def _ler_q(qs):
             raise PedidoInvalido("%s deve ser true ou false" % campo)
     if q.get("fonte", "lista") not in ("lista", "steam"):
         raise PedidoInvalido("fonte aceita só lista ou steam")
+    if q.get("adulto", "ocultar") not in ADULTO:
+        raise PedidoInvalido("adulto aceita só: %s" % ", ".join(ADULTO))
     busca = q.get("busca") or ""
     if not isinstance(busca, str):
         raise PedidoInvalido("busca deve ser texto")
@@ -404,7 +415,7 @@ def _ler_q(qs):
                        ("rcount", numero("analises_de"), numero("analises_ate")),
                        ("nota", numero("nota_min"), None), ("corte", numero("desconto_min"), None),
                        ("lancamento", data("lanc_de"), data("lanc_ate"))],
-            "em_breve": bool(q.get("em_breve")), "ordem": ordem, "pagina": pagina, "por_pagina": pp}
+            "em_breve": bool(q.get("em_breve")), "adulto": q.get("adulto", "ocultar"), "ordem": ordem, "pagina": pagina, "por_pagina": pp}
 
 
 def _filtros(f):
@@ -434,6 +445,9 @@ def _filtros(f):
         out["faixa_" + campo] = faixa
     if f["em_breve"]:
         out["em_breve"] = lambda o: bool(o["em_breve"])
+    if f["adulto"] != "mostrar":
+        so = f["adulto"] == "so"
+        out["adulto"] = lambda o: bool(o["adulto"]) == so
     return out
 
 
@@ -477,7 +491,7 @@ def api_promocoes(qs):
 
 
 def api_vitrine(_q):
-    """Prateleiras da aba "Vale a pena": um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
+    """Prateleiras de Ofertas → Destaques (antiga "Vale a pena"): um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
     qualquer corte (o selo_corte_minimo ja esta nele); os outros blocos so com corte >= desconto_minimo."""
     itens, cfg, _conta = linhas_promocoes()
     al = cfg["alerta"]
@@ -516,6 +530,11 @@ def api_jogo(q):
     cfg = config.carregar()
     b = Banco()
     ctx = analise.Contexto(b, cfg)
+    if a not in ctx.lista and b.um("SELECT 1 FROM steam_promo WHERE appid=?", a):
+        try:
+            return _jogo_steam(b, cfg, ctx, a)
+        finally:
+            b.con.close()
     j = ctx.jogos.get(a) or {}
     hist = {}
     for r in b.q("SELECT loja, preco, quando FROM preco WHERE appid=? ORDER BY quando", a):
@@ -572,6 +591,71 @@ def api_jogo(q):
          "na_lista": a in ctx.lista}
     b.con.close()
     return r
+
+
+def _jogo_steam(b, cfg, ctx, a):
+    """Ficha de um item da Steam inteira (fora da lista): o historico das lojas marcadas pela ITAD, baixado na hora
+    se faltar (steam_inteira.historico_um), e a mesma avaliacao da lista. Das outras lojas so o menor (sem o preco
+    de agora); sem DLCs, bundles e keyshop (isso vem ao monitorar o jogo)."""
+    from . import credenciais, steam_inteira
+    try:
+        aviso = steam_inteira.historico_um(b, cfg, credenciais.ler("itad"), a, log=lambda *_: None)
+    except Exception as e:   # ex.: banco ocupado pela coleta; a ficha abre com o historico que ja tem
+        b.con.rollback()
+        _log_erro("ficha da Steam inteira", e)
+        aviso = "o histórico não pôde ser gravado agora (%s); tente de novo em alguns minutos" % e
+    sp = dict(b.um("SELECT * FROM steam_promo WHERE appid=?", a))
+    with _TRAVA_STEAM:   # a linha da tabela ja mostra o Selo/recorde novo, sem esperar a proxima coleta
+        for o in _STEAM["itens"]:
+            if o.appid == a:
+                _aplicar_aval(o, sp.get("aval"))
+                break
+    nomes = set((b.meta("promo_lojas") or {}).get("nomes") or [])
+    hist, linhas = {}, []
+    for r in b.q("SELECT loja, preco, corte, quando FROM promo_hist WHERE appid=? ORDER BY quando", a):
+        hist.setdefault(r["loja"], []).append([r["quando"], r["preco"]])
+        if r["loja"] in nomes:
+            linhas.append(dict(r))
+    if "Steam" not in hist:
+        hist["Steam"] = [[sp["visto"], sp["preco"]]]
+    marc = _marcadas(cfg)
+    lojas = []
+    for l, pts in hist.items():
+        vals = [p for _q, p in pts if p]
+        lojas.append({"loja": l, "atual": None, "cheio": None, "corte": None, "url": None, "menor": min(vals) if vals else None,
+                      "marcada": l.lower() in marc, "vende": False, "sem_atual": True})
+    st = next(x for x in lojas if x["loja"] == "Steam")
+    st.update(atual=sp["preco"], cheio=sp["cheio"], corte=sp["corte"], vende=True, sem_atual=False,
+              url="https://store.steampowered.com/app/%d/" % a, menor=min(st["menor"] or sp["preco"], sp["preco"]))
+    lojas.sort(key=lambda x: (not x["marcada"], not x["vende"], x["loja"]))
+    try:
+        an = analise.analisar(linhas, sp["preco"], sp["corte"], cfg_alerta=cfg["alerta"])
+    except Exception as e:   # dado estranho no historico: ficha sem avaliacao, como no retrato (steam_inteira._aval)
+        _log_erro("ficha da Steam inteira (avaliacao)", e)
+        an = analise.analisar([], sp["preco"], sp["corte"], cfg_alerta=cfg["alerta"])
+        aviso = aviso or "o histórico desta oferta veio com dados estranhos"
+    tipos = analise.tipos_de(an)
+    volta, _ordem = analise.costuma_voltar(an, sp["corte"])
+    ps = Banco._pisos_de(linhas, (90, 180, 270, 365)) if linhas else {}
+    tenho = a in ctx.possuidos or bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a))
+    return {"jogo": {"appid": a, "nome": sp["nome"], "tipo": sp["tipo"], "capa": sp["capa"], "rpos": sp["rpos"],
+                     "rcount": sp["rcount"], "rotulo": sp["rotulo"], "lancamento": sp["lancamento"], "preco_steam": sp["preco"],
+                     "cheio_steam": sp["cheio"], "desconto_steam": sp["corte"], "pai": None},
+            "historico": hist, "lojas": lojas, "dlcs": [], "dlcs_estado": None, "caminhos": [], "combo": None,
+            "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"], "selo_motivo": an["selo_motivo"],
+            "no_piso": an["no_piso"], "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
+            "score": an["score"], "tipos": tipos, "tipo_oferta": analise.tipo_oferta(tipos), "volta_texto": volta,
+            "volta_dica": analise.dica_volta(an, sp["corte"]), "regua_steam": None, "fim": sp["fim"], "corte": sp["corte"],
+            "gg": None, "modo": "base", "classes": dlcmod.CLASSES, "tenho": tenho,
+            "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
+            "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a)), "na_lista": False,
+            "steam_inteira": True, "aviso_hist": aviso, "adulto": bool(sp.get("adulto")),
+            # o que a ficha da lista le da linha da tabela (IDX): melhor preco, pisos e marcas
+            "item": {"appid": a, "preco": sp["preco"], "loja": "Steam", "corte": sp["corte"], "fim": sp["fim"],
+                     "piso": ps.get(0), "piso_geral": None, "selo": an["selo"], "selo_motivo": an["selo_motivo"],
+                     "tipo_oferta": analise.tipo_oferta(tipos), "piso_ref": an["piso_ref"], "piso_tipo": an["piso_tipo"],
+                     "pisos": {"3m": ps.get(90), "6m": ps.get(180), "9m": ps.get(270), "1a": ps.get(365), "sempre": ps.get(0)}
+                     if ps else None}}
 
 
 def _ler_carrinho():
