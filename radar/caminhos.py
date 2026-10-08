@@ -23,6 +23,7 @@ ARQ_LOG = os.path.join(DADOS, "radar.log")
 ARQ_RELATORIO = os.path.join(DADOS, "alertas.html")
 ARQ_ICONE = os.path.join(DADOS, "icone.png")
 ARQ_CARRINHO = os.path.join(DADOS, "carrinho.json")
+PASTA_EXTENSAO = os.path.join(BASE, "extensao")   # extensao do navegador (carrinho da Steam); o instalador copia
 ANTIGA = r"C:\Kurokami Radar"
 
 

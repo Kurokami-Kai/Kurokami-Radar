@@ -54,9 +54,6 @@ button{font-family:inherit}
 .btn-finalizar{display:block;width:100%;margin:10px 0 6px;padding:12px 16px;border:0;border-radius:2px;background:linear-gradient(90deg,var(--go1) 5%,var(--go2) 95%);color:#fff;font:inherit;font-size:16px;letter-spacing:.02em;text-align:center;cursor:pointer;box-shadow:none}
 .btn-finalizar:hover{filter:brightness(1.15)}.btn-finalizar:disabled{filter:grayscale(.6) brightness(.8);cursor:default}.btn-finalizar:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 .cart-head{display:flex;align-items:baseline;gap:12px;margin:6px 0 10px}.cart-head h1{margin:0;font-size:26px;font-weight:300;color:#fff;letter-spacing:.02em}
-#qrPop{position:fixed;top:56px;right:14px;z-index:60;width:210px;background:#171a21;border:1px solid #2f4d64;box-shadow:0 8px 24px rgba(0,0,0,.6);padding:12px;text-align:center}
-#qrPop h4{margin:0 0 6px;color:#fff;font-size:13px;letter-spacing:.04em}#qrPop .qx{position:absolute;top:2px;right:6px;background:none;border:0;color:#8f98a0;font-size:18px;cursor:pointer}
-#qrBox{background:#fff;display:inline-block;padding:6px;margin:8px 0;min-width:150px;min-height:150px}
 #contaSteam{display:inline-flex;align-items:center;gap:6px;margin-left:8px}#contaSteam a{text-decoration:none;display:inline-block}.chip-steam{font-size:12px;color:var(--blue);background:rgba(103,193,245,.12);padding:5px 9px;border-radius:2px}
 
 /* ---------- store subnav ---------- */
@@ -1256,65 +1253,38 @@ async function salvarCfg(){
 /* ================= conta Steam (topo) ================= */
 async function carregarConta(){
   const el=$('#contaSteam');if(!el)return;
-  await carregarContaQR();
   let c;try{c=(await api('/api/config')).config;}catch(e){return;}
   const p=String(c.perfil_steam||''),local=['localhost','127.0.0.1'].includes(location.hostname),id=/^\d{17}$/.test(p);
   const dica='Você confirma na página da própria Steam. O Radar só recebe o seu SteamID: nunca a senha, token ou cookie.';
   el.innerHTML=(p?`<span class="chip-steam" title="Perfil em uso: ${esc(p)}">Steam ${id?'…'+esc(p.slice(-4)):esc(p.replace(/\/+$/,'').split('/').pop().slice(0,16))}</span>`:'')+
-    (local?`<button class="btn-ghost" id="btnQR" type="button" title="Carrinho direto da Steam, sem extensão: leia um QR com o app da Steam">${CQ&&CQ.conectado?'Carrinho ✓':'Conectar carrinho'}</button>`:'')+(local?`<a class="${p?'btn-ghost':'btn-imp'}" href="/kurokami/steam/entrar" title="${esc(dica)}">${p?'Trocar':'Entrar pela Steam'}</a>`:(p?'':'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>'));
-  if($('#btnQR'))$('#btnQR').onclick=alternarPop;
+    (local?`<a class="${p?'btn-ghost':'btn-imp'}" href="/kurokami/steam/entrar" title="${esc(dica)}">${p?'Trocar':'Entrar pela Steam'}</a>`:(p?'':'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>'));
 }
-/* ================= conta Steam por QR: popover no canto (carrinho direto) ================= */
-let CQ=null,POP={timer:null,url:'',aberto:false};
-async function carregarContaQR(){try{CQ=await api('/api/steam/conta');}catch(e){CQ=null;}}
+/* QR (endereço do painel para o celular, em Configurações) */
 function comQR(fn){if(window.QRCode)return fn();const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.integrity='sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU';sc.crossOrigin='anonymous';sc.onload=fn;document.head.appendChild(sc);}
-function fecharPop(){POP.aberto=false;clearInterval(POP.timer);POP.timer=null;const p=$('#qrPop');if(p)p.remove();}
-async function alternarPop(){if(POP.aberto){fecharPop();return;}await abrirPop();}
-async function abrirPop(){
-  await carregarContaQR();fecharPop();POP.aberto=true;POP.url='';
-  const p=document.createElement('div');p.id='qrPop';p.setAttribute('role','dialog');
-  p.innerHTML='<button class="qx" id="qrX" type="button" aria-label="Fechar">×</button><div id="qrCorpo"></div>';
-  document.body.appendChild(p);$('#qrX').onclick=fecharPop;
-  if(CQ&&CQ.conectado){
-    $('#qrCorpo').innerHTML=`<h4>Carrinho direto</h4><div class="hint"><span style="color:#a1cd44">Conectado ✓</span> (conta …${esc(CQ.steamid_final)})<br>A sessão vale mais ${CQ.dias} dia(s).${CQ.vence_em_breve?' <b style="color:#e2a635">Vence em breve:</b> depois é só ler o QR de novo.':''}</div>
-      <button class="btn-ghost" id="qrSair" type="button" style="margin-top:8px">Desconectar</button>`;
-    $('#qrSair').onclick=async()=>{if(!confirm('Desconectar? A sessão é revogada na Steam e apagada deste PC.'))return;const rs=await post('/api/steam/sair');
-      toast(rs.revogado===false?'Desconectado deste PC, mas NÃO consegui revogar na Steam: remova o dispositivo em Steam → Segurança → Dispositivos autorizados.':'Desconectado da Steam (sessão revogada).');fecharPop();carregarConta();};
-    return;
-  }
-  $('#qrCorpo').innerHTML=`<h4>Carrinho direto</h4>${CQ&&CQ.erro?`<div class="hint" style="color:#ff9b8a">${esc(CQ.erro)}</div>`:''}
-    <div class="hint" id="qrMsg">No app da Steam: <b>Steam Guard → Ler QR</b> e aprove.</div><div id="qrBox"></div>
-    <div class="hint" style="font-size:10.5px">O Radar nunca vê a sua senha; guarda só uma chave (~30 dias) no cofre do Windows.</div>`;
-  const desenhar=u=>{if(u===POP.url)return;POP.url=u;comQR(()=>{const b=$('#qrBox');if(!b)return;b.innerHTML='';try{new QRCode(b,{text:u,width:150,height:150});}catch(e){}});};
-  const r=await post('/api/steam/qr/iniciar');
-  if(!POP.aberto)return;
-  if(!r.ok){$('#qrMsg').textContent=r.erro||'Não consegui pedir o QR.';return;}
-  desenhar(r.url);
-  POP.timer=setInterval(async()=>{
-    if(!POP.aberto)return;const c=await post('/api/steam/qr/consultar');if(!POP.aberto)return;
-    if(c.estado==='ok'){fecharPop();toast('Conectado à Steam: carrinho direto liberado.');carregarConta();}
-    else if(c.estado==='expirou'||c.estado==='nenhum'){clearInterval(POP.timer);$('#qrMsg').textContent='O QR expirou (3 min). Clique em "Conectar carrinho" de novo.';}
-    else if(c.estado==='erro'||c.ok===false){clearInterval(POP.timer);$('#qrMsg').textContent=c.erro||'Não deu certo.';}
-    else if(c.url)desenhar(c.url);
-  },3000);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharBusca();});
+/* ---- Finalizar pedido: abre o carrinho da Steam com o pedido no endereço; a extensão do Radar põe os itens lá ---- */
+async function mostrarExtensao(){
+  const nota=$('#finalNota');let ex={};try{ex=await api('/api/extensao');}catch(e){}
+  nota.innerHTML=`<div class="hint" style="text-align:left;font-size:12px;margin-top:8px">Para o <b>Finalizar</b> pôr tudo no carrinho da Steam sozinho, instale a extensão do Radar <b>uma vez</b> (Chrome, Edge, Brave ou Opera):
+    <ol style="margin:6px 0 6px 18px;padding:0"><li>Abra <b>chrome://extensions</b> (no Edge, <b>edge://extensions</b>) numa aba nova.</li>
+    <li>Ligue o <b>Modo do desenvolvedor</b>.</li><li>Clique em <b>Carregar sem compactação</b> e escolha a pasta:<br><code style="user-select:all;word-break:break-all">${esc(ex.pasta||'extensao')}</code></li>
+    <li>Recarregue esta página e clique em Finalizar pedido.</li></ol>
+    <button class="btn-ghost" id="abrirExt" type="button">Abrir a pasta da extensão</button>
+    <div style="font-size:10.5px;margin-top:6px;color:var(--dim)">Ela só age na página do carrinho da Steam e usa a sessão que o navegador já tem: o Radar nunca vê senha, token ou cookie.</div></div>`;
+  $('#abrirExt').onclick=async()=>{const r=await post('/api/steam/extensao');if(!r.ok)toast(r.erro||'Não consegui abrir a pasta.');};
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){fecharPop();fecharBusca();}});
-/* ---- Finalizar pedido: manda o carrinho para a conta Steam e abre o carrinho da loja ---- */
 async function finalizar(){
   if(!CD)return;
-  const stm=CD.itens.filter(c=>!c.possuido).length+CD.bundles.length;
   const nota=$('#finalNota');nota.innerHTML='';
-  if(!stm){toast('O carrinho está vazio.');return;}
-  await carregarContaQR();
-  if(!(CQ&&CQ.conectado)){await abrirPop();toast('Conecte a Steam pelo QR (canto superior direito) e clique em Finalizar pedido de novo.');return;}
+  if(!(CD.itens.filter(c=>!c.possuido).length+CD.bundles.length)){toast('O carrinho está vazio.');return;}
+  if(!document.documentElement.dataset.kurokamiExt){mostrarExtensao();return;}
   const w=window.open('about:blank','_blank');   // abre já, no clique, para o navegador não bloquear
-  const b=$('#btnFinalizar');b.disabled=true;const r=await post('/api/steam/carrinho');b.disabled=false;
-  if(r.erro&&!r.faltaram){if(w)w.close();toast('Erro: '+r.erro);return;}
-  const url='https://store.steampowered.com/cart/';
-  if(w)w.location=url;else nota.innerHTML=`<a class="btn-ghost" href="${url}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir o carrinho da Steam</a>`;
-  const ja=r.ja_estavam?` (${r.ja_estavam} já estava(m) lá e não foi(ram) repetido(s))`:'';
-  const md=(r.modo_diferente||[]).length?` Entraram sem o modo pedido (presente/privado): ${r.modo_diferente.join(', ')}; ajuste no carrinho da Steam.`:'';
-  toast(r.ok?`${r.entraram} item(ns) novo(s) no carrinho da Steam${ja}. Conclua o pagamento lá.`:`${r.entraram} entraram${ja}.${(r.faltaram||[]).length?` Não entraram: ${r.faltaram.join(', ')}.`:''}${md}`);
+  const b=$('#btnFinalizar');b.disabled=true;let r;try{r=await post('/api/steam/carrinho');}finally{b.disabled=false;}
+  if(!r.ok){if(w)w.close();toast('Erro: '+(r.erro||'?'));}
+  else{
+    if(w)w.location=r.url;else nota.innerHTML=`<a class="btn-ghost" href="${esc(r.url)}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir o carrinho da Steam</a>`;
+    toast(`${r.n} item(ns) a caminho do carrinho da Steam: a extensão do Radar adiciona na aba que abriu. Conclua o pagamento lá.`);
+  }
   if((r.sem_pacote||[]).length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#e2a635;font-size:11.5px">Sem pacote conhecido (abra a página): ${r.sem_pacote.map(esc).join(', ')}</div>`);
 }
 

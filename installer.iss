@@ -35,6 +35,8 @@ Name: "desktopicon"; Description: "Criar atalho na área de trabalho"; Flags: un
 
 [Files]
 Source: "dist\KurokamiRadar\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
+; extensao do navegador (carrinho da Steam): o usuario a carrega uma vez em chrome://extensions
+Source: "extensao\*"; DestDir: "{app}\extensao"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
 Name: "{group}\Kurokami Radar"; Filename: "{app}\KurokamiRadar.exe"; Parameters: "bandeja --abrir"

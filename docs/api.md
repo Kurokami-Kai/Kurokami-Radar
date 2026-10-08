@@ -28,7 +28,7 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | `/api/alertas` | último resultado de `avaliar` (`quando, itens[], novos[]`) |
 | `/api/notificacoes` | `itens[]` da tabela `alerta` (200 mais recentes) |
 | `/api/config` | `config, lojas_itad[], classes` |
-| `/api/steam/conta` | `{conectado, steamid_final (4 dígitos), dias, vence_em_breve, erro?}`; nunca devolve token |
+| `/api/extensao` | `{pasta, existe}`: onde está a extensão do navegador (para o passo a passo do painel) |
 | `/api/carrinho` | `itens[]` (só a Steam: `lojas[]` tem 1 oferta; `modo`; `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `sem_pacote[]` |
 | `/api/buscar?q=` | busca na loja (nome, appid ou link) → `itens[{appid,nome,capa,preco,corte,tipo,na_lista,possuido}]` |
 | `/api/biblioteca` | `jogos[]` (valor, DLCs que contam, faltantes com preço/menor, bundles), `total{hoje,cheio,menor,falta_*}`, `franquias[]` (séries), `sem_lista_dlc, sem_dados, atualizado, falta_ids`, `dlcs_promo[]` (DLCs que contam, que você não tem, de jogos que você tem, com desconto agora: `appid, nome, capa, pai, pai_nome, preco, cheio, corte, loja, so_steam` (preço só do catálogo da Steam), `fim, tipo_oferta, piso_ref`) |
@@ -52,8 +52,6 @@ Todo POST bem-sucedido invalida o cache das linhas de Promoções (refeito na pr
 | `/api/silenciar` | `{appid, mudo}` | sem notificações para o jogo |
 | `/api/acesso` | `{rede_local?, novo_codigo?}` | liga/desliga rede local (reinicia o servidor), troca o PIN |
 | `/api/atualizar_app` | — | abre a janela de atualização |
-| `/api/steam/qr/iniciar` | — | **só o próprio PC.** Pede um QR à Steam (`BeginAuthSessionViaQR`, `platform_type=3`); devolve `{ok, url}` (o painel desenha) |
-| `/api/steam/qr/consultar` | — | **só o próprio PC.** Um Poll: `{estado: aguardando\|ok\|expirou\|nenhum\|erro, url?, erro?}`; em `ok` o refresh token vai para o cofre do Windows. Recusa conta diferente do `perfil_steam` |
-| `/api/steam/carrinho` | — | **só o próprio PC.** Manda os itens da Steam do carrinho (pacote/bundle) para o carrinho da conta (`AddItemsToCart`) e confere lendo de volta: `{ok, entraram (novos), ja_estavam, faltaram[], sem_pacote[]}`. Só adiciona o que ainda não está no carrinho, em qualquer modo (clicar de novo ou ter o item lá não duplica); manda `flags` `is_gift`/`is_private` conforme o `modo` e confere de volta (`modo_diferente[]` se a Steam não aceitou o modo); nunca remove |
-| `/api/steam/sair` | — | **só o próprio PC.** Revoga a sessão na Steam e apaga do cofre |
+| `/api/steam/carrinho` | — | **só o próprio PC.** Monta o pedido para a extensão: `{ok, n, url, sem_pacote[]}`, com `url = https://store.steampowered.com/cart/#kurokami=PAIS:p<subid>[-presente\|-privado],b<bundleid>[-modo]` (sem repetidos). Descobre na hora o pacote que falta. Não fala com a conta: quem adiciona é a extensão |
+| `/api/steam/extensao` | — | **só o próprio PC.** Abre a pasta da extensão no Explorador: `{ok, pasta}` |
 | `/api/sair` | — | fecha o Radar (usado pelo instalador .bat) |

@@ -35,7 +35,7 @@ As chaves ficam guardadas no **Gerenciador de Credenciais do Windows** (nunca nu
 
 **Ou entre pela Steam** (como no ITAD ou na SteamDB): no painel, botão *Entrar pela Steam* no canto superior direito (em qualquer aba). Você confirma na página da própria Steam e o Radar só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel no próprio PC.
 
-**Carrinho direto (opcional):** botão *Conectar carrinho* no canto superior direito (leia o QR com o app da Steam e aprove). Depois, *Finalizar pedido* manda o carrinho para a sua conta e abre o carrinho da Steam, sem extensão nenhuma. A sessão fica no cofre do Windows e vale ~30 dias; *Desconectar* revoga na Steam.
+**Carrinho direto (extensão do Radar):** na aba Carrinho, *Finalizar pedido* abre o carrinho da Steam e a extensão do Radar põe os jogos lá sozinha, com a sessão que o seu navegador já tem (o Radar nunca vê senha, token ou cookie). Instale a extensão uma vez (Chrome, Edge, Brave ou Opera): abra `chrome://extensions` (no Edge, `edge://extensions`), ligue o *Modo do desenvolvedor*, clique em *Carregar sem compactação* e escolha a pasta `extensao` da instalação do Radar (o botão *Abrir a pasta da extensão*, que aparece no Finalizar pedido, abre essa pasta). Ela só age na página do carrinho da Steam e só adiciona: nunca tira nada.
 
 **A lista de desejos precisa estar pública.** Na Steam: *Perfil → Editar perfil → Configurações de privacidade → Detalhes dos jogos = Público*. Se estiver privada, a janela avisa "a lista de desejos veio vazia".
 

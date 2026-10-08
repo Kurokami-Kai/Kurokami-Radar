@@ -90,10 +90,22 @@ r = subprocess.run([sys.executable, os.path.join("tools", "testar_openid.py")], 
 if r.returncode:
     falhas += [l for l in r.stdout.splitlines() if l.startswith("FALHA")] or ["testar_openid: %s" % (r.stderr.strip()[-160:] or "?")]
 
-# 9. sessao Steam por QR (cofre e Steam simulados)
-r = subprocess.run([sys.executable, os.path.join("tools", "testar_sessao.py")], capture_output=True, text=True, encoding="utf-8")
-if r.returncode:
-    falhas += [l for l in r.stdout.splitlines() if l.startswith("FALHA")] or ["testar_sessao: %s" % (r.stderr.strip()[-160:] or "?")]
+# 9. extensao do navegador (carrinho da Steam): manifest valido, arquivos citados existem, JS ok, vai no instalador
+import json  # noqa: E402
+try:
+    man = json.load(open("extensao/manifest.json", encoding="utf-8"))
+    js_ext = [man["background"]["service_worker"]] + [j for c in man["content_scripts"] for j in c["js"]]
+    for j in js_ext:
+        if not os.path.isfile(os.path.join("extensao", j)):
+            falhas.append("extensao: %s citado no manifest nao existe" % j)
+        elif node:
+            r = subprocess.run([node, "--check", os.path.join("extensao", j)], capture_output=True, text=True, encoding="utf-8")
+            if r.returncode:
+                falhas.append("JS extensao/%s: %s" % (j, (r.stderr.strip().splitlines() or ["?"])[-1][:160]))
+except (OSError, ValueError, KeyError) as e:
+    falhas.append("extensao/manifest.json invalido: %s" % e)
+if "extensao\\*" not in open("installer.iss", encoding="utf-8-sig").read():
+    falhas.append("installer.iss nao copia a pasta extensao")
 
 print("versao %s" % v)
 for a in avisos:
@@ -103,4 +115,4 @@ if falhas:
     for f in falhas:
         print("  - " + f)
     sys.exit(1)
-print("ok: sintaxe, JS, versao, --add-data, dados pessoais, .gitignore, testar_piso, testar_openid e testar_sessao")
+print("ok: sintaxe, JS, versao, --add-data, dados pessoais, .gitignore, testar_piso, testar_openid e extensao")

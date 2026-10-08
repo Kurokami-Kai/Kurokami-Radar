@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-08 — QR trocado pela extensão do Radar
+- **Heredoc de novo quebrou aspas** num script de edição: edite o `.py` do scratchpad com a ferramenta Edit em vez de remendar via Bash.
+- **`troca` com texto que aparece duas vezes** (`await carregarContaQR();` estava no topo e no Finalizar): inclua a linha de cima no trecho para ele ficar único.
+- **A estrutura da página da Steam dá para conferir sem login** no navegador do app (`#application_config` → `store_user_config.webapi_token` vazio). Já adicionar ao carrinho pela extensão só o dono testa, com a conta dele.
+
 ## 2026-10-07 — busca do carrinho ao lado do resumo
 - **O `painel_copia.py` velho na 8799 continuava vivo** e o modo automático não deixa encerrar processo de outra sessão: suba a cópia em outra porta (`--porta 8801`) em vez de tentar matar.
 

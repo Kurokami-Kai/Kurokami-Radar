@@ -76,7 +76,7 @@ Linha de base na primeira vez (não dispara nada em massa) → ao **ligar um tip
 
 ## Conta Steam (opcional)
 
-Dois níveis, ambos opcionais. **Entrar pela Steam** (`steam_openid.py`, OpenID 2.0): só o SteamID, gravado em `perfil_steam`. **QR** (`steam_sessao.py`): o botão "Conectar carrinho" no topo mostra um popover com o QR (a Steam o troca a cada ~20 s); o refresh token (~30 dias) vai para o cofre do Windows e o access token fica em memória, renovado sozinho. Com a sessão, **Finalizar pedido** (aba Carrinho) manda os itens da Steam para o carrinho da conta (`IAccountCartService/AddItemsToCart`), confere lendo de volta e abre `store.steampowered.com/cart/`. Só adiciona, nunca remove. Ver `docs/decisoes.md`, "Login Steam". Não há mais userscript (a ponte do Tampermonkey foi removida).
+**Entrar pela Steam** (`steam_openid.py`, OpenID 2.0, opcional): só o SteamID, gravado em `perfil_steam`. **Finalizar pedido** (aba Carrinho): `POST /api/steam/carrinho` devolve o endereço `store.steampowered.com/cart/#kurokami=…` com os pacotes/bundles e modos; o painel o abre numa aba e a extensão do Radar (`extensao/`: `carrinho.js` na página do carrinho, `fundo.js` faz as chamadas a `IAccountCartService`, `painel.js` só marca `data-kurokami-ext` no painel) põe os itens com a sessão da própria página, confere e recarrega. Sem a extensão, o painel mostra como carregá-la ("Carregar sem compactação"). Ver `docs/decisoes.md`, "Login Steam".
 
 ## Distribuição
 

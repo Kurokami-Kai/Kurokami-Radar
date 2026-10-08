@@ -956,68 +956,68 @@ def post_pausar(_d):
     return {"ok": True, "pausado": bool(v)}
 
 
-# ------------------------------------------------------------------ conta Steam por QR (opcional; spec 06, nivel 2)
-def api_steam_conta(_q):
-    from . import steam_sessao
-    return steam_sessao.estado()
-
-
-def _sessao(f):
-    from . import steam_sessao
-    try:
-        return f(steam_sessao)
-    except steam_sessao.SessaoErro as e:
-        return {"ok": False, "erro": str(e)}
-
-
-def post_steam_qr_iniciar(_d):
-    return _sessao(lambda s: {"ok": True, "url": s.iniciar_qr()})
-
-
-def post_steam_qr_consultar(_d):
-    return _sessao(lambda s: s.consultar_qr())
-
-
-def post_steam_sair(_d):
-    return _sessao(lambda s: s.sair())
-
-
+# ------------------------------------------------------------------ carrinho da Steam pela extensao do navegador
 def post_steam_carrinho(_d):
-    """Manda o carrinho do Radar (itens da Steam) direto para o carrinho da conta e confere lendo de volta."""
+    """Monta o endereco do carrinho da Steam com o pedido (#kurokami=PAIS:p<subid>[-modo],b<bundleid>[-modo]).
+    Quem poe no carrinho e a extensao do Radar (pasta extensao/), com a sessao da propria pagina da Steam:
+    o Radar nao ve token, cookie nem senha."""
     itens = _itens_para_steam()
-    nomes = {}
-    pacotes, bundles, sem = [], [], []
+    partes, sem = [], []
     for i in itens:
+        m = "" if i["modo"] == "conta" else "-" + i["modo"]
         if i.get("tipo") == "bundle" and i.get("bundleid"):
-            bundles.append((i["bundleid"], i["modo"]))
-            nomes[("bundle", i["bundleid"])] = i.get("nome")
+            partes.append("b%d%s" % (i["bundleid"], m))
         elif i.get("subid"):
-            pacotes.append((i["subid"], i["modo"]))
-            nomes[("pacote", i["subid"])] = i.get("nome")
+            partes.append("p%d%s" % (int(i["subid"]), m))
         else:
             sem.append(i.get("nome") or str(i.get("appid")))
-    if not pacotes and not bundles:
+    if not partes:
         return {"ok": False, "erro": "Nada para enviar: o carrinho não tem item da Steam com pacote conhecido.", "sem_pacote": sem}
-    r = _sessao(lambda s: s.carrinho_adicionar(pacotes, bundles))
-    if "faltaram" in r:
-        r["faltaram"] = [nomes.get(tuple(x)) or str(x[1]) for x in r["faltaram"]]
-        r["modo_diferente"] = [nomes.get(tuple(x)) or str(x[1]) for x in r.get("modo_diferente") or []]
-        r["entraram"] = len(r["entraram"])
-        r["sem_pacote"] = sem
-    return r
+    pais = str(config.carregar().get("pais") or "BR").upper()
+    return {"ok": True, "n": len(partes), "sem_pacote": sem,
+            "url": "https://store.steampowered.com/cart/#kurokami=%s:%s" % (pais, ",".join(dict.fromkeys(partes)))}
+
+
+def api_extensao(_q):
+    return {"pasta": caminhos.PASTA_EXTENSAO, "existe": os.path.isfile(os.path.join(caminhos.PASTA_EXTENSAO, "manifest.json"))}
+
+
+def post_steam_extensao(_d):
+    """Abre a pasta da extensao no Explorador (para o "Carregar sem compactacao" do navegador)."""
+    if not os.path.isdir(caminhos.PASTA_EXTENSAO):
+        return {"ok": False, "erro": "Pasta da extensão não encontrada: reinstale o Radar."}
+    os.startfile(caminhos.PASTA_EXTENSAO)
+    return {"ok": True, "pasta": caminhos.PASTA_EXTENSAO}
+
+
+def _limpar_sessao_qr():
+    """O login por QR saiu na 0.16 (a Steam o tratava como celular novo). Quem tinha a sessao no cofre:
+    revoga na Steam e apaga, uma vez. Falha de rede: tenta de novo na proxima abertura."""
+    from . import credenciais
+    from .rede import http_json
+    refresh = credenciais.ler("steam_refresh")
+    if not refresh:
+        return
+    try:
+        http_json("https://api.steampowered.com/IAuthenticationService/RevokeToken/v1/", tentativas=2,
+                  form={"input_json": json.dumps({"token": refresh, "revoke_action": 1})})
+    except Exception as e:   # so o tipo do erro: nada que possa carregar o token
+        import logging
+        logging.getLogger("radar").warning("Painel: nao revoguei a sessao QR antiga (%s); tento na proxima abertura", type(e).__name__)
+        return
+    credenciais.gravar("steam_refresh", "")
 
 
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
-       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/steam/conta": api_steam_conta}
+       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/extensao": api_extensao}
 POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,
         "/api/atualizar_app": post_atualizar_app,
-        "/api/steam/qr/iniciar": post_steam_qr_iniciar, "/api/steam/qr/consultar": post_steam_qr_consultar,
-        "/api/steam/sair": post_steam_sair, "/api/steam/carrinho": post_steam_carrinho}
+        "/api/steam/carrinho": post_steam_carrinho, "/api/steam/extensao": post_steam_extensao}
 
 
 def _log_erro(rota, e):
@@ -1233,6 +1233,7 @@ def iniciar(abrir=False):
     srv.daemon_threads = True
     CONTROLE["srv"] = srv
     threading.Thread(target=srv.serve_forever, daemon=True).start()
+    threading.Thread(target=_limpar_sessao_qr, daemon=True).start()
     if abrir:
         webbrowser.open(url())
     return srv
