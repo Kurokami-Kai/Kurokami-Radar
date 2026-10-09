@@ -93,6 +93,7 @@ Leia antes de mexer em coleta, preços ou avaliação: cada item abaixo já foi 
 
 ## Produto (preferências do usuário)
 - Visual da **loja Steam** (cores Valve, caixas de preço com desconto verde, hover estilo Steam).
+- **Ficha do jogo = amostra B+ (08/10):** `docs/specs/09-amostras-ficha.html` é a referência visual (capa vertical, logo, fundo de captura de tela escurecida, 5 números, franquia com setas sem barra de rolagem, duas colunas). A mesma ficha em todo o painel.
 - **+18 oculto por padrão (08/10, pedido do dono: "só sujam a lista"):** pela classificação da própria Steam (descritores 3 = só adultos e 4 = nudez/sexo frequentes, os que a loja esconde), não por etiqueta. Filtro Ocultar/Mostrar/Só +18; só vale para a Steam inteira: o que está na sua lista nunca some.
 - **Ficha também fora da lista (08/10, pedido do dono):** ao clicar, o histórico das lojas marcadas vem na hora (1–2 chamadas à ITAD, `tentativas=1`: se a cota estourou, a ficha abre e diz por quê). Das outras lojas só o menor (sem preço de agora: isso exigiria a coleta da lista); para alertas e todas as lojas, Monitorar.
 - **Biblioteca não zera quando a API falha (08/10):** sem `userdata.json`, um 401 da Steam deixava a biblioteca com 0 itens e tudo que o dono tinha voltava às Promoções (Until Then). Agora fica a anterior e o painel mostra uma faixa até a chave voltar.

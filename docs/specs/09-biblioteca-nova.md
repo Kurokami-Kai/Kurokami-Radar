@@ -1,6 +1,11 @@
 # Spec 09 — Biblioteca nova: Coleção por franquias, ficha estilo PlayStation
 
-Status: **em discussão** (rascunho de 08/10, respostas do dono na mesma noite; absorve a [spec 03](03-franquias-com-capas.md)) · Skills: `editar-painel`, `coleta-e-apis`, `testar-sem-rede`
+Status: **Etapa 1 pronta para implementar** (ficha decidida em 08/10); Etapas 2 e 3 ainda em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
+
+## Etapas
+1. **Ficha nova (decidida: B+ com fundo de captura de tela).** **A referência visual é a amostra B+ de [09-amostras-ficha.html](09-amostras-ficha.html)** (dono: "ficou perfeito"): siga o layout, as medidas e os blocos dela. Inclui: a mesma ficha em Ofertas, Promoções e Biblioteca; arte da biblioteca (`logo.png`, capa vertical do `capa_v`) e captura de tela de fundo (`appdetails.screenshots`, cache); fileira de 5 números; fileira da franquia com setas (só com os jogos que o Radar já conhece: biblioteca e lista); duas colunas (veredito/pisos/histórico | preço por loja, HLTB, crítica, informações); HLTB, jogadores e notas pelo Augmented Steam (servidor, cache de 30 dias, sem chamar em lote); tempo jogado e última vez pelo `GetOwnedGames` (`include_appinfo`/`playtime_forever`, `rtime_last_played`); "trocar" franquia à mão. Conquistas (`GetPlayerAchievements`) podem ficar para o fim da etapa, se pesar.
+2. **Biblioteca: Coleção, Franquias e Completar** com os modos Capas e Texto; DLCs em promoção sai. Precisa de amostras antes (como as da ficha).
+3. **Franquia inteira** (jogos que não estão na biblioteca nem na lista, em preto e branco): medir a fonte antes. · Skills: `editar-painel`, `coleta-e-apis`, `testar-sem-rede`
 
 ## Pedido (dono, 08/10)
 - A aba está mal disposta. Hoje: **Completar · Franquias · Coleção · DLCs em promoção** (botões no topo da aba).
@@ -21,7 +26,7 @@ Status: **em discussão** (rascunho de 08/10, respostas do dono na mesma noite; 
 - **A mesma ficha abre em Ofertas, Promoções e Biblioteca**; só mudam os blocos (não tenho: preço, piso, costuma voltar, carrinho; tenho: tempo jogado, última vez, conquistas, DLCs). **HLTB em todos os jogos.**
 - **Sem espaço vazio embaixo da imagem** (reclamação sobre a ficha de hoje): usar a arte da biblioteca da Steam, que existe por appid sem chamada extra: `library_hero.jpg` (1920×620), `logo.png` (fundo transparente) e `library_600x900_2x.jpg` (capa vertical), em `shared.fastly.steamstatic.com/store_item_assets/steam/apps/<appid>/` (conferido em 7 jogos, inclusive os de caminho com hash). Falta o que fazer quando não houver hero/logo (cair para `header.jpg` e o nome em texto).
 - **HLTB do Augmented Steam vem em minutos** (FF VII Remake: 1935 = 32 h, como no site). A API responde com CORS aberto, mas buscar pelo servidor com cache.
-- **Três amostras para escolher:** [09-amostras-ficha.html](09-amostras-ficha.html) (abre no navegador; A = biblioteca da Steam, banner largo e coluna lateral; B = PlayStation, capa vertical e fundo do banner, sequências logo abaixo e abas; C = cartões, faixa curta do banner e blocos em grade). Cada uma nos dois estados.
+- **Três amostras para escolher:** [09-amostras-ficha.html](09-amostras-ficha.html) (abre no navegador; A = biblioteca da Steam, banner largo e coluna lateral; B = PlayStation, capa vertical e fundo do banner, sequências logo abaixo e abas; C = cartões, faixa curta do banner e blocos em grade). Cada uma nos dois estados. **Escolhida: B+ com fundo de captura de tela** (a "cor da capa" fica só como reserva quando o jogo não tiver captura).
 
 ## Escolha da base (08/10, noite): B aprimorada ("B+" nas amostras)
 - Dono: gostou da B (PlayStation), mas (1) a imagem repetida atrás é ruim, porque o banner é a mesma arte da capa; (2) a barra de rolagem da fileira da franquia é feia; (3) as informações ficavam menos práticas que na A.
@@ -61,7 +66,7 @@ Status: **em discussão** (rascunho de 08/10, respostas do dono na mesma noite; 
 
 ## Perguntas em aberto
 - "Platinar": vale 100% das conquistas da Steam (`GetPlayerAchievements`), além do "Completacionista" do HLTB?
-- Ver antes um esboço visual dos dois modos (blocos de texto × capas) e da ficha, para decidir o layout?
+- Etapa 2: esboço dos dois modos (blocos de texto × capas) antes de programar.
 
 ## Aceite (a fechar depois da discussão)
 - Coleção abre por padrão, por franquia, com capas; alterna Capas/Texto e lembra a escolha.

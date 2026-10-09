@@ -1,7 +1,7 @@
 # Pendências e ideias
 
 ## Especificações prontas para implementar
-- [09 — Biblioteca nova: Coleção por franquias com capas, modo texto, ficha estilo PlayStation](specs/09-biblioteca-nova.md) — **em discussão**; absorve a 03
+- [09 — Biblioteca nova: Coleção por franquias com capas, modo texto, ficha estilo PlayStation](specs/09-biblioteca-nova.md) — **Etapa 1 (ficha nova, B+) pronta para implementar**; Etapas 2 e 3 em discussão; absorve a 03
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md) (entra na 09)
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
 - [07 — Promoções da Steam inteira](specs/07-steam-inteira.md): implementada em 08/10 e revisada na mesma noite (recordes e histórico também fora da lista, menus no topo, sem botão de fonte); falta o teste do dono antes de publicar. Ideia original: Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".
