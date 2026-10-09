@@ -32,3 +32,4 @@ description: Como editar o painel web do Kurokami Hunter (radar/painel.html + CS
 ## Testar
 - `py tools/checar.py` (valida o JS).
 - Visual: `py radar.py painel` e abrir `http://127.0.0.1/kurokami`; olhe o console do navegador.
+- **Confira pelo DOM, não por print:** `read_page`/`get_page_text` para texto e estrutura, `javascript_tool` com `getComputedStyle`/`getBoundingClientRect` para cor, tamanho e alinhamento (um laço cobre várias abas de uma vez). Print só no fim, um por mudança, com `scale: 0.5`.

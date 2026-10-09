@@ -14,8 +14,8 @@ Regra de ouro (de `verification-before-completion`, obra/superpowers, se instala
    - leitura de "preço atual" fora de `oferta_atual`;
    - caminhos fixos que quebram no `.exe` (use `radar/caminhos.py`).
 3. Arquivo novo lido pelo `.exe` → `--add-data` (o checar acusa).
-4. Função pública nova/alterada → `py tools/gerar_referencia.py`.
-5. Comportamento mudou para o usuário → `README.md`. Mudou rota/dado/arquitetura → doc em `docs/`. Pegadinha nova → `docs/decisoes.md`.
+4. `docs/referencia.md` só se regenera ao publicar versão (skill `publicar-versao`).
+5. **Ajuste só visual** (cor, espaçamento, posição, texto): só uma linha na seção de cima de `docs/novidades.md`; pule o resto deste passo e o revisor. Comportamento mudou para o usuário → `README.md`. Mudou rota/dado/arquitetura → doc em `docs/`. Pegadinha nova → `docs/decisoes.md`.
 6. Com o `checar` em `ok` → commit e push **sem perguntar** (ver `CLAUDE.md`). Só pergunte antes de `reset`, `rebase`, `push --force` ou de apagar arquivos fora do projeto.
 7. Vai virar release? → skill `publicar-versao`.
 8. Resposta final ao usuário (curta):

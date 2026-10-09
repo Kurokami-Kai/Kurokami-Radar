@@ -7,15 +7,15 @@ App local de Windows (Python 3.12) que monitora a lista de desejos da Steam em v
 Leia só o que a tarefa pede, nesta ordem de utilidade:
 
 - Leitura e testes: subagente explorador; revisão de diff: revisor; painel só por função (tools/mapa.py radar/painel-web); regras em .claude/skills/economia-de-contexto.
-- `docs/aprendizados.md` — leia no início de toda tarefa; atualize no fim.
-- `docs/decisoes.md` — **sempre leia antes de mexer em coleta, preços, avaliação ou instalador.** Lista armadilhas que já foram bugs reais (preço "atual", fusos, pacote base, GG.deals, versão da página etc.) e as preferências de produto.
+- `docs/aprendizados.md` — curto (até 40 linhas); leia no início de tarefa de código. Só acrescente uma linha quando achar uma armadilha que vai se repetir.
+- `docs/decisoes.md` — **antes de mexer em coleta, preços, avaliação ou instalador, leia a seção da tarefa** (`grep -n '^## ' docs/decisoes.md` e só o intervalo; nunca o arquivo inteiro). Lista armadilhas que já foram bugs reais (preço "atual", fusos, pacote base, GG.deals, versão da página etc.) e as preferências de produto.
 - `docs/estrutura.md` — o que cada arquivo e pasta contém e onde ficam os dados. Consulte para achar onde ler, editar ou criar algo.
 - `docs/arquitetura.md` — como as peças conversam: threads, ciclo de coleta, fontes de dados e seus limites, avaliação, notificação, painel, carrinho pela extensão do navegador, distribuição e atualização.
 - `docs/api.md` — rotas HTTP do painel (GET/POST), campos e regras de acesso. Consulte ao mexer em `painel.py` ou no painel (`painel.html`, `painel-web/`).
 - `docs/dados.md` — tabelas SQLite, chaves de `meta`, `config.json` e onde ficam os segredos.
-- `docs/referencia.md` — assinaturas e docstrings de todas as funções (gerado; rode `py tools/gerar_referencia.py` depois de mudar funções).
+- `docs/referencia.md` — assinaturas e docstrings de todas as funções (gerado; não leia inteiro; regenere com `py tools/gerar_referencia.py` só ao publicar versão).
 - `docs/processo.md` — rodar, testar e publicar versão; convenções de código.
-- `docs/novidades.md` — novidades da próxima versão (texto do release); acrescente ao mudar algo visível.
+- `docs/novidades.md` — novidades da próxima versão (texto do release); acrescente ao mudar algo visível. A seção de cima é a próxima versão: leia só ela, nunca o arquivo inteiro.
 - `docs/pendencias.md` — ideias combinadas e ainda não feitas; aponta para `docs/specs/`.
 - `docs/specs/NN-*.md` — especificação de cada funcionalidade pedida (problema, dados reais, proposta, critérios de aceite). **Ao implementar uma, leia só a spec dela.** Ao terminar, marque o Status como "feito em vX.Y.Z".
 
@@ -38,6 +38,6 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Arquivo novo que o `.exe` precise ler → adicionar ao `--add-data` do workflow e do `gerar_setup.bat`.
 - Visual do painel segue a loja da Steam, **só preto e vermelho**, cada vermelho com um papel (`--acao` compra, `--sinal` ativo/importante, `--blue` texto clicável), botões secundários cinza e **escala de calor** no desconto e nas etiquetas (`data-calor`); símbolo em preto e vermelho (ver `docs/decisoes.md`, "Produto", "Paleta por papel").
 - Nome visível: **Kurokami Hunter**. Pasta de dados, keyring, `KurokamiRadar.exe`, nome do instalador, repositório e pacote `radar/` continuam com o nome antigo de propósito (lista em `docs/decisoes.md`, "Produto"): não renomeie.
-- Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança.
+- Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança. **Ajuste só visual** (cor, espaçamento, posição, texto de botão): só uma linha em `docs/novidades.md`, sem README, outros docs nem revisor.
 - Ao terminar cada tarefa, depois de `py tools/checar.py` dar `ok`: faça o commit e o push **sem perguntar**. Só pergunte antes de comandos que reescrevem histórico (`reset`, `rebase`, `push --force`) ou que apagam arquivos fora do projeto.
 - **Publicar = você cria e envia a tag `vX.Y.Z`**, só quando o dono disser "publique". Antes: `VERSAO`/`VERSAO_PAGINA` iguais e a seção `## X.Y.Z` em `docs/novidades.md` (vira a descrição do release; sem ela o workflow falha). Ver skill `publicar-versao`.

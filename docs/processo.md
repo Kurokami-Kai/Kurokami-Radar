@@ -30,7 +30,7 @@ Com o Hunter instalado aberto, feche-o antes (porta 80 e trava 47811 são compar
 
 ## Publicar uma versão
 1. Mudar `VERSAO` em `radar/__init__.py` **e** `VERSAO_PAGINA` em `radar/painel-web/status.js` (mesmo número).
-2. Se mudou função pública: `py tools/gerar_referencia.py`.
+2. `py tools/gerar_referencia.py` (a referência só é regenerada aqui, não a cada tarefa).
 3. Atualizar `README.md`/docs se o comportamento mudou para o usuário.
 4. Escrever a seção `## X.Y.Z` em `docs/novidades.md` (o título pode ter complemento, ex.: `## 0.14.0 (publicada em 2026-10-04)`). O texto dela, sem o título e até o próximo `## `, vira a **descrição do release** — é o que aparece na janela de atualização.
 5. Commit/push no GitHub.
