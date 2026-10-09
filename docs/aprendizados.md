@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — ficha em painéis, colunas alinhadas, fundo vivo
+- **"Desalinhado" era coluna `auto`:** o -90% andava porque a largura do preço (e da etiqueta GMG) variava por linha; caixas de largura fixa (grid 50px + 80px, loja embaixo do preço) e o calor sem negrito resolveram.
+- **Flex column na `.mbox` não alcança os netos:** o painel não crescia porque o filho direto é `#mbody`; ele também precisa ser flex (medir `getBoundingClientRect` mostrou na hora).
+- **Porta 8801 ocupada de novo:** entrada temporária 8803 no `launch.json` e `git checkout` dele antes do commit.
+
 ## 2026-10-09 — carrinho por loja, HLTB na franquia, Completar em Texto
 - **Uma causa do "achei que era Steam" era empate:** o FF XIV tinha R$ 52,99 na Steam e na GMG, e `min(..., key=preco)` ficava com a primeira linha do banco (GMG). Ao mostrar "a loja do melhor preço", desempate pela Steam.
 - **`${}` dentro de aspas simples não interpola:** trocar `title="Pôr no carrinho"` por `${maisT(o)}` em massa pegou 4 trechos que eram `'...'` e não template; procure no DOM por `title` com `${` depois de uma troca dessas.

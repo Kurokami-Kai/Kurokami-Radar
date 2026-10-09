@@ -376,6 +376,12 @@ body.mod-C main{max-width:1680px;padding:18px 24px 90px}
 .rv .n small{display:block;color:var(--c);font-size:12px;opacity:.9;overflow:hidden;text-overflow:ellipsis}
 .pb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--vtx);white-space:nowrap}
 .pb .pc{background:var(--vbg);color:var(--vtx);padding:1px 5px;font-size:12px}
+/* nas colunas, % e preço em caixas de largura fixa: o -90% e o R$ ficam na mesma linha vertical em todas as linhas */
+.rv .pb{display:grid;grid-template-columns:50px 80px;gap:8px;align-items:center}
+.rv .pb .pc{display:block;text-align:center;padding:3px 0;line-height:16px}
+.rv .pv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;font-variant-numeric:tabular-nums}
+.rv .pv .lj{margin:2px 0 0;font-size:9.5px;line-height:13px}
+@media (max-width:640px){.rv .pb{grid-template-columns:44px 66px;gap:6px}.rv .pv .lj{display:none}}
 .pb.fora{color:var(--fraco)}
 .lane .lm{margin-top:8px;align-self:flex-end}
 /* B: agenda */
@@ -535,7 +541,14 @@ body.pg-dest .full{margin-left:-32px;margin-right:-32px}
 [data-calor="0"]{background:#262626!important;color:#c8c8c8!important}
 [data-calor="1"]{background:#4a1016!important;color:#ff8a94!important}
 [data-calor="2"]{background:#8a1520!important;color:#ffd6d9!important}
-[data-calor="3"]{background:#d63031!important;color:#fff!important;font-weight:700}
+[data-calor="3"]{background:#d63031!important;color:#fff!important}
+.pc,.pct{font-variant-numeric:tabular-nums;text-align:center;border-radius:2px}
+/* fundo vivo: duas manchas carmim girando devagar atrás de tudo (paradas se o sistema pede menos movimento) */
+body::after{content:"";position:fixed;z-index:-1;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;pointer-events:none;will-change:transform;
+  background:radial-gradient(circle at 28% 32%,#96001852 0,#96001800 24%),radial-gradient(circle at 74% 66%,#dc143c33 0,#dc143c00 22%),radial-gradient(circle at 62% 22%,#5c001040 0,#5c001000 20%);
+  animation:kh-gira 80s linear infinite}
+@keyframes kh-gira{to{transform:rotate(1turn)}}
+@media (prefers-reduced-motion:reduce){body::after{animation:none}}
 </style>
 </head>
 <body>
@@ -991,7 +1004,7 @@ function agCol(x,c){return `<div class="agc" style="--c:${c}"><div class="agh"><
 
 /* ---------- capas e linhas de cada modelo ---------- */
 function rowV(o,nome){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k];
-  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:${nome||o.t==='selo'?c[2]:'var(--fraco)'}">${nome?c[0]+(s?' · ':''):''}${esc(s)}</small></span>${em(o)?`<span class="pb"><span class="pc">-${o.corte}%</span>${precoTxt(o)}</span>`:''}</button>`;}
+  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:${nome||o.t==='selo'?c[2]:'var(--fraco)'}">${nome?c[0]+(s?' · ':''):''}${esc(s)}</small></span>${em(o)?`<span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span>`:''}</button>`;}
 function lane(cor,tit,exp,l,go,nome,row,extra){row=row||(o=>rowV(o,nome));
   return `<section class="lane" style="--c:${cor}"><div class="lh"><button class="lnum" data-go="${go}" title="Ver todos">${fmtN(l.length)}</button><div><h3><button class="lt" data-go="${go}" title="Ver todos">${tit}<i>›</i></button></h3><span>${exp}</span></div></div><div class="lr">${l.slice(0,8).map(row).join('')||'<p class="vazio">Nenhum hoje.</p>'}</div><div class="lfoot">${extra||'<span></span>'}${go.startsWith('baratos')?`<button class="vt" data-go="${go}">ver todos ${(TETOS.find(t=>'baratos:'+t[0]===go)||[0,''])[1]} ›</button>`:l.length>8?`<button class="vt" data-go="${go}">ver os ${fmtN(l.length)} ›</button>`:''}</div></section>`;}
 /* capa no molde da Biblioteca: % no canto (cor do veredito), barra embaixo = do preço cheio ao menor em 2 anos */
@@ -1021,7 +1034,7 @@ const notaB=o=>(o.rpos||0)/100+.03*Math.log10(Math.max(1,o.rcount||1));
 const BB=(()=>{let c=null;return ()=>c||(c=PS.filter(o=>em(o)&&fl(o)&&!gratis(o)&&(o.rpos||0)>=85&&(o.cheio||0)>=3000&&o.preco<=5000&&!['imperdivel','menor'].includes(verd(o)[0]))
   .sort((a,b)=>(AF[b.appid]?1:0)-(AF[a.appid]?1:0)||notaB(b)-notaB(a)));})();
 function rowB(o){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k],af=AF[o.appid];
-  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:var(--txt)">${af?`<span style="color:var(--lista)">série que você tem: ${esc(af)}</span> · `:''}${o.rpos}% de ${fmtN(o.rcount)} análises${k==='espera'?` · <span style="color:${c[2]}">${esc(s)}</span>`:''}</small></span><span class="pb"><span class="pc">-${o.corte}%</span>${precoTxt(o)}</span></button>`;}
+  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:var(--txt)">${af?`<span style="color:var(--lista)">série que você tem: ${esc(af)}</span> · `:''}${o.rpos}% de ${fmtN(o.rcount)} análises${k==='espera'?` · <span style="color:${c[2]}">${esc(s)}</span>`:''}</small></span><span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span></button>`;}
 function pagDestA(){const st=PS.filter(o=>em(o)&&o.hist&&fl(o)),vk=k=>st.filter(o=>verd(o)[0]===k),
     mo=vk('imperdivel').sort((a,b)=>ganho(b)-ganho(a)),mh=vk('menor').sort((a,b)=>b.eco-a.eco),li=L.filter(o=>em(o)&&fl(o)).sort(ordV);
   const fim=[...li,...st].filter(o=>breve(o)&&['imperdivel','menor'].includes(verd(o)[0])).sort(SORT.fim);
