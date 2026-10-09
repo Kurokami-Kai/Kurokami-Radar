@@ -127,7 +127,7 @@ button{font-family:inherit}
 .flag.cart{background:rgba(255,138,148,.14);color:var(--disc-fg)}
 .flag.own{background:rgba(255,255,255,.08);color:#d2d2d2}
 
-.flag.bun{background:#ff8a9433;color:#ffc2c7}
+.flag.bun{background:#ff8a9433;color:#ff4655}
 
 /* review word colors (Steam) */
 .rv-pos{color:var(--pos)}.rv-mix{color:var(--mix)}.rv-neg{color:#c35c2c}.rv-non{color:var(--dim)}
@@ -1296,7 +1296,7 @@ $('#buscaRes').addEventListener('click',async e=>{if(e.target.closest('[data-fec
 let NOTIF=[];
 // etiqueta pelo começo do motivo (analise.motivo_tipo); o 4º item diz se o texto fica inteiro
 const NF_TIPOS=[[/^Selo Kurokami:\s*/i,'Selo Kurokami','#f5c75b'],[/^menor preço já registrado/i,'Novo recorde','#ff4655',1],
-  [/^mesmo preço do menor/i,'Igual ao recorde','#ff8a94',1],[/^menor preço em 2 anos/i,'Menor em 2 anos','#ffc2c7',1],
+  [/^mesmo preço do menor/i,'Igual ao recorde','#ff8a94',1],[/^menor preço em 2 anos/i,'Menor em 2 anos','#ff4655',1],
   [/^keyshop\s*/i,'Keyshop','#e2a635'],[/^versão completa/i,'Versão completa','#d2d2d2',1]];
 const nfKey=n=>/keyshop/i.test(n.loja||'');
 function nfTipo(n){const m=n.motivo||'',r=NF_TIPOS.find(x=>x[0].test(m));let t,c='#979797',txt=m;
