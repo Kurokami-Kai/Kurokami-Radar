@@ -255,6 +255,7 @@ Dados das páginas novas de Ofertas e Biblioteca (spec 09, amostra 8 de Ofertas 
 ## `radar/painel.py`
 Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagina painel.html.
 
+- `montar_painel()` — painel.html com cada /*incluir arquivo*/ trocado pelo arquivo de painel-web/: o navegador recebe uma página só, como antes.
 - `token(novo)`
 - `ips_locais()`
 - `_base(host)`
@@ -334,6 +335,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
   - `_steam_openid(u)` — Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Hunter.
   - `do_GET()`
   - `do_POST()`
+- **class `_Servidor`** — 
 - `iniciar(abrir)`
 - `reiniciar()` — Troca entre so-este-PC e rede local sem fechar o Hunter.
 - `url()`

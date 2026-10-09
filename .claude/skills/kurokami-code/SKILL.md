@@ -9,7 +9,7 @@ Esta skill **não carrega as outras**: ela indica qual abrir. Abra só a que a t
 
 ## 1. Entender antes de tocar (barato)
 - Leia o `CLAUDE.md` (já está no contexto) e **só** o doc de `docs/` que a tarefa pede.
-- Para achar código: `py tools/mapa.py <arquivo> [termo]` e leia apenas o intervalo de linhas indicado. Nunca abra `painel.html` ou `docs/referencia.md` inteiros.
+- Para achar código: `py tools/mapa.py <arquivo> [termo]` e leia apenas o intervalo de linhas indicado. Nunca abra `ficha.js`, `ofertas.html` ou `docs/referencia.md` inteiros (`py tools/mapa.py radar/painel-web [termo]`).
 - Mexe em coleta, preços, avaliação ou instalador? Leia `docs/decisoes.md` primeiro.
 
 ## 2. Plano curto
@@ -19,7 +19,7 @@ Antes de editar, escreva em 3 a 8 linhas: o que muda, em quais arquivos, como te
 | A tarefa mexe em… | Abra |
 |---|---|
 | economizar contexto/tokens, arquivo grande, conversa longa | `economia-de-contexto` |
-| `painel.html` (visual, abas, JS do painel) | `editar-painel` |
+| `painel.html`/`painel-web/` (visual, abas, JS do painel) | `editar-painel` |
 | `steam.py`, `itad.py`, `ggdeals.py`, `coleta.py`, `rede.py` | `coleta-e-apis` |
 | tabelas, colunas, `meta`, `config.json` | `banco-e-migracao` |
 | bug, erro do usuário, log, comportamento estranho | `depurar` (+ `systematic-debugging`, global) |

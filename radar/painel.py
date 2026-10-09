@@ -20,9 +20,21 @@ CAMINHO = "/kurokami"
 ARQ_TOKEN = os.path.join(caminhos.DADOS, "painel_token.txt")
 TENTATIVAS = {}           # ip -> [horarios], limita chutes de PIN
 HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)), "painel.html")
+PARTES = os.path.join(os.path.dirname(HTML), "painel-web")   # CSS e JS do painel, um arquivo por seção
 # páginas novas (spec 09) que o painel abre dentro das abas Ofertas e Biblioteca; os dados entram no lugar de /*DADOS*/{}
 PAGINAS = {CAMINHO + "/ofertas": "ofertas.html", CAMINHO + "/biblioteca": "biblioteca.html"}
 CONTROLE = {"servico": None, "srv": None}  # preenchido pela bandeja
+
+
+def montar_painel():
+    """painel.html com cada /*incluir arquivo*/ trocado pelo arquivo de painel-web/: o navegador recebe uma página só, como antes."""
+    with open(HTML, encoding="utf-8") as f:
+        modelo = f.read()
+
+    def parte(m):
+        with open(os.path.join(PARTES, m.group(1)), encoding="utf-8") as f:
+            return f.read()
+    return re.sub(r"/\*incluir ([\w.-]+)\*/", parte, modelo)
 
 
 def token(novo=False):
@@ -1549,8 +1561,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path in (CAMINHO + "/steam/entrar", CAMINHO + "/steam/retorno"):
             return self._steam_openid(u)
         if u.path in (CAMINHO, CAMINHO + "/"):
-            with open(HTML, "rb") as f:
-                dados = f.read()
+            dados = montar_painel().encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(dados)))

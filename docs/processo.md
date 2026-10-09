@@ -23,13 +23,13 @@ Com o Hunter instalado aberto, feche-o antes (porta 80 e trava 47811 são compar
 - **Spec 09, previsão de Ofertas:** `py tools/backtest_previsao.py` (≈ 30 s; só leitura numa cópia do banco): se o preço volta em 6/12 meses (modelos comparados por Brier e calibração), em quanto tempo por grupo, e qual regra acerta a data e o preço da próxima promoção. Grava `dados/sonda/backtest_previsao.json`, que o gerador local da amostra (`dados/dados_ofertas4.py`, fora do Git) lê.
 - **Toast de Selo:** `py radar.py testar-notificacao --selo` (pega um Selo de verdade do seu banco e passa pelo `Notificador._enviar`, como numa rodada).
 - Sintaxe: `py -c "import ast,glob;[ast.parse(open(f,encoding='utf-8').read()) for f in glob.glob('radar/*.py')+['radar.py']]"`
-- JS do painel: extrair o `<script>` de `painel.html` e rodar `new Function(js)` no Node.
+- JS do painel: montar a página (`painel.montar_painel()`), extrair o `<script>` e rodar `new Function(js)` no Node (o `checar.py` faz isso).
 - Lógica sem rede: copiar um `dados/radar.sqlite3` real e chamar `painel.api_lista({})`, `api_jogo`, `api_carrinho`, `analise.avaliar` com `b.ofertas_atuais()`.
 - Visual: subir `py radar.py painel` e tirar prints com Playwright em `http://127.0.0.1/kurokami`.
 - O que só dá para testar no Windows real: notificações, bandeja, instalador, carrinho direto na Steam, atualização silenciosa.
 
 ## Publicar uma versão
-1. Mudar `VERSAO` em `radar/__init__.py` **e** `VERSAO_PAGINA` em `radar/painel.html` (mesmo número).
+1. Mudar `VERSAO` em `radar/__init__.py` **e** `VERSAO_PAGINA` em `radar/painel-web/status.js` (mesmo número).
 2. Se mudou função pública: `py tools/gerar_referencia.py`.
 3. Atualizar `README.md`/docs se o comportamento mudou para o usuário.
 4. Escrever a seção `## X.Y.Z` em `docs/novidades.md` (o título pode ter complemento, ex.: `## 0.14.0 (publicada em 2026-10-04)`). O texto dela, sem o título e até o próximo `## `, vira a **descrição do release** — é o que aparece na janela de atualização.
@@ -39,7 +39,7 @@ Com o Hunter instalado aberto, feche-o antes (porta 80 e trava 47811 são compar
    - gera o `Setup.exe` e publica o release com a descrição e o instalador anexado.
 7. Os Radars instalados avisam ao abrir ou em até 24 h.
 
-Arquivos novos que o `.exe` precisa ler (como `painel.html`) devem entrar no `--add-data` do workflow **e** do `gerar_setup.bat`.
+Arquivos novos que o `.exe` precisa ler (como `painel.html` ou a pasta `painel-web/`) devem entrar no `--add-data` do workflow **e** do `gerar_setup.bat`.
 
 ## Exportar a documentação (reserva)
 O Projeto "Kurokami Radar" no claude.ai lê os docs **direto do GitHub**: não é preciso atualizá-lo à mão, e o fim de cada tarefa não tem mais o passo "Docs para atualizar no Projeto". O `tools/exportar_docs.py` fica no repositório só como reserva (por exemplo, se o Projeto voltar a usar arquivos enviados):

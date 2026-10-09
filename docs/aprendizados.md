@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — painel dividido em radar/painel-web/
+- **Montar no servidor em vez de `<script src>`:** um `<script>` só mantém o hoisting entre arquivos e não deixa JS velho em cache; a prova de que nada mudou foi comparar a página montada com a cópia original (só 7 linhas em branco a mais).
+- **A marca de seção de Ofertas/Biblioteca não fechava na mesma linha** (`/* ===== nome =====` + texto na linha de baixo), e o `mapa.py` a escondia dentro da ficha; a regex aceita agora as duas formas.
+- **`\\n` dentro de heredoc Python virou quebra de linha real** no arquivo gravado; para trocas com escapes, use o Edit.
+
 ## 2026-10-09 — aviso de versão, buscas, DLCs da conta
 - **"Rodando 0.16.0, arquivos 0.17.1" eram 6 cópias de teste na 8801 ao mesmo tempo:** o `HTTPServer` liga `SO_REUSEADDR`, que no Windows deixa vários processos na mesma porta, e responde o mais antigo. `_Servidor(allow_reuse_address=False)` no `painel.py`. Olhar `netstat -ano | findstr LISTENING` antes de suspeitar do código.
 - **"Não puxa minhas DLCs" não era o SteamID:** `GetOwnedGames` não traz DLCs; só o `rgOwnedApps` da extensão. O explorador achou em uma rodada (646 jogos, 0 DLCs, sem `userdata.json`).

@@ -6,7 +6,7 @@ description: Prepara uma versão nova do Kurokami Hunter para o GitHub Releases 
 # Publicar versão
 
 1. Número novo `MAJOR.MINOR.PATCH` (correção = PATCH, função nova = MINOR). Confirme com o usuário se não for óbvio.
-2. Atualize juntos: `VERSAO` em `radar/__init__.py` e `VERSAO_PAGINA` em `radar/painel.html`.
+2. Atualize juntos: `VERSAO` em `radar/__init__.py` e `VERSAO_PAGINA` em `radar/painel-web/status.js`.
 3. `py tools/gerar_referencia.py` se funções mudaram.
 4. `py tools/checar.py` → `ok`.
 5. README/docs coerentes com o que mudou.

@@ -8,7 +8,7 @@ effort: low
 
 Você é o explorador do Kurokami Hunter. Só lê, procura e roda comandos de checagem; **nunca cria nem edita arquivos** (nada de `>`, `sed -i`, `git commit` etc.).
 
-- Arquivo grande (ex.: `radar/painel.html`): rode `py tools/mapa.py <arquivo> [termo]` e leia só o intervalo das funções relevantes. Nunca leia o arquivo inteiro.
+- Arquivo grande (ex.: `radar/painel-web/ficha.js`, `radar/ofertas.html`): rode `py tools/mapa.py <arquivo> [termo]` e leia só o intervalo das funções relevantes. Nunca leia o arquivo inteiro.
 - Busque antes de abrir (`Grep`), corte saídas de comando (`| tail -40`).
 - Checagens: `py tools/checar.py`; testes: scripts em `tools/` (ex.: `py tools/testar_piso.py`).
 

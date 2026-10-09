@@ -6,12 +6,12 @@ App local de Windows (Python 3.12) que monitora a lista de desejos da Steam em v
 
 Leia só o que a tarefa pede, nesta ordem de utilidade:
 
-- Leitura e testes: subagente explorador; revisão de diff: revisor; painel.html só por função (tools/mapa.py); regras em .claude/skills/economia-de-contexto.
+- Leitura e testes: subagente explorador; revisão de diff: revisor; painel só por função (tools/mapa.py radar/painel-web); regras em .claude/skills/economia-de-contexto.
 - `docs/aprendizados.md` — leia no início de toda tarefa; atualize no fim.
 - `docs/decisoes.md` — **sempre leia antes de mexer em coleta, preços, avaliação ou instalador.** Lista armadilhas que já foram bugs reais (preço "atual", fusos, pacote base, GG.deals, versão da página etc.) e as preferências de produto.
 - `docs/estrutura.md` — o que cada arquivo e pasta contém e onde ficam os dados. Consulte para achar onde ler, editar ou criar algo.
 - `docs/arquitetura.md` — como as peças conversam: threads, ciclo de coleta, fontes de dados e seus limites, avaliação, notificação, painel, carrinho pela extensão do navegador, distribuição e atualização.
-- `docs/api.md` — rotas HTTP do painel (GET/POST), campos e regras de acesso. Consulte ao mexer em `painel.py` ou `painel.html`.
+- `docs/api.md` — rotas HTTP do painel (GET/POST), campos e regras de acesso. Consulte ao mexer em `painel.py` ou no painel (`painel.html`, `painel-web/`).
 - `docs/dados.md` — tabelas SQLite, chaves de `meta`, `config.json` e onde ficam os segredos.
 - `docs/referencia.md` — assinaturas e docstrings de todas as funções (gerado; rode `py tools/gerar_referencia.py` depois de mudar funções).
 - `docs/processo.md` — rodar, testar e publicar versão; convenções de código.
@@ -22,7 +22,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 ## Ferramentas e skills
 
 - Comece tarefas de código pela skill **`kurokami-code`** (ela diz qual outra skill abrir; não carrega todas).
-- `py tools/mapa.py <arquivo> [termo]` → seções/funções com linhas; leia só o intervalo. Nunca abra `radar/painel.html` inteiro.
+- `py tools/mapa.py <arquivo ou pasta> [termo]` → seções/funções com linhas; leia só o intervalo. O painel é `radar/painel.html` (só o HTML) + `radar/painel-web/` (CSS e JS, um arquivo por seção; o `painel.py` troca cada `/*incluir x*/` pelo arquivo e entrega uma página só): `py tools/mapa.py radar/painel-web [termo]` acha a função. Nunca abra `ficha.js`, `ofertas.html` ou `biblioteca.html` inteiros.
 - Abas Ofertas e Biblioteca = `radar/ofertas.html` e `radar/biblioteca.html` (páginas próprias num iframe, dados de `radar/ofertas.py`); falam com o painel por `parent.KH` (ver `docs/arquitetura.md`, "Ofertas e Biblioteca").
 - `py tools/checar.py` → checagens finais (sintaxe, JS, versão, `--add-data`, `tools/testar_piso.py`, dados pessoais e `.gitignore`: falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`). Precisa dar `ok`.
 - `tools\exportar_docs.py` → **reserva, fora do fluxo**: o Projeto do claude.ai lê os docs direto do GitHub. Só use se o dono pedir.
@@ -30,7 +30,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 
 ## Regras do projeto
 
-- Versão: `VERSAO` em `radar/__init__.py` e `VERSAO_PAGINA` em `radar/painel.html` mudam **juntas**.
+- Versão: `VERSAO` em `radar/__init__.py` e `VERSAO_PAGINA` em `radar/painel-web/status.js` mudam **juntas**.
 - Login Steam: "Entrar pela Steam" (OpenID) guarda só o SteamID; o carrinho vai pela extensão própria (`extensao/`), que usa a sessão da página da Steam; o QR saiu na 0.16. Senha, token e cookie da Steam nunca em arquivo, log, banco ou Git (ver `docs/decisoes.md`, "Login Steam").
 - "Preço de agora" vem de `oferta_atual`/`Banco.ofertas_atuais()`, nunca do último registro de `preco`.
 - Dinheiro em centavos; datas em UTC ISO.

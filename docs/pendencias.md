@@ -6,10 +6,11 @@
 - **Ofertas e Biblioteca no celular:** o topo do painel ocupa ~320 px numa tela de 375 px; recolher o topo (ou só o ícone e o menu) quando a página nova está aberta.
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md) (entra na 09)
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
-- [07 — Promoções da Steam inteira](specs/07-steam-inteira.md): implementada em 08/10 e revisada na mesma noite (recordes e histórico também fora da lista, menus no topo, sem botão de fonte); falta o teste do dono antes de publicar. Ideia original: Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".
+- [07 — Promoções da Steam inteira](specs/07-steam-inteira.md): feito em v0.17.0 (revisada em 08/10 com recordes e histórico também fora da lista, menus no topo, sem botão de fonte). Ideia original: Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".
 - 08 — Layout em etapas: inventário, referência, base visual, uma aba por vez, celular (a escrever)
 
 ## Feitas
+- **Painel dividido** (v0.17.2): `painel.html` só com o HTML; CSS e JS em `radar/painel-web/`, juntados pelo servidor. Falta, se valer a pena, o mesmo em `ofertas.html` (~120 KB) e `biblioteca.html`.
 - [06 — Login Steam: "Entrar pela Steam" (OpenID) feito em v0.16.0; o QR foi descartado e o carrinho vai pela extensão do Hunter](specs/06-login-steam.md)
 - [04 — Vitrine, aba Promoções e avisos por tipo de recorde (feito em v0.15.0)](specs/04-vitrine-promocoes-e-avisos.md)
 - [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica (feito em v0.14.0)](specs/01-selo-kurokami-e-raridade.md)
@@ -24,7 +25,6 @@ Em ordem aproximada de valor. Nada aqui foi iniciado.
 - **Bundles de outras lojas** (Humble, Fanatical) via ITAD `games/bundles/v2`.
 - **Hype Games e 2Game**: fora da ITAD; só lendo o site (frágil).
 - **Backup automático** semanal do `radar.sqlite3`.
-- **Dividir o `painel.html`** (≈80 KB) em CSS/JS separados ou módulos, mantendo sem build.
 - **Versão multiusuário na nuvem** (discutida, não decidida): Oracle Always Free + login Steam OpenID + Telegram; exigiria pedir permissão de uso às APIs.
 - **Guia em PDF** para usuários: ainda não cobre o carrinho direto, a raridade v2 nem o Selo.
 - **Faixa do evento da Steam com data de fim** (falta fonte).

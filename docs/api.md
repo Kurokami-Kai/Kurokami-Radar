@@ -9,7 +9,7 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | Rota | O que é |
 |---|---|
 | `GET /` | redireciona para `/kurokami` |
-| `GET /kurokami` | `painel.html` |
+| `GET /kurokami` | `painel.html` montado com as partes de `painel-web/` (`montar_painel`) |
 | `GET /kurokami/ofertas` | `ofertas.html` com os dados (`ofertas.dados_ofertas`): `P` (promoções da Steam inteira e da lista; o número é a linha da lista), `L` (a lista inteira), `PT`, `steam`, `quando`, `EV` (grandes eventos), `H` (episódios de 25 meses por jogo), `AF` (jogos de séries que você tem). Cada linha é uma lista no formato da amostra 8 (`M()` na página), com a previsão no índice 29. gzip se o navegador aceitar; `Cache-Control: no-store` |
 | `GET /kurokami/biblioteca` | `biblioteca.html` com `total`, `n`, `G` (jogos que você tem e os da lista das suas franquias: appid, nome, capa vertical, franquia, tenho, lista, lançamento, preço, cheio, desconto, minutos, última vez, nota, capa, loja: a do preço de quem falta = a oferta mais barata de agora nas lojas marcadas, empate = Steam; quem você tem fica com a Steam) e `C` (Completar: tem, total, valor, falta hoje, falta no piso, DLCs que faltam) |
 | `GET /kurokami/acao?silenciar=<appid>` | botão "Não avisar mais" das notificações (só local) |

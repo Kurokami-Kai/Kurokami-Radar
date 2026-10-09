@@ -1,6 +1,6 @@
 ---
 name: economia-de-contexto
-description: Regras de economia de tokens do Kurokami Hunter - painel.html só por função (tools/mapa.py), leitura/testes no subagente explorador, revisão no revisor, /clear e /compact, docs por seção, relatório enxuto e esforço por tipo de tarefa. Use sempre que for ler arquivos grandes, buscar, testar, revisar diff ou a conversa estiver longa.
+description: Regras de economia de tokens do Kurokami Hunter - painel só por função (tools/mapa.py radar/painel-web), leitura/testes no subagente explorador, revisão no revisor, /clear e /compact, docs por seção, relatório enxuto e esforço por tipo de tarefa. Use sempre que for ler arquivos grandes, buscar, testar, revisar diff ou a conversa estiver longa.
 ---
 
 # Economia de contexto (Kurokami Hunter)
@@ -8,7 +8,7 @@ description: Regras de economia de tokens do Kurokami Hunter - painel.html só p
 Complementa a skill geral `~/.claude/skills/economia-de-contexto` (buscar antes de abrir, ler por trechos, cortar saídas, não reler o que editou). Aqui ficam só as regras deste projeto.
 
 ## Ler
-- `radar/painel.html` (~1.300 linhas, muitas longas) **nunca** é lido inteiro: `py tools/mapa.py radar/painel.html [termo]`, ache a função e leia só o intervalo dela (offset/limit).
+- O painel fica em `radar/painel.html` (só o HTML) + `radar/painel-web/` (um `.css`/`.js` por seção, linhas longas): **nunca** leia um arquivo grande inteiro (`ficha.js`, `ofertas.html`, `biblioteca.html`): `py tools/mapa.py radar/painel-web [termo]`, ache a função e leia só o intervalo dela (offset/limit).
 - `docs/` não se lê inteiro: abra só o doc do assunto (ver `CLAUDE.md`) e só a seção necessária (`py tools/mapa.py docs/x.md` ou `Grep` no título).
 
 ## Delegar

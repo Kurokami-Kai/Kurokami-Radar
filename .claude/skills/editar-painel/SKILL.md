@@ -1,15 +1,16 @@
 ---
 name: editar-painel
-description: Como editar o painel web do Kurokami Hunter (radar/painel.html - HTML, CSS e JS num arquivo só) sem quebrar nada nem estourar o contexto. Use sempre que a tarefa mexer em abas, visual, filtros, carrinho, biblioteca, ficha do jogo, configurações ou qualquer coisa que o usuário veja no navegador.
+description: Como editar o painel web do Kurokami Hunter (radar/painel.html + CSS e JS em radar/painel-web/) sem quebrar nada nem estourar o contexto. Use sempre que a tarefa mexer em abas, visual, filtros, carrinho, biblioteca, ficha do jogo, configurações ou qualquer coisa que o usuário veja no navegador.
 ---
 
 # Editar o painel
 
 ## Localizar
-`py tools/mapa.py radar/painel.html [termo]` → leia só o intervalo. Organização:
-- `<style>`: CSS base (visual Steam) e depois `/* ---------- painel: extras ---------- */`.
-- HTML: `<header class="topbar">`, depois uma `<section id="tab-…">` por aba (`vale`, `lista`, `bib`, `carr`, `notif`, `cfg`), modal `#modal`, `#hv` (hover), `#toast`.
-- `<script>` dividido por marcadores `/* ================= nome ================= */`: helpers, estado, blocos, hover, abas, vale a pena, lista, modal do jogo, biblioteca, carrinho, notificações, configurações, status / ações.
+`py tools/mapa.py radar/painel-web [termo]` → arquivo e intervalo; leia só ele. Organização:
+- `radar/painel.html`: só o HTML (`<header class="topbar">`, uma `<section id="tab-…">` por aba: `vale`, `lista`, `bib`, `carr`, `notif`, `cfg`; modal `#modal`, `#hv`, `#toast`) e as marcas `/*incluir arquivo*/` dentro do `<style>` e do `<script>`.
+- `radar/painel-web/`: CSS (`base.css` tokens e visual Steam, `extras.css`, `configuracoes.css`, `promocoes.css`, `paginas.css`) e JS (`base.js` helpers/estado/blocos/hover/abas, `promocoes.js` tabela com filtros, `ficha.js` modal do jogo, `paginas.js` iframes e `window.KH`, `carrinho.js`, `notificacoes.js`, `configuracoes.js`, `conta.js` conta Steam e Finalizar pedido, `status.js` `VERSAO_PAGINA` e ações).
+- O `painel.py` (`montar_painel`) junta tudo numa página só, **num `<script>` só**: os arquivos de JS dividem o mesmo escopo e rodam na ordem das marcas; `function` serve antes de onde está escrita, `const`/`let` não (TDZ).
+- Arquivo novo em `painel-web/`: crie a marca no `painel.html` (o `checar.py` falha se faltar) e ele já vai no instalador (a pasta inteira está no `--add-data`).
 
 ## Ofertas e Biblioteca são outras páginas
 `radar/ofertas.html` (Destaques, Promoções, Lista) e `radar/biblioteca.html` (Coleção/Franquias, Completar) abrem num iframe nas abas `#vale` e `#bib`; os dados vêm de `radar/ofertas.py` (no lugar de `/*DADOS*/{}`). Têm CSS e JS próprios (os das amostras da spec 09). Ficha do jogo, carrinho e loja: `parent.KH` (definido no `painel.html`, seção "Ofertas e Biblioteca"). Teste em `/kurokami/ofertas` direto também (sem o painel em volta, as ações avisam por toast).
