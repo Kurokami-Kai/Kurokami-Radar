@@ -43,6 +43,13 @@ Amostra em `dados/amostras-biblioteca-2.html` (mesmos dados). Nas duas: capa da 
 - Amostra em `dados/amostras-biblioteca-4.html`. **H:** cabeçalho da G (capa, etiquetas, nome, ações), fileira de arrastar com bordas esmaecidas indicando que há mais, e a barra deitada de ponta a ponta até o fim (números | onde foi o seu tempo | o que falta | nunca jogados): 814–846 px de altura, cabe numa tela de 900. **G:** igual, mas com o painel ao lado indo até o fim (o conteúdo acompanha a rolagem).
 - A confirmar: o "texto" do Completar já usa o mesmo bloco da Coleção em texto da F; se a ideia era o Completar em texto mostrar as **franquias com os jogos que faltam** (e não as DLCs), é uma troca pequena.
 
+## Quinta rodada: H1 e H2 (09/10)
+- Dono escolheu a **H com ressalvas**: a barra verde ao lado de "Jogos da franquia" não lia como 100% (era curta); os jogos não chegavam às bordas nem ficavam centralizados; o fundo parecia desproporcional (banner esticado/ampliado); a capa vertical do topo disputava com as capas dos jogos. Pediu para testar uma **capa horizontal**.
+- **Completar decidido:** Texto = o bloco de franquia da Coleção em texto da F (o que falta em lilás), só das franquias com algo faltando e o que falta primeiro; clique abre a ficha da franquia. **Capas = DLCs (3 por linha, 6 DLCs), abrindo na ordem "Em promoção".**
+- Amostra em `dados/amostras-biblioteca-5.html`. Nas duas: barra de progresso ocupando o resto da linha; jogos crescem até 156 px e ficam centralizados (com muitos, arrasta); números da barra de baixo numa linha só.
+- **H1 · Banner horizontal:** `library_hero` no topo, na proporção dele (até 260 px de altura, corta um pouco em cima e embaixo, não estica), nome e ações sobre o banner. 838–863 px de altura.
+- **H2 · Capa horizontal ao lado do nome:** a capa da loja (`header.jpg`, 340 px) à esquerda do nome e das ações; o banner fica só de fundo esmaecido, na largura da ficha. 751–776 px.
+
 ## Pedido (dono, 08/10)
 - A aba está mal disposta. Hoje: **Completar · Franquias · Coleção · DLCs em promoção** (botões no topo da aba).
 - Deve ficar parecida com **Ofertas** (menu no topo com subpáginas, talvez).
