@@ -48,7 +48,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .chips button[aria-pressed=true]{background:#3d3d3d;color:#fff}
 .tool .sp{flex:1}
 .aviso-dlc{margin:14px 0 4px;padding:12px 16px;border-radius:3px;background:#4a10168c;box-shadow:inset 3px 0 0 var(--sinal);color:var(--txt);font-size:13px;line-height:1.7}
-.aviso-dlc b{color:#fff;font-weight:400}.aviso-dlc .bq-btn{margin:0 4px}
+.aviso-dlc b{color:#fff;font-weight:400}.aviso-dlc a{color:var(--azul)}.aviso-dlc .bq-btn{margin:0 4px}
 /* busca (Esc ou /): barra larga no centro, no alto da barra de ferramentas, como a de Ofertas */
 .tool .bq{flex:0 0 100%;display:flex;align-items:center;gap:14px;max-width:960px;margin:6px auto 6px;height:54px;padding:0 12px 0 18px;cursor:text;
   background:#0d0d0dd9;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:3px;box-shadow:inset 0 0 0 1px #ff475759,0 10px 30px #00000080;transition:box-shadow .15s}
@@ -485,7 +485,12 @@ function pagFranquias(){const o=ordem(),l=FR.filter(busca).sort(SORT[o]);S.lista
     ${bar(100*x.tenho/x.total)}${fileira(x.m,104,false)}</div>`).join('')}</div>`;}
 /* Completar em texto: as franquias com algo faltando, no bloco da Coleção em texto da F (o que falta primeiro, em lilás) */
 /* a API da Steam só passa jogos: as DLCs que você tem vêm da extensão (sessão da loja) */
-const avisoDlc=()=>D.dlcs===false?`<div class="aviso-dlc"><b>As DLCs que você já tem ainda não entraram</b>, então aparecem aqui como faltando. A Steam só mostra as DLCs da sua conta na própria loja, e quem lê isso é a <b>extensão do Hunter</b>${PAI&&PAI.instalarExt?' <button class="bq-btn" data-instext>Instalar a extensão</button>':''}. Depois de instalar, abra a loja da Steam logado uma vez.</div>`:'';
+function avisoDlc(){if(D.dlcs!==false)return '';
+  const v=PAI&&PAI.extVersao?PAI.extVersao():'',[ma,mi]=v.split('.').map(Number),velha=v&&(ma<1||(ma===1&&mi<1));   // a 1.1 começou a ler a conta
+  const acao=!v?`, que não está neste navegador.${PAI&&PAI.instalarExt?' <button class="bq-btn" data-instext>Instalar a extensão</button>':''} Instale no navegador em que você entra na Steam e abre o Hunter; depois abra a loja da Steam logado uma vez.`
+    :velha?`, mas a sua é a ${esc(v)}, que ainda não lê a conta: recarregue-a na página de extensões do navegador.`
+    :` e ela está neste navegador (${esc(v)}), mas ainda não leu a sua conta: <a href="https://store.steampowered.com/" target="_blank" rel="noopener">abra a loja da Steam</a> <b>logado, neste mesmo navegador</b>, e depois volte aqui.`;
+  return `<div class="aviso-dlc"><b>As DLCs que você já tem ainda não entraram</b>, então aparecem aqui como faltando. A Steam só mostra as DLCs da sua conta na própria loja, e quem lê isso é a <b>extensão do Hunter</b>${acao}</div>`;}
 function pagCompletarTexto(){const f=FR.filter(x=>x.falta.length&&busca(x)).sort(SORT[ordem()]);S.lista=f;
   return `${avisoDlc()}<div class="pcab"><h2>Completar</h2><span class="res"><b>${f.length}</b> franquias com jogo faltando · <b>${fmtN(f.reduce((s,x)=>s+x.falta.length,0))}</b> jogos · <b>${brl0(f.reduce((s,x)=>s+x.custo,0))}</b> hoje · clique abre a franquia</span></div>${tool()}${legenda}<div class="tgrid">${f.map((x,i)=>tcFr(x,i,6,true)).join('')}</div>`;}
 function pagCompletar(){if(modo()==='texto')return pagCompletarTexto();const o=ordem(),l=C.filter(c=>!S.q||c.nome.toLowerCase().includes(S.q)||c.falta.some(d=>d.nome.toLowerCase().includes(S.q))).sort(SORTC[o]);S.lista=l;

@@ -1396,6 +1396,7 @@ window.KH={
   loja(a){open(storeUrl(a),'_blank','noopener');},
   aba(t){setTab(t);},
   instalarExt(){instalarExt();},
+  extVersao(){return document.documentElement.dataset.kurokamiExt||'';},
   sub(aba,s){if(FR[aba])FR[aba].sub=s;},
   dlcsPromo(){FR.bib.sub='completar:capas';setTab('bib');}   // o Completar em Capas abre na ordem "Em promoção": as DLCs com desconto de cada jogo
 };
@@ -1647,7 +1648,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharBusca();});
 const temExt=()=>!!document.documentElement.dataset.kurokamiExt;
 // a extensão entrega o que leu da sua conta na loja da Steam (seguidos, ignorados, biblioteca com DLCs) e avisa aqui
 document.addEventListener('kurokami-conta',e=>{let d={};try{d=JSON.parse(e.detail)||{};}catch(x){}
-  if(d.ok){toast(`Conta Steam atualizada pela extensão: ${fmtN(d.seguidos)} seguidos, ${fmtN(d.ignorados)} ignorados, ${fmtN(d.possuidos)} na biblioteca`);carregarLista().catch(()=>{});}
+  if(d.ok){toast(`Conta Steam atualizada pela extensão: ${fmtN(d.seguidos)} seguidos, ${fmtN(d.ignorados)} ignorados, ${fmtN(d.possuidos)} na biblioteca`);carregarLista().catch(()=>{});
+    for(const k in FR)FR[k].velho=true;}   // Ofertas e Biblioteca recarregam com as DLCs da conta ao entrar
   else if(d.erro)toast('Extensão: '+d.erro);});
 function faixaExt(forcar){
   if(temExt()||$('#aviso-ext')||!['localhost','127.0.0.1'].includes(location.hostname))return;

@@ -5,6 +5,7 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 ## 2026-10-09 — aviso de versão, buscas, DLCs da conta
 - **"Rodando 0.16.0, arquivos 0.17.1" eram 6 cópias de teste na 8801 ao mesmo tempo:** o `HTTPServer` liga `SO_REUSEADDR`, que no Windows deixa vários processos na mesma porta, e responde o mais antigo. `_Servidor(allow_reuse_address=False)` no `painel.py`. Olhar `netstat -ano | findstr LISTENING` antes de suspeitar do código.
 - **"Não puxa minhas DLCs" não era o SteamID:** `GetOwnedGames` não traz DLCs; só o `rgOwnedApps` da extensão. O explorador achou em uma rodada (646 jogos, 0 DLCs, sem `userdata.json`).
+- **Extensão no navegador errado:** estava só no Edge (`Secure Preferences` → `path`), e o dono usa o Chrome; o log da coleta ("sem userdata.json") confirmou que nada chegou. O aviso agora diz em qual caso a pessoa está.
 - **Matar processos seguidos esbarrou no classificador:** depois de um `Stop-Process`, um simples `sed` foi negado; ler com Grep/Read resolveu.
 
 ## 2026-10-09 — Esc em todas as abas; barra de busca no centro
