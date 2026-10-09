@@ -1,6 +1,6 @@
 # Spec 09 — Biblioteca nova: Coleção por franquias, ficha estilo PlayStation
 
-Status: **Etapa 1 feita** (08/10; vai na 0.17.0); Etapa 2 com três amostras para o dono escolher (09/10); Etapa 3 em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
+Status: **Etapa 1 feita** (08/10; vai na 0.17.0); Etapa 2 em amostras: A/B/C avaliadas, D/E na mesa (09/10); Etapa 3 em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
 
 ## Etapas
 1. **Ficha nova (decidida: B+ com fundo de captura de tela).** **A referência visual é a amostra B+ de [09-amostras-ficha.html](09-amostras-ficha.html)** (dono: "ficou perfeito"): siga o layout, as medidas e os blocos dela. Inclui: a mesma ficha em Ofertas, Promoções e Biblioteca; arte da biblioteca (`logo.png`, capa vertical do `capa_v`) e captura de tela de fundo (`appdetails.screenshots`, cache); fileira de 5 números; fileira da franquia com setas (só com os jogos que o Radar já conhece: biblioteca e lista); duas colunas (veredito/pisos/histórico | preço por loja, HLTB, crítica, informações); HLTB, jogadores e notas pelo Augmented Steam (servidor, cache de 30 dias, sem chamar em lote); tempo jogado e última vez pelo `GetOwnedGames` (`include_appinfo`/`playtime_forever`, `rtime_last_played`); "trocar" franquia à mão. Conquistas (`GetPlayerAchievements`) podem ficar para o fim da etapa, se pesar.
@@ -19,6 +19,17 @@ Amostra com os dados reais do dono em `dados/amostras-biblioteca.html` (pasta ig
 - **B · Coleção por franquia (pedido original):** Coleção = seções por franquia com capas quebrando linha, P&B no meio, "Avulsos" no fim; texto = tabela agrupada por franquia. Franquias e Completar = blocos lado a lado que abrem ao clicar (ocupam a linha inteira).
 - **C · Lista lateral (cliente Steam):** lista à esquerda, conteúdo à direita. Coleção filtra por Todos/Jogados recentemente/Nunca jogados/Sem franquia/uma franquia; Franquias e Completar mostram a escolhida com a arte `library_hero` no topo.
 - Medido nos dados: 634 jogos, 757 na lista, 135 franquias com algo que tenho (197 com 2+ jogos conhecidos), 278 jogos com DLC faltando. **DLCs possuídas = 0** porque falta o `userdata.json` (a extensão ainda não sincronizou): sem ele, Completar mostra todas as DLCs como faltando.
+
+## Retorno do dono sobre A/B/C (09/10)
+- **Coleção:** jogos lado a lado vira "mistura heterogênea" com qualquer filtro. Quer **uma capa por franquia** (um pouco maior que a da grade de jogos) e, ao abrir, uma **ficha da franquia espelhando a ficha B+ do jogo**. Texto do A: não gostou. B (seções por franquia) muito legal, mas com espaço vazio: franquias **2 ou 3 por linha**. C: gostou de "puxar as franquias", mas a barra de rolagem é péssima e digitar no dia a dia não serve. **Regra de layout: uma mão no teclado e outra no mouse; andar pela tela tem de ser prático e bonito; é vitrine, orgulho do jogador.** Ordenação em lista suspensa e os filtros do C não agradaram.
+- **Franquias:** prateleiras do A legais (uma por linha, em dúvida). Texto do A bom, mas o nome do jogo precisa de cor que diferencie, e **bug**: abrir um bloco da 2ª ou 3ª coluna deixava buracos na grade (o bloco aberto pulava de linha). Capas do B muito boas; ao clicar, maximizar na tela seguindo a ficha.
+- **Completar:** capas do A boas, mas com espaço sobrando (2 ou 3 por linha). Texto do B cansativo.
+- **Nome errado da franquia do The Last of Us** ("45527500"): a Steam manda `The Last of Us Franchise|45527500` e no empate a regra ficava com o mais curto. Corrigido em `series._limpa` (ignora nome só com dígitos e tira " Franchise").
+
+## Segunda rodada: D e E (09/10)
+Amostra em `dados/amostras-biblioteca-2.html` (mesmos dados). Nas duas: capa da franquia em **pilha** (capa do jogo mais jogado, "23 de 30" e barra de progresso), **ordem em botões de um clique** (sem lista suspensa), **índice A–Z** fixo à direita (sem rolar nem digitar), **atalhos** (setas andam pelas capas, Enter abre, Esc fecha, letra pula, `/` busca, 1/2/3 trocam a página, T alterna texto/capas), **ficha da franquia** no molde da B+ (capa, nome, etiquetas, 5 números: jogos, tempo jogado, para completar, DLCs que faltam, valor; ações; todos os jogos em capas; "onde foi o seu tempo" e "o que falta"). Texto em colunas (sem buraco ao abrir) e nomes coloridos: tenho = claro, falta = lilás.
+- **D · Vitrine + ficha em tela cheia:** franquias e avulsos misturados na mesma vitrine; a ficha da franquia abre por cima, com ‹ › (← →) para a vizinha. Franquias e Completar em 3 por linha.
+- **E · Estante que abre no lugar:** franquias primeiro, avulsos embaixo em capas menores; a ficha da franquia abre embaixo da linha clicada (com "abrir em tela cheia"). Franquias em 2 prateleiras com setas por linha; Completar em 2 por linha.
 
 ## Pedido (dono, 08/10)
 - A aba está mal disposta. Hoje: **Completar · Franquias · Coleção · DLCs em promoção** (botões no topo da aba).

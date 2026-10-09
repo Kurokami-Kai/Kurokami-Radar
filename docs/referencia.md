@@ -354,6 +354,7 @@ Agrupa jogos da mesma serie pelo nome, em vez do campo "franquia" da Steam
 - `rotulo(nomes)` — Prefixo comum dos nomes, recortado do primeiro nome original (mantem a grafia: "Half-Life", "Need for Speed").
 - `agrupar(itens)` — itens: [{"appid", "nome", ...}] -> {chave: [itens]}
 - `_editora(f)`
+- `_limpa(f)`
 - `_da_steam(it)`
 - `franquias(itens, manual)` — itens: [{"appid", "nome", "franquia"}] -> {appid: nome da franquia}.
 

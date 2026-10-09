@@ -83,8 +83,15 @@ def _editora(f):
     return f.lower() in SERVICOS or p[-1] in EMPRESA
 
 
+def _limpa(f):
+    # "The Last of Us Franchise" -> "The Last of Us"; a Steam as vezes manda so um numero (The Last of Us: "45527500")
+    f = re.sub(r"\s+franchise$", "", f.strip(), flags=re.I)
+    return "" if f.isdigit() else f
+
+
 def _da_steam(it):
-    return [f.strip() for f in (it.get("franquia") or "").split("|") if f.strip() and not _editora(f.strip())]
+    fs = [_limpa(f) for f in (it.get("franquia") or "").split("|")]
+    return [f for f in fs if f and not _editora(f)]
 
 
 def franquias(itens, manual=None):
