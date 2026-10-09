@@ -2,6 +2,12 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — spec 09: duas opções para a aba Ofertas (O1/O2)
+- **Amostra de Ofertas sem copiar o banco:** a API do Radar aberto (`/api/vitrine`, `/api/promocoes` com `por_pagina` 250) já dá tudo; só a franquia veio do banco (`series.franquias`). Rotas ficam na raiz (`/api/...`), não em `/kurokami/api/`. As contagens batem com a vitrine filtrando `corte >= desconto_minimo`.
+- **CSS da referência injetado pelo gerador** (lê o `<style>` de `09-referencia-biblioteca.html`): a amostra herda o visual H2 sem duplicar.
+- **Prints do navegador do app seguem instáveis** (tempo esgotado, escala errada, quadro velho): cada `navigate` para arquivo local abre aba nova; medir pelo DOM (alturas, colunas, erros num laço por opção × página × modo) e usar `zoom` só para conferir.
+- **Caminho Windows em string Python sem `r` e com barra invertida antes de dígito** (`specs` + barra + `09`) vira byte nulo: use barras normais.
+
 ## 2026-10-09 — spec 09 Etapa 2: três amostras da Biblioteca
 - **Amostra com dados pessoais vai para `dados/`** (ignorada pelo Git): script no scratchpad chama `painel.api_biblioteca` + `series.franquias` numa cópia do banco e injeta o JSON no modelo HTML.
 - **Ordem padrão antes de ordenar:** `tool()` fixava a ordem depois do `sort` e a 1ª pintura saiu sem ordem; testar cada tela num laço JS (opção × página × modo) achou isso mais rápido que prints.
@@ -40,19 +46,8 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Arquivo .py de edição no scratchpad + `assert count == 1`** funcionou sem retrabalho (o único heredoc tentado quebrou de novo nas aspas).
 - **O navegador do app guardou o `painel.html` velho:** depois de editar, navegue com `?v=N` para forçar a página nova.
 
-## 2026-10-08 — spec 07, Steam inteira
-- **Os 126 MB/dia da spec 04 eram falta de gzip:** a Steam comprime se pedir (1,5 MB → 150 KB por página). Meça o tamanho com `Accept-Encoding: gzip` antes de concluir que algo é pesado.
-- **`cmp_to_key` com 100 mil linhas leva segundos;** ordenações estáveis do último critério ao primeiro (nulos separados) dão o mesmo resultado em ~100 ms.
-- **Teste de desempenho barato:** cópia do banco + 100 mil linhas sintéticas em `steam_promo` + `painel.api_promocoes` chamado direto (sem servidor).
-- **Reescrever histórico (e-mail pessoal, 08/10):** `git filter-branch --env-filter ... --tag-name-filter cat -- --all` (o filter-repo não está instalado), backup com `git bundle` antes, e as 4 tags num push só: com mais de 3 tags por push o GitHub não dispara o workflow de instalador.
-- **O hook que mostra o `painel.html` no navegador do app troca a aba ativa:** depois de editar o HTML, navegue de novo para a porta da cópia (a aba nova vem com outro `tabId`).
-
-## 2026-10-08 — QR trocado pela extensão do Radar
-- **Heredoc de novo quebrou aspas** num script de edição: edite o `.py` do scratchpad com a ferramenta Edit em vez de remendar via Bash.
-- **`troca` com texto que aparece duas vezes** (`await carregarContaQR();` estava no topo e no Finalizar): inclua a linha de cima no trecho para ele ficar único.
-- **A estrutura da página da Steam dá para conferir sem login** no navegador do app (`#application_config` → `store_user_config.webapi_token` vazio). Já adicionar ao carrinho pela extensão só o dono testa, com a conta dele.
-
-## Antigas, resumidas (até 07/10)
+## Antigas, resumidas (até 08/10)
+- **Steam inteira e extensão (08/10):** peça gzip antes de achar algo pesado (1,5 MB → 150 KB); ordenar estável do último critério ao primeiro em vez de `cmp_to_key`; teste de desempenho com cópia do banco + linhas sintéticas chamando `painel.api_promocoes` direto; reescrever histórico com `git filter-branch` e `git bundle` de backup; a página da Steam dá para conferir sem login no navegador do app.
 - **Scripts de edição:** Write num `.py` do scratchpad (heredoc quebra aspas, crases e `\`), `assert s.count(a) == 1` antes de cada troca, trecho único (inclua a linha de cima) e corte só entre marcadores nomeados, com `git diff --stat` logo depois.
 - **Testes:** `painel_copia.py` velho pode seguir vivo em outra porta (use `--porta 8801`); `tools/rodar_instalado.py` para o caminho real (achou o que os sintéticos não acharam); teste que mexe na conta guarda o conteúdo a cada passo; `GetCart` só lê. Medir na fonte (`Query` precisa de `sort: 2`).
 - **Leitura:** mapeie com `tools/mapa.py` e leia só a função; código morto por script de referências, procurando também em `tools/`. Releia a skill antes do último passo; `gh` não existe: workflow pela API pública.
