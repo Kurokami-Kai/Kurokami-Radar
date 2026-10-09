@@ -118,7 +118,7 @@ Em **Configurações → Acesso pelo celular**, ligue a opção. Aparece um ende
 
 ## 6. Atualizar
 
-O Hunter procura versão nova **sempre que abre** e uma vez por dia enquanto fica aberto. Quando tem, chega uma notificação e aparece uma faixa verde no painel com **Atualizar agora**: ele baixa, instala por cima e abre de novo sozinho. Seus dados e chaves ficam.
+O Hunter procura versão nova **sempre que abre** e uma vez por dia enquanto fica aberto. Quando tem, chega uma notificação e aparece uma faixa vermelha no painel com **Atualizar agora**: ele baixa, instala por cima e abre de novo sozinho. Seus dados e chaves ficam.
 
 Se preferir na mão: menu Iniciar → **Kurokami Hunter (Atualizar)**, ou ícone → **Procurar atualização…**
 

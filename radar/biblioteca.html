@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Biblioteca · Kurokami Hunter</title>
 <style>
-:root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#666666;--azul:#66c0f4;--verde:#a4d007;--vbg:#4c6b22;--vtx:#beee11;--borda:#ffffff14;--lista:#c9a0ff;--tenho:#f0f0f0}
+:root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#666666;--azul:#ff4655;--verde:#ff4655;--vbg:#6e0a14;--vtx:#ff8a94;--borda:#ffffff14;--lista:#c9a0ff;--tenho:#f0f0f0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
 button{font:inherit;color:inherit}
@@ -22,12 +22,13 @@ button{font:inherit;color:inherit}
 .nav{display:flex;gap:4px;height:100%}
 .nav>div,.nav>button{position:relative;display:flex;align-items:center}
 .nav .t{background:none;border:0;color:#dcdedf;text-transform:uppercase;font-size:14px;letter-spacing:.04em;padding:0 12px;height:100%;cursor:pointer}
+.nav .t:hover{color:var(--azul)}
 .nav .t.on{color:var(--azul);box-shadow:inset 0 -3px 0 var(--azul)}
 .ddm{display:none;position:absolute;top:100%;left:0;min-width:250px;background:#1c1c1c;box-shadow:0 6px 18px #000a;padding:6px 0;z-index:40}
 .nav>div:hover .ddm,.nav>div:focus-within .ddm{display:block}
 .ddm button{display:flex;justify-content:space-between;width:100%;text-align:left;background:none;border:0;color:#dcdedf;padding:8px 16px;font-size:13.5px;cursor:pointer}
-.ddm button:hover{background:#dcdedf;color:#000000}
-.ddm button.on{color:var(--azul)}.ddm button.on:hover{color:#000000}
+.ddm button:hover{background:#1a1a1a;color:var(--azul)}
+.ddm button.on{color:var(--azul)}
 .ddm kbd{font-size:11px;opacity:.6}
 .ddm hr{border:0;border-top:1px solid #ffffff22;margin:6px 0}
 .ddm .ext{color:var(--fraco);font-size:12.5px}
@@ -62,7 +63,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .capa .cor{position:absolute;top:6px;right:6px;color:var(--lista);font-size:15px;text-shadow:0 0 4px #000}
 .capa .pr{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:4px;background:linear-gradient(transparent,#000d 40%);padding:16px 6px 6px;font-size:12.5px;color:#fff}
 .capa .pr .c{background:var(--vbg);color:var(--vtx);font-size:11px;padding:0 4px;margin-right:4px}
-.mais{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:2px;background:linear-gradient(90deg,#75b022,#588a1b);color:#d2efa9;cursor:pointer;font-size:15px;line-height:1;flex:none}
+.mais{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:2px;background:linear-gradient(90deg,#b3121f,#7a0c15);color:#ffd6d9;cursor:pointer;font-size:15px;line-height:1;flex:none}
 .vit{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:26px 20px}
 .it{min-width:0}
 .pilha{position:relative;padding:8px 8px 0 0}
@@ -79,8 +80,8 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .secao h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:0}
 .secao span{color:var(--fraco);font-size:12.5px}
 .bar{height:6px;background:#ffffff12;position:relative;margin:6px 0}.bar i{position:absolute;inset:0 auto 0 0;background:var(--verde)}
-.btn{border:0;padding:0 16px;height:38px;border-radius:2px;cursor:pointer;background:#67c1f533;color:var(--azul);font-size:14px}
-.btn.verde{background:linear-gradient(90deg,#75b022,#588a1b);color:#d2efa9}
+.btn{border:0;padding:0 16px;height:38px;border-radius:2px;cursor:pointer;background:#ff465533;color:var(--azul);font-size:14px}
+.btn.verde{background:linear-gradient(90deg,#b3121f,#7a0c15);color:#ffd6d9}
 .btn:hover{filter:brightness(1.15)}
 .pct{background:var(--vbg);color:var(--vtx);padding:1px 5px;font-size:12px}
 .grid2{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:14px}
@@ -111,7 +112,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .lst .n{color:var(--tenho);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lst .n.f{color:var(--lista)}
 .lst .n .a{color:var(--dim);font-size:11.5px;margin-left:6px}
-.lst .s{white-space:nowrap;color:#9ccc54;font-size:12.5px;display:flex;gap:6px;align-items:center}.lst .s.f{color:#fff}
+.lst .s{white-space:nowrap;color:#ff8a94;font-size:12.5px;display:flex;gap:6px;align-items:center}.lst .s.f{color:#fff}
 .lstd li{grid-template-columns:52px minmax(0,1fr) auto}
 .lstd img{width:52px;height:24px;object-fit:cover;display:block;filter:grayscale(1) brightness(.75)}
 .rod{background:none;border:0;border-top:1px solid var(--borda);color:var(--azul);text-align:left;padding:8px 0 0;margin-top:6px;cursor:pointer;font-size:12.5px}
@@ -153,7 +154,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .fx .top .capa{box-shadow:0 10px 30px #000c;cursor:default}
 .fx h1{font-size:34px;font-weight:400;color:#fff;margin:4px 0 6px;line-height:1.15;text-shadow:0 2px 8px #000}
 .chip{display:inline-block;font-size:12.5px;padding:3px 9px;border-radius:2px;background:#ffffff14;color:var(--txt);margin:0 6px 6px 0}
-.chip.tenho{background:var(--vbg);color:var(--vtx)}.chip.lista{background:#4b3a6e;color:#e4d7ff}.chip.promo{background:#1a6fd1;color:#fff}
+.chip.tenho{background:var(--vbg);color:var(--vtx)}.chip.lista{background:#4b3a6e;color:#e4d7ff}.chip.promo{background:#b3121f;color:#fff}
 .fx .dsc{color:var(--txt);font-size:14px;margin:4px 0 12px}
 .tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-bottom:12px}
 .tiles>div{background:#0d0d0dd9;padding:10px 12px;border-top:3px solid transparent;min-width:0}
@@ -168,7 +169,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .lg{font-size:12px;margin-top:4px;line-height:1.35}
 .lg .n{color:var(--tenho);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
 .lg .n.f{color:var(--lista)}
-.lg .a{color:var(--dim)}.lg .a b{color:#9ccc54;font-weight:400}.lg .a b.f{color:#fff}
+.lg .a{color:var(--dim)}.lg .a b{color:#ff8a94;font-weight:400}.lg .a b.f{color:#fff}
 .cx{background:var(--pan);padding:12px 14px}
 .hb{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:2px 10px;font-size:13px;align-items:center}
 .hb span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

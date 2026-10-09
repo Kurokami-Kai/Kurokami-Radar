@@ -6,7 +6,7 @@
 <title>Ofertas · Kurokami Hunter</title>
 <style>
 
-:root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#666666;--azul:#66c0f4;--verde:#a4d007;--vbg:#4c6b22;--vtx:#beee11;--borda:#ffffff14;--lista:#c9a0ff;--tenho:#f0f0f0}
+:root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#666666;--azul:#ff4655;--verde:#ff4655;--vbg:#6e0a14;--vtx:#ff8a94;--borda:#ffffff14;--lista:#c9a0ff;--tenho:#f0f0f0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
 button{font:inherit;color:inherit}
@@ -23,12 +23,13 @@ button{font:inherit;color:inherit}
 .nav{display:flex;gap:4px;height:100%}
 .nav>div,.nav>button{position:relative;display:flex;align-items:center}
 .nav .t{background:none;border:0;color:#dcdedf;text-transform:uppercase;font-size:14px;letter-spacing:.04em;padding:0 12px;height:100%;cursor:pointer}
+.nav .t:hover{color:var(--azul)}
 .nav .t.on{color:var(--azul);box-shadow:inset 0 -3px 0 var(--azul)}
 .ddm{display:none;position:absolute;top:100%;left:0;min-width:250px;background:#1c1c1c;box-shadow:0 6px 18px #000a;padding:6px 0;z-index:40}
 .nav>div:hover .ddm,.nav>div:focus-within .ddm{display:block}
 .ddm button{display:flex;justify-content:space-between;width:100%;text-align:left;background:none;border:0;color:#dcdedf;padding:8px 16px;font-size:13.5px;cursor:pointer}
-.ddm button:hover{background:#dcdedf;color:#000000}
-.ddm button.on{color:var(--azul)}.ddm button.on:hover{color:#000000}
+.ddm button:hover{background:#1a1a1a;color:var(--azul)}
+.ddm button.on{color:var(--azul)}
 .ddm kbd{font-size:11px;opacity:.6}
 .ddm hr{border:0;border-top:1px solid #ffffff22;margin:6px 0}
 .ddm .ext{color:var(--fraco);font-size:12.5px}
@@ -63,7 +64,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .capa .cor{position:absolute;top:6px;right:6px;color:var(--lista);font-size:15px;text-shadow:0 0 4px #000}
 .capa .pr{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:4px;background:linear-gradient(transparent,#000d 40%);padding:16px 6px 6px;font-size:12.5px;color:#fff}
 .capa .pr .c{background:var(--vbg);color:var(--vtx);font-size:11px;padding:0 4px;margin-right:4px}
-.mais{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:2px;background:linear-gradient(90deg,#75b022,#588a1b);color:#d2efa9;cursor:pointer;font-size:15px;line-height:1;flex:none}
+.mais{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:2px;background:linear-gradient(90deg,#b3121f,#7a0c15);color:#ffd6d9;cursor:pointer;font-size:15px;line-height:1;flex:none}
 .vit{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:26px 20px}
 .it{min-width:0}
 .pilha{position:relative;padding:8px 8px 0 0}
@@ -80,8 +81,8 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .secao h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:0}
 .secao span{color:var(--fraco);font-size:12.5px}
 .bar{height:6px;background:#ffffff12;position:relative;margin:6px 0}.bar i{position:absolute;inset:0 auto 0 0;background:var(--verde)}
-.btn{border:0;padding:0 16px;height:38px;border-radius:2px;cursor:pointer;background:#67c1f533;color:var(--azul);font-size:14px}
-.btn.verde{background:linear-gradient(90deg,#75b022,#588a1b);color:#d2efa9}
+.btn{border:0;padding:0 16px;height:38px;border-radius:2px;cursor:pointer;background:#ff465533;color:var(--azul);font-size:14px}
+.btn.verde{background:linear-gradient(90deg,#b3121f,#7a0c15);color:#ffd6d9}
 .btn:hover{filter:brightness(1.15)}
 .pct{background:var(--vbg);color:var(--vtx);padding:1px 5px;font-size:12px}
 .grid2{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:14px}
@@ -112,7 +113,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .lst .n{color:var(--tenho);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lst .n.f{color:var(--lista)}
 .lst .n .a{color:var(--dim);font-size:11.5px;margin-left:6px}
-.lst .s{white-space:nowrap;color:#9ccc54;font-size:12.5px;display:flex;gap:6px;align-items:center}.lst .s.f{color:#fff}
+.lst .s{white-space:nowrap;color:#ff8a94;font-size:12.5px;display:flex;gap:6px;align-items:center}.lst .s.f{color:#fff}
 .lstd li{grid-template-columns:52px minmax(0,1fr) auto}
 .lstd img{width:52px;height:24px;object-fit:cover;display:block;filter:grayscale(1) brightness(.75)}
 .rod{background:none;border:0;border-top:1px solid var(--borda);color:var(--azul);text-align:left;padding:8px 0 0;margin-top:6px;cursor:pointer;font-size:12.5px}
@@ -154,7 +155,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .fx .top .capa{box-shadow:0 10px 30px #000c;cursor:default}
 .fx h1{font-size:34px;font-weight:400;color:#fff;margin:4px 0 6px;line-height:1.15;text-shadow:0 2px 8px #000}
 .chip{display:inline-block;font-size:12.5px;padding:3px 9px;border-radius:2px;background:#ffffff14;color:var(--txt);margin:0 6px 6px 0}
-.chip.tenho{background:var(--vbg);color:var(--vtx)}.chip.lista{background:#4b3a6e;color:#e4d7ff}.chip.promo{background:#1a6fd1;color:#fff}
+.chip.tenho{background:var(--vbg);color:var(--vtx)}.chip.lista{background:#4b3a6e;color:#e4d7ff}.chip.promo{background:#b3121f;color:#fff}
 .fx .dsc{color:var(--txt);font-size:14px;margin:4px 0 12px}
 .tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-bottom:12px}
 .tiles>div{background:#0d0d0dd9;padding:10px 12px;border-top:3px solid transparent;min-width:0}
@@ -169,7 +170,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .lg{font-size:12px;margin-top:4px;line-height:1.35}
 .lg .n{color:var(--tenho);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
 .lg .n.f{color:var(--lista)}
-.lg .a{color:var(--dim)}.lg .a b{color:#9ccc54;font-weight:400}.lg .a b.f{color:#fff}
+.lg .a{color:var(--dim)}.lg .a b{color:#ff8a94;font-weight:400}.lg .a b.f{color:#fff}
 .cx{background:var(--pan);padding:12px 14px}
 .hb{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:2px 10px;font-size:13px;align-items:center}
 .hb span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -238,7 +239,7 @@ body.pg-dest main{max-width:1600px;padding:0 24px 90px}
 .ban3 .top3{display:grid;grid-template-columns:minmax(300px,440px) minmax(0,1fr);gap:30px;align-items:center}
 .ban3 .hcap{box-shadow:0 14px 40px #000d;width:100%;display:block}
 .ban3 h1{font-size:40px;font-weight:400;color:#fff;margin:6px 0 8px;line-height:1.1;text-shadow:0 2px 10px #000}
-.ban3 .se{background:#0d0d0dd9;border-left:3px solid var(--c,#66c0f4);padding:10px 14px;margin:0 0 14px;max-width:780px}
+.ban3 .se{background:#0d0d0dd9;border-left:3px solid var(--c,#ff4655);padding:10px 14px;margin:0 0 14px;max-width:780px}
 .ban3 .se b{display:block;color:#fff;font-weight:400;font-size:15px}
 .ban3 .se span{color:var(--txt);font-size:13.5px}
 .ban3 .tiles{margin:18px 0 0}
@@ -248,8 +249,8 @@ body.pg-dest main{max-width:1600px;padding:0 24px 90px}
 .ban3 .minis button[aria-current=true]{opacity:1;box-shadow:0 0 0 2px var(--azul)}
 .ban3 .minis img{width:100%;aspect-ratio:460/215;object-fit:cover;display:block}
 .ban3 .minis .mh{position:absolute;left:4px;bottom:4px}
-.fev{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:9px 24px;font-size:14px;background:linear-gradient(90deg,#5c4a12,#2a2208 70%);color:#ffd75e}
-.fev b{color:#fff;font-weight:400}.fev span{color:#d8c690;font-size:13px}.fev .vt{margin-left:auto}
+.fev{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:9px 24px;font-size:14px;background:linear-gradient(90deg,#2a070b,#0d0d0d 60%);box-shadow:inset 3px 0 0 var(--azul),inset 0 -1px 0 #ffffff0d;color:#fff}
+.fev b{color:#fff;font-weight:400}.fev .st{font-style:normal;color:var(--azul)}.fev span{color:var(--fraco);font-size:13px}.fev .vt{margin-left:auto}
 .hoje{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin:18px 0 6px}
 .hoje>div{background:var(--pan);padding:12px 14px;border-top:3px solid var(--c,#3d3d3d);cursor:pointer;min-width:0}
 .hoje>div:hover{background:#151515}
@@ -421,7 +422,7 @@ body.mod-C main{max-width:1680px;padding:18px 24px 90px}
 .graf .gp{font-size:10.5px;text-anchor:end}
 .gl{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;color:var(--fraco);margin-top:4px}
 .gl i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
-.gl i.o{border:2px dashed #66c0f4;border-radius:50%;width:10px;height:10px;box-sizing:border-box}
+.gl i.o{border:2px dashed #ff4655;border-radius:50%;width:10px;height:10px;box-sizing:border-box}
 @media (max-width:1100px){.tri{grid-template-columns:1fr}.ag{grid-template-columns:1fr}.agg:first-child{border:0;padding:0 0 14px}.agg{padding:0}.cwrap{grid-template-columns:1fr}.painel{display:none}.agr{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* ---------- sexta rodada ---------- */
 .ban3 .se{max-width:none}
@@ -488,14 +489,14 @@ body.pg-dest .full{margin-left:-32px;margin-right:-32px}
 .vers{display:flex;gap:2px}
 .vers button{background:none;border:0;border-bottom:2px solid transparent;color:var(--fraco);padding:4px 8px;cursor:pointer;font-size:13px}
 .vers button small{color:var(--dim)}.vers button[aria-pressed=true]{color:#fff;border-bottom-color:var(--azul)}
-.orc{position:relative;overflow:hidden;background:#0d0d0d;border-top:3px solid #beee11;margin:8px 0 12px}
+.orc{position:relative;overflow:hidden;background:#0d0d0d;border-top:3px solid #ff8a94;margin:8px 0 12px}
 .orc .obg{position:absolute;inset:0;background:center 30%/cover no-repeat;opacity:.35}
 .orc .obg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#000 0,#000000d0 38%,#00000066 100%)}
 .orc .oin{position:relative;display:grid;grid-template-columns:minmax(300px,400px) minmax(0,1fr);gap:28px;align-items:center;padding:18px 20px}
 .orc .k{color:var(--fraco);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
 .orc .ot{font-size:20px;color:#fff;margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .seg2{display:inline-flex;gap:2px}.seg2 button{background:#ffffff12;border:0;color:var(--txt);padding:4px 10px;font-size:14px;cursor:pointer}
-.seg2 button[aria-pressed=true]{background:#beee11;color:#000}
+.seg2 button[aria-pressed=true]{background:#ff8a94;color:#000}
 .orc .ob{font-size:26px;color:#fff;margin-top:6px}.orc .ob b{font-weight:400}.orc .ob .g{color:var(--vtx)}
 .orc .os{color:var(--fraco);font-size:13px;margin:4px 0 12px}.orc .os b{color:var(--vtx);font-weight:400}
 .orc .op{color:var(--vtx);font-size:13px;margin-top:5px;text-align:center}
@@ -521,7 +522,7 @@ body.pg-dest .full{margin-left:-32px;margin-right:-32px}
 .tetos button[aria-pressed=true] small{color:#000a}
 .btn{background:#ffffff17;color:#e6e6e6}
 .btn:hover{background:#ffffff26;filter:none}
-.btn.verde{background:linear-gradient(90deg,#75b022,#588a1b);color:#e9f7d4}
+.btn.verde{background:linear-gradient(90deg,#b3121f,#7a0c15);color:#ffd6d9}
 /* ---------- dentro do painel (iframe): o topo é o do painel ---------- */
 .tool{top:0}
 .az{top:70px;bottom:44px}
@@ -573,7 +574,7 @@ const SORT={melhor:(a,b)=>(b.risco??-1)-(a.risco??-1)||b.corte-a.corte||b.eco-a.
 const tempo=d=>d<10?'poucos dias':d<45?`~${Math.max(2,Math.round(d/7))} semanas`:`~${Math.max(2,Math.round(d/30.4))} meses`;
 
 /* ---------- etiquetas ---------- */
-const ET={selo:['Selo Kurokami','#5c4a12','#ffd75e'],novo:['Novo recorde','#4c6b22','#beee11'],igual:['Igual ao recorde','#1a4a6b','#66c0f4'],'24m':['Menor em 2 anos','#262626','#c8c8c8'],
+const ET={selo:['Selo Kurokami','#5c4a12','#ffd75e'],novo:['Novo recorde','#6e0a14','#ff8a94'],igual:['Igual ao recorde','#4a1016','#ff4655'],'24m':['Menor em 2 anos','#262626','#c8c8c8'],
   gratis:['Grátis para resgatar','#3a3a3a','#f0f0f0'],fim:['','#6b3a12','#ffb36b'],rara:['','#1f4f4a','#6fe0c8'],volta:['','#2a2a2a','#979797'],info:['','#2a2a2a','#979797']};
 const etqP=o=>gratis(o)?['Grátis para resgatar','gratis']:em(o)&&ET[o.t]?[ET[o.t][0],o.t]:null;
 function etqC(o){if(!em(o)||o.risco==null)return null;
@@ -697,7 +698,7 @@ function prateleiras(){const v=o=>o.pv,logo=L.filter(o=>!em(o)&&v(o).prox_t&&v(o
   {nome:'Da sua lista',c:'#c9a0ff',desc:'Valem a pena: o preço tem chance real de não voltar logo · os mais difíceis de repetir primeiro',l:ELEG_L()},
   {nome:'Raras na Steam',c:'#6fe0c8',desc:'Fora da sua lista, com histórico · os mais difíceis de repetir primeiro',l:ELEG_S()},
   {nome:'Terminam em até 3 dias',c:'#ffb36b',desc:'Valem a pena e acabam logo · pelo término (♥ = da sua lista)',l:[...ELEG_L(),...ELEG_S()].filter(breve).sort(SORT.fim)},
-  {nome:'Da sua lista: devem entrar em promoção logo',c:'#66c0f4',desc:'Fora de promoção hoje; pela previsão, a próxima deve vir em até 3 semanas, no menor preço que já teve · vale esperar',l:logo}].filter(x=>x.l.length);}
+  {nome:'Da sua lista: devem entrar em promoção logo',c:'#ff4655',desc:'Fora de promoção hoje; pela previsão, a próxima deve vir em até 3 semanas, no menor preço que já teve · vale esperar',l:logo}].filter(x=>x.l.length);}
 const quando=s=>{const h=(Date.now()-Date.parse(s))/36e5;return h<1?'há menos de 1 h':h<24?`há ${Math.round(h)} h`:`há ${Math.round(h/24)} dias`;};
 function fichaPrat(x){const l=x.l,A=l[0].appid;
   return `<div class="fx">${navOv}<div class="fundo2" style="background-image:url('${CDN+A}/library_hero.jpg')"></div><div class="in">
@@ -861,8 +862,8 @@ const atualEp=(o,e)=>em(o)&&e.f>=T0-DIA;
 const EVT=(()=>{if(!EV)return null;let m=0;P.forEach(o=>{if(o.fim>AGORA&&o.fim-AGORA<60*DIA&&ddmm(o.fim)===EV.d)m=Math.max(m,o.fim);});return m||null;})();
 
 /* ---------- veredito: o piso (menor preço dos últimos 24 meses, antes desta promoção) e quanto se ganha ---------- */
-const VD={imperdivel:['Imperdível','#4c6b22','#beee11'],menor:['Menor preço','#1f4f4a','#6fe0c8'],espera:['Pode esperar','#262626','#c8c8c8'],
-  comum:['Preço de costume','#2a2a2a','#d2d2d2'],sem:['Sem histórico','#2a2a2a','#979797'],vem:['Vem aí','#1a4a6b','#66c0f4'],
+const VD={imperdivel:['Imperdível','#6e0a14','#ff8a94'],menor:['Menor preço','#1f4f4a','#6fe0c8'],espera:['Pode esperar','#262626','#c8c8c8'],
+  comum:['Preço de costume','#2a2a2a','#d2d2d2'],sem:['Sem histórico','#2a2a2a','#979797'],vem:['Vem aí','#4a1016','#ff4655'],
   fora:['Fora de promoção','#222222','#979797'],breve:['Em breve','#222222','#979797']};
 const RANK={imperdivel:0,menor:1,espera:2,comum:3,sem:4,vem:5,fora:6,breve:7};
 const GANHO_MIN=500,GANHO_PCT=.15;   /* imperdível: abaixo do piso por R$ 5 e 15% ou mais */
@@ -888,10 +889,10 @@ const ordV=(a,b)=>RANK[verd(a)[0]]-RANK[verd(b)[0]]||ganho(b)-ganho(a)||b.eco-a.
 const X0=T0-730*DIA,X1=T0+100*DIA,xs=(t,W)=>Math.max(0,Math.min(W,(t-X0)/(X1-X0)*W));
 function faixa(o,W=240,Hh=14){const h=HI(o),r=refP(o);
   if(!h.length)return `<span class="fx0">${em(o)?'sem histórico ainda':'sem promoções registradas'}</span>`;
-  const x0=xs(T0,W);let s=`<rect width="${W}" height="${Hh}" fill="#ffffff0a"/><rect x="${x0}" width="${W-x0}" height="${Hh}" fill="#66c0f414"/>`;
+  const x0=xs(T0,W);let s=`<rect width="${W}" height="${Hh}" fill="#ffffff0a"/><rect x="${x0}" width="${W-x0}" height="${Hh}" fill="#ff465514"/>`;
   for(const e of h){if(e.f<X0)continue;const a=xs(e.t,W),w=Math.max(1.5,xs(e.f,W)-a),cur=atualEp(o,e),ok=r!=null&&e.p<=r+tolP(r);
-    s+=`<rect x="${a.toFixed(1)}" y="${cur?0:2}" width="${w.toFixed(1)}" height="${cur?Hh:Hh-4}" fill="${cur?'#66c0f4':ok?'#beee11':'#474747'}"/>`;}
-  const v=o.pv;if(v.prox_t&&v.prox_t<X1){const a=xs(v.prox_t,W);s+=`<rect x="${(a-1.5).toFixed(1)}" y="1" width="3" height="${Hh-2}" fill="none" stroke="#66c0f4" stroke-dasharray="2 1.5"/>`;}
+    s+=`<rect x="${a.toFixed(1)}" y="${cur?0:2}" width="${w.toFixed(1)}" height="${cur?Hh:Hh-4}" fill="${cur?'#ff4655':ok?'#ff8a94':'#474747'}"/>`;}
+  const v=o.pv;if(v.prox_t&&v.prox_t<X1){const a=xs(v.prox_t,W);s+=`<rect x="${(a-1.5).toFixed(1)}" y="1" width="3" height="${Hh-2}" fill="none" stroke="#ff4655" stroke-dasharray="2 1.5"/>`;}
   s+=`<rect x="${x0-.5}" width="1" height="${Hh}" fill="#ffffff80"/>`;
   return `<svg class="fx1" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Promoções nos últimos 24 meses"><title>Últimos 24 meses · verde: ${em(o)?'esse preço':'o menor preço'} ou menor · azul: a promoção de agora · tracejado: a próxima prevista</title>${s}</svg>`;}
 function faixaTxt(o){const v=o.pv;
@@ -905,21 +906,21 @@ function grafico(o){const h=HI(o).filter(e=>e.f>=X0);if(!h.length)return '';
   for(const d=new Date(X0*1000);d.getTime()/1000<X1;d.setMonth(d.getMonth()+1)){d.setDate(1);const t=d.getTime()/1000;
     if(t>X0&&d.getMonth()%3===0){const x=X(t);s+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${Hh-B}" stroke="#ffffff12"/><text x="${x}" y="${Hh-6}" class="gm">${MESES[d.getMonth()]}/${String(d.getFullYear()).slice(2)}</text>`;}}
   (D.EV||[]).forEach(t=>{if(t>X0&&t<X1)s+=`<line x1="${X(t)}" x2="${X(t)}" y1="${T}" y2="${Hh-B}" stroke="#ffd75e55" stroke-dasharray="3 3"/>`;});
-  s+=`<rect x="${X(T0)}" y="${T}" width="${W-R0-X(T0)}" height="${Hh-T-B}" fill="#66c0f40f"/><text x="${X(T0)+4}" y="${T+10}" class="gm" style="text-anchor:start">hoje</text>`;
+  s+=`<rect x="${X(T0)}" y="${T}" width="${W-R0-X(T0)}" height="${Hh-T-B}" fill="#ff46550f"/><text x="${X(T0)+4}" y="${T+10}" class="gm" style="text-anchor:start">hoje</text>`;
   const lin=(p,c,t,dash)=>`<line x1="${L0}" x2="${W-R0}" y1="${Y(p)}" y2="${Y(p)}" stroke="${c}"${dash?' stroke-dasharray="4 3"':''}/><text x="${L0-6}" y="${Y(p)+4}" class="gp" fill="${c}">${t}</text>`;
   if(o.cheio&&(r==null||Math.abs(Y(o.cheio)-Y(r))>12))s+=lin(o.cheio,'#666666','cheio '+brl0(o.cheio));
   for(const e of h){const a=X(e.t),w=Math.max(2,X(e.f)-a),cur=atualEp(o,e),ok=r!=null&&e.p<=r+tolP(r),y=Y(e.p);
-    s+=`<g><title>${mesAno(e.t)} · ${brl(e.p)} (-${e.c}%)</title><rect x="${a.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${(Hh-B-y).toFixed(1)}" fill="${cur?'#66c0f444':ok?'#beee1129':'#47474740'}"/><rect x="${a.toFixed(1)}" y="${(y-1.2).toFixed(1)}" width="${w.toFixed(1)}" height="2.5" fill="${cur?'#66c0f4':ok?'#beee11':'#8a8a8a'}"/></g>`;}
-  if(r!=null)s+=lin(r,'#beee11',brl0(r),true);
+    s+=`<g><title>${mesAno(e.t)} · ${brl(e.p)} (-${e.c}%)</title><rect x="${a.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${(Hh-B-y).toFixed(1)}" fill="${cur?'#ff465544':ok?'#ff8a9429':'#47474740'}"/><rect x="${a.toFixed(1)}" y="${(y-1.2).toFixed(1)}" width="${w.toFixed(1)}" height="2.5" fill="${cur?'#ff4655':ok?'#ff8a94':'#8a8a8a'}"/></g>`;}
+  if(r!=null)s+=lin(r,'#ff8a94',brl0(r),true);
   if(v.prox_t&&v.prox_p&&v.prox_t<X1){const x=X(v.prox_t),y=Y(v.prox_p);
-    s+=`<circle cx="${x}" cy="${y}" r="6" fill="none" stroke="#66c0f4" stroke-width="2" stroke-dasharray="3 2"/><text x="${x-9}" y="${Math.max(T+10,y-9)}" class="gp" fill="#66c0f4">próxima: ${esc(v.prox_curto||'')}</text>`;}
+    s+=`<circle cx="${x}" cy="${y}" r="6" fill="none" stroke="#ff4655" stroke-width="2" stroke-dasharray="3 2"/><text x="${x-9}" y="${Math.max(T+10,y-9)}" class="gp" fill="#ff4655">próxima: ${esc(v.prox_curto||'')}</text>`;}
   return `<svg class="graf" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Promoções nos últimos 24 meses">${s}</svg>`;}
 function grafBox(o){const g=grafico(o);if(!g)return '';
-  return `<div class="gbox"><div class="k">Promoções nos últimos 24 meses, nas suas lojas</div>${g}<div class="gl"><span><i style="background:#beee11"></i>${em(o)?'esse preço ou menor':'no menor preço'}</span><span><i style="background:#8a8a8a"></i>outras promoções</span>${em(o)?'<span><i style="background:#66c0f4"></i>a de agora</span>':''}${o.pv.prox_t?'<span><i class="o"></i>próxima prevista</span>':''}<span><i style="background:#ffd75e88"></i>grandes eventos da Steam</span></div></div>`;}
+  return `<div class="gbox"><div class="k">Promoções nos últimos 24 meses, nas suas lojas</div>${g}<div class="gl"><span><i style="background:#ff8a94"></i>${em(o)?'esse preço ou menor':'no menor preço'}</span><span><i style="background:#8a8a8a"></i>outras promoções</span>${em(o)?'<span><i style="background:#ff4655"></i>a de agora</span>':''}${o.pv.prox_t?'<span><i class="o"></i>próxima prevista</span>':''}<span><i style="background:#ffd75e88"></i>grandes eventos da Steam</span></div></div>`;}
 
 /* ---------- peças comuns ---------- */
 function fechaPop(){S.pop=false;const p=$('.fpop');if(p)p.hidden=true;const a=$('[data-pop]');if(a)a.setAttribute('aria-expanded','false');}
-const faixaEv=(full=true)=>EV?`<div class="${full?'full ':''}fev"><b>★ ${esc(EVN)} até ${EV.d}</b><span>${fmtN(EV.n)} promoções terminam juntas · ${fmtN(D.steam)} em promoção na Steam</span><button class="vt" data-go="promo">ver as promoções ›</button></div>`:'';
+const faixaEv=(full=true)=>EV?`<div class="${full?'full ':''}fev"><b><i class="st">★</i> ${esc(EVN)} até ${EV.d}</b><span>${fmtN(EV.n)} promoções terminam juntas · ${fmtN(D.steam)} em promoção na Steam</span><button class="vt" data-go="promo">ver as promoções ›</button></div>`:'';
 /* banner: as 10 melhores da lista (com o filtro escondido do Destaques) */
 const BAN=(()=>{let c=null;return ()=>c||(c=[L.filter(o=>em(o)&&o.hist&&!gratis(o)&&fl(o)).sort(ordV).slice(0,10),[]]);})();
 function banner(){const [a,b]=BAN(),H=[...a,...b];if(!H.length)return '';S.h=(S.h+H.length)%H.length;
@@ -929,7 +930,7 @@ function banner(){const [a,b]=BAN(),H=[...a,...b];if(!H.length)return '';S.h=(S.
    <button class="bnav e" data-hp="-1" title="Anterior">‹</button><button class="bnav d" data-hp="1" title="Próximo">›</button><div class="w3 anim">
     <div class="top3"><button data-nav data-j="${j}" style="border:0;padding:0;background:none;cursor:pointer" title="${esc(o.nome)}">${imgH(o,'hcap')}</button>
      <div style="min-width:0"><div><span class="chip" style="background:#0009">${pop?'Popular nas lojas':'♥ Da sua lista'} · ${S.h%10+1} de ${pop?b.length:a.length}</span>${etqFicha(o)}</div><h1>${esc(o.nome)}</h1>
-     ${k==='sem'?`<div class="se" style="--c:#66c0f4"><b>Popular: ${fmtN(o.rcount)} análises na Steam</b><span>-${o.corte}% · economia de ${brl0(o.eco)}${fimTxt(o.fim)?' · '+fimTxt(o.fim):''}. O Hunter ainda não tem as promoções antigas deste jogo para comparar.</span></div>`
+     ${k==='sem'?`<div class="se" style="--c:#ff4655"><b>Popular: ${fmtN(o.rcount)} análises na Steam</b><span>-${o.corte}% · economia de ${brl0(o.eco)}${fimTxt(o.fim)?' · '+fimTxt(o.fim):''}. O Hunter ainda não tem as promoções antigas deste jogo para comparar.</span></div>`
       :`<div class="se" style="--c:${c[2]}"><b>${c[0]}${sv?': '+esc(sv):''}</b><span>${fatos(o).map(([a,b])=>esc(a+': '+b)).join(' · ')}</span></div>`}
      <div class="acoes"><button class="btn verde" data-mais="${o.appid}">Pôr no carrinho · ${brl(o.preco)}</button><button class="btn" data-j="${j}">Abrir a ficha</button><button class="btn" data-loja="${o.appid}">Abrir na Steam</button></div></div></div>
     ${tilesJ(o)}
@@ -965,7 +966,7 @@ function bucketsMes(){const d=new Date(AGORA*1000),y=d.getFullYear(),m=d.getMont
 function agrupa(l,bk,chave){const usado=new Set();return bk.map(([id,curto,longo,f])=>{const g=l.filter(o=>!usado.has(o)&&f(chave(o)));g.forEach(o=>usado.add(o));return {id,curto,longo,l:g};});}
 function miniB(o){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k],v=o.pv;
   const h=(o.fim-AGORA)/3600,lin=em(o)?c[0]+(k==='agora'&&o.fim>AGORA&&h<=48?` · ${Math.max(1,Math.round(h))} h`:k==='espera'&&o.espera?' · '+tempo(o.espera):''):`${parteMes(v.prox_t).split(' de ')[0]} · ${v.prox_c>=4?brl(v.prox_p):(v.prox_curto||'').split(' · ')[1]||''}`;
-  return `<button class="mb" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}"><span class="im">${imgH(o)}${em(o)?`<span class="pz"><span class="pc">-${o.corte}%</span>${precoTxt(o)}</span>`:''}</span><span class="n">${esc(o.nome)}</span><span class="s" style="color:${em(o)?c[2]:'#66c0f4'}">${esc(lin)}</span></button>`;}
+  return `<button class="mb" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}"><span class="im">${imgH(o)}${em(o)?`<span class="pz"><span class="pc">-${o.corte}%</span>${precoTxt(o)}</span>`:''}</span><span class="n">${esc(o.nome)}</span><span class="s" style="color:${em(o)?c[2]:'#ff4655'}">${esc(lin)}</span></button>`;}
 const agr=(l,c)=>{l=l.filter(x=>x.l.length);return `<div class="agr" style="grid-template-columns:repeat(${Math.max(1,l.length)},minmax(0,1fr))">${l.map(x=>agCol(x,c)).join('')}</div>`;};
 function agCol(x,c){return `<div class="agc" style="--c:${c}"><div class="agh"><b>${esc(x.curto)}</b><span>${fmtN(x.l.length)}</span></div>${x.l.slice(0,5).map(miniB).join('')||'<p class="vazio" style="margin:0">nenhum</p>'}${x.l.length>5?`<button class="vt" data-go="lista:${x.id}">+ ${fmtN(x.l.length-5)} ›</button>`:''}</div>`;}
 
@@ -982,7 +983,7 @@ function itP(o){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k],z=o.pv.piso,
    <div class="sub vs" style="color:${c[2]}" title="${esc(c[0]+(s?' · '+s:''))}">${c[0]}${s?' · '+esc(s):''}</div></div>`;}
 const itA=o=>{const j=reg({k:'jogo',o});return `<div class="it" data-L="${o.L}">${capaV(o,j,{semLista:true})}<div class="nm">${esc(o.nome)}</div>${vdPill(o)}</div>`;};
 function itB(o){const j=reg({k:'jogo',o}),v=o.pv,prev=!em(o)&&!o.breve&&v.prox_t;
-  const band=prev?`<span class="vd" style="--eb:#1a4a6b;--ec:#66c0f4"><b>${esc(parteMes(v.prox_t))}</b> · ${esc(v.prox_c>=4?brl(v.prox_p):(v.prox_curto||'').split(' · ')[1]||'')}</span>`:vdPill(o);
+  const band=prev?`<span class="vd" style="--eb:#4a1016;--ec:#ff4655"><b>${esc(parteMes(v.prox_t))}</b> · ${esc(v.prox_c>=4?brl(v.prox_p):(v.prox_curto||'').split(' · ')[1]||'')}</span>`:vdPill(o);
   return `<div class="it" data-L="${o.L}">${capaV(o,j,{semLista:true})}<div class="nm">${esc(o.nome)}</div>${band}${prev?`<div class="sub2">${v.prox_c>=4?`o preço de ${v.prox_c} das 6 últimas promoções`:'faixa das 3 últimas promoções'}</div>`:''}</div>`;}
 const itC=o=>{const j=reg({k:'jogo',o});return `<div class="it" data-L="${o.L}">${capaV(o,j,{semLista:S.sub==='lista'})}<div class="nm">${esc(o.nome)}</div>${faixa(o,200,12)}<div class="sub fxt">${esc(faixaTxt(o))}</div></div>`;};
 function rowC(o){const j=reg({k:'jogo',o}),p=etqP(o);
@@ -1007,18 +1008,18 @@ function pagDestA(){const st=PS.filter(o=>em(o)&&o.hist&&fl(o)),vk=k=>st.filter(
   const fim=[...li,...st].filter(o=>breve(o)&&['imperdivel','menor'].includes(verd(o)[0])).sort(SORT.fim);
   const bb=BB(),tt=S.teto,bt=bb.filter(o=>o.preco<=tt);
   const tetos=`<div class="tetos">${TETOS.map(([v,t])=>`<button data-teto="${v}" aria-pressed="${v===tt}">${t} <small>${fmtN(bb.filter(o=>o.preco<=v).length)}</small></button>`).join('')}</div>`;
-  return faixaEv()+banner()+`<div class="pcab" style="margin-top:24px"><h2>Hoje</h2><span class="res">o piso é o menor preço dos últimos 2 anos: abaixo dele por R$ 5 e 15% ou mais é <b style="color:#beee11">imperdível</b>; nele, <b style="color:#6fe0c8">não fica mais barato</b></span></div>
-   <div class="tri">${lane('#beee11','Melhores ofertas','fora da lista · abaixo do menor preço em 2 anos · pelo ganho',mo,'promo:imperdivel')}${lane('#6fe0c8','Menores históricos','fora da lista · no menor preço em 2 anos · pela economia',mh,'promo:menor')}${lane('#ffb36b','Bons e baratos','fora da lista · baratos e bem avaliados · pelas análises',bt,'baratos:'+tt,false,rowB,tetos)}${lane('#c9a0ff','Lista de desejos','em promoção · as melhores primeiro',li,'lista:imperdivel',true)}</div>`
+  return faixaEv()+banner()+`<div class="pcab" style="margin-top:24px"><h2>Hoje</h2><span class="res">o piso é o menor preço dos últimos 2 anos: abaixo dele por R$ 5 e 15% ou mais é <b style="color:#ff8a94">imperdível</b>; nele, <b style="color:#6fe0c8">não fica mais barato</b></span></div>
+   <div class="tri">${lane('#ff8a94','Melhores ofertas','fora da lista · abaixo do menor preço em 2 anos · pelo ganho',mo,'promo:imperdivel')}${lane('#6fe0c8','Menores históricos','fora da lista · no menor preço em 2 anos · pela economia',mh,'promo:menor')}${lane('#ffb36b','Bons e baratos','fora da lista · baratos e bem avaliados · pelas análises',bt,'baratos:'+tt,false,rowB,tetos)}${lane('#c9a0ff','Lista de desejos','em promoção · as melhores primeiro',li,'lista:imperdivel',true)}</div>`
    +pratsLinha([{nome:'Acabam em até 3 dias',c:'#ff7b6b',desc:'Imperdíveis e no menor preço que terminam logo (♥ = da sua lista)',l:fim}]);}
 function pagDestB(){const pm=L.filter(em),fo=L.filter(o=>!em(o)&&!o.breve&&o.pv.prox_t),sp=L.filter(o=>!em(o)&&!o.breve&&!o.pv.prox_t).length;
   const A=agrupa(pm,bucketsFim(),o=>o).map(x=>(x.l.sort(SORT.melhor),x)),F=agrupa(fo,bucketsMes(),o=>o.pv.prox_t).map(x=>(x.l.sort(SORT.prox),x));
   return faixaEv()+banner(destaque())+`<div class="pcab" style="margin-top:24px"><h2>Agenda da sua lista</h2><span class="res">à esquerda, o que acaba (os que pedem pressa primeiro); à direita, quando deve vir a próxima promoção de quem está fora</span></div>
    <div class="ag"><div class="agg" style="--c:#ffb36b"><h4>Acabam<span>${fmtN(pm.length)} em promoção</span></h4>${agr(A,'#ffb36b')}</div>
-   <div class="agg" style="--c:#66c0f4"><h4>Vêm aí<span>${fmtN(fo.length)} com previsão · ${fmtN(sp)} sem</span></h4>${agr(F,'#66c0f4')}</div></div>`
+   <div class="agg" style="--c:#ff4655"><h4>Vêm aí<span>${fmtN(fo.length)} com previsão · ${fmtN(sp)} sem</span></h4>${agr(F,'#ff4655')}</div></div>`
    +pratsLinha([{nome:'Raras na Steam, pela data de fim',c:'#6fe0c8',desc:'Fora da sua lista, com histórico: as que acabam primeiro na frente',l:ELEG_S().filter(o=>o.fim>AGORA).sort(SORT.fim)}]);}
 function pagDestC(){const ag=ELEG_L(),st=ELEG_S(),vm=(prateleiras().find(x=>x.nome.startsWith('Da sua lista: devem'))||{l:[]}).l;
   const sec=(t,s,l,id,mais)=>l.length?`<div class="divi" id="sec-${id}"><h3>${t}</h3><span>${s}</span>${mais||''}</div><div class="vitC">${l.map(itC).join('')}</div>`:'';
-  return faixaEv(false)+`<div class="pcab" style="margin-top:14px"><h2>Destaques</h2><span class="res">a faixa sob cada capa são os últimos 24 meses: <b style="color:#beee11">verde</b> = esse preço ou menor, <b style="color:#66c0f4">azul</b> = agora, tracejado = próxima prevista</span></div>`
+  return faixaEv(false)+`<div class="pcab" style="margin-top:14px"><h2>Destaques</h2><span class="res">a faixa sob cada capa são os últimos 24 meses: <b style="color:#ff8a94">verde</b> = esse preço ou menor, <b style="color:#ff4655">azul</b> = agora, tracejado = próxima prevista</span></div>`
    +sec('Da sua lista: compre agora',`${ag.length} · o preço pode não voltar em 3 meses`,ag,'agora')
    +sec('Raras na Steam',`${st.length} · fora da sua lista, com histórico`,st.slice(0,30),'steam',st.length>30?'<button class="vt" data-go="promo" style="margin-left:auto">ver todas ›</button>':'')
    +sec('Da sua lista: vale esperar',`${vm.length} · fora de promoção; a próxima deve vir em até 3 semanas, no menor preço`,vm,'vem');}
@@ -1030,7 +1031,7 @@ const vazioF='<p class="vazio">Nenhum jogo com esses filtros. Abra “Filtros”
 /* recortes: cada um é um jeito de olhar as promoções (com os seus filtros); o cartão mostra a capa do melhor dele */
 const tetoTxt=()=>'até '+brl0(S.teto);
 const REC_P=[['tudo','Todas','pelo veredito','#d2d2d2',o=>true,null],
-  ['imperdivel','Imperdíveis','abaixo do menor preço em 2 anos','#beee11',o=>verd(o)[0]==='imperdivel',(a,b)=>ganho(b)-ganho(a)],
+  ['imperdivel','Imperdíveis','abaixo do menor preço em 2 anos','#ff8a94',o=>verd(o)[0]==='imperdivel',(a,b)=>ganho(b)-ganho(a)],
   ['menor','Menores históricos','no menor preço em 2 anos','#6fe0c8',o=>verd(o)[0]==='menor',(a,b)=>b.eco-a.eco],
   ['baratos','Bons e baratos',()=>tetoTxt()+' · 85%+ positivas','#ffb36b',o=>o.preco<=S.teto&&(o.rpos||0)>=85&&(o.cheio||0)>=3000,(a,b)=>(AF[b.appid]?1:0)-(AF[a.appid]?1:0)||notaB(b)-notaB(a)],
   ['grandes','Grandes por pouco','eram R$ 150+, hoje até R$ 50','#ff8fd0',o=>(o.cheio||0)>=15000&&o.preco<=5000,(a,b)=>b.eco-a.eco],
@@ -1056,10 +1057,10 @@ const SECS=[['imperdivel','Imperdíveis','abaixo do menor preço em 2 anos por R
   ['vem','Vem aí','fora de promoção; deve voltar em até 30 dias no menor preço',SORT.prox],
   ['fora','Fora de promoção','pela próxima promoção prevista',SORT.prox],['breve','Em breve','ainda não lançados',SORT.az]];
 const secVerd=l=>SECS.map(([k,t,s,so])=>{const g=l.filter(o=>verd(o)[0]===k).sort(so);return [t,`${fmtN(g.length)} · ${s}`,g,'p',k];}).filter(b=>b[2].length);
-const REC_L=[['agora','Compre agora','imperdíveis e no menor preço','#beee11',o=>em(o)&&['imperdivel','menor'].includes(verd(o)[0]),ordV],
+const REC_L=[['agora','Compre agora','imperdíveis e no menor preço','#ff8a94',o=>em(o)&&['imperdivel','menor'].includes(verd(o)[0]),ordV],
   ['fim','Acabam em 3 dias','as melhores primeiro','#ff7b6b',o=>em(o)&&o.fim>AGORA&&o.fim-AGORA<=3*DIA,ordV],
   ['espera','Pode esperar','o menor preço volta logo','#c8c8c8',o=>em(o)&&verd(o)[0]==='espera',ordV],
-  ['vem','Vem aí','fora de promoção; deve entrar em 30 dias','#66c0f4',o=>verd(o)[0]==='vem',SORT.prox],
+  ['vem','Vem aí','fora de promoção; deve entrar em 30 dias','#ff4655',o=>verd(o)[0]==='vem',SORT.prox],
   ['baratos','Até R$ 25','em promoção, os melhores primeiro','#ffb36b',o=>em(o)&&!gratis(o)&&o.preco<=2500,ordV]];
 const VER_L=[['todos','Todos',o=>true],['promo','Em promoção',em],['fora','Fora de promoção',o=>!em(o)&&!o.breve],['breve','Em breve',o=>!!o.breve]];
 /* orçamento: entre os melhores negócios da lista (imperdíveis e no menor preço), a combinação que cabe no valor e

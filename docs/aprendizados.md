@@ -2,6 +2,10 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — azul e verde viram vermelho
+- **Mapa de hex com alfa preservado nos 3 arquivos (painel, ofertas, biblioteca) + varredura do DOM por matiz** (abas e iframe) achou as 2 sobras (ícone da lista, "igual ao recorde") que o mapa não cobria; troca de texto de comentário que contém hex tem de vir depois do mapa (o assert pegou).
+- **Verde com sentido fica** (exigir × excluir, feito, turquesa dos vereditos): trocar tudo por vermelho apagaria a diferença entre bom e ruim.
+
 ## 2026-10-09 — Ofertas (amostra 8) e Biblioteca (H2) no painel
 - **Pedido "implemente as amostras" = os geradores fora do Git** (`dados/dados_ofertas4/6/7.py`, scratchpad antigo com `dados_bib.py`): achar a cadeia de dados antes de escrever deu o formato exato das linhas; o código das amostras entrou quase intacto num iframe (CSS e nomes delas brigariam com os do painel).
 - **Limpar CSS morto por regra, não por linha** (regras de várias linhas, várias regras por linha) e procurar classe montada no JS (`pp-${t}`): a primeira passada apagou `pp-novo/24m` e a constante `TIPO_COR`, que o console pegou na hora. Depois de tirar código, compare os nomes declarados antes/depois e procure os que ainda são usados.

@@ -36,7 +36,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Dinheiro em centavos; datas em UTC ISO.
 - Nada pessoal no repositório: `config.json`, `userdata.json` e `dados/` estão no `.gitignore`. Chaves só no keyring.
 - Arquivo novo que o `.exe` precise ler → adicionar ao `--add-data` do workflow e do `gerar_setup.bat`.
-- Visual do painel segue a loja da Steam, **em tons de preto**; símbolo em preto e vermelho (ver `docs/decisoes.md`, "Produto").
+- Visual do painel segue a loja da Steam, **em tons de preto**, destaques em vermelho (sem azul; botões de compra em vermelho escuro, `--blue` agora é vermelho); símbolo em preto e vermelho (ver `docs/decisoes.md`, "Produto").
 - Nome visível: **Kurokami Hunter**. Pasta de dados, keyring, `KurokamiRadar.exe`, nome do instalador, repositório e pacote `radar/` continuam com o nome antigo de propósito (lista em `docs/decisoes.md`, "Produto"): não renomeie.
 - Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança.
 - Ao terminar cada tarefa, depois de `py tools/checar.py` dar `ok`: faça o commit e o push **sem perguntar**. Só pergunte antes de comandos que reescrevem histórico (`reset`, `rebase`, `push --force`) ou que apagam arquivos fora do projeto.
