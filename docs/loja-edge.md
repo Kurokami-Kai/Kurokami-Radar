@@ -21,20 +21,23 @@ O `description` do `manifest.json` tem no máximo **132 caracteres** (a loja rec
 
   Na aba Carrinho do Hunter, você separa os jogos que quer comprar e escolhe se cada um é para a sua conta, de presente ou privado. Ao clicar em "Finalizar pedido", o Hunter abre o carrinho da Steam e esta extensão coloca os jogos lá, sem você precisar abrir a página de cada um.
 
-  - Só age na página do carrinho da Steam (store.steampowered.com/cart) e só quando o pedido vem do Hunter.
-  - Usa a sessão que o seu navegador já tem na Steam. Não pede senha, não guarda nada e não envia nada a ninguém além da própria Steam.
+  - No carrinho da Steam (store.steampowered.com/cart), só age quando o pedido vem do Hunter.
+  - Na loja da Steam, lê com a sua sessão o que a conta tem, deseja, segue e ignora e entrega ao Hunter no seu PC (localhost), para ele não sugerir o que você já tem ou ignorou.
+  - Não pede senha, não guarda token nem cookie, e nada sai do seu PC a não ser para a própria Steam.
   - Só adiciona: nunca remove nem altera o que já estava no seu carrinho, e não repete o que já está lá.
   - Não tem anúncios nem rastreamento.
 
   Sem o Kurokami Hunter instalado, a extensão não faz nada.
 - **Logo da loja:** `output/loja-edge-logo-300.png`.
 - **Capturas de tela (opcional):** a aba Carrinho do Hunter e a faixa "Kurokami Hunter: … no carrinho" na Steam (1280x800).
-- **Política de privacidade (URL):** https://github.com/Kurokami-Kai/Kurokami-Hunter/blob/main/docs/privacidade-extensao.md
-- **Site:** https://github.com/Kurokami-Kai/Kurokami-Hunter
-- **Justificativa das permissões** (se perguntarem):
-  - *Acesso a store.steampowered.com/cart:* ler o pedido do endereço e mostrar o resultado na página do carrinho.
-  - *Acesso a api.steampowered.com:* ler e adicionar itens ao carrinho da conta (IAccountCartService), com o token que a própria página da Steam já tem.
-  - *Acesso a localhost:* só marca no painel local do Hunter que a extensão está instalada; não lê nem envia nada.
+- **Política de privacidade (URL):** https://github.com/Kurokami-Kai/Kurokami-Radar/blob/main/docs/privacidade-extensao.md (o repositório continua com o nome antigo; o link com "Kurokami-Hunter" dá 404)
+- **Site:** https://github.com/Kurokami-Kai/Kurokami-Radar
+- **Permission justification** (o formulário é em inglês; cole como está):
+  - *storage justification:* Stores, only in this browser (chrome.storage.local), the app IDs that the user's Steam account owns, wishlists, follows, ignores and has in the cart, plus the SteamID, read from the Steam store page with the page's own session (at most once every 10 minutes). The Kurokami Hunter desktop app on the same PC (http://localhost) picks them up so it does not recommend games the user already owns or ignored. No password, token or cookie is stored, and nothing is sent anywhere except Steam and the local app.
+  - *Host permission justification:* api.steampowered.com: the background worker calls IAccountCartService (GetCart and AddItemsToCart) to add the games chosen in the Kurokami Hunter app to the user's Steam cart; it runs in the extension because the Steam page cannot call this API directly (CORS). The access token comes from the Steam page itself and is sent only to Steam. store.steampowered.com: content scripts read the order on the cart page (#kurokami=...) and the account lists from /dynamicstore/userdata/. localhost and 127.0.0.1: the Kurokami Hunter dashboard running on the user's own PC; the extension marks that it is installed and hands over the lists above. No other sites.
+  - *Are you using remote code?* No. (Justification em branco.)
+- **Data usage:** nenhuma caixa marcada. Esses campos são sobre dados que o desenvolvedor coleta, e nada sai do PC do usuário (só vai à Steam e ao Hunter no mesmo PC); a política de privacidade descreve o que é lido. Marque as três declarações do fim do formulário (não vende nem transfere dados, não usa para outro fim, não usa para crédito).
+- **Availability:** Hidden; mercados: todos.
 - **Notas para a certificação:** "Para testar: em store.steampowered.com, logado, abra https://store.steampowered.com/cart/#kurokami=BR:p<subid> (o subid de um jogo pago, que aparece no botão "Adicionar ao carrinho" da página do jogo). A extensão adiciona o item ao carrinho e mostra uma faixa no topo. Sem o fragmento #kurokami, ela não faz nada."
 
 ## Depois de aprovada

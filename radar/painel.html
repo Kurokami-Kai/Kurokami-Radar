@@ -127,7 +127,7 @@ button{font-family:inherit}
 .flag.cart{background:rgba(255,138,148,.14);color:var(--disc-fg)}
 .flag.own{background:rgba(255,255,255,.08);color:#d2d2d2}
 
-.flag.bun{background:#8a5cf633;color:#c7b3ff}
+.flag.bun{background:#ff8a9433;color:#ffc2c7}
 
 /* review word colors (Steam) */
 .rv-pos{color:var(--pos)}.rv-mix{color:var(--mix)}.rv-neg{color:#c35c2c}.rv-non{color:var(--dim)}
@@ -212,7 +212,7 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 #hv .tags span{background:#8a8a8a;color:#e6e6e6;padding:2px 6px;font-size:11px;border-radius:2px}
 #hv .tags span.g{background:#5c7e10}
 #hv .tags span.r{background:#b4532f}
-#hv .tags span.v{background:#6b56b8}
+#hv .tags span.v{background:#a3222e}
 #hv .note{margin-top:8px;color:var(--hover-sub);font-size:11px}
 #hv .dl{max-height:150px;overflow:hidden;font-size:11px;margin-top:4px}
 #hv .dl div{display:flex;justify-content:space-between;gap:8px;padding:1px 0}
@@ -260,7 +260,7 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 
 .pp-ref{background:none;color:var(--dim);font-weight:400;padding:2px 0;white-space:normal;text-align:right;max-width:170px}
 @media(max-width:720px){.pp-ref{max-width:118px;font-size:10px}}
-.pp-novo{background:#b3121f;color:#fff}.pp-raro{background:#ff9aa3;color:#000000}.pp-igual{background:#4a1016;color:#ff8a94}.pp-24m{background:#6a3fc0;color:#fff}
+.pp-novo{background:#b3121f;color:#fff}.pp-raro{background:#ff9aa3;color:#000000}.pp-igual{background:#4a1016;color:#ff8a94}.pp-24m{background:#8a1220;color:#fff}
 .ppwrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .porque{background:rgba(0,0,0,.25);padding:8px 10px;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
 .porque b{color:var(--text);font-weight:400}
@@ -320,7 +320,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-mais[hidden]{display:none}
 .fx-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .fx-chip{font-size:12px;padding:2px 8px;border-radius:2px;background:#ffffff14;color:var(--text)}
-.fx-chip.tenho{background:var(--disc-bg);color:var(--disc-fg)}.fx-chip.lista{background:#4b3a6e;color:#e4d7ff}
+.fx-chip.tenho{background:var(--disc-bg);color:var(--disc-fg)}.fx-chip.lista{background:#3d1a1e;color:#ffd6d9}
 .fx-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:920px}
 .fx-tile{background:#000000d0;backdrop-filter:blur(6px);padding:9px 12px 10px;border-top:2px solid #ffffff18;min-width:0}
 .fx-tile small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -346,7 +346,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-capa.falta img{filter:grayscale(1) brightness(.6)}
 .fx-capa.atual img{outline:2px solid var(--blue);outline-offset:2px}
 .fx-capa .sel{position:absolute;top:4px;right:4px;font-size:11px;line-height:1;padding:3px 5px;border-radius:2px}
-.fx-capa .sel.ok{background:var(--disc-bg);color:var(--disc-fg)}.fx-capa .sel.cor{background:#4b3a6e;color:#e4d7ff}
+.fx-capa .sel.ok{background:var(--disc-bg);color:var(--disc-fg)}.fx-capa .sel.cor{background:#3d1a1e;color:#ffd6d9}
 .fx-capa .nm{font-size:11px;margin-top:4px;line-height:1.25;height:2.5em;color:#b0b0b0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .fx-capa:hover .nm{color:#fff}
 .fx-capa .ano{font-size:11px;color:var(--dim)}.fx-capa .pr{color:var(--disc-fg)}
@@ -806,7 +806,7 @@ let VIT=null;   // /api/vitrine: só para o "N na vitrine" do topo
 const TIPO_NOME={selo:'Selo Kurokami',novo:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
 const TIPO_DESC={selo:'O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade',novo:'Nunca esteve tão barato',
   igual:'No mesmo preço do menor já registrado','24m':'No menor preço dos últimos 2 anos'};
-const TIPO_COR={selo:'#f5c75b',novo:'#b3121f',igual:'#8a1220','24m':'#6a3fc0'};
+const TIPO_COR={selo:'#f5c75b',novo:'#b3121f',igual:'#8a1220','24m':'#8a1220'};
 
 /* ================= promoções (explorador; filtros no Hunter: /api/promocoes) ================= */
 // Promoções e Lista de desejos (menu Ofertas) abrem sempre com estes filtros (sempre só Jogo, como os Destaques); +18 fica oculto sem o campo adulto
@@ -959,7 +959,7 @@ function porqueVolta(m){const o=IDX.get(m.jogo.appid)||{};
   const ref=m.piso_ref&&m.corte>0?`${volta?'<br>':''}Menor preço antes desta promoção: <b>${esc(pisoRefTxt(m.piso_ref))}</b>`:'';
   const regua=m.regua_steam?`<div class="regua">${esc(m.regua_steam.texto)}</div>`:'';
   return selo||volta||ref?`<div class="porque">${selo}${volta}${ref}</div>${regua}`:regua;}
-const CORES=['#ff4655','#a1cd44','#e2a635','#e8e8e8','#c7b3ff','#4fd1c5','#f472b6','#facc15','#94a3b8','#fb923c'];
+const CORES=['#ff4655','#a1cd44','#e2a635','#e8e8e8','#ffc2c7','#4fd1c5','#f472b6','#facc15','#94a3b8','#fb923c'];
 let MJ=null, MVIS=new Set(), MRANGE=365;
 let MSEQ=0;
 async function abrirJogo(appid,op){
@@ -1296,7 +1296,7 @@ $('#buscaRes').addEventListener('click',async e=>{if(e.target.closest('[data-fec
 let NOTIF=[];
 // etiqueta pelo começo do motivo (analise.motivo_tipo); o 4º item diz se o texto fica inteiro
 const NF_TIPOS=[[/^Selo Kurokami:\s*/i,'Selo Kurokami','#f5c75b'],[/^menor preço já registrado/i,'Novo recorde','#ff4655',1],
-  [/^mesmo preço do menor/i,'Igual ao recorde','#ff8a94',1],[/^menor preço em 2 anos/i,'Menor em 2 anos','#c7b3ff',1],
+  [/^mesmo preço do menor/i,'Igual ao recorde','#ff8a94',1],[/^menor preço em 2 anos/i,'Menor em 2 anos','#ffc2c7',1],
   [/^keyshop\s*/i,'Keyshop','#e2a635'],[/^versão completa/i,'Versão completa','#d2d2d2',1]];
 const nfKey=n=>/keyshop/i.test(n.loja||'');
 function nfTipo(n){const m=n.motivo||'',r=NF_TIPOS.find(x=>x[0].test(m));let t,c='#979797',txt=m;
