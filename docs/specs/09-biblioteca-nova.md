@@ -29,6 +29,46 @@ Amostra com os dados reais em `dados/amostras-ofertas.html` (pasta ignorada pelo
 - Já decidido nesta conversa: **jogo grátis não é destaque** (giveaways entram na Steam toda semana e não dizem nada da qualidade); **análises não entram na métrica** (o que importa é só o preço, o tamanho do desconto e a recorrência das promoções na linha do tempo do próprio jogo); **fora de promoção não fica em P&B** em Ofertas (P&B é coisa da Biblioteca); a ordem tem de fazer sentido à primeira vista (nas amostras, lista e Steam inteira saíram embaralhadas); **números podem ficar invisíveis**: para o usuário bastam as etiquetas (Novo recorde etc.); na **ficha do jogo**, uma **previsão curta** de quando ele deve entrar em promoção de novo e por quanto, pelo histórico (pode ser uma simulação).
 - Da O4 o dono aproveitou a ideia de **avaliar o desconto** (a nota), sem as análises.
 
+### Terceira rodada (09/10): V1 e V2, e o retorno
+- Proposta de nota feita à mão (espera 45 + preço contra o recorde 35 + desconto 20) e duas versões visuais (V1 capas, V2 loja), em `dados/amostras-ofertas-3.html`.
+- **Dono:** V1 e V2 ficaram parecidas. Fica a V2 em **Promoções**, a V1 em **Destaques** e na **Lista de desejos**, com **5 capas por linha** (capas maiores). Texto fixo de filtro ("-50% e 500+") não faz sentido: **todo filtro tem de ser fácil de tirar**. Grátis **não** sai por regra (pode ser jogo bom). A previsão "o próximo preço é o anterior" foi chamada de covarde: a previsão tem de vir do histórico, e a pergunta que importa é **"estou perdendo uma promoção?"**.
+
+### Quarta rodada (09/10): a previsão medida no histórico e o layout final
+**Backtest** (`py tools/backtest_previsao.py`, só leitura numa cópia do banco; 699 jogos da lista, lojas marcadas, 12.849 promoções como pontos de decisão no 1º dia, só com o histórico até ali):
+- **Quase todo preço volta.** O preço de hoje (ou menor) voltou em até 6 meses depois do fim da promoção em 94,7% dos casos e em até 12 meses em 96,3% (95,5% com cada jogo pesando igual). Espera mediana: 25 dias (25% em até 13, 75% em até 45).
+- **O que separa é ser a 1ª vez nesse preço** (volta em 1 / 3 / 12 meses; espera mediana):
+
+  | Grupo | n | 1 mês | 3 meses | 12 meses | mediana |
+  |---|---|---|---|---|---|
+  | Selo, 1ª vez | 45 | 20% | 47% | 67% | 133 dias |
+  | Novo recorde, 1ª vez | 798 | 38% | 74% | 89% | 41 dias |
+  | 1ª vez com -80% ou mais | 155 | – | 56% | 73% | 53 dias |
+  | 1ª vez em 2 anos, fora o Selo (todos os tipos juntos) | 866 | 38% | 74% | 89% | 41 dias |
+  | Igual ao recorde, já visto 1 vez nos 24 meses antes | 604 | 40% | 85% | 96% | 35 dias |
+  | Igual ao recorde, já visto 4+ vezes | 2.419 | 54% | 92% | 97% | 28 dias |
+  | Sem recorde, já visto 4+ vezes | 4.957 | 62% | 92% | 98% | 23 dias |
+
+  Grupos com menos de 30 casos não viram regra: "Igual ao recorde, 1ª vez" (15) e "Menor em 2 anos, 1ª vez" (27) usam a linha "1ª vez em 2 anos, fora o Selo".
+
+- **"Costuma voltar" quase não separa** (fora "todo mês": 94% voltam em 3 meses; os outros níveis, 77–90%). O corte só pesa na 1ª vez num preço. Comprar num grande evento: volta um pouco menos em 3 meses (85% contra 91%).
+- **Modelos de "volta em 12 meses":** a taxa por tipo e a Gama-Poisson por jogo com a prioridade por tipo empatam (Brier 0,035; com a grade estreita da 1ª medição a Gama-Poisson saía pior, 0,039–0,041, mas era a grade batendo no limite). Fica a **tabela por grupo** (tipo × vezes nesse preço em 24 meses): mesma qualidade e mais fácil de explicar ("em N casos assim...").
+- **Espera:** o intervalo do próprio jogo entre as vezes nesse preço acerta a classe (até 1 mês, 1–3, 3–6, 6–12, > 12) em 56% e erra no máximo uma classe em 92%; erro mediano de 14 dias com 2+ intervalos. Prever "> 3 meses" só acerta em ~30–50%: espera longa é dita como chance, não como data.
+- **Preço da próxima promoção** (13.338 casos): **repetir o último preço é o melhor previsor** (igual em 67%, até 10% em 76%), melhor que a mediana das 3 últimas (64%) e o menor de 12 meses (49%). O mesmo evento do ano anterior (36%) e a tendência de escada (28%) erram mais mesmo sabendo de antemão a data da próxima (são um teto otimista, sobre 85% dos casos). A confiança vem da concordância, medida só em jogos com 6+ promoções antes: as 6 últimas com esse preço → a próxima repetiu em 88%; 5/6 em 77%; 4/6 em 68%; 3/6 em 61%; 1/6 em 41%; com menos de 6 promoções, 53%. Com pouca concordância (ou menos de 6), a faixa das 3 últimas acerta em 83%.
+- **Data da próxima promoção:** "o que vier antes" entre o intervalo mediano e o próximo grande evento em que o jogo esteve no ano anterior: erro mediano de 10 dias, 63% em até 14 dias e 87% em até 30. Os eventos saem do histórico (dias em que 200+ jogos da lista começam promoção: 21 desde 2021).
+
+**A métrica (substitui a nota feita à mão):** **chance de perder** = chance de o preço de hoje **não voltar em 3 meses**, pela tabela do backtest (grupo do jogo; 1ª vez com -80% ou mais usa o grupo dela). **Vale a pena** = Selo, Novo recorde, Igual ou Menor em 2 anos, com chance de perder ≥ 20% e corte ≥ 40% (o Selo com qualquer corte). Ordem: chance de perder, depois corte, depois economia. Na prática: Selo (53%), 1ª vez com -80%+ (44%), as outras 1ª vezes em 2 anos (26%). Hoje: 16 da lista, 93 da Steam inteira com histórico.
+
+**Layout final** (`dados/amostras/amostras-ofertas-4.html`, servida em `http://localhost:8802/amostras-ofertas-4.html` pelo launch.json "amostras"; refazer com o Radar aberto: `py tools/backtest_previsao.py` e depois `py dados/dados_ofertas4.py dados/modelo_ofertas4.html dados/amostras/amostras-ofertas-4.html`. O gerador e o modelo ficam só na máquina do dono, em `dados/` (fora do Git); só leem a API e o banco, sem rede):
+- **Destaques (capas, molde da Biblioteca):** faixa de evento · banner (o melhor pago; grátis só se não houver outro) com "Se você não comprar agora" · números do dia · prateleiras 2 por linha com capas de 170 px: Da sua lista · Raras na Steam · Terminam em até 3 dias · **Da sua lista: devem entrar em promoção logo** (fora de promoção; próxima em até 3 semanas, no menor preço que já teve, com 4+ das 6 últimas nesse preço: vale esperar). Seção vazia some.
+- **Promoções (cartões da loja):** "Valem a pena" em cartões horizontais com a caixa verde da Steam; "Outras promoções" numa lista compacta pelo desconto (as sem histórico ficam aqui).
+- **Lista de desejos (capas, 5 por linha, ~218 px em 1440):** Mostrar Em promoção · Todos · Fora de promoção · Em breve; blocos Valem a pena · Outras em promoção ("dá para esperar") · Fora de promoção (pela próxima promoção prevista) · Em breve. Jogos / Franquias como antes.
+- **Filtros:** o menu aplica o padrão (-50%, 500+ análises, só jogos, sem os que você tem), mas **cada filtro ligado vira uma pílula com ✕**, mais "Limpar tudo" e "Voltar ao padrão"; os grupos (Desconto, Análises, Tipo, Você tem, Lista, Etiquetas) ficam sempre à vista; Backspace tira o último. Sem texto fixo de filtro no cabeçalho. Na Lista, desconto e etiquetas só valem para quem está em promoção.
+- **Grátis:** concorre como qualquer promoção (etiqueta "Grátis para resgatar"); o filtro de análises e a economia ≥ R$ 10 dos Destaques já separam o brinde da semana do jogo bom.
+- **Etiquetas:** de preço (Selo · Novo recorde · Igual ao recorde · Menor em 2 anos · Grátis para resgatar) + uma de contexto: Termina hoje/em N h (só as que valem a pena) · **Pode não voltar tão cedo** (chance ≥ 40%) · **1ª vez nesse preço em 2 anos** (≥ 20%) · **Volta em ~N semanas/meses** (cinza: dá para esperar).
+- **Ficha:** 5 números (Preço hoje · Menor de antes · Esse preço em 2 anos · Economia · Termina) e as caixas **"Se você não comprar agora"** (o histórico do próprio jogo + a taxa do grupo: "Em 798 casos assim no seu histórico, 7 em 10 voltaram em até 3 meses e 9 em 10 em até 1 ano. Deve voltar na Promoção de Inverno da Steam (dez/2026).") e **"Próxima promoção"** / "Depois desta" (data e preço com a confiança medida: "Por volta de nov/2026 (costuma entrar a cada ~5 semanas), provavelmente R$ 43,72 (-75%), o preço de 4 das 6 últimas promoções. A próxima repetiu esse preço em 7 de 10 casos assim.").
+- "Ver os números (só na amostra)" mostra a chance e a espera em cada capa.
+- **Para levar ao código:** a tabela do backtest pode ser recalculada pelo Radar de tempos em tempos (é o histórico de cada usuário); fora da lista, a coleta já puxa o histórico da Steam inteira aos poucos (60 por ciclo), e sem histórico o jogo fica em "Outras" com "sem histórico ainda".
+
 ## Etapa 2: veredito (09/10) — o que implementar
 **Referência visual: [09-referencia-biblioteca.html](09-referencia-biblioteca.html)** (abre no navegador; dados de exemplo: parte da biblioteca do dono, tempos e totais sintéticos). Siga o layout, as medidas e o comportamento dela. A mesma página com todos os dados reais fica só na máquina do dono, em `dados/amostras-biblioteca-escolhida.html` (pasta ignorada pelo Git). As rodadas A–H1 abaixo são histórico.
 

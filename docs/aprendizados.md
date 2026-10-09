@@ -2,25 +2,15 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
-## 2026-10-09 — spec 09: duas opções para a aba Ofertas (O1/O2) e a segunda rodada (O3/O4)
-- **Medir a cobertura antes de ranquear:** "as mais raras" parecia simples, mas 248 de 250 jogos da Steam inteira não têm histórico; a amostra estima pela marca da ITAD e marca com `*`.
-- **Desestruturar o retorno de uma função que às vezes devolve 0** (`const [m,est]=espera(o)`) derrubou a página inteira em silêncio: testar `typeof` das constantes no navegador achou a linha.
-- **Amostra de Ofertas sem copiar o banco:** a API do Radar aberto (`/api/vitrine`, `/api/promocoes` com `por_pagina` 250) já dá tudo; só a franquia veio do banco (`series.franquias`). Rotas ficam na raiz (`/api/...`), não em `/kurokami/api/`. As contagens batem com a vitrine filtrando `corte >= desconto_minimo`.
-- **Prints do navegador do app seguem instáveis** (tempo esgotado, escala errada, quadro velho): cada `navigate` para arquivo local abre aba nova; medir pelo DOM (alturas, colunas, erros num laço por opção × página × modo) e usar `zoom` só para conferir.
-- **Caminho Windows em string Python sem `r` e com barra invertida antes de dígito** (`specs` + barra + `09`) vira byte nulo: use barras normais.
+## 2026-10-09 — spec 09: Ofertas, da O1/O2 à quarta rodada (previsão medida)
+- **Medir antes de propor a métrica:** a nota feita à mão parecia razoável, mas o backtest mostrou que quase todo preço volta (96% em 12 meses) e que "costuma voltar" quase não separa; o que separa é a 1ª vez nesse preço. O "último preço", chamado de covarde, é o melhor previsor (67%): a resposta foi mostrar a confiança medida.
+- **Revisor no backtest pegou 4 erros reais:** "6 de 6" misturando jogos com 2–3 promoções, comparação usando a data futura, grade do ajuste batendo no limite (mudou a conclusão: a Gama-Poisson empata) e grupos de 15–27 casos virando regra. Rode o revisor antes de escrever os números nos docs.
+- **Não rodar coleta pelo Radar do dono para encher amostra** (puxei 14 min de ITAD sem pedir; ele cortou). Amostra = API de listagem + banco em modo leitura. O Radar em `localhost` é o instalado (banco em `%LOCALAPPDATA%`), não o `dados/` do código.
+- **Amostras servidas por `http.server` só de `dados/amostras`** (launch.json "amostras"); arquivo local não abre no navegador do app e servir `dados/` inteiro expõe o banco.
+- **Prints do navegador do app seguem instáveis:** medir pelo DOM num laço (página × filtro), `resize_window` 1440×900 logo antes do print; capas pretas = `loading=lazy` ainda carregando.
 
-## 2026-10-09 — spec 09 Etapa 2: três amostras da Biblioteca
-- **Amostra com dados pessoais vai para `dados/`** (ignorada pelo Git): script no scratchpad chama `painel.api_biblioteca` + `series.franquias` numa cópia do banco e injeta o JSON no modelo HTML.
-- **Ordem padrão antes de ordenar:** `tool()` fixava a ordem depois do `sort` e a 1ª pintura saiu sem ordem; testar cada tela num laço JS (opção × página × modo) achou isso mais rápido que prints.
-- **Prints do navegador do app falham depois de `resize_window`** (a pane muda de largura e limpa a emulação): confira pelo DOM (`getBoundingClientRect`, contagens) em vez de insistir.
-- **DLCs possuídas = 0 sem `userdata.json`:** antes de concluir "bug no Completar", `grep userdata radar.log`.
-- **Cinco rodadas de amostras com dados reais fecharam a Biblioteca (H2):** o dono decide melhor vendo; o que travou cada rodada foi detalhe visual medido (altura da ficha em 1280×900, capas centralizadas, barra que não lê 100%). Referência para outro chat vai para `docs/specs/` com dados reduzidos e tempos sintéticos; a completa fica em `dados/`.
-- **Regra de dado sintético com `appid % 5`** zerou uma franquia inteira (os appids do GTA são múltiplos de 10): use um hash, não um módulo pequeno.
-- **O navegador do app não abre arquivo local acima de ~512 KB** ("couldn't open file"): 510 KB abriu, 513 não. Tire dos dados o que a amostra não usa.
-- **`Set-Content -Encoding utf8` no PowerShell 5.1 grava BOM** (apareceu na mensagem do commit): escreva o texto com a ferramenta Write.
-- **Mensagem de commit com aspas no PowerShell 5.1 quebra** (vira pathspec): use `git commit -F arquivo.txt` do scratchpad.
-- **Aba do navegador do app recusa JS em arquivo local às vezes** ("shows a local file"): `preview_start` com a mesma URL abre outra aba que aceita.
-- **Amostra com dados reais pegou um bug de produção** (franquia "45527500"): contar no banco os campos com parte numérica respondeu em 1 consulta. `zoom` na região do print funciona quando o `screenshot` cheio sai em escala estranha.
+## 2026-10-09 — spec 09 Etapa 2: amostras da Biblioteca (resumo)
+- Amostra com dados pessoais vai para `dados/` (fora do Git); medir pelo DOM num laço (opção × página × modo) em vez de prints; arquivo local acima de ~512 KB não abre no navegador do app; `Set-Content` grava BOM e aspas quebram o commit no PowerShell 5.1 (use `git commit -F`); hash, não `appid % 5`, para dado sintético; cinco rodadas com dados reais fecharam a H2.
 
 ## 2026-10-08 (madrugada do 09) — v0.16.0 publicada; spec 09 Etapa 1 (ficha B+)
 - **Medir a fonte no banco antes da regra:** contar as `franquia` da Steam por nº de nomes distintos mostrou na hora as editoras (WB Games, Team17 Digital...); a regra "nomes muito diferentes" da spec não separava (Sonic tem 8 nomes em 10 jogos).
