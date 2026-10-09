@@ -17,6 +17,12 @@ Status: **em discussão** (rascunho de 08/10, respostas do dono na mesma noite; 
 - **Juntar/separar franquias:** aceito qualquer jeito melhor que eu achar (ver proposta abaixo).
 - **Tempo para zerar: pelo Augmented Steam** (o dono já usa; o quadro "How Long to Beat" da loja com História principal, + Extras, Completacionista e "Mais informações").
 
+## Ficha padronizada (08/10, noite)
+- **A mesma ficha abre em Ofertas, Promoções e Biblioteca**; só mudam os blocos (não tenho: preço, piso, costuma voltar, carrinho; tenho: tempo jogado, última vez, conquistas, DLCs). **HLTB em todos os jogos.**
+- **Sem espaço vazio embaixo da imagem** (reclamação sobre a ficha de hoje): usar a arte da biblioteca da Steam, que existe por appid sem chamada extra: `library_hero.jpg` (1920×620), `logo.png` (fundo transparente) e `library_600x900_2x.jpg` (capa vertical), em `shared.fastly.steamstatic.com/store_item_assets/steam/apps/<appid>/` (conferido em 7 jogos, inclusive os de caminho com hash). Falta o que fazer quando não houver hero/logo (cair para `header.jpg` e o nome em texto).
+- **HLTB do Augmented Steam vem em minutos** (FF VII Remake: 1935 = 32 h, como no site). A API responde com CORS aberto, mas buscar pelo servidor com cache.
+- **Três amostras para escolher:** [09-amostras-ficha.html](09-amostras-ficha.html) (abre no navegador; A = biblioteca da Steam, banner largo e coluna lateral; B = PlayStation, capa vertical e fundo do banner, sequências logo abaixo e abas; C = cartões, faixa curta do banner e blocos em grade). Cada uma nos dois estados.
+
 ## Hoje (o que existe)
 - `api_biblioteca` (`painel.py`) devolve totais (valor cheio, hoje, piso, para completar), `jogos[]` com `falta[]` (DLCs que faltam) e as séries agrupadas pelo nome (o campo `franquia` da Steam mistura coisas como "EA Play").
 - `renderBib` (`painel.html`, seção `biblioteca`): faixa de totais, barra "Progresso da coleção" com o carrinho, e os quatro segmentos com ordenações próprias (`BSORTS`).

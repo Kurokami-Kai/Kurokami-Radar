@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Amostras da ficha</title>
+<style>
+:root{--bg:#1b2838;--bg2:#171a21;--pan:#0e141b;--pan2:#16202d;--txt:#c7d5e0;--fraco:#8f98a0;--azul:#66c0f4;--verde:#a4d007;--vbg:#4c6b22;--vtx:#beee11;--borda:#ffffff14}
+*{box-sizing:border-box}
+body{margin:0;background:#0b0f15;color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
+a{color:var(--azul);text-decoration:none}
+.topo{position:sticky;top:0;z-index:10;background:var(--bg2);border-bottom:1px solid var(--borda);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.topo h1{font-size:15px;font-weight:400;margin:0;color:#fff;letter-spacing:.03em}
+.seg{display:inline-flex;background:var(--pan);border-radius:3px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--fraco);padding:7px 14px;font:inherit;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--azul);color:#0b0f15}
+.nota{color:var(--fraco);font-size:12px;max-width:1180px;margin:10px auto 0;padding:0 16px}
+.palco{max-width:1180px;margin:14px auto 40px;padding:0 16px}
+.ficha{background:var(--bg);box-shadow:0 0 40px #000;position:relative;overflow:hidden}
+.x{position:absolute;top:12px;right:12px;z-index:5;width:36px;height:36px;border:0;background:#000a;color:#fff;font-size:18px;cursor:pointer}
+h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:0 0 10px}
+.cx{background:var(--pan);padding:14px 16px}
+.preco{display:inline-flex;align-items:stretch;background:#000;height:44px}
+.preco .pct{background:var(--vbg);color:var(--vtx);font-size:24px;padding:0 10px;display:flex;align-items:center}
+.preco .vals{background:#344654;padding:0 12px;display:flex;flex-direction:column;justify-content:center;line-height:1.1}
+.preco s{color:#738895;font-size:12px}
+.preco b{color:var(--vtx);font-size:17px;font-weight:400}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;padding:0 16px;height:40px;font:inherit;font-size:15px;cursor:pointer;border-radius:2px;background:#67c1f533;color:var(--azul)}
+.btn.verde{background:linear-gradient(90deg,#75b022,#588a1b);color:#d2efa9}
+.btn.azul{background:linear-gradient(90deg,#47bfff,#1a44c2);color:#fff}
+.chip{display:inline-block;font-size:12px;padding:2px 8px;border-radius:2px;background:#ffffff14;color:var(--txt);margin:0 6px 6px 0}
+.chip.rec{background:#1a6fd1;color:#fff}.chip.lista{background:#4b3a6e;color:#e4d7ff}.chip.tenho{background:var(--vbg);color:var(--vtx)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px}.kv dt{color:var(--fraco)}.kv dd{margin:0}
+.hltb .l{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--borda);font-size:13px}
+.hltb .l span:first-child{color:var(--fraco);text-transform:uppercase;font-size:12px;letter-spacing:.03em}
+.hltb .hb{height:6px;background:#ffffff12;margin:2px 0 4px;position:relative}.hltb .hb i{position:absolute;inset:0 auto 0 0;background:var(--azul)}
+.pisos{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.pisos div{background:var(--pan2);padding:8px 10px;border-bottom:3px solid var(--verde)}
+.pisos small{display:block;color:var(--fraco);font-size:12px}
+.grafico svg{width:100%;height:auto;display:block}
+.legenda{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px}.legenda span{background:var(--pan2);padding:3px 8px}.legenda i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.serie{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.capa{flex:0 0 auto;position:relative;width:96px}
+.capa img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#000}
+.capa.falta img{filter:grayscale(1) brightness(.6)}
+.capa.atual{outline:2px solid var(--azul);outline-offset:2px}
+.capa .sel{position:absolute;top:4px;right:4px;font-size:11px;line-height:1;padding:3px 5px;border-radius:2px}
+.capa .sel.ok{background:var(--vbg);color:var(--vtx)}.capa .sel.cor{background:#4b3a6e;color:#e4d7ff}
+.capa .nm{font-size:11px;color:var(--fraco);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.capa .pr{font-size:11px;color:var(--vtx)}
+.desc{color:#acb2b8;font-size:13.5px}
+.meu{display:flex;gap:22px;flex-wrap:wrap}.meu div small{display:block;color:var(--fraco);font-size:11px;text-transform:uppercase;letter-spacing:.05em}.meu div b{font-weight:400;font-size:18px;color:#fff}
+.crit{display:flex;gap:8px}.crit span{display:flex;flex-direction:column;align-items:center;background:var(--pan2);padding:6px 10px;font-size:11px;color:var(--fraco)}.crit b{font-size:18px;color:#fff;font-weight:400}
+.volta{font-size:13px}.volta b{color:#fff;font-weight:400}
+/* ---------- A: biblioteca da Steam ---------- */
+.A .hero{position:relative;height:300px;background:#000 center/cover}
+.A .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0000 55%,var(--bg) 100%)}
+.A .hero .logo{position:absolute;left:32px;bottom:26px;max-width:360px;max-height:150px;z-index:1;filter:drop-shadow(0 4px 12px #000)}
+.A .barra{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:14px 24px;background:linear-gradient(90deg,#ffffff0d,#0000);border-top:1px solid var(--borda);border-bottom:1px solid var(--borda)}
+.A .barra .esp{flex:1}
+.A .corpo{display:grid;grid-template-columns:1fr 320px;gap:20px;padding:20px 24px}
+.A .lat{display:flex;flex-direction:column;gap:14px}
+.A .pri{display:flex;flex-direction:column;gap:18px;min-width:0}
+.A .rodape{padding:0 24px 24px}
+/* ---------- B: PlayStation ---------- */
+.B{background:#0b0f15}
+.B .fundo{position:absolute;inset:0 0 auto 0;height:640px;background:#000 center/cover;opacity:.55}
+.B .fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0b0f15f0 0%,#0b0f15b0 45%,#0b0f1540 100%),linear-gradient(180deg,#0000 50%,#0b0f15 100%)}
+.B .cab{position:relative;display:grid;grid-template-columns:230px 1fr;gap:28px;padding:36px 32px 22px}
+.B .cab .vert{width:230px;aspect-ratio:2/3;object-fit:cover;box-shadow:0 10px 30px #000}
+.B .cab .logo{max-width:340px;max-height:110px;display:block;margin:0 0 12px}
+.B .cab .info{display:flex;flex-direction:column;gap:12px;max-width:620px}
+.B .seq{position:relative;padding:0 32px 18px}
+.B .abas{position:relative;display:flex;gap:4px;padding:0 32px;border-bottom:1px solid var(--borda)}
+.B .abas button{background:none;border:0;border-bottom:2px solid transparent;color:var(--fraco);padding:10px 14px;font:inherit;cursor:pointer}
+.B .abas button[aria-pressed=true]{color:#fff;border-bottom-color:var(--azul)}
+.B .aba{position:relative;padding:20px 32px 28px;display:none}.B .aba.on{display:block}
+.B .lado{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+/* ---------- C: cartões ---------- */
+.C .faixa{position:relative;height:190px;background:#000 center/cover;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:18px 24px}
+.C .faixa::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#1b2838 0%,#1b2838c0 35%,#0000 100%)}
+.C .faixa>*{position:relative}
+.C .faixa .logo{max-width:300px;max-height:110px;filter:drop-shadow(0 4px 12px #000)}
+.C .faixa .acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.C .grade{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;padding:14px 24px 24px}
+.C .s4{grid-column:span 4}.C .s5{grid-column:span 5}.C .s7{grid-column:span 7}.C .s8{grid-column:span 8}.C .s12{grid-column:span 12}
+.C .cx{border-top:2px solid #ffffff10}
+@media (max-width:820px){
+  .A .corpo{grid-template-columns:1fr}.A .hero{height:180px}.A .hero .logo{max-width:220px;left:16px}
+  .B .cab{grid-template-columns:110px 1fr;gap:14px;padding:20px 16px}.B .cab .vert{width:110px}.B .lado{grid-template-columns:1fr}.B .seq,.B .abas,.B .aba{padding-left:16px;padding-right:16px}
+  .C .grade>*{grid-column:span 12!important}.C .faixa{height:auto;min-height:150px;flex-direction:column;align-items:flex-start}
+  .pisos{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="topo">
+  <h1>Ficha do jogo · 3 amostras</h1>
+  <span class="seg" id="amostra"><button data-a="A" aria-pressed="true">A · Biblioteca da Steam</button><button data-a="B">B · PlayStation</button><button data-a="C">C · Cartões</button></span>
+  <span class="seg" id="estado"><button data-e="oferta" aria-pressed="true">Não tenho (Ofertas)</button><button data-e="tenho">Tenho (Biblioteca)</button></span>
+</div>
+<p class="nota">Esboço para decidir o layout: dados reais do seu banco, da Steam e do Augmented Steam (HLTB, Metacritic, OpenCritic, jogadores) de 08/10. A mesma ficha abre em Ofertas, Promoções e Biblioteca; só mudam os blocos conforme você tem o jogo ou não. Conquistas são ilustrativas (ainda não buscamos). Nenhum botão funciona.</p>
+<div class="palco"><div class="ficha" id="ficha"></div></div>
+<script>
+const CDN='https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/';
+const img=(a,f)=>CDN+a+'/'+f;
+const brl=c=>'R$ '+(c/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const horas=m=>(m/60).toLocaleString('pt-BR',{maximumFractionDigits:1})+' h';
+const SERIE=[[39140,'FINAL FANTASY VII',1],[377840,'FINAL FANTASY IX',1],[359870,'FINAL FANTASY X/X-2 HD',1],[39210,'FINAL FANTASY XIV Online',0,1,5299],
+  [595520,'FINAL FANTASY XII',1],[637650,'FINAL FANTASY XV',1],[1026680,'FINAL FANTASY VIII Remastered',1],[1462040,'FINAL FANTASY VII REMAKE',1],
+  [1608070,'CRISIS CORE Reunion',0,1,null],[1358700,'STRANGER OF PARADISE',0,1,5997],[2515020,'FINAL FANTASY XVI',1],[2909400,'FINAL FANTASY VII REBIRTH',1],
+  [1004640,'FF TACTICS Ivalice Chronicles',0,1,21990],[3259780,'FINAL FANTASY RESONANCE',0,1,null]];
+const J={
+  oferta:{appid:1358700,nome:'STRANGER OF PARADISE FINAL FANTASY ORIGIN',tenho:false,lista:true,
+    desc:'Desenvolvido em cooperação entre a Square Enix e a Team Ninja (Koei Tecmo Games), STRANGER OF PARADISE FINAL FANTASY ORIGIN é um RPG de ação hardcore que leva a série FINAL FANTASY a uma nova direção.',
+    dev:'Square Enix, Koei Tecmo',gen:'Ação, Aventura, RPG',lanc:'06 de abr de 2023',anal:'Muito positivas · 82% de 3.793',
+    preco:5997,cheio:19990,corte:70,loja:'Nuuvem',fim:'13 de out (em 5 dias)',rec:'Novo recorde',bundle:'Em 1 bundle',
+    volta:['Nunca teve esse desconto','maior antes: −62% (R$ 74,99, 02/2026)','0 vezes com −65% ou mais em 2 anos'],
+    pisos:[5997,5997,5997,5997,5997],keyshop:'R$ 64,31 (menor R$ 63,75)',hltb:[1053,1750,3025],meta:66,oc:72,jog:[126,2376]},
+  tenho:{appid:1462040,nome:'FINAL FANTASY VII REMAKE INTERGRADE',tenho:true,lista:false,
+    desc:'Cloud Strife, ex-agente da SOLDIER, chega a Midgar, a cidade movida a energia de mako. O clássico atemporal FINAL FANTASY VII renasceu, com gráficos de última geração, um novo sistema de combate e uma aventura adicional com Yuffie Kisaragi.',
+    dev:'Square Enix',gen:'Ação, Aventura, RPG',lanc:'17 de jun de 2022',anal:'Muito positivas · 86% de 44.250',
+    preco:4372,cheio:17490,corte:75,loja:'Steam',fim:'em 5 dias',hltb:[1935,2468,5149],meta:86,oc:87,jog:[2378,12844],
+    jogado:186,ultima:'30 de abr de 2026',conq:[12,57],dlcs:'Todas as DLCs que contam'}
+};
+// historico real (Steam e Nuuvem, ultimo ano) do Stranger of Paradise
+const HIST={Steam:[['2025-10-06',19990],['2025-11-18',7996],['2025-12-02',19990],['2025-12-18',7996],['2026-01-05',19990],['2026-01-22',7996],['2026-02-04',19990],['2026-03-12',7996],['2026-03-26',19990],['2026-04-23',7996],['2026-05-07',19990],['2026-06-11',7996],['2026-07-09',19990],['2026-08-04',7996],['2026-08-11',19990],['2026-09-18',5997],['2026-10-08',5997]],
+  Nuuvem:[['2025-10-06',19990],['2025-11-27',7996],['2025-12-06',19990],['2025-12-18',7996],['2026-01-10',19990],['2026-01-27',7996],['2026-02-04',19990],['2026-02-11',7499],['2026-02-21',19990],['2026-03-19',7996],['2026-04-01',19990],['2026-04-15',7996],['2026-04-28',19990],['2026-06-25',7996],['2026-07-11',19990],['2026-07-28',7996],['2026-08-05',19990],['2026-08-26',7996],['2026-09-15',19990],['2026-10-01',5997]]};
+const COR={Steam:'#a4d007',Nuuvem:'#c9b8ff'};
+function grafico(h){const W=760,H=h||220,x0=46,y0=12,x1=W-8,y1=H-24,t0=Date.parse('2025-10-06'),t1=Date.parse('2026-10-08'),max=24000;
+  const X=t=>x0+(Date.parse(t)-t0)/(t1-t0)*(x1-x0),Y=v=>y1-v/max*(y1-y0);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histórico de preços">`;
+  [0,8000,16000,24000].forEach(v=>{s+=`<line x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}" stroke="#ffffff12"/><text x="${x0-6}" y="${Y(v)+4}" fill="#8f98a0" font-size="11" text-anchor="end">${v/100|0}</text>`;});
+  ['2025-10-06','2026-01-01','2026-04-01','2026-07-01','2026-10-01'].forEach((t,i)=>{s+=`<text x="${X(t)}" y="${H-6}" fill="#8f98a0" font-size="11" text-anchor="middle">${['out','jan','abr','jul','out'][i]}</text>`;});
+  for(const [loja,pts] of Object.entries(HIST)){let d='';pts.forEach(([t,v],i)=>{d+=(i?`H${X(t)}V${Y(v)}`:`M${X(t)} ${Y(v)}`);});d+=`H${x1}`;
+    s+=`<path d="${d}" fill="none" stroke="${COR[loja]}" stroke-width="2"/>`;}
+  return s+'</svg>';}
+const legenda=()=>`<div class="legenda">${Object.keys(HIST).map(l=>`<span><i style="background:${COR[l]}"></i>${l}</span>`).join('')}<span style="opacity:.5"><i style="background:#3d6b9e"></i>Epic</span><span style="opacity:.5"><i style="background:#2bb5a0"></i>GreenManGaming</span><span style="opacity:.5"><i style="background:#ffcc00"></i>Completo (Steam)</span></div>`;
+function precoBox(g){return `<span class="preco"><span class="pct">-${g.corte}%</span><span class="vals"><s>${brl(g.cheio)}</s><b>${brl(g.preco)}</b></span></span>`;}
+function hltb(g,titulo){const m=Math.max(...g.hltb);const l=(n,v)=>`<div class="l"><span>${n}</span><span>${horas(v)}</span></div><div class="hb"><i style="width:${v/m*100}%"></i></div>`;
+  return `<div class="cx hltb">${titulo===false?'':'<h3>How Long to Beat</h3>'}${l('História principal',g.hltb[0])}${l('Principal + extras',g.hltb[1])}${l('Completacionista',g.hltb[2])}
+    ${g.tenho?`<div style="font-size:12px;color:var(--fraco);margin-top:8px">Você jogou ${horas(g.jogado)}: ${Math.round(g.jogado/g.hltb[0]*100)}% da história principal</div>`:''}
+    <div style="margin-top:10px"><a href="#">Mais informações ↗</a></div></div>`;}
+function crit(g){return `<div class="crit"><span><b>${g.meta}</b>Metacritic (usuários)</span><span><b>${g.oc}</b>OpenCritic</span><span><b>${g.jog[0].toLocaleString('pt-BR')}</b>jogando agora</span></div>`;}
+function info(g){return `<dl class="kv"><dt>Análises</dt><dd>${g.anal}</dd><dt>Lançamento</dt><dd>${g.lanc}</dd><dt>Desenvolvedor</dt><dd>${g.dev}</dd><dt>Gêneros</dt><dd>${g.gen}</dd>
+  <dt>Franquia</dt><dd>FINAL FANTASY · <a href="#">trocar</a></dd></dl>`;}
+function precos(g){return g.tenho?`<div class="cx"><h3>Seus números</h3><div class="meu"><div><small>Tempo jogado</small><b>${horas(g.jogado)}</b></div><div><small>Última vez</small><b>${g.ultima}</b></div>
+    <div><small>Conquistas</small><b>${g.conq[0]} de ${g.conq[1]}</b></div><div><small>Platinado</small><b>${Math.round(g.conq[0]/g.conq[1]*100)}%</b></div><div><small>DLCs</small><b>${g.dlcs}</b></div></div></div>`
+  :`<div class="cx volta"><b>Costuma voltar: ${g.volta[0]}</b><br>${g.volta[2]} · ${g.volta[1]}</div>
+   <div><h3>Menor preço nas lojas que alertam</h3><div class="pisos">${['3 meses','6 meses','9 meses','1 ano','De sempre'].map((n,i)=>`<div><small>${n}</small>${brl(g.pisos[i])}</div>`).join('')}</div></div>`;}
+function historico(){return `<div><h3>Histórico de preços</h3><div class="grafico cx" style="padding:10px">${grafico()}</div>${legenda()}</div>`;}
+function serie(g,tit){return `<h3>${tit||'Da mesma franquia'} <span style="color:var(--fraco);text-transform:none;letter-spacing:0">· FINAL FANTASY · tenho 23 de 30</span></h3><div class="serie">${SERIE.map(([a,n,t,l,p])=>
+  `<div class="capa${t?'':' falta'}${a===g.appid?' atual':''}" title="${n}${t?' (tenho)':l?' (na lista de desejos)':' (não tenho)'}"><img loading="lazy" src="${img(a,'library_600x900_2x.jpg')}" alt="">
+   ${t?'<span class="sel ok">✓</span>':l?'<span class="sel cor">♥</span>':''}<div class="nm">${n}</div>${!t&&p?`<div class="pr">${brl(p)}</div>`:''}</div>`).join('')}</div>`;}
+function acoes(g){return g.tenho?`<button class="btn azul">▶ Jogar na Steam</button><button class="btn">Página na loja</button><button class="btn">DLCs</button>`
+  :`${precoBox(g)}<button class="btn verde">Pôr no carrinho</button><button class="btn">Página na Steam</button><button class="btn">Já tenho</button>`;}
+function chips(g){return `${g.tenho?'<span class="chip tenho">✓ Na sua biblioteca</span>':''}${g.lista?'<span class="chip lista">♥ Na lista de desejos</span>':''}${g.rec?`<span class="chip rec">${g.rec}</span>`:''}${g.bundle?`<span class="chip">${g.bundle}</span>`:''}${!g.tenho?`<span class="chip">Melhor preço na ${g.loja} · termina ${g.fim}</span>`:`<span class="chip">Na Steam hoje ${brl(g.preco)} (−${g.corte}%)</span>`}`;}
+
+const R={
+A(g){return `<div class="A"><button class="x">✕</button>
+  <div class="hero" style="background-image:url('${img(g.appid,'library_hero.jpg')}')"><img class="logo" src="${img(g.appid,'logo.png')}" alt="${g.nome}"></div>
+  <div class="barra">${acoes(g)}<span class="esp"></span><span>${chips(g)}</span></div>
+  <div class="corpo"><div class="pri"><p class="desc" style="margin:0">${g.desc}</p>${precos(g)}${historico()}</div>
+    <div class="lat">${hltb(g)}<div class="cx">${crit(g)}</div><div class="cx">${info(g)}</div>${g.tenho?'':`<div class="cx" style="font-size:13px"><span style="color:var(--fraco)">Keyshop</span> ${g.keyshop} · <a href="#">GG.deals</a></div>`}</div></div>
+  <div class="rodape">${serie(g)}</div></div>`;},
+B(g){return `<div class="B"><div class="fundo" style="background-image:url('${img(g.appid,'library_hero.jpg')}')"></div><button class="x">✕</button>
+  <div class="cab"><img class="vert" src="${img(g.appid,'library_600x900_2x.jpg')}" alt="">
+    <div class="info"><img class="logo" src="${img(g.appid,'logo.png')}" alt="${g.nome}"><div>${chips(g)}</div><p class="desc" style="margin:0">${g.desc}</p>
+      <dl class="kv"><dt>Análises</dt><dd>${g.anal}</dd><dt>Lançamento</dt><dd>${g.lanc} · ${g.dev}</dd><dt>Para zerar</dt><dd>${horas(g.hltb[0])} · ${horas(g.hltb[2])} para completar (HLTB)</dd>${g.tenho?`<dt>Você jogou</dt><dd>${horas(g.jogado)} · última vez ${g.ultima}</dd>`:''}</dl>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">${acoes(g)}</div></div></div>
+  <div class="seq">${serie(g,'Sequências e franquia')}</div>
+  <div class="abas" id="abasB">${(g.tenho?['Progresso','Preço','Histórico','Detalhes']:['Preço','Histórico','Tempo','Detalhes']).map((n,i)=>`<button data-aba="${i}" aria-pressed="${!i}">${n}</button>`).join('')}</div>
+  ${(g.tenho?[precos(g)+`<div style="margin-top:14px">${hltb(g)}</div>`,precosOferta(g),historico(),detalhes(g)]:[precos(g),historico(),hltb(g),detalhes(g)]).map((c,i)=>`<div class="aba${i?'':' on'}">${c}</div>`).join('')}</div>`;},
+C(g){return `<div class="C"><button class="x">✕</button>
+  <div class="faixa" style="background-image:url('${img(g.appid,'library_hero.jpg')}')"><img class="logo" src="${img(g.appid,'logo.png')}" alt="${g.nome}"><div class="acoes">${acoes(g)}</div></div>
+  <div style="padding:0 24px">${chips(g)}</div>
+  <div class="grade">
+    <div class="cx s8"><p class="desc" style="margin:0 0 12px">${g.desc}</p>${info(g)}</div>
+    <div class="s4">${hltb(g)}</div>
+    ${g.tenho?`<div class="s8">${precos(g)}</div><div class="cx s4">${crit(g)}</div>`
+      :`<div class="cx s5 volta"><h3>Costuma voltar</h3><b>${g.volta[0]}</b><br>${g.volta[2]}<br>${g.volta[1]}</div>
+        <div class="cx s7"><h3>Menor preço nas lojas que alertam</h3><div class="pisos">${['3 meses','6 meses','9 meses','1 ano','De sempre'].map((n,i)=>`<div><small>${n}</small>${brl(g.pisos[i])}</div>`).join('')}</div>
+        <div style="margin-top:10px;font-size:13px"><span style="color:var(--fraco)">Keyshop</span> ${g.keyshop}</div></div>
+        <div class="cx s12">${crit(g)}</div>`}
+    <div class="cx s12"><h3>Histórico de preços</h3>${grafico(190)}${legenda()}</div>
+    <div class="cx s12">${serie(g)}</div>
+  </div></div>`;}
+};
+function precosOferta(g){return `<div class="cx">${precoBox(g)} <span style="margin-left:10px">Na ${g.loja} hoje · termina ${g.fim}</span></div><div style="margin-top:14px">${historico()}</div>`;}
+function detalhes(g){return `<div class="lado"><div class="cx">${info(g)}</div><div class="cx">${crit(g)}${g.keyshop?`<div style="margin-top:12px;font-size:13px"><span style="color:var(--fraco)">Keyshop</span> ${g.keyshop}</div>`:''}</div></div>`;}
+
+let A='A',E='oferta';
+function desenhar(){document.getElementById('ficha').innerHTML=R[A](J[E]);
+  document.querySelectorAll('#amostra button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.a===A));
+  document.querySelectorAll('#estado button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.e===E));}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-a]'),s=e.target.closest('[data-e]'),t=e.target.closest('[data-aba]');
+  if(a){A=a.dataset.a;desenhar();}else if(s){E=s.dataset.e;desenhar();}
+  else if(t){const p=t.parentElement;p.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===t));
+    p.parentElement.querySelectorAll('.aba').forEach((d,i)=>d.classList.toggle('on',i===+t.dataset.aba));}});
+desenhar();
+</script>
+</body>
+</html>
