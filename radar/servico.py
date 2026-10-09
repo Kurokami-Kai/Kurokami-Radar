@@ -86,6 +86,8 @@ def ciclo(log=print, forcar=False, sem_limite=False, steam_agora=False):
         relatorio.gerar(alertas, capas, {a["appid"] for a in novos})
         from . import painel
         painel.invalidar_linhas()  # a vitrine e a aba Promocoes passam a ver a coleta nova
+        from . import ofertas
+        ofertas.aquecer()  # Ofertas e Biblioteca já montadas quando o painel abrir
         log("Ciclo ok: %d valem a pena, %d notificado(s)" % (len(alertas), len(novos)))
         if forcar and sem_limite:
             b.meta("ult_completa", __import__("radar.banco", fromlist=["agora"]).agora())

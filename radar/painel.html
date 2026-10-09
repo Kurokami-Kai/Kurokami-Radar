@@ -126,41 +126,16 @@ button{font-family:inherit}
 .flag.top{background:#a3cf06;color:#050505;font-weight:700}
 .flag.cart{background:rgba(190,238,17,.14);color:var(--disc-fg)}
 .flag.own{background:rgba(255,255,255,.08);color:#d2d2d2}
-.flag.low{background:#c5262633;color:#ff8f7f}
+
 .flag.bun{background:#8a5cf633;color:#c7b3ff}
 
 /* review word colors (Steam) */
 .rv-pos{color:var(--pos)}.rv-mix{color:var(--mix)}.rv-neg{color:#c35c2c}.rv-non{color:var(--dim)}
 
 /* ---------- hero carousel ---------- */
-.hero{position:relative}
-.hero-stage{display:grid;grid-template-columns:1.72fr 1fr;box-shadow:0 0 7px rgba(0,0,0,.6);min-height:300px}
-.hero-art{display:block;min-width:0}
-.hero-stage .hero-art .art{aspect-ratio:auto;height:100%;min-height:300px}
-.hero-info h3 a{color:#fff}
-.hero-info{background:linear-gradient(180deg,#0a0a0a 0%,#111111 100%);padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.hero-info h3{margin:0;color:#fff;font-size:23px;font-weight:400;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.hero-why{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12px;color:var(--muted)}
-.hero-why b{color:var(--text);font-weight:400}
-.hero-next{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:auto}
-.hero-next button{padding:0;border:0;background:none;cursor:pointer;opacity:.6;box-shadow:0 0 4px #000}
-.hero-next button:hover,.hero-next button:focus-visible{opacity:1}
-.hero-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.hero-foot .avail{color:#fff;font-size:15px}
-.arrow{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:84px;border:0;cursor:pointer;color:#fff;font-size:26px;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(90deg,rgba(0,0,0,.3) 5%,rgba(0,0,0,0) 95%);opacity:.75;z-index:2}
-.arrow:hover{opacity:1;background:linear-gradient(90deg,rgba(171,218,244,.3) 5%,rgba(171,218,244,0) 95%)}
-.arrow.r{right:-40px;background:linear-gradient(270deg,rgba(0,0,0,.3) 5%,rgba(0,0,0,0) 95%)}
-.arrow.r:hover{background:linear-gradient(270deg,rgba(171,218,244,.3) 5%,rgba(171,218,244,0) 95%)}
-.arrow.l{left:-40px}
-.arrow svg{width:12px;height:22px}
-.dots{display:flex;justify-content:center;gap:4px;margin-top:10px}
-.dots button{width:15px;height:9px;border:0;border-radius:2px;background:hsla(202,60%,100%,.2);cursor:pointer;padding:0}
-.dots button[aria-current="true"]{background:hsla(202,60%,100%,.4)}
 
 /* ---------- shelves ---------- */
-.shelf{position:relative}
-.shelf-track{display:grid;gap:10px;grid-template-columns:repeat(var(--per,4),minmax(0,1fr))}
+
 .cap{display:block;background:var(--bg-row);color:var(--text);box-shadow:0 0 5px rgba(0,0,0,.35);min-width:0;transition:none}
 .cap:hover{color:#fff;background:#1c1c1c}
 .cap .meta{padding:7px 8px 8px;display:flex;flex-direction:column;gap:6px}
@@ -179,8 +154,6 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .views button{background:rgba(0,0,0,.25);border:0;color:var(--muted);width:30px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px}
 .views button:hover{color:#fff}
 .views button[aria-pressed="true"]{background:var(--blue);color:#000000}
-.sum{color:var(--muted);font-size:12px;padding:2px 2px 8px}
-.sum b{color:var(--disc-fg);font-weight:400}
 
 /* list rows (search_result_row) */
 .rows{display:flex;flex-direction:column;gap:2px}
@@ -201,7 +174,7 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .ctab td{padding:5px 8px;border-top:1px solid #ffffff0d;white-space:nowrap}
 .ctab tr:hover td{background:#1c1c1c;color:#fff}
 .ctab td.t{max-width:340px;overflow:hidden;text-overflow:ellipsis}
-.ctab td .pctx{color:var(--disc-fg)}
+
 .ctab-wrap{overflow-x:auto}
 
 /* grid view */
@@ -214,10 +187,7 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .blk{background:rgba(0,0,0,.2)}
 .blk h4{margin:0;background:linear-gradient(90deg,#2a2a2a,#1f1f1f 70%);color:#fff;font-weight:400;font-size:12px;padding:7px 10px;letter-spacing:.02em}
 .blk .in{padding:10px}
-.chips{display:flex;flex-wrap:wrap;gap:4px}
-.chips button{background:rgba(103,193,245,.12);color:var(--blue);border:0;border-radius:2px;padding:5px 8px;font-size:12px;cursor:pointer}
-.chips button:hover{color:#fff}
-.chips button[aria-pressed="true"]{background:var(--blue);color:#000000}
+
 .tick{display:flex;align-items:center;gap:8px;padding:5px 2px;cursor:pointer;color:var(--text);font-size:12.5px;user-select:none}
 .tick input{appearance:none;width:15px;height:15px;border-radius:2px;background:#000000;box-shadow:inset 0 0 0 1px #333333;margin:0;flex:0 0 auto;display:grid;place-items:center;cursor:pointer}
 .tick input:checked{background:var(--blue)}
@@ -250,75 +220,12 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 @media (hover:none){#hv{display:none}}
 
 /* ---------- library (Steam client) ---------- */
-.libtop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:20px;background:#000000}
-.libtop>div{background:linear-gradient(180deg,#1a1a1a,#141414);padding:12px 14px}
-.libtop .k{color:#8c8c8c;font-size:11.5px}
-.libtop .v{color:#fff;font-size:21px;margin-top:2px}
-.libtop .d{color:#8c8c8c;font-size:11px;margin-top:1px}
-.libtop .v.g{color:#a1cd44}
-.libbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
-.libbar .search{margin-left:0;background:#1c1c1c;flex:1 1 220px}
-.libbar .search input::placeholder{color:#8c8c8c}
-.shelfwin{display:grid;grid-template-columns:300px minmax(0,1fr);background:var(--lib-bg);box-shadow:0 0 8px #000a;height:min(78vh,760px);margin-bottom:40px}
-.llist{background:var(--lib-side);overflow-y:auto;border-right:1px solid #0006}
-.llist .grp{position:sticky;top:0;background:#0d0d0d;color:#8c8c8c;font-size:11px;padding:7px 12px;letter-spacing:.04em;z-index:1;border-bottom:1px solid #0004}
-.lit{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:8px;padding:3px 10px 3px 12px;color:#bdbdbd;cursor:pointer;width:100%;background:none;border:0;text-align:left;font-size:12.5px}
-.lit:hover{background:#2a2a2a;color:#fff}
-.lit[aria-selected="true"]{background:#3e76cb;color:#fff}
-.lit .art{width:32px;aspect-ratio:1/1}
-.lit .art img{object-fit:cover}
-.lit .ph span{display:none}
-.lit .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lit .v{color:#8c8c8c;font-size:11px}
-.lit[aria-selected="true"] .v{color:#dce7f7}
-.ldet{overflow-y:auto;position:relative}
-.lhero{position:relative;height:250px;overflow:hidden}
-.lhero .bgi{position:absolute;inset:-30px;filter:blur(22px) brightness(.55) saturate(1.2)}
-.lhero .bgi .art{width:100%;height:100%;aspect-ratio:auto}
-.lhero .fg{position:absolute;left:24px;bottom:22px;width:min(320px,55%);box-shadow:0 6px 24px #000c}
-.lhero::after{content:"";position:absolute;inset:auto 0 0 0;height:90px;background:linear-gradient(180deg,transparent,var(--lib-bg))}
-.lhead{display:flex;align-items:center;gap:16px;padding:6px 24px 14px;flex-wrap:wrap}
-.lhead h3{margin:0;color:#fff;font-size:26px;font-weight:400;flex:1 1 260px;line-height:1.15}
+
 .btn-go{background:linear-gradient(90deg,#47bfff 0%,#1a44c2 100%);color:#fff;border-radius:2px;padding:11px 22px;font-size:15px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:8px}
 .btn-go.green{background:linear-gradient(90deg,var(--go1) 5%,var(--go2) 95%)}
 .btn-go:hover{filter:brightness(1.15);color:#fff}
-.lstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;margin:0 24px;background:#0003}
-.lstats>div{background:#1a1a1a;padding:10px 12px}
-.lstats .k{color:#8c8c8c;font-size:11px}
-.lstats .v{color:#fff;font-size:17px;margin-top:2px}
-.lstats .v.g{color:#a1cd44}
-.ldl{margin:20px 24px 28px}
-.ldl h5{margin:0 0 6px;color:#fff;font-size:12px;font-weight:400;letter-spacing:.04em;text-transform:uppercase}
-.ldl .ctab td{border-top-color:#ffffff10}
-.ldl .ctab th{background:#141414}
-.lempty{color:#8c8c8c;padding:24px}
-.colgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:40px}
-.colcard{background:none;border:0;padding:0;cursor:pointer;text-align:left;color:#bdbdbd;font-size:12px}
-.colcard .art{box-shadow:0 4px 12px #0009;transition:transform .12s}
-.colcard:hover .art{transform:scale(1.03);box-shadow:0 8px 20px #000c}
-.colcard .nm{margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#dfe3e6}
-.colcard .v{color:#8c8c8c}
 
 /* ---------- bundles ---------- */
-.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;margin-bottom:40px}
-.bcard{background:linear-gradient(180deg,#161616,#0a0a0a);box-shadow:0 0 5px #0007;display:flex;flex-direction:column}
-.bcard .mos{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#000}
-.bcard .mos .art:first-child{grid-column:span 3}
-.bcard .bd{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
-.bcard h3{margin:0;color:#fff;font-size:15px;font-weight:400}
-.bcard .src{color:var(--muted);font-size:11px}
-.bcard ul{list-style:none;margin:0;padding:0;font-size:12px;max-height:150px;overflow:auto}
-.bcard li{display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid #ffffff08}
-.bcard li span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bcard li.w span:first-child{color:var(--disc-fg)}
-.bcard li.o span:first-child{color:var(--dim);text-decoration:line-through}
-.bcard li em{font-style:normal;font-size:10.5px;color:var(--muted);flex:0 0 auto}
-.bcard .bf{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.howto{background:rgba(0,0,0,.25);padding:22px 24px;max-width:760px;margin:24px 0 40px;line-height:1.6;font-size:13.5px}
-.howto h3{margin:0 0 8px;color:#fff;font-weight:400;font-size:19px}
-.howto ol{padding-left:20px;margin:10px 0}
-.howto code{background:#000000;padding:1px 6px;border-radius:2px;color:#a9d4f1;font-size:12.5px}
-.howto p{margin:8px 0;max-width:70ch}
 
 #impMenu{position:absolute;right:0;top:calc(100% + 4px);background:#1c1c1c;box-shadow:0 6px 18px #000b;z-index:40;display:flex;flex-direction:column;min-width:210px}
 #impMenu[hidden]{display:none}
@@ -330,21 +237,17 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .foot{color:var(--dim);font-size:11.5px;text-align:center;padding:10px 0 34px}
 
 @media (max-width:900px){
-  .arrow.l{left:0}.arrow.r{right:0}
+
   .browse{grid-template-columns:1fr}
   .side{position:static;order:-1}
-  .libtop{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .libtop div:first-child{grid-column:span 2}
+
 }
 @media (max-width:720px){
-  .hero-stage{grid-template-columns:1fr}
-  .hero-stage .hero-art .art{min-height:0;aspect-ratio:460/215;height:auto}
+
   .srow{grid-template-columns:96px minmax(0,1fr) auto;gap:8px}
   .srow .art{width:96px}
   .srow .rel{display:none}
-  .shelfwin{grid-template-columns:1fr;height:auto}
-  .llist{max-height:44vh}
-  .lstats{grid-template-columns:repeat(2,minmax(0,1fr))}
+
   .nav button{padding:12px 8px;font-size:13px}
   .who{margin-left:0;width:100%;padding-bottom:10px}
 }
@@ -354,9 +257,10 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
   letter-spacing:.06em;background:linear-gradient(180deg,#2a2210,#14110a);color:#f5c75b;border:1px solid #c9a03f;box-shadow:0 0 6px #f5b83d55}
 .selo svg{width:13px;height:13px}
 .pp{font-size:10.5px;padding:2px 6px;border-radius:2px;white-space:nowrap;font-weight:700}
-.pp-novo{background:#1a6fd1;color:#fff}.pp-raro{background:#8fd3ff;color:#000000}.pp-igual{background:#4c8a1c;color:#eaffd0}
-.pp-24m{background:#6a3fc0;color:#fff}.pp-ref{background:none;color:var(--dim);font-weight:400;padding:2px 0;white-space:normal;text-align:right;max-width:170px}
+
+.pp-ref{background:none;color:var(--dim);font-weight:400;padding:2px 0;white-space:normal;text-align:right;max-width:170px}
 @media(max-width:720px){.pp-ref{max-width:118px;font-size:10px}}
+.pp-novo{background:#1a6fd1;color:#fff}.pp-raro{background:#8fd3ff;color:#000000}.pp-igual{background:#4c8a1c;color:#eaffd0}.pp-24m{background:#6a3fc0;color:#fff}
 .ppwrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .porque{background:rgba(0,0,0,.25);padding:8px 10px;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
 .porque b{color:var(--text);font-weight:400}
@@ -545,34 +449,14 @@ select.mini{padding:3px 6px;font-size:11.5px}
 #progBox h5{margin:0 0 6px;color:#fff;font-size:13px;font-weight:400}
 #progBox .bar{height:8px}
 #progBox pre{margin:8px 0 0;max-height:260px;overflow:auto;background:#000000;color:#979797;padding:8px;font-size:11px;white-space:pre-wrap}
-.brow{background:rgba(0,0,0,.2);margin-bottom:2px}
-.brow .h{display:grid;grid-template-columns:120px minmax(0,1fr) 190px auto;gap:12px;align-items:center;padding:4px 10px 4px 4px;cursor:pointer}
-.brow .h:hover{background:#1c1c1c}
-.brow .nm{color:#fff;font-size:14px}
-.prog{height:6px;background:#000000;border-radius:1px;overflow:hidden;margin-top:5px}.prog i{display:block;height:100%;background:linear-gradient(90deg,#4c6b22,#a1cd44)}
-.brow .val{text-align:right;font-size:12px;color:var(--muted)}.brow .val b{display:block;color:var(--disc-fg);font-size:15px;font-weight:400}
-.brow .det{padding:4px 10px 10px 136px}
-.brow .det table{width:100%}
+
 .art.vert{aspect-ratio:2/3}
-.colgrid.vert{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-.mbar{display:flex;height:14px;background:#000000;border-radius:2px;overflow:hidden;margin:6px 0}
-.mbar i{display:block;height:100%}.mbar .t{background:linear-gradient(90deg,#4c6b22,#a1cd44)}.mbar .p{background:repeating-linear-gradient(45deg,#3e76cb 0 6px,#5a8fe0 6px 12px)}
-.mbar.fino{height:6px;margin:5px 0 0}
-.meta-col{background:rgba(0,0,0,.25);padding:12px 14px;margin:2px 0 14px}
-.meta-col .l{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
-.meta-col .l b{color:#fff;font-weight:400}
+
 .leg{display:inline-flex;align-items:center;gap:5px;margin-right:12px}.leg i{width:10px;height:10px;display:inline-block;border-radius:2px}
-.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:40px}
-.fcard{background:linear-gradient(180deg,#161616,#0a0a0a);padding:12px;box-shadow:0 0 5px #0007}
-.fcard h3{margin:0 0 4px;color:#fff;font-weight:400;font-size:16px}
-.fcard .sub{color:var(--muted);font-size:12px;margin-bottom:8px}
-.fcard ul{list-style:none;margin:0;padding:0;font-size:12px;max-height:180px;overflow:auto}
-.fcard li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #ffffff08;align-items:center}
-.fcard li.w span:first-child{color:var(--disc-fg)}
-.fcard li span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 .qr{background:#fff;padding:8px;display:inline-block;margin-top:6px}
 .lnk{word-break:break-all;font-size:11.5px;background:#000000;padding:6px 8px;border-radius:2px;color:#a9d4f1}
-@media (max-width:720px){.brow .h{grid-template-columns:90px 1fr}.brow .val{grid-column:2;text-align:left}.brow .det{padding-left:10px}}
+
 .carr-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start;margin-bottom:40px}
 .crow{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto 28px;gap:12px;align-items:center;background:rgba(0,0,0,.2);padding:4px 8px 4px 4px;margin-bottom:2px}
 .crow .nm{color:#fff;font-size:14px;cursor:pointer}
@@ -607,13 +491,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 @media (max-width:900px){.carr-grid{grid-template-columns:1fr}.crow{grid-template-columns:90px 1fr auto 28px}.crow .modosel{grid-column:2}}
 @media (max-width:720px){.nrow{grid-template-columns:90px 1fr auto}.nrow .q{display:none}}
 /* ---------- 0.15: vitrine e Promoções (spec 04) ---------- */
-.vhead{align-items:flex-end}.vhead h2{margin:0}
-.vsub{color:var(--muted);font-size:12px;margin-top:4px}
-.vtudo{background:none;border:0;color:var(--blue);cursor:pointer;font-size:12.5px;padding:0;white-space:nowrap}
-.vtudo:hover{color:#fff}
-.vgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.vcard .row{justify-content:space-between}
-.vfim{font-size:11px;color:#ff9b8a}
+
 .pbrowse{grid-template-columns:minmax(0,1fr) 232px}
 .topbar .wrap,.tabsec.wrap,.foot.wrap{max-width:1240px}
 /* barra de filtros compacta, como a da SteamDB: cabe na tela sem rolar */
@@ -627,9 +505,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .pside .hint{font-size:10.5px;line-height:1.35;margin-top:3px}
 .pside .pfx .f{margin-bottom:5px}
 .pside .pin{padding:4px 5px;width:70px}
-.vtit{background:none;border:0;padding:0;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;text-align:left}
-.vtit::after{content:" ›";opacity:.6}
-.vtit:hover{color:#fff;text-decoration:underline}
+
 .pfbtn{display:none;padding:5px 10px}
 .pchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
 .pchip{display:inline-flex;align-items:center;gap:4px;background:rgba(103,193,245,.16);color:var(--blue);font-size:12px;padding:3px 4px 3px 8px;border-radius:2px}
@@ -674,15 +550,37 @@ details.blk[open]>summary h4::after{content:"▴"}
 .pager button:disabled{opacity:.35;cursor:default}
 .pager span{color:var(--dim);align-self:center}
 .regua{background:rgba(26,111,209,.14);padding:8px 10px;font-size:12px;color:#cfe3ff;margin-top:8px}
-.dlcp td.t{white-space:normal}
+
 @media (max-width:900px){.pbrowse{grid-template-columns:minmax(0,1fr)}}
 .pbrowse>div{min-width:0}
 @media (max-width:720px){
-  .vgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
   .pfbtn{display:inline-block}
   .pside{display:none}.pside.open{display:flex}
   .ptab .pcap .art{width:64px}
 }
+/* ---------- Ofertas e Biblioteca (spec 09): páginas próprias (ofertas.html, biblioteca.html) abaixo do topo ---------- */
+.framesec{position:fixed;left:0;right:0;bottom:0;top:var(--topoH,64px);z-index:5;background:#050505}
+.framesec iframe{display:block;width:100%;height:100%;border:0;background:#050505}
+.fr-msg{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px}
+body.emframe{overflow:hidden}body.emframe .foot{display:none}
+.ddm kbd{float:right;font:inherit;font-size:11px;opacity:.55;margin-left:18px}
+.ddm hr{border:0;border-top:1px solid #ffffff22;margin:6px 0}
+.nav .ddm button[data-dlcpromo]{color:var(--muted)}
+/* ficha aberta pelas páginas novas: ‹ › pelos jogos da mesma lista e a caixa do veredito (amostra 8) */
+.mnav{position:fixed;top:45%;z-index:72;width:44px;height:76px;border:0;background:#000b;color:#fff;font-size:30px;cursor:pointer}
+.mnav:hover{background:var(--blue);color:#000}.mnav.e{left:max(4px,calc(50vw - 660px))}.mnav.d{right:max(4px,calc(50vw - 660px))}
+.mpos{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:72;background:#000c;color:var(--muted);font-size:12px;padding:3px 12px}
+.fx-v8{border-left:3px solid var(--c)}
+.fx-v8 .l1{color:#fff;font-size:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.fx-v8 .l1 b{font-weight:400}
+.fx-etq{font-size:11px;padding:3px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:.04em}
+.fx-v8 .fts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px 24px;margin-top:10px}
+.fx-v8 .fts .k{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.fx-v8 .fts b{display:block;color:#fff;font-weight:400;font-size:14.5px}.fx-v8 .fts small{color:var(--dim);font-size:12px}
+.fx-v8 details{margin-top:8px}.fx-v8 summary{cursor:pointer;color:var(--blue);font-size:12.5px;list-style:none}.fx-v8 summary::-webkit-details-marker{display:none}
+.fx-v8 details[open] summary{color:var(--muted)}.fx-v8 details p{color:var(--text);font-size:13px;margin:6px 0 0}
+.fx-v8 .selo-m{color:#ffd75e;font-size:13px;margin-top:8px}
 </style></head><body>
 <header class="topbar">
   <div class="wrap">
@@ -691,9 +589,10 @@ details.blk[open]>summary h4::after{content:"▴"}
       <span class="logo-t">KUROKAMI<small>HUNTER</small></span>
     </a>
     <nav class="nav" aria-label="Seções">
-      <div class="dd"><button data-tab="vale" data-tabs="vale lista" aria-haspopup="true">Ofertas</button>
-        <div class="ddm"><button data-tab="vale">Destaques</button><button data-tab="lista" data-ir="promo">Promoções</button><button data-tab="lista" data-ir="desejos">Lista de desejos</button></div></div>
-      <button data-tab="bib" data-tabs="bib">Biblioteca</button>
+      <div class="dd"><button data-tab="vale" data-tabs="vale lista" data-sub="dest" aria-haspopup="true">Ofertas</button>
+        <div class="ddm"><button data-tab="vale" data-sub="dest">Destaques<kbd>1</kbd></button><button data-tab="vale" data-sub="promo">Promoções<kbd>2</kbd></button><button data-tab="vale" data-sub="lista">Lista de desejos<kbd>3</kbd></button><hr><button data-tab="lista" data-ir="promo">Tabela com todos os filtros</button></div></div>
+      <div class="dd"><button data-tab="bib" data-tabs="bib" data-sub="bib" aria-haspopup="true">Biblioteca</button>
+        <div class="ddm"><button data-tab="bib" data-sub="bib">Biblioteca<kbd>1</kbd></button><button data-tab="bib" data-sub="completar">Completar<kbd>2</kbd></button><hr><button data-dlcpromo>DLCs dos meus jogos em promoção ↗</button></div></div>
       <div class="dd"><button data-tab="cfg" data-tabs="cfg notif" aria-haspopup="true">Configurações</button>
         <div class="ddm"><button data-tab="cfg">Configurações</button><button data-tab="notif">Notificações</button></div></div>
       <button data-tab="carr" data-tabs="carr">Carrinho <span id="carrN" style="color:var(--disc-fg)"></span></button>
@@ -708,11 +607,7 @@ details.blk[open]>summary h4::after{content:"▴"}
 </header>
 
 <main>
-  <section id="tab-vale" class="wrap tabsec">
-    <div class="shead vhead"><div><h2><button class="vtit" type="button" data-vertudo="selo" title="Ver todos em Promoções">Selo Kurokami</button></h2><div class="vsub" id="valeNote"></div></div></div>
-    <div class="hero" id="hero"></div>
-    <div id="vitrine"></div>
-  </section>
+  <section id="tab-vale" class="tabsec framesec"><div class="fr-msg" id="frValeMsg">Montando as ofertas… (alguns segundos na primeira vez depois de cada verificação)</div><iframe id="frVale" title="Ofertas" hidden></iframe></section>
 
   <section id="tab-lista" class="wrap tabsec" hidden>
     <div class="shead"><h2 id="listaTit">Promoções</h2><span class="aside" id="listaNote"></span></div>
@@ -736,17 +631,7 @@ details.blk[open]>summary h4::after{content:"▴"}
     </div>
   </section>
 
-  <section id="tab-bib" class="wrap tabsec" hidden>
-    <div class="libtop" id="bibTop"></div>
-    <div class="libbar">
-      <span class="seg" id="bibSeg"><button data-bseg="completar" aria-pressed="true">Completar</button><button data-bseg="franquias">Franquias</button><button data-bseg="colecao">Coleção</button><button data-bseg="dlcpromo">DLCs em promoção</button></span>
-      <label class="search"><span class="sr">Buscar na biblioteca</span><input id="bq" type="search" placeholder="Buscar na biblioteca" autocomplete="off"></label>
-      <select id="bsort"></select>
-    </div>
-    <div class="meta-col" id="bibMeta"></div>
-    <div id="bibNote" class="sum"></div>
-    <div id="bibView"></div>
-  </section>
+  <section id="tab-bib" class="tabsec framesec" hidden><div class="fr-msg" id="frBibMsg">Montando a biblioteca…</div><iframe id="frBib" title="Biblioteca" hidden></iframe></section>
 
   <section id="tab-carr" class="wrap tabsec" hidden>
     <div class="cart-head"><h1>Seu carrinho de compras</h1><span class="aside" id="carrNote"></span><span class="aside">só itens da Steam · cada um para a sua conta, presente ou privado</span></div>
@@ -778,7 +663,7 @@ details.blk[open]>summary h4::after{content:"▴"}
   <div class="foot wrap">Preços via <a href="https://isthereanydeal.com" target="_blank" rel="noopener">IsThereAnyDeal</a>, <a href="https://gg.deals" target="_blank" rel="noopener">GG.deals</a> e Steam · Kurokami Hunter <span id="ver"></span></div>
 </main>
 
-<div id="modal" hidden><div class="mbox fx" role="dialog" aria-modal="true" aria-label="Detalhes do jogo"><button class="mclose" aria-label="Fechar">×</button><div id="mbody"></div></div></div>
+<div id="modal" hidden><div class="mbox fx" role="dialog" aria-modal="true" aria-label="Detalhes do jogo"><button class="mclose" aria-label="Fechar">×</button><div id="mbody"></div></div><button class="mnav e" data-mpasso="-1" title="Anterior (←)" hidden>‹</button><button class="mnav d" data-mpasso="1" title="Próximo (→)" hidden>›</button><div class="mpos" id="mpos" hidden></div></div>
 <div id="hv" role="tooltip" aria-hidden="true"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="progTopo" style="width:0"></div>
@@ -798,7 +683,7 @@ const storeUrl=id=>`https://store.steampowered.com/app/${id}/`;
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),3500);}
 const ls={get(k,d){try{const v=localStorage.getItem('kr:'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem('kr:'+k,JSON.stringify(v));}catch(e){}}};
 async function api(p){const r=await fetch(p);if(!r.ok){const e=(await r.json().catch(()=>({}))).erro||r.status;toast('Erro: '+e);throw new Error(e);}return r.json();}
-async function post(p,d){let r;try{r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d||{})});}
+async function post(p,d){try{Object.values(FR).forEach(f=>{f.velho=true;});}catch(e){}let r;try{r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d||{})});}
   catch(e){toast('O Hunter não respondeu. Ele está aberto na bandeja?');return {ok:false,erro:String(e)};}
   const j=await r.json().catch(()=>({ok:false,erro:'resposta inválida'}));if(!r.ok||j.ok===false){toast('Não deu certo: '+(j.erro||r.status));if(j.ok===undefined)j.ok=false;}return j;}
 function ph(name,id,small){return `<span class="ph${small?' sm':''}" style="--h:${hue(id)}"><span>${esc(name)}</span></span>`;}
@@ -847,7 +732,6 @@ function flags(o){
   return f.join('');
 }
 function revText(o){return o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo||o.rpos+'%')}</span> <span style="color:var(--dim)">(${fmtK(o.rcount)})</span>`:'<span class="rv-non">Sem análises</span>';}
-function cartBtnB(id){const on=CARR.some(c=>c.bundle===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cartb="${id}" title="${on?'Tirar o bundle do carrinho':'Pôr o bundle no carrinho'}">${on?'✓':'+'}</span>`;}
 function cartBtn(id,mon){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}"${mon?' data-mon="1"':''} title="${on?'Tirar do carrinho':mon?'Pôr no carrinho (e monitorar)':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
 const abre=o=>o.steam_inteira?`data-open="${o.appid}"`:`data-open="${o.appid}" data-hv="${o.appid}"`;   // Steam inteira: ficha sem o cartão de passar o mouse
 function capCard(o){return `<a class="cap" href="#" ${abre(o)}>${art(o.appid,o.nome,o.capa)}
@@ -879,65 +763,34 @@ async function alternarCarr(id,forcar,mon){const i=CARR.findIndex(c=>c.appid===i
   if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}
   else if(i<0){if(mon){const r=await post('/api/extra',{appid:id});if(!r||r.ok===false||r.erro){toast('Não consegui monitorar: '+((r&&r.erro)||'?'));return;}}CARR.push({appid:id,modo:'conta'});toast(mon?'No carrinho e monitorado (entra na lista na próxima checagem)':'No carrinho');}
   await salvarCarr();$$(`[data-cart="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.appid===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
-  if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();if(S.tab==='lista')renderLista();}
+  if(S.tab==='carr')renderCarr();if(S.tab==='lista')renderLista();}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cart]');if(!c)return;e.preventDefault();e.stopPropagation();alternarCarr(+c.dataset.cart,false,c.dataset.mon==='1');},true);
 async function alternarBundle(id){const i=CARR.findIndex(c=>c.bundle===id);if(i>=0){CARR.splice(i,1);toast('Bundle saiu do carrinho');}else{CARR.push({bundle:id,modo:'conta'});toast('Bundle no carrinho');}
   await salvarCarr();$$(`[data-cartb="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.bundle===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
-  if(S.tab==='carr')renderCarr();if(S.tab==='bib')renderBib();}
+  if(S.tab==='carr')renderCarr();}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cartb]');if(!c)return;e.preventDefault();e.stopPropagation();alternarBundle(+c.dataset.cartb);},true);
 document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(!o)return;e.preventDefault();HV.classList.remove('on');abrirJogo(+o.dataset.open);});
 
 /* ================= abas ================= */
-function setTab(t){S.tab=t;save();document.body.dataset.tab=t;try{history.replaceState(null,'','#'+t);}catch(e){}$$('.nav [data-tabs]').forEach(b=>b.setAttribute('aria-current',b.dataset.tabs.split(' ').includes(t)?'page':'false'));
+function setTab(t){ENTRANDO=S.tab!==t;S.tab=t;save();document.body.dataset.tab=t;document.body.classList.toggle('emframe',!!FR[t]);try{history.replaceState(null,'','#'+t);}catch(e){}$$('.nav [data-tabs]').forEach(b=>b.setAttribute('aria-current',b.dataset.tabs.split(' ').includes(t)?'page':'false'));
   ['vale','lista','bib','carr','notif','cfg'].forEach(x=>$('#tab-'+x).hidden=x!==t);render();}
 $('#logoHome').addEventListener('click',e=>{e.preventDefault();setTab('vale');window.scrollTo({top:0,behavior:'smooth'});});
-$('.nav').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
-  if(b.dataset.ir==='desejos')aplicarP(P_DESEJOS);else if(b.dataset.ir==='promo')aplicarP(P_PADRAO);
+$('.nav').addEventListener('click',e=>{if(e.target.closest('[data-dlcpromo]')){KH.dlcsPromo();e.target.blur();return;}
+  const b=e.target.closest('[data-tab]');if(!b)return;
+  if(b.dataset.ir==='promo')aplicarP(P_PADRAO);
+  if(b.dataset.sub&&FR[b.dataset.tab])FR[b.dataset.tab].sub=b.dataset.sub;
   setTab(b.dataset.tab);if(b.closest('.ddm'))b.blur();});
 
-/* ================= Ofertas → Destaques (vitrine; aba #vale) ================= */
-let heroI=0, VIT=null;
+/* ================= tipos de recorde (Configurações e a tabela de Promoções) ================= */
+let VIT=null;   // /api/vitrine: só para o "N na vitrine" do topo
 const TIPO_NOME={selo:'Selo Kurokami',novo:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
 const TIPO_DESC={selo:'O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade',novo:'Nunca esteve tão barato',
   igual:'No mesmo preço do menor já registrado','24m':'No menor preço dos últimos 2 anos'};
 const TIPO_COR={selo:'#f5c75b',novo:'#1a6fd1',igual:'#4c8a1c','24m':'#6a3fc0'};
-function vitCard(o){const ft=fimTxt(o.fim);
-  return `<a class="cap vcard" href="#" data-open="${o.appid}" data-hv="${o.appid}">${art(o.appid,o.nome,o.capa)}
-  <div class="meta"><div class="nm">${esc(o.nome)}</div>${ft?`<div class="vfim">⏳ ${ft}</div>`:''}
-    <div class="row"><span>${cartBtn(o.appid)}</span>${priceBlock(o)}</div></div></a>`;}
-function verTudo(t){const P0={mostrar_so:[t],tipo:['jogo'],relacao:{na_lista:'exigir',tenho:'excluir'}};if(t!=='selo'&&VIT&&VIT.desconto_minimo)P0.desconto_min=VIT.desconto_minimo;
-  aplicarP(P0);setTab('lista');}
-async function renderVale(){
-  try{VIT=await api('/api/vitrine');}catch(e){return;}
-  atualizarStatus();
-  const sel=VIT.selo,top=sel.itens;
-  $('#valeNote').innerHTML=`${VIT.avisa.selo?'🔔 ':''}${esc(TIPO_DESC.selo)}${sel.total?` · <button class="lk vtudo" data-vertudo="selo">Ver tudo (${sel.total})</button>`:''}`;
-  if(!top.length){$('#hero').innerHTML='<div class="empty">Nenhum jogo com Selo agora.</div>';}
-  else{heroI=(heroI+top.length)%top.length;const o=top[heroI];
-  $('#hero').innerHTML=`<div class="hero-stage">
-    <a class="hero-art" href="#" data-open="${o.appid}">${art(o.appid,o.nome,o.capa,{style:'--fs:30px'})}</a>
-    <div class="hero-info"><h3><a href="#" data-open="${o.appid}">${esc(o.nome)}</a></h3><div class="flags">${seloBadge(o)}${fimTxt(o.fim)?`<span class="flag" style="background:#d6492f33;color:#ff9b8a">⏳ ${fimTxt(o.fim)}</span>`:''}</div>
-      <div class="hero-why tnum"><span>Por quê</span><b>${esc((o.selo_motivo||'').replace(/^./,c=>c.toUpperCase()))}</b>
-        <span>Loja</span><b>${esc(o.loja)}</b><span>Análises</span><b>${o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo)}</span> · ${o.rpos}%`:'Sem análises'}</b></div>
-      ${top.length>1?`<div class="hero-next">${[1,2,3,4].slice(0,top.length-1).map(k=>{const n=top[(heroI+k)%top.length];return `<button type="button" data-heroi="${(heroI+k)%top.length}" title="${esc(n.nome)}">${art(n.appid,n.nome,n.capa,{small:true})}</button>`;}).join('')}</div>`:''}
-      <div class="hero-foot"><span style="display:flex;gap:8px;align-items:center"><a class="btn-go green" href="${esc(o.url||storeUrl(o.appid))}" target="_blank" rel="noopener" style="padding:8px 14px;font-size:13px">Abrir oferta</a>${cartBtn(o.appid)}</span>${priceBlock(o,true)}</div></div></div>
-    ${top.length>1?`<button class="arrow l" aria-label="Anterior" data-hero="-1"><svg viewBox="0 0 12 22"><path d="M11 1 1 11l10 10" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
-    <button class="arrow r" aria-label="Próximo" data-hero="1"><svg viewBox="0 0 12 22"><path d="m1 1 10 10L1 21" stroke="#fff" stroke-width="2" fill="none"/></svg></button>
-    <div class="dots">${top.map((_,i)=>`<button aria-label="Destaque ${i+1}" data-heroi="${i}" aria-current="${i===heroI}"></button>`).join('')}</div>`:''}`;}
-  $('#vitrine').innerHTML=['novo','igual','24m'].map(t=>{const b=VIT[t];if(!b||!b.total)return '';
-    return `<div class="shead vhead"><div><h2>${VIT.avisa[t]?'🔔 ':''}<button class="vtit" type="button" data-vertudo="${t}" title="Ver todos em Promoções">${TIPO_NOME[t]}</button></h2><div class="vsub">${esc(TIPO_DESC[t])}</div></div>
-      <button class="lk vtudo" data-vertudo="${t}">Ver tudo (${b.total})</button></div>
-      <div class="vgrid">${b.itens.map(vitCard).join('')}</div>`;}).join('')||
-    `<div class="empty" style="margin-top:20px">Nenhum outro recorde com desconto de ${VIT.desconto_minimo}% ou mais agora.</div>`;
-}
-$('#tab-vale').addEventListener('click',e=>{const v=e.target.closest('[data-vertudo]');if(v){e.preventDefault();verTudo(v.dataset.vertudo);}});
-$('#hero').addEventListener('click',e=>{const a=e.target.closest('[data-hero]'),d=e.target.closest('[data-heroi]');
-  if(a){heroI+=+a.dataset.hero;renderVale();}else if(d){heroI=+d.dataset.heroi;renderVale();}});
 
 /* ================= promoções (explorador; filtros no Hunter: /api/promocoes) ================= */
 // Promoções e Lista de desejos (menu Ofertas) abrem sempre com estes filtros (sempre só Jogo, como os Destaques); +18 fica oculto sem o campo adulto
 const P_PADRAO={desconto_min:50,analises_de:500,tipo:['jogo'],relacao:{tenho:'excluir'}};
-const P_DESEJOS={desconto_min:50,analises_de:500,tipo:['jogo'],relacao:{na_lista:'exigir',tenho:'excluir'}};
 let P=ls.get('promo',null)||JSON.parse(JSON.stringify(P_PADRAO)), PG=1, PP=ls.get('pp',100), PR=null, pSeq=0;
 const salvarP=()=>{ls.set('promo',P);ls.set('pp',PP);};
 function aplicarP(p){P=JSON.parse(JSON.stringify(p));PG=1;salvarP();}
@@ -1089,8 +942,10 @@ function porqueVolta(m){const o=IDX.get(m.jogo.appid)||{};
 const CORES=['#66c0f4','#a1cd44','#e2a635','#ef6f6a','#c7b3ff','#4fd1c5','#f472b6','#facc15','#94a3b8','#fb923c'];
 let MJ=null, MVIS=new Set(), MRANGE=365;
 let MSEQ=0;
-async function abrirJogo(appid){
-  const meu=++MSEQ;
+async function abrirJogo(appid,op){
+  const meu=++MSEQ;MOP=op||{};
+  $$('#modal .mnav').forEach(b=>b.hidden=!MOP.passo);$('#mpos').hidden=!MOP.pos;$('#mpos').textContent=MOP.pos||'';
+  if(op){window.focus();setTimeout(()=>{const c=$('#modal .mclose');if(c)c.focus({preventScroll:true});},0);}
   $('#modal').hidden=false;$('#modal').scrollTop=0;document.body.style.overflow='hidden';$('#mbody').innerHTML='<div class="empty">carregando… (fora da lista, o histórico vem da IsThereAnyDeal na hora)</div>';
   MX=undefined;MTROCA=false;   // descrição, HLTB, notas e conquistas chegam depois, para a ficha abrir na hora
   const extra=fetch('/api/jogo_extra?appid='+appid).then(r=>r.ok?r.json():{falhou:true}).catch(()=>({falhou:true}));
@@ -1102,9 +957,16 @@ async function abrirJogo(appid){
   renderModal();
   const x=await extra;if(meu===MSEQ&&!$('#modal').hidden){MX=x;renderModal();}
 }
-function fecharModal(){$('#modal').hidden=true;document.body.style.overflow='';}
-$('#modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.closest('.mclose'))fecharModal();});
-addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)fecharModal();});
+function fecharModal(){$('#modal').hidden=true;document.body.style.overflow='';if(FR[S.tab])focaFrame();MOP={};}
+$('#modal').addEventListener('click',e=>{const p=e.target.closest('[data-mpasso]');if(p){if(MOP.passo)MOP.passo(+p.dataset.mpasso);return;}
+  if(e.target.id==='modal'||e.target.closest('.mclose'))fecharModal();});
+addEventListener('keydown',e=>{if($('#modal').hidden)return;if(e.key==='Escape')fecharModal();
+  else if(MOP.passo&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();MOP.passo(e.key==='ArrowRight'?1:-1);}});
+/* a caixa do veredito das páginas novas (amostra 8): o veredito numa linha, 2 frases e o "por quê" fechado */
+function fxVered(v){return `<div class="fx-cx fx-v8" style="--c:${v.cor}"><div class="l1">${v.etq?`<span class="fx-etq" style="background:${v.etq[1]};color:${v.etq[2]}">${esc(v.etq[0])}</span>`:''}<span><b style="color:${v.cor}">${esc(v.rot)}</b>${v.sub?' · '+esc(v.sub):''}</span></div>
+  ${v.fatos.length?`<div class="fts">${v.fatos.map(([a,b,n])=>`<div><span class="k">${esc(a)}</span><b>${esc(b)}</b>${n?`<small>${esc(n)}</small>`:''}</div>`).join('')}</div>`:''}
+  ${v.fora?'<div class="fx-vazio" style="margin-top:6px">Fora de venda nas suas lojas.</div>':''}${v.selo?`<div class="selo-m">Selo Kurokami: ${esc(v.selo)}.</div>`:''}
+  ${v.porque.length?`<details><summary>por quê</summary>${v.porque.map(x=>`<p>${esc(x)}</p>`).join('')}</details>`:''}</div>`;}
 function dlcMotivo(e){
   if(!e)return '';
   const t=e.motivo==='falhou'?`A consulta de DLCs falhou em ${fmtISO(e.quando)}; o Hunter tenta de novo na próxima verificação.`
@@ -1180,7 +1042,8 @@ function fxPri(){
     if(conq||dl)s+=`<div class="fx-cx"><h3>Seu progresso</h3>${conq}${dl}</div>`;
   }else{
     const pv=porqueVolta(MJ),t=!MJ.selo&&MJ.corte>0&&TITULO_TIPO[MJ.tipo_oferta];
-    if(pv||t)s+=`<div class="fx-cx fx-vered">${t?`<div class="t">${recPill({tipo_oferta:MJ.tipo_oferta,corte:MJ.corte,piso_ref:MJ.piso_ref})}${t}</div>`:''}${pv}</div>`;
+    if(MOP.vered)s+=fxVered(MOP.vered);
+    else if(pv||t)s+=`<div class="fx-cx fx-vered">${t?`<div class="t">${recPill({tipo_oferta:MJ.tipo_oferta,corte:MJ.corte,piso_ref:MJ.piso_ref})}${t}</div>`:''}${pv}</div>`;
     if(o.pisos)s+=`<div><h3>Menor preço nas lojas que alertam</h3><div class="pisos tnum">${[['3m','3 meses'],['6m','6 meses'],['9m','9 meses'],['1a','1 ano'],['sempre','De sempre']].map(([k,t])=>`<div class="${o.preco!=null&&o.pisos[k]!=null&&o.preco<=o.pisos[k]?'on':''}">${t}<b>${brl(o.pisos[k])}</b></div>`).join('')}</div>
       ${o.piso_geral!=null&&o.piso!=null&&o.piso_geral<o.piso?`<div class="fx-vazio" style="margin-top:6px">Em lojas que não alertam já teve ${brl(o.piso_geral)}.</div>`:''}</div>`;
   }
@@ -1269,7 +1132,7 @@ $('#mbody').addEventListener('click',async e=>{
   const r=e.target.closest('[data-range]');if(r){MRANGE=+r.dataset.range;renderModal();return;}
   const l=e.target.closest('[data-serie]');if(l){const s=l.dataset.serie;MVIS.has(s)?MVIS.delete(s):MVIS.add(s);desenharGrafico();return;}
   const th=e.target.closest('[data-tenho]');if(th){if(MJ.tenho&&!MJ.tenho_manual){toast('Já está na sua biblioteca da Steam');return;}const novo=!MJ.tenho_manual;await post('/api/tenho',{appid:MJ.jogo.appid,tenho:novo});
-    toast(novo?'Marcado como seu: sai dos alertas e do carrinho':'Desmarcado');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();BD=null;return;}
+    toast(novo?'Marcado como seu: sai dos alertas e do carrinho':'Desmarcado');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();FR.bib.velho=FR.vale.velho=true;return;}
   const mu=e.target.closest('[data-mudo]');if(mu){await post('/api/silenciar',{appid:MJ.jogo.appid,mudo:mu.dataset.mudo==='1'});toast(mu.dataset.mudo==='1'?'Sem alertas para este jogo':'Alertas de volta');
     MJ.mudo=mu.dataset.mudo==='1';const it=IDX.get(MJ.jogo.appid);if(it)it.mudo=MJ.mudo;renderModal();return;}
   const mc=e.target.closest('[data-mcart]');if(mc){await alternarCarr(+mc.dataset.mcart);renderModal();return;}
@@ -1307,84 +1170,32 @@ function desenharGrafico(){
   svg.addEventListener('mouseleave',()=>{tip.style.display='none';cur.setAttribute('visibility','hidden');});
 }
 
-/* ================= biblioteca ================= */
-let BD=null;S.bseg=S.bseg||'completar';S.bsort=S.bsort||'perto';S.bq='';const ABERTOS=new Set();
-const BSORTS={completar:[['perto','Mais perto de completar'],['barato','Mais barato para completar'],['promo','DLCs faltantes em promoção'],['caro','Mais caro para completar'],['nome','Nome']],
-  franquias:[['tenho','Mais jogos que tenho'],['falta','Mais coisas faltando'],['nome','Nome']],
-  colecao:[['valor','Maior valor'],['nome','Nome'],['aval','Melhor avaliados']],
-  dlcpromo:[['corte','Maior desconto'],['preco','Menor preço'],['fim','Termina antes'],['nome','Nome']]};
-async function renderBib(){
-  if(!BD){$('#bibView').innerHTML='<div class="empty">carregando a biblioteca…</div>';BD=await api('/api/biblioteca');}
-  const t=BD.total;
-  $('#bibTop').innerHTML=`<div><div class="k">Sua biblioteca</div><div class="v tnum">${fmtN(BD.n_jogos)} jogos</div><div class="d">${fmtN(t.dlcs_tenho)} DLCs</div></div>
-    <div><div class="k">Valor pelo preço cheio</div><div class="v tnum">${brl0(t.cheio)}</div><div class="d">tudo sem desconto</div></div>
-    <div><div class="k">Valor hoje na Steam</div><div class="v tnum">${brl0(t.hoje)}</div><div class="d">${t.cheio?Math.round(100*(1-t.hoje/t.cheio)):0}% abaixo do cheio</div></div>
-    <div><div class="k">No menor histórico</div><div class="v g tnum">${brl0(t.menor)}</div><div class="d">o piso de cada item</div></div>
-    <div><div class="k">Para completar tudo</div><div class="v tnum">${brl0(t.falta_hoje)}</div><div class="d">${fmtN(t.dlcs_faltam)} DLCs · ${brl0(t.falta_menor)} nos pisos</div></div>`;
-  $$('#bibSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.bseg===S.bseg));
-  const opts=BSORTS[S.bseg];if(!opts.some(o=>o[0]===S.bsort))S.bsort=opts[0][0];
-  $('#bsort').innerHTML=opts.map(([v,l])=>`<option value="${v}"${v===S.bsort?' selected':''}>${l}</option>`).join('');
-  const cset=new Set(CARR.map(c=>c.appid));
-  const planC=BD.jogos.reduce((s,g)=>s+g.falta.filter(d=>cset.has(d.appid)).reduce((x,d)=>x+(d.cheio||d.preco||0),0),0);
-  const planH=BD.jogos.reduce((s,g)=>s+g.falta.filter(d=>cset.has(d.appid)).reduce((x,d)=>x+(d.preco||0),0),0);
-  const univ=t.cheio+t.falta_cheio, pt=univ?100*t.cheio/univ:100, pp=univ?100*planC/univ:0;
-  $('#bibMeta').innerHTML=`<div class="l"><span>Progresso da coleção, pelo preço cheio (seus jogos + DLCs que contam)</span><span><b>${pt.toFixed(1)}%</b>${planC?` → <b style="color:#8fb8ff">${(pt+pp).toFixed(1)}%</b> com o carrinho`:''}</span></div>
-    <div class="mbar"><i class="t" style="width:${pt}%"></i><i class="p" style="width:${pp}%"></i></div>
-    <div class="l"><span><span class="leg"><i style="background:#a1cd44"></i>tenho ${brl0(t.cheio)}</span><span class="leg"><i style="background:#5a8fe0"></i>no carrinho ${brl0(planC)} (custa ${brl0(planH)} hoje)</span><span class="leg"><i style="background:#000000;box-shadow:inset 0 0 0 1px #333333"></i>falta ${brl0(t.falta_cheio-planC)}</span></span>
-      <span>para completar: <b>${brl0(t.falta_hoje-planH)}</b> hoje${planH?' depois do carrinho':''}</span></div>`;
-  const notas=[];if(BD.sem_lista_dlc)notas.push(`${BD.sem_lista_dlc} jogos ainda sem lista de DLCs (o Hunter completa em segundo plano)`);
-  if(BD.sem_dados)notas.push(`${BD.sem_dados} itens sem página na loja (removidos ou ocultos; não entram na conta)`);if(!BD.atualizado)notas.push('a primeira leitura completa da biblioteca acontece na próxima checagem');
-  $('#bibNote').textContent=notas.join(' · ');
-  const q=S.bq;const J=BD.jogos.filter(g=>!q||g.nome.toLowerCase().includes(q));
-  if(S.bseg==='completar'){
-    let l=J.filter(g=>g.falta.length);
-    const pct=g=>g.dlc_total?g.dlc_tenho/g.dlc_total:1;
-    const c={perto:(a,b)=>pct(b)-pct(a)||a.falta_hoje-b.falta_hoje,barato:(a,b)=>a.falta_hoje-b.falta_hoje,caro:(a,b)=>b.falta_hoje-a.falta_hoje,
-      promo:(a,b)=>b.falta.filter(d=>d.corte>0).length-a.falta.filter(d=>d.corte>0).length,nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[S.bsort];
-    l.sort(c);
-    $('#bibView').innerHTML=l.length?l.slice(0,200).map(g=>{const p=Math.round(100*pct(g));const promo=g.falta.filter(d=>d.corte>0).length;
-      return `<div class="brow"><div class="h" data-bopen="${g.appid}">${art(g.appid,g.nome,g.capa,{small:true})}
-        <div><div class="nm">${esc(g.nome)}</div><div class="motivo">tem ${g.dlc_tenho} de ${g.dlc_total} DLCs que contam${g.franquia?' · '+esc(g.franquia.split('|')[0]):''}${promo?` · <span style="color:var(--disc-fg)">${promo} em promoção</span>`:''}</div>${(()=>{const n=g.falta.filter(d=>cset.has(d.appid)).length;const pc=g.dlc_total?100*n/g.dlc_total:0;return `<div class="mbar fino"><i class="t" style="width:${p}%"></i><i class="p" style="width:${pc}%"></i></div>`;})()}</div>
-        <div class="val">faltam<b>${brl(g.falta_hoje)}</b>${g.falta_menor<g.falta_hoje?`${brl(g.falta_menor)} nos pisos`:''}</div><span style="color:var(--muted)">${ABERTOS.has(g.appid)?'▴':'▾'}</span></div>
-        ${ABERTOS.has(g.appid)?`<div class="det"><table class="ctab tnum"><thead><tr><th>Falta</th><th>Tipo</th><th class="n">Hoje</th><th class="n">Menor</th><th></th></tr></thead><tbody>
-          ${g.falta.sort((x,y)=>(y.corte>0)-(x.corte>0)||x.preco-y.preco).map(d=>`<tr><td class="t">${esc(d.nome)}</td><td>${esc((CLASSES[d.classe])||d.classe)}</td>
-          <td class="n">${d.corte>0?`<span class="pctx">-${d.corte}%</span> `:''}${brl(d.preco)}</td><td class="n">${brl(d.menor)}</td><td>${cartBtn(d.appid)}</td></tr>`).join('')}</tbody></table>
-          ${g.bundles&&g.bundles.length?`<div class="motivo" style="margin-top:8px">Bundles da Steam com DLCs que faltam:</div>${g.bundles.map(b=>`<div class="tot"><span>📦 ${esc(b.nome)} · cobre ${b.cobre} · ${b.economia>0?`<b style="color:var(--disc-fg)">economiza ${brl(b.economia)}</b>`:`avulsas sai ${brl(-b.economia)} mais barato`}</span><span style="display:flex;gap:6px;align-items:center">${brl(b.preco)} ${cartBtnB(b.bundle)}</span></div>`).join('')}`:''}
-          <div style="text-align:right;margin-top:6px"><button class="btn-ghost" data-todos="${g.falta.map(d=>d.appid).join(',')}">Pôr todas no carrinho</button></div></div>`:''}</div>`;}).join(''):
-      '<div class="empty">Nenhum jogo com DLC faltando (ou as listas de DLC ainda estão sendo montadas).</div>';
-  }else if(S.bseg==='franquias'){
-    let f=BD.franquias.filter(x=>!q||x.nome.toLowerCase().includes(q)||x.tenho.some(g=>g.nome.toLowerCase().includes(q)));
-    f.sort({tenho:(a,b)=>b.tenho.length-a.tenho.length,falta:(a,b)=>(b.lista.length+b.dlc_faltam)-(a.lista.length+a.dlc_faltam),nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[S.bsort]);
-    $('#bibView').innerHTML=f.length?`<div class="fgrid">${f.slice(0,150).map(x=>`<div class="fcard"><h3>${esc(x.nome)}</h3>
-      <div class="sub">você tem ${x.tenho.length} jogo(s)${x.lista.length?` · ${x.lista.length} na lista de desejos (${brl(x.custo_lista)})`:''}${x.dlc_faltam?` · ${x.dlc_faltam} DLCs faltando (${brl(x.falta_dlc_hoje)})`:''}</div>
-      ${(()=>{const u=x.valor_tenho+x.valor_falta;if(!u)return '';const pl=x.lista.filter(g=>cset.has(g.appid)).reduce((s,g)=>s+(g.cheio||g.preco||0),0);
-        return `<div class="mbar fino"><i class="t" style="width:${100*x.valor_tenho/u}%"></i><i class="p" style="width:${100*pl/u}%"></i></div><div class="sub" style="margin:4px 0 8px">${Math.round(100*x.valor_tenho/u)}% da série pelo preço cheio${pl?` · ${Math.round(100*(x.valor_tenho+pl)/u)}% com o carrinho`:''}</div>`;})()}
-      <ul>${x.lista.map(g=>`<li class="w"><span>${esc(g.nome)}</span><span style="display:flex;gap:6px;align-items:center">${g.corte?`<span class="pctx">-${g.corte}%</span>`:''}${brl(g.preco)} ${cartBtn(g.appid)}</span></li>`).join('')}
-      ${x.tenho.map(g=>`<li><span>${esc(g.nome)}</span><span style="color:var(--dim)">${g.dlc_faltam?g.dlc_faltam+' DLC faltando':'✓ tenho'}</span></li>`).join('')}</ul></div>`).join('')}</div>
-      <div class="hint" style="color:var(--dim);font-size:11px;margin-bottom:30px">Os jogos "faltando" de uma franquia são os que estão na sua lista de desejos: a Steam não informa a franquia inteira.</div>`:
-      '<div class="empty">Sem franquias ainda: a informação chega na leitura da biblioteca.</div>';
-  }else if(S.bseg==='dlcpromo'){
-    let l=(BD.dlcs_promo||[]).filter(d=>!q||d.nome.toLowerCase().includes(q)||d.pai_nome.toLowerCase().includes(q));
-    l.sort({corte:(a,b)=>b.corte-a.corte||a.preco-b.preco,preco:(a,b)=>a.preco-b.preco,fim:(a,b)=>(a.fim||9e12)-(b.fim||9e12),nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[S.bsort]);
-    $('#bibView').innerHTML=l.length?`<div class="sum">${fmtN(l.length)} DLCs que contam, de jogos que você tem, com desconto agora${l.length>300?' (mostrando 300)':''}.</div>
-      <div class="ctab-wrap"><table class="ctab ptab dlcp tnum"><thead><tr><th></th><th>DLC</th><th>Jogo</th><th class="n">%</th><th class="n">Preço</th><th></th><th class="n">Termina</th><th></th></tr></thead><tbody>
-      ${l.slice(0,300).map(d=>`<tr data-open="${d.appid}"><td class="pcap">${art(d.appid,d.nome,d.capa,{small:true})}</td><td class="t">${esc(d.nome)}</td><td class="t" style="color:var(--muted)">${esc(d.pai_nome)}</td>
-        <td class="n"><span class="pct">-${d.corte}%</span></td><td class="n">${brl(d.preco)}${d.so_steam?'<div class="vsub" style="margin:0">preço Steam</div>':`<div class="vsub" style="margin:0">${esc(d.loja)}</div>`}</td>
-        <td>${d.tipo_oferta&&d.tipo_oferta!=='selo'?`<span class="pp pp-${d.tipo_oferta}">${TIPO_NOME[d.tipo_oferta]}</span>`:(d.tipo_oferta==='selo'?seloBadge({selo:true}):'')}</td>
-        <td class="n">${relTempo(d.fim,true)}</td><td>${cartBtn(d.appid)}</td></tr>`).join('')}</tbody></table></div>`:
-      '<div class="empty">Nenhuma DLC dos seus jogos em promoção agora.</div>';
-  }else{
-    let l=[...J];l.sort({valor:(a,b)=>b.valor_cheio-a.valor_cheio,nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR'),aval:(a,b)=>b.rpos-a.rpos||b.rcount-a.rcount}[S.bsort]);
-    $('#bibView').innerHTML=`<div class="colgrid vert">${l.slice(0,300).map(g=>`<button class="colcard" data-open="${g.appid}">${art(g.appid,g.nome,g.capa_v,{alt:g.capa,v:!!g.capa_v})}<div class="nm">${esc(g.nome)}</div><div class="v tnum">${brl0(g.valor_cheio)} cheio${g.dlc_tenho_todas?' · '+g.dlc_tenho_todas+' DLCs':''}</div></button>`).join('')}</div>`;
-  }
-}
-let CLASSES={historia:'História',conteudo:'Conteúdo',cosmetico:'Cosmético',atalho:'Atalho',extra:'Extra',pacote:'Pacote'};
-$('#bibSeg').addEventListener('click',e=>{const b=e.target.closest('[data-bseg]');if(!b)return;S.bseg=b.dataset.bseg;save();renderBib();});
-$('#bsort').addEventListener('change',e=>{S.bsort=e.target.value;save();renderBib();});
-$('#bq').addEventListener('input',e=>{S.bq=e.target.value.trim().toLowerCase();renderBib();});
-$('#bibView').addEventListener('click',async e=>{const td=e.target.closest('[data-todos]');if(td){e.stopPropagation();let n=0;
-    td.dataset.todos.split(',').map(Number).forEach(id=>{if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,modo:'conta'});n++;}});await salvarCarr();toast(n+' no carrinho');renderBib();return;}
-  if(e.target.closest('[data-cart]')||e.target.closest('[data-cartb]'))return;const h=e.target.closest('[data-bopen]');if(!h)return;const id=+h.dataset.bopen;ABERTOS.has(id)?ABERTOS.delete(id):ABERTOS.add(id);renderBib();});
+/* ================= Ofertas e Biblioteca: páginas próprias (radar/ofertas.html e biblioteca.html) num iframe =================
+   As páginas pedem a ficha do jogo, o carrinho e a loja ao painel por window.KH (mesma origem). */
+const FR={vale:{id:'frVale',url:'/kurokami/ofertas',sub:'dest'},bib:{id:'frBib',url:'/kurokami/biblioteca',sub:'bib'}};
+function ajustaTopo(){const t=$('.topbar');if(t)document.documentElement.style.setProperty('--topoH',Math.max(0,Math.round(t.getBoundingClientRect().bottom))+'px');}
+addEventListener('resize',ajustaTopo);
+try{new ResizeObserver(ajustaTopo).observe($('.topbar'));new MutationObserver(ajustaTopo).observe(document.body,{childList:true});}catch(e){}
+let ENTRANDO=true;   // velho só recarrega ao entrar na aba (nunca na cara de quem está usando)
+function mostraFrame(t){const f=FR[t],el=$('#'+f.id);scrollTo(0,0);ajustaTopo();
+  if(!el.getAttribute('src')||(f.velho&&ENTRANDO)){f.velho=false;el.hidden=true;$('#'+f.id+'Msg').hidden=false;
+    el.onload=()=>{el.hidden=false;$('#'+f.id+'Msg').hidden=true;if(S.tab===t)focaFrame();};el.src=f.url+'?t='+Date.now()+'#'+f.sub;}
+  else{try{el.contentWindow.irSub(f.sub);}catch(e){}focaFrame();}}
+function focaFrame(){const f=FR[S.tab];if(f)try{$('#'+f.id).contentWindow.focus();}catch(e){}}
+let MOP={};   // como a ficha foi aberta: {vered, passo, pos} quando vem das páginas novas
+window.KH={
+  ficha(appid,op){abrirJogo(appid,op);},
+  async carrinho(itens){let n=0,ja=0;
+    for(const it of itens){if(CARR.some(c=>c.appid===it.appid)){ja++;continue;}
+      if(it.mon){const r=await post('/api/extra',{appid:it.appid});if(!r||r.ok===false||r.erro){toast('Não consegui monitorar: '+((r&&r.erro)||'?'));continue;}}
+      CARR.push({appid:it.appid,modo:'conta'});n++;}
+    if(n)await salvarCarr();
+    toast(n?(n===1?'No carrinho':n+' no carrinho')+(ja?` · ${ja} já estava${ja>1?'m':''}`:''):'Já está no carrinho');},
+  loja(a){open(storeUrl(a),'_blank','noopener');},
+  aba(t){setTab(t);},
+  sub(aba,s){if(FR[aba])FR[aba].sub=s;},
+  dlcsPromo(){FR.bib.sub='completar';setTab('bib');}   // o Completar abre na ordem "Em promoção": as DLCs com desconto de cada jogo
+};
 
 /* ================= carrinho ================= */
 let CD=null;
@@ -1693,10 +1504,10 @@ $('#btnPausa').addEventListener('click',async()=>{const r=await post('/api/pausa
 $('#btnVerif').addEventListener('click',async()=>{const r=await post('/api/verificar');if(!r.ok){toast(r.erro);return;}toast('Checando…');
   pollResumo.ativo=true;setTimeout(()=>carregarResumo().catch(()=>{}),1500);});
 async function carregarLista(){const d=await api('/api/lista');L=d.itens;IDX=new Map(L.map(o=>[o.appid,o]));render();}
-function render(){if(S.tab==='vale')renderVale();else if(S.tab==='lista')renderLista();else if(S.tab==='bib')renderBib();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else renderCfg();}
+function render(){if(FR[S.tab])mostraFrame(S.tab);else if(S.tab==='lista')renderLista();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else renderCfg();}
 
 async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&RES.progresso)||{};
-  if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;await carregarLista();try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}toast('Verificação concluída');}
+  if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;Object.keys(FR).forEach(k=>{FR[k].velho=true;});await carregarLista();try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}toast('Verificação concluída');}
   if(P.ativo)pollResumo.ativo=true;setTimeout(pollResumo,P.ativo?3000:30000);}
 (async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,modo:i.modo})).concat(c.bundles.map(b=>({bundle:b.bundle,modo:b.modo})));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
   const h=location.hash.slice(1);  // #vale, #lista... (o resumo "Tipo ligado" abre a vitrine com #vale)

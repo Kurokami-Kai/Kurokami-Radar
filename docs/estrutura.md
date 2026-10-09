@@ -29,7 +29,11 @@ Kurokami Hunter/
 │   ├── progresso.py         # estado da checagem em andamento (painel e tooltip)
 │   ├── relatorio.py         # dados/alertas.html (página estática de reserva)
 │   ├── painel.py            # servidor HTTP + API JSON + PIN + Entrar pela Steam + pedido para a extensão
-│   ├── painel.html          # o painel inteiro (HTML/CSS/JS inline)
+│   ├── painel.html          # o painel (HTML/CSS/JS inline): topo, Carrinho, Configurações, Notificações, Tabela, ficha do jogo
+│   ├── ofertas.html         # aba Ofertas (Destaques, Promoções, Lista; spec 09, amostra 8), aberta num iframe; dados em /*DADOS*/{}
+│   ├── biblioteca.html      # aba Biblioteca (Coleção/Franquias, Completar; spec 09, H2), aberta num iframe
+│   ├── ofertas.py           # monta os dados das duas páginas (cache; aquecido depois de cada coleta)
+│   ├── previsao.py          # piso de 24 meses, "se não comprar agora" e a próxima promoção (tabela do backtest embutida)
 │   ├── bandeja.py           # ícone, menu, threads, verificação de versão
 │   ├── inicio.py            # iniciar com o Windows (versão pelo código)
 │   └── atualizador.py       # GitHub Releases: verificar, baixar, instalar silencioso; janela Tk

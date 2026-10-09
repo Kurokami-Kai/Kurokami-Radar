@@ -1,7 +1,9 @@
 # Pendências e ideias
 
 ## Especificações prontas para implementar
-- [09 — Biblioteca nova: Coleção por franquias com capas, modo texto, ficha estilo PlayStation](specs/09-biblioteca-nova.md) — **Etapa 1 (ficha nova, B+) feita** (vai na 0.17.0); **Etapa 2 decidida (opção H2, referência em `specs/09-referencia-biblioteca.html`), pronta para implementar**; Etapa 3 em discussão; Ofertas no molde da Biblioteca: previsão medida no histórico (backtest) e layout final (quarta rodada) esperando o aval; absorve a 03
+- [09 — Biblioteca nova: Coleção por franquias com capas, modo texto, ficha estilo PlayStation](specs/09-biblioteca-nova.md) — **Etapas 1 e 2 e as Ofertas (amostra 8) feitas** (vão na 0.17.0); Etapa 3 (franquia inteira) em discussão; absorve a 03
+- **Previsão pelo histórico de cada usuário** (spec 09): `previsao.TABELA` é o backtest do dono; rodar o backtest no Hunter de tempos em tempos (ex.: uma vez por semana, depois da coleta) e usar a tabela de cada um. Medir antes quanto tempo leva numa lista de 700 jogos.
+- **Ofertas e Biblioteca no celular:** o topo do painel ocupa ~320 px numa tela de 375 px; recolher o topo (ou só o ícone e o menu) quando a página nova está aberta.
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md) (entra na 09)
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
 - [07 — Promoções da Steam inteira](specs/07-steam-inteira.md): implementada em 08/10 e revisada na mesma noite (recordes e histórico também fora da lista, menus no topo, sem botão de fonte); falta o teste do dono antes de publicar. Ideia original: Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".

@@ -23,6 +23,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 
 - Comece tarefas de código pela skill **`kurokami-code`** (ela diz qual outra skill abrir; não carrega todas).
 - `py tools/mapa.py <arquivo> [termo]` → seções/funções com linhas; leia só o intervalo. Nunca abra `radar/painel.html` inteiro.
+- Abas Ofertas e Biblioteca = `radar/ofertas.html` e `radar/biblioteca.html` (páginas próprias num iframe, dados de `radar/ofertas.py`); falam com o painel por `parent.KH` (ver `docs/arquitetura.md`, "Ofertas e Biblioteca").
 - `py tools/checar.py` → checagens finais (sintaxe, JS, versão, `--add-data`, `tools/testar_piso.py`, dados pessoais e `.gitignore`: falha se `config.json`, `userdata.json` ou `dados/` estiverem rastreados pelo Git ou faltarem no `.gitignore`). Precisa dar `ok`.
 - `tools\exportar_docs.py` → **reserva, fora do fluxo**: o Projeto do claude.ai lê os docs direto do GitHub. Só use se o dono pedir.
 - Skills em `.claude/skills/`: `kurokami-code`, `economia-de-contexto`, `editar-painel`, `coleta-e-apis`, `banco-e-migracao`, `depurar`, `testar-sem-rede`, `revisar-mudanca`, `publicar-versao`.

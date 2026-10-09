@@ -20,6 +20,8 @@ CAMINHO = "/kurokami"
 ARQ_TOKEN = os.path.join(caminhos.DADOS, "painel_token.txt")
 TENTATIVAS = {}           # ip -> [horarios], limita chutes de PIN
 HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)), "painel.html")
+# páginas novas (spec 09) que o painel abre dentro das abas Ofertas e Biblioteca; os dados entram no lugar de /*DADOS*/{}
+PAGINAS = {CAMINHO + "/ofertas": "ofertas.html", CAMINHO + "/biblioteca": "biblioteca.html"}
 CONTROLE = {"servico": None, "srv": None}  # preenchido pela bandeja
 
 
@@ -157,6 +159,8 @@ VALIDADE_LINHAS = 600
 def invalidar_linhas():
     with _TRAVA_LINHAS:
         _LINHAS["itens"] = None
+    from . import ofertas
+    ofertas.invalidar()
 
 
 def linhas_promocoes():
@@ -1378,6 +1382,25 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Location", CAMINHO)
         self.end_headers()
 
+    def _pagina_dados(self, arquivo):
+        """Ofertas e Biblioteca: o modelo com os dados de agora dentro (gzip: ~3 MB viram ~400 KB no celular)."""
+        from . import ofertas
+        d = ofertas.dados_ofertas() if arquivo == "ofertas.html" else ofertas.dados_biblioteca()
+        with open(os.path.join(os.path.dirname(HTML), arquivo), encoding="utf-8") as f:
+            modelo = f.read()
+        js = json.dumps(d, ensure_ascii=False, separators=(",", ":"), default=str).replace("<", "\\u003c")   # nada no JSON fecha ou abre <script>/<!--
+        dados = modelo.replace("/*DADOS*/{}", js, 1).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        if "gzip" in (self.headers.get("Accept-Encoding") or ""):
+            import gzip
+            dados = gzip.compress(dados, 5)
+            self.send_header("Content-Encoding", "gzip")
+        self.send_header("Content-Length", str(len(dados)))
+        self.end_headers()
+        self.wfile.write(dados)
+
     def _json(self, obj, code=200):
         dados = json.dumps(obj, ensure_ascii=False, default=str).encode("utf-8")
         self.send_response(code)
@@ -1467,6 +1490,22 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(dados)
             return
+        if u.path in PAGINAS:
+            try:
+                return self._pagina_dados(PAGINAS[u.path])
+            except Exception as e:
+                _log_erro(u.path, e)
+                from html import escape
+                dados = ("<!doctype html><meta charset=utf-8><body style='background:#050505;color:#d2d2d2;font:15px Arial;padding:40px'>"
+                         "<h3 style='color:#fff;font-weight:400'>Não consegui montar esta página.</h3><p>%s</p>"
+                         "<p><a style='color:#66c0f4' href='javascript:location.reload()'>Tentar de novo</a> · o erro foi para o radar.log.</p>"
+                         % escape(str(e))).encode("utf-8")
+                self.send_response(500)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(dados)))
+                self.end_headers()
+                self.wfile.write(dados)
+                return
         f = GET.get(u.path)
         if not f:
             return self._json({"erro": "o Hunter aberto (versao %s) nao tem %s. Reinicie o Hunter pela bandeja." % (VERSAO, u.path)}, 404)
@@ -1501,6 +1540,8 @@ class Handler(BaseHTTPRequestHandler):
             d = json.loads(self.rfile.read(n) or b"{}")
             r = f(d)
             invalidar_linhas()  # silenciar, extra, tenho, carrinho, modo, dlc, config... mudam as linhas de Promocoes
+            from . import ofertas
+            ofertas.aquecer(3)  # Ofertas e Biblioteca prontas de novo quando você voltar a elas
             self._json(r)
         except Exception as e:
             _log_erro(self.path, e)

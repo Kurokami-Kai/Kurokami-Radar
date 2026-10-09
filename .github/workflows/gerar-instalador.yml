@@ -64,6 +64,8 @@ jobs:
           pyinstaller --noconfirm --clean --onedir --windowed --name KurokamiRadar
           --icon assets/radar.ico
           --add-data "radar/painel.html;radar"
+          --add-data "radar/ofertas.html;radar"
+          --add-data "radar/biblioteca.html;radar"
           --collect-submodules radar --collect-submodules keyring --collect-submodules pystray
           --hidden-import win32ctypes.core --hidden-import win32ctypes.pywin32
           radar.py

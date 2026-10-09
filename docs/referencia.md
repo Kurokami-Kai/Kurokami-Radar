@@ -236,6 +236,21 @@ Notificacoes nativas do Windows (central de notificacoes), sem dependencias.
 - `_uri(caminho)`
 - `mostrar(titulo, texto, clique, botoes, imagem, rodape, silenciosa)` — botoes: [(rotulo, url)]. url pode ser http(s) ou file:///.
 
+## `radar/ofertas.py`
+Dados das páginas novas de Ofertas e Biblioteca (spec 09, amostra 8 de Ofertas e referência H2 da Biblioteca).
+
+- `invalidar()`
+- `_cache(nome, fazer)` — Um cálculo por vez para cada página; quem chega no meio espera o mesmo resultado.
+- `curta(u)`
+- `_linhas_de(b, tabela, lojas, appids)`
+- `_todas(q)` — Todas as páginas de /api/promocoes com o pedido q (no próprio processo).
+- `_linha(o, cv, fr, hist, prev, an)` — Uma linha no formato da amostra (os índices são lidos pela função M() da página).
+- `_montar_ofertas()`
+- `dados_ofertas()`
+- `_montar_biblioteca()`
+- `dados_biblioteca()`
+- `aquecer(atraso)` — Monta as duas em segundo plano (depois de uma coleta ou de um POST), para a página abrir na hora.
+
 ## `radar/painel.py`
 Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagina painel.html.
 
@@ -309,6 +324,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
   - `_autorizado(u)` — Do proprio PC: sempre. De outro aparelho: so depois de digitar o PIN (fica lembrado por 1 ano).
   - `_pagina_pin(erro)`
   - `_entrar()`
+  - `_pagina_dados(arquivo)` — Ofertas e Biblioteca: o modelo com os dados de agora dentro (gzip: ~3 MB viram ~400 KB no celular).
   - `_json(obj, code)`
   - `_steam_openid(u)` — Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Hunter.
   - `do_GET()`
@@ -316,6 +332,23 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `iniciar(abrir)`
 - `reiniciar()` — Troca entre so-este-PC e rede local sem fechar o Hunter.
 - `url()`
+
+## `radar/previsao.py`
+Previsão de Ofertas (spec 09): "se eu não comprar agora, esse preço volta?", o piso de 24 meses e "quando e por
+
+- `nome_ev(t)`
+- `mm(t)`
+- `brl(c)`
+- `tol(p)` — Folga de centavos do "igual" (R$ 0,10 ou 1%).
+- `dez(f)`
+- `tempo(d)`
+- `kc(k)`
+- `grupo(tipo, k)` — Taxas do grupo (tipo × vezes nesse preço em 24 meses). Grupo com menos de 30 casos: na 1ª vez, junta todas as
+- `eventos(linhas_steam, agora)` — Grandes eventos da Steam pelo próprio histórico: dias em que 200+ jogos começaram promoção (epoch, em ordem).
+- **class `Previsor`** — Previsões num instante fixo (`agora`), com os eventos do último ano projetados para o próximo.
+  - `evento_perto(t)`
+  - `hist(lin)` — [[dias desde agora (negativo), duração em dias, menor preço, maior corte], ...] dos últimos 25 meses.
+  - `prever(lin, p, corte, tipo, em_promo, fim)` — O que a página mostra: piso de 24 meses, risco (o preço não voltar em 3 meses), espera e a próxima promoção.
 
 ## `radar/progresso.py`
 Em que parte da checagem o Hunter esta (para o painel e o icone da bandeja).

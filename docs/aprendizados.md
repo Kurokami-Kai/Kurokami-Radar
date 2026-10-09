@@ -2,6 +2,12 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — Ofertas (amostra 8) e Biblioteca (H2) no painel
+- **Pedido "implemente as amostras" = os geradores fora do Git** (`dados/dados_ofertas4/6/7.py`, scratchpad antigo com `dados_bib.py`): achar a cadeia de dados antes de escrever deu o formato exato das linhas; o código das amostras entrou quase intacto num iframe (CSS e nomes delas brigariam com os do painel).
+- **Limpar CSS morto por regra, não por linha** (regras de várias linhas, várias regras por linha) e procurar classe montada no JS (`pp-${t}`): a primeira passada apagou `pp-novo/24m` e a constante `TIPO_COR`, que o console pegou na hora. Depois de tirar código, compare os nomes declarados antes/depois e procure os que ainda são usados.
+- **`cat > /dev/null` no fim de um comando travou de novo** (espera entrada): nunca terminar comando com `cat` sem arquivo.
+- **"DLCs em promoção" pela tabela achava 5 de 129:** antes de trocar uma tela por um atalho, conte o resultado nas duas.
+
 ## 2026-10-09 — Kurokami Hunter: nome, paleta preta, logo, Configurações
 - **Classe nova colidiu com uma antiga** (`.crow` já era a linha do carrinho e virou grid): o grep por `^\.crow` não achou porque a regra estava depois de `}` na mesma linha. Prefixe classes novas da aba (`cfg-…`) e liste as regras que casam pelo JS (`cssRules` + `matches`) quando o layout sair estranho.
 - **Trocar paleta por mapa de hex** (40 tons, com alfa preservado) + varredura pelo DOM em todas as abas e na ficha (`getComputedStyle`, azul com pouca luz) achou zero sobras; mais barato que olhar print por print.
@@ -11,12 +17,6 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 ## 2026-10-09 — spec 09: Ofertas, oitava rodada (ficha curta, recortes, orçamento)
 - **"Os melhores que cabem" em ordem gulosa levou 2 jogos com R$ 100** (os imperdíveis caros entram primeiro): para orçamento, mochila pela economia (9 jogos). Conferir a saída com 4 valores antes de mostrar.
 - **Encurtar texto expôs uma contradição** (duas datas diferentes para "volta"): ao resumir, escolha uma fonte só para cada pergunta.
-
-## 2026-10-09 — spec 09: Ofertas, sétima rodada (filtro escondido, Bons e baratos, preto)
-- **`cat > arquivo` sem heredoc travou o Bash 2 min** esperando entrada: scripts sempre pelo Write no scratchpad.
-- **O porto 8802 das amostras pode estar com o servidor de outra conversa:** navegue direto para `http://127.0.0.1:8802/<arquivo>` (serve a mesma pasta) em vez de subir outro.
-- **"Bem avaliado" só pela % premia brinquedo de R$ 2** (gatos, pato a 97–99%): somar o peso das análises e exigir preço cheio mínimo antes de chamar de descoberta.
-- **Contar o filtro antes de mostrar a coluna** de novo valeu: o -50% escondido cortou a Lista de 208 para 118 e tirou sozinho o "AAA recente caro".
 
 ## 2026-10-09 — spec 09: Ofertas, sexta rodada (piso e patamar)
 - **A amostra e o backtest discordavam na definição:** o backtest chama de "último preço" a promoção que acabou de acabar; a amostra pulava a promoção de agora. Antes de dizer que a previsão é "a medida", confira se a página usa os mesmos pontos de dados do backtest.
@@ -46,6 +46,7 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Rota nova testada chamando a função direto** numa cópia do banco (`caminhos.RAIZ_DADOS/ARQ_BANCO` trocados no script): mais barato que subir o `painel_copia.py`.
 
 ## Antigas, resumidas (até 08/10)
+- **Ofertas, 7ª rodada (09/10):** scripts sempre pelo Write (`cat >` sem heredoc trava 2 min); porta 8802 pode ser de outra conversa; "bem avaliado" só pela % premia brinquedo de R$ 2 (pesar análises e preço cheio); contar o filtro antes de mostrar a coluna.
 - **Ofertas O1 à 4ª rodada (09/10):** medir antes de propor métrica (backtest: o "último preço" prevê 67%); revisor no backtest pegou 4 erros reais; não rodar coleta pelo app do dono para encher amostra (amostra = API de listagem + banco em modo leitura); amostras só por `http.server` de `dados/amostras`; prints instáveis: medir pelo DOM.
 - **Ofertas, +18, biblioteca com 401 (08/10, madrugada):** "jogo que tenho aparece" era a biblioteca vazia (`grep "biblioteca:" radar.log` antes de mexer em filtro); a Query já traz `content_descriptorids`; `painel_copia.py` morto deixa `kr-painel-*` no %TEMP% (apague); a rota é `/api/...` na raiz; explorador + revisor pegaram 2 erros reais.
 - **Steam inteira, recordes e menus (08/10, noite):** confira 3 itens na loja antes de perseguir contagem da SteamDB; a ITAD tem cota (~100 chamadas em 5 min): espaçar sondagens e parar no primeiro 429; `.py` de edição no scratchpad com `assert count == 1`; navegue com `?v=N` para o navegador do app largar o `painel.html` velho.

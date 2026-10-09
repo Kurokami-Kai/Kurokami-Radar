@@ -11,6 +11,9 @@ description: Como editar o painel web do Kurokami Hunter (radar/painel.html - HT
 - HTML: `<header class="topbar">`, depois uma `<section id="tab-…">` por aba (`vale`, `lista`, `bib`, `carr`, `notif`, `cfg`), modal `#modal`, `#hv` (hover), `#toast`.
 - `<script>` dividido por marcadores `/* ================= nome ================= */`: helpers, estado, blocos, hover, abas, vale a pena, lista, modal do jogo, biblioteca, carrinho, notificações, configurações, status / ações.
 
+## Ofertas e Biblioteca são outras páginas
+`radar/ofertas.html` (Destaques, Promoções, Lista) e `radar/biblioteca.html` (Coleção/Franquias, Completar) abrem num iframe nas abas `#vale` e `#bib`; os dados vêm de `radar/ofertas.py` (no lugar de `/*DADOS*/{}`). Têm CSS e JS próprios (os das amostras da spec 09). Ficha do jogo, carrinho e loja: `parent.KH` (definido no `painel.html`, seção "Ofertas e Biblioteca"). Teste em `/kurokami/ofertas` direto também (sem o painel em volta, as ações avisam por toast).
+
 ## Padrões que já existem (reutilize, não recrie)
 - Dados: `api(url)` e `post(url, corpo)` (já mostram erro em toast). Lista em `L`/`IDX`, carrinho em `CARR`, resumo em `RES`.
 - Render por aba: `renderVale`, `renderLista`, `renderBib`, `renderCarr`, `renderNotif`, `renderCfg`; `render()` chama a da aba atual.

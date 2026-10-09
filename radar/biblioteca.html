@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biblioteca · Kurokami Hunter</title>
+<style>
+:root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#666666;--azul:#66c0f4;--verde:#a4d007;--vbg:#4c6b22;--vtx:#beee11;--borda:#ffffff14;--lista:#c9a0ff;--tenho:#f0f0f0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--azul);outline-offset:3px}
+.esc{position:sticky;top:0;z-index:30;background:#000;border-bottom:1px solid var(--borda);padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.esc b{color:#fff;font-weight:400;letter-spacing:.03em}
+.seg{display:inline-flex;background:var(--pan);border-radius:3px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--fraco);padding:6px 14px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--azul);color:#000000}
+.esc .desc{color:var(--fraco);font-size:12.5px;flex:1 1 380px}
+.topbar{background:var(--bg2);position:sticky;top:44px;z-index:20}
+.topbar .w{max-width:1240px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:26px;height:56px}
+.logo{color:#fff;font-size:15px;letter-spacing:.08em}.logo small{display:block;font-size:9px;color:var(--azul);letter-spacing:.3em}
+.nav{display:flex;gap:4px;height:100%}
+.nav>div,.nav>button{position:relative;display:flex;align-items:center}
+.nav .t{background:none;border:0;color:#dcdedf;text-transform:uppercase;font-size:14px;letter-spacing:.04em;padding:0 12px;height:100%;cursor:pointer}
+.nav .t.on{color:var(--azul);box-shadow:inset 0 -3px 0 var(--azul)}
+.ddm{display:none;position:absolute;top:100%;left:0;min-width:250px;background:#1c1c1c;box-shadow:0 6px 18px #000a;padding:6px 0;z-index:40}
+.nav>div:hover .ddm,.nav>div:focus-within .ddm{display:block}
+.ddm button{display:flex;justify-content:space-between;width:100%;text-align:left;background:none;border:0;color:#dcdedf;padding:8px 16px;font-size:13.5px;cursor:pointer}
+.ddm button:hover{background:#dcdedf;color:#000000}
+.ddm button.on{color:var(--azul)}.ddm button.on:hover{color:#000000}
+.ddm kbd{font-size:11px;opacity:.6}
+.ddm hr{border:0;border-top:1px solid #ffffff22;margin:6px 0}
+.ddm .ext{color:var(--fraco);font-size:12.5px}
+main{max-width:1240px;margin:0 auto;padding:18px 44px 90px 16px;position:relative}
+h2{font-size:22px;font-weight:400;color:#fff;margin:0}
+.pcab{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:12px}
+.pcab .res{color:var(--fraco);font-size:13px}.pcab .res b{color:#fff;font-weight:400}.pcab .res .g{color:var(--verde)}
+.tool{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 18px;padding:8px 0;border-bottom:1px solid var(--borda);position:sticky;top:100px;z-index:10;background:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.chips span{color:var(--dim);font-size:12px;margin-right:4px;text-transform:uppercase;letter-spacing:.05em}
+.chips button{background:#ffffff0d;border:0;color:var(--fraco);padding:5px 11px;border-radius:2px;cursor:pointer;font-size:13px}
+.chips button:hover{background:#ffffff1a;color:#fff}
+.chips button[aria-pressed=true]{background:#3d3d3d;color:#fff}
+.tool .sp{flex:1}
+.tool input{background:#0d0d0d;border:0;box-shadow:inset 0 0 0 1px #333333;color:#fff;padding:6px 10px;border-radius:2px;font:inherit;font-size:13px;width:190px}
+.views{display:inline-flex;gap:2px}
+.views button{background:#0d0d0d;border:0;color:var(--fraco);padding:6px 10px;cursor:pointer;border-radius:2px;font-size:12.5px}
+.views button[aria-pressed=true]{background:#3d3d3d;color:#fff}
+.az{position:fixed;right:max(6px,calc(50vw - 640px));top:170px;bottom:56px;display:flex;flex-direction:column;justify-content:center;gap:1px;z-index:15}
+.az button{background:none;border:0;color:var(--fraco);font-size:11px;width:24px;height:clamp(14px,2.6vh,22px);cursor:pointer;border-radius:2px;padding:0}
+.az button:hover{background:var(--azul);color:#000000}
+.az button:disabled{color:#ffffff1f;cursor:default;background:none}
+.kb{position:fixed;left:0;right:0;bottom:0;z-index:70;background:#000d;border-top:1px solid var(--borda);font-size:12px;color:var(--fraco);display:flex;gap:16px;justify-content:center;flex-wrap:wrap;padding:6px 10px}
+.kb kbd{background:#ffffff1a;color:#fff;border-radius:2px;padding:0 5px;font:inherit;font-size:11.5px;margin-right:4px}
+/* capas */
+.capa{position:relative;display:block;aspect-ratio:2/3;background:#0d0d0d;overflow:hidden;border:0;padding:0;cursor:pointer;width:100%}
+.capa img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .15s,transform .2s}
+.capa .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:12px;color:#fff;background:linear-gradient(160deg,hsl(var(--h) 35% 28%),hsl(var(--h) 40% 12%))}
+.capa.falta img,.capa.falta .ph{filter:grayscale(1) brightness(.55)}
+.capa.falta:hover img,.capa.falta:focus-visible img{filter:grayscale(.2) brightness(.85)}
+.capa .ok{position:absolute;top:6px;left:6px;background:var(--vbg);color:var(--vtx);font-size:11px;padding:1px 6px;border-radius:2px}
+.capa .cor{position:absolute;top:6px;right:6px;color:var(--lista);font-size:15px;text-shadow:0 0 4px #000}
+.capa .pr{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:4px;background:linear-gradient(transparent,#000d 40%);padding:16px 6px 6px;font-size:12.5px;color:#fff}
+.capa .pr .c{background:var(--vbg);color:var(--vtx);font-size:11px;padding:0 4px;margin-right:4px}
+.mais{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:2px;background:linear-gradient(90deg,#75b022,#588a1b);color:#d2efa9;cursor:pointer;font-size:15px;line-height:1;flex:none}
+.vit{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:26px 20px}
+.it{min-width:0}
+.pilha{position:relative;padding:8px 8px 0 0}
+.pilha::before,.pilha::after{content:"";position:absolute;inset:8px 8px 0 0;background:#2a2a2a;border-radius:2px;transform:translate(8px,-8px);box-shadow:0 0 0 1px #ffffff10}
+.pilha::after{background:#1f1f1f;transform:translate(4px,-4px)}
+.pilha .capa{z-index:1;box-shadow:0 6px 16px #0009}
+.it:hover .capa img,.it .capa:focus-visible img{transform:scale(1.035)}
+.it .qt{position:absolute;z-index:2;left:6px;top:14px;background:#000c;color:#fff;font-size:12px;padding:2px 7px;border-radius:2px}
+.it .qt.ok{background:var(--vbg);color:var(--vtx)}
+.it .pb{position:absolute;z-index:2;left:0;right:8px;bottom:0;height:4px;background:#000a}.it .pb i{display:block;height:100%;background:var(--verde)}
+.it .nm{color:#fff;margin-top:8px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .sub{color:var(--fraco);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.secao{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px;border-bottom:1px solid var(--borda);padding-bottom:6px}
+.secao h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:0}
+.secao span{color:var(--fraco);font-size:12.5px}
+.bar{height:6px;background:#ffffff12;position:relative;margin:6px 0}.bar i{position:absolute;inset:0 auto 0 0;background:var(--verde)}
+.btn{border:0;padding:0 16px;height:38px;border-radius:2px;cursor:pointer;background:#67c1f533;color:var(--azul);font-size:14px}
+.btn.verde{background:linear-gradient(90deg,#75b022,#588a1b);color:#d2efa9}
+.btn:hover{filter:brightness(1.15)}
+.pct{background:var(--vbg);color:var(--vtx);padding:1px 5px;font-size:12px}
+.grid2{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:14px}
+/* prateleira de franquia (2 por linha) */
+.prat{background:var(--pan);padding:12px 14px 14px;min-width:0;cursor:pointer;border-left:3px solid transparent}
+.prat:hover{border-left-color:var(--azul);background:#141414}
+.prat .cab{display:flex;align-items:center;gap:10px}
+.prat .cab h3{font-size:16px;font-weight:400;color:#fff;margin:0;flex:1;min-width:0}
+.prat .cab h3 button{background:none;border:0;padding:0;cursor:pointer;color:#fff;font-size:16px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.prat .cab small{color:var(--fraco);font-size:12.5px;white-space:nowrap}
+.fil{position:relative}
+.fil .trilho{display:flex;gap:8px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none}
+.fil .trilho::-webkit-scrollbar{display:none}
+.fil .trilho>div{flex:0 0 var(--cw,104px);min-width:0}
+.fil .seta{position:absolute;top:0;bottom:var(--sb,20px);width:32px;border:0;background:#000b;color:#fff;font-size:24px;cursor:pointer;z-index:2}
+.fil .seta.e{left:0}.fil .seta.d{right:0}
+.ano{font-size:11.5px;color:var(--dim);text-align:center;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* texto simétrico: todos os blocos com a mesma altura */
+.tgrid{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:14px}
+.tc{background:var(--pan);padding:14px 16px 10px;display:flex;flex-direction:column;min-width:0}
+.tc h3{font-size:15px;font-weight:400;color:#fff;margin:0;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.tc h3 button{background:none;border:0;padding:0;color:#fff;font-size:15px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.tc h3 small{color:var(--fraco);font-size:12.5px;white-space:nowrap}
+.tc .sub{font-size:12.5px;color:var(--fraco);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lst{list-style:none;margin:6px 0 0;padding:0;font-size:13px;flex:1}
+.lst li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;height:30px;border-bottom:1px solid #ffffff08}
+.lst li.vz{border-color:transparent}
+.lst .n{color:var(--tenho);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lst .n.f{color:var(--lista)}
+.lst .n .a{color:var(--dim);font-size:11.5px;margin-left:6px}
+.lst .s{white-space:nowrap;color:#9ccc54;font-size:12.5px;display:flex;gap:6px;align-items:center}.lst .s.f{color:#fff}
+.lstd li{grid-template-columns:52px minmax(0,1fr) auto}
+.lstd img{width:52px;height:24px;object-fit:cover;display:block;filter:grayscale(1) brightness(.75)}
+.rod{background:none;border:0;border-top:1px solid var(--borda);color:var(--azul);text-align:left;padding:8px 0 0;margin-top:6px;cursor:pointer;font-size:12.5px}
+.rod:hover{color:#fff}
+.leg2{display:flex;gap:16px;font-size:12px;color:var(--fraco);margin:-6px 0 14px}.leg2 i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
+.avt{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.avt button{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:center;background:var(--pan);border:0;padding:6px;cursor:pointer;text-align:left;min-width:0}
+.avt button:hover{background:#151515}
+.avt img{width:92px;height:43px;object-fit:cover;display:block}
+.avt .nm{color:var(--tenho);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.avt .sb{color:var(--fraco);font-size:12px}
+/* Completar */
+.cp{background:var(--pan);padding:12px;display:grid;grid-template-columns:var(--cw,80px) minmax(0,1fr);gap:12px;align-items:start;min-width:0;cursor:pointer;border-left:3px solid transparent;text-align:left;border-top:0;border-right:0;border-bottom:0;width:100%}
+.cp:hover{border-left-color:var(--azul);background:#141414}
+.cp .capa{cursor:inherit}
+.cp .nm{color:#fff;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp .sub{color:var(--fraco);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cp .sub b{color:#fff;font-weight:400}
+.dg{display:grid;grid-template-columns:repeat(var(--dc,3),minmax(0,1fr));gap:6px;margin-top:8px}
+.dl{background:#0a0a0a;min-width:0;cursor:pointer;display:block}
+.dl .im{position:relative;aspect-ratio:460/215;background:#0d0d0d;overflow:hidden}
+.dl .im img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(1) brightness(.6);transition:filter .15s}
+.dl:hover .im img{filter:none}
+.dl .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;text-align:center;padding:4px;background:linear-gradient(160deg,hsl(var(--h) 30% 26%),hsl(var(--h) 30% 12%));filter:grayscale(1) brightness(.7)}
+.dl .b{display:flex;justify-content:space-between;align-items:center;gap:4px;padding:4px 5px;font-size:11.5px}
+.dl .im .c{position:absolute;left:4px;top:4px;z-index:1}
+.dl .nm2{font-size:12.5px;color:var(--txt);padding:5px 6px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:42px}
+.dl .mn{font-size:11.5px;color:var(--fraco);padding:0 6px}
+.dlmais{display:flex;align-items:center;justify-content:center;background:#ffffff0a;color:var(--azul);font-size:12.5px;min-height:40px}
+/* tela cheia */
+.ov{position:fixed;inset:0;z-index:60;background:#000d;overflow-y:auto;padding:24px 16px 50px}
+.fx{max-width:1200px;margin:0 auto;position:relative;background:var(--bg);box-shadow:0 0 40px #000}
+.fx .fundo{position:absolute;inset:0 0 auto 0;height:560px;background:#0d0d0d center top/cover;opacity:.4;overflow:hidden}
+.fx .fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05050540 0,#050505 100%)}
+.fx .x{position:absolute;top:12px;right:12px;z-index:5;width:36px;height:36px;border:0;background:#000a;color:#fff;font-size:18px;cursor:pointer}
+.fx .nav2{position:fixed;top:45%;z-index:65;width:40px;height:70px;border:0;background:#000b;color:#fff;font-size:28px;cursor:pointer}
+.fx .nav2.e{left:max(4px,calc(50vw - 650px))}.fx .nav2.d{right:max(4px,calc(50vw - 650px))}
+.fx .in{position:relative;padding:28px 36px 26px}
+.fx .top{display:grid;grid-template-columns:190px minmax(0,1fr);gap:28px}
+.fx .top .capa{box-shadow:0 10px 30px #000c;cursor:default}
+.fx h1{font-size:34px;font-weight:400;color:#fff;margin:4px 0 6px;line-height:1.15;text-shadow:0 2px 8px #000}
+.chip{display:inline-block;font-size:12.5px;padding:3px 9px;border-radius:2px;background:#ffffff14;color:var(--txt);margin:0 6px 6px 0}
+.chip.tenho{background:var(--vbg);color:var(--vtx)}.chip.lista{background:#4b3a6e;color:#e4d7ff}.chip.promo{background:#1a6fd1;color:#fff}
+.fx .dsc{color:var(--txt);font-size:14px;margin:4px 0 12px}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-bottom:12px}
+.tiles>div{background:#0d0d0dd9;padding:10px 12px;border-top:3px solid transparent;min-width:0}
+.tiles>div.d{border-top-color:var(--verde)}
+.tiles .k{color:var(--fraco);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.tiles .v{color:#fff;font-size:22px;line-height:1.25;white-space:nowrap}.tiles .v.g{color:var(--vtx)}
+.tiles .s{color:var(--fraco);font-size:12px;line-height:1.3;margin-top:2px}
+.acoes{display:flex;flex-wrap:wrap;gap:8px}
+.fx h4{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:22px 0 10px;display:flex;align-items:center;gap:14px}
+.fx h4 span{color:var(--fraco);text-transform:none;letter-spacing:0;font-size:13px}
+.fx h4 .bar{width:180px;margin:0}
+.lg{font-size:12px;margin-top:4px;line-height:1.35}
+.lg .n{color:var(--tenho);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:32px}
+.lg .n.f{color:var(--lista)}
+.lg .a{color:var(--dim)}.lg .a b{color:#9ccc54;font-weight:400}.lg .a b.f{color:#fff}
+.cx{background:var(--pan);padding:12px 14px}
+.hb{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:2px 10px;font-size:13px;align-items:center}
+.hb span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb .b{grid-column:1/-1;height:4px;background:#ffffff10;margin-bottom:6px}.hb .b i{display:block;height:100%;background:var(--azul)}
+.hb .t{text-align:right;color:var(--fraco)}
+.tag{display:inline-block;background:#ffffff10;padding:3px 8px;margin:0 6px 6px 0;font-size:12.5px;cursor:pointer;border-radius:2px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
+.tag:hover{background:#ffffff22}
+.fl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:5px 0;border-bottom:1px solid #ffffff0a;font-size:13px;align-items:center}
+.fl .n{color:var(--lista);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl .p{display:flex;gap:6px;align-items:center;white-space:nowrap}
+.vazio{color:var(--fraco);font-size:13px}
+/* F: uma tela só */
+.tres{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;gap:14px}
+.tres h4{margin-top:18px}
+/* G: painel ao lado */
+.fxG{display:grid;grid-template-columns:minmax(0,1fr) 330px}
+.fxG .lat{position:relative;align-self:stretch;background:#0d0d0df2;border-left:1px solid var(--borda);z-index:2}
+.fxG .lat .gruda{position:sticky;top:-24px;padding:22px 20px 24px}
+.fxG .lat h4{margin:16px 0 8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13.5px;align-items:baseline}
+.kv dt{color:var(--fraco);font-size:12px;text-transform:uppercase;letter-spacing:.04em}.kv dd{margin:0;color:#fff;text-align:right}.kv dd.g{color:var(--vtx)}
+.kv dd small{display:block;color:var(--fraco);font-size:11.5px}
+.fgr{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:14px 10px}
+/* ficha de completar */
+.dgr{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.faixa{position:relative;background:#0d0d0df2;border-top:1px solid var(--borda);display:grid;grid-template-columns:270px repeat(3,minmax(0,1fr));margin-top:20px}
+.faixa>div{padding:14px 20px 18px;border-left:1px solid var(--borda);min-width:0}
+.faixa .kv{gap:1px 14px}.faixa .kv dd small{display:inline;margin-left:6px}.faixa .kv dt,.faixa .kv dd{line-height:1.9}.faixa>div:first-child{border-left:0}
+.fx .faixa h4{margin:0 0 12px}
+.fil .trilho.arr{cursor:grab;user-select:none;scroll-behavior:auto;--fe:0px;--fd:56px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fe),#000 calc(100% - var(--fd)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--fe),#000 calc(100% - var(--fd)),transparent 100%)}
+.fil .trilho.arr .capa{cursor:inherit}
+.fil .trilho.puxando{cursor:grabbing}
+.ban{position:relative;width:100%;aspect-ratio:1920/620;max-height:260px;overflow:hidden;background:#0d0d0d}
+.ban>img{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block}
+.ban::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0000 30%,#050505d9 78%,#050505)}
+.banin{position:absolute;left:0;right:0;bottom:0;z-index:1;padding:0 36px 12px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.banin h1{margin:2px 0}.banin .dsc{margin:0}
+.fundo2{position:absolute;left:0;right:0;top:0;aspect-ratio:1920/620;background:center top/100% auto no-repeat;opacity:.35}
+.fundo2::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05050530,#050505)}
+.top2{display:grid;grid-template-columns:340px minmax(0,1fr);gap:26px;align-items:center;position:relative}
+.hcap{width:100%;aspect-ratio:460/215;object-fit:cover;box-shadow:0 10px 30px #000c;display:block}
+.fx h4 .bar{flex:1;width:auto;margin:0}
+.fx .trilho.arr{justify-content:safe center}
+.fx .trilho.arr>div{flex:1 1 0;min-width:var(--cw);max-width:156px}
+.faixa .kv{gap:9px 12px}.faixa .kv dd{white-space:nowrap}.faixa .kv dd small{display:inline;margin-left:6px}.faixa .kv dt,.faixa .kv dd{line-height:1.5}
+.ov{padding-top:14px}
+.toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%);background:#1c1c1c;color:#fff;padding:9px 18px;border-radius:3px;box-shadow:0 4px 18px #000;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80}
+.toast.on{opacity:1}
+.nota{font-size:12px;color:var(--dim);margin:24px 0}
+@media (max-width:1000px){.top2{grid-template-columns:1fr}.banin{flex-direction:column;align-items:flex-start}.faixa{grid-template-columns:1fr 1fr}.faixa>div:nth-child(3){border-left:0}.tgrid,.grid2{--n:2!important}.tiles{grid-template-columns:repeat(3,1fr)}.tres{grid-template-columns:1fr}.fxG{grid-template-columns:1fr}.fxG .lat{position:static;max-height:none}.avt{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){
+  main{padding-right:16px}.az,.kb{display:none}
+  .tgrid,.grid2{--n:1!important}.fx .top{grid-template-columns:110px 1fr;gap:14px}.fx .in{padding:20px 16px}.fx h1{font-size:24px}.tiles{grid-template-columns:repeat(2,1fr)}
+  .vit{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}.avt{grid-template-columns:1fr}
+  .topbar .w{gap:8px}.logo{display:none}.nav .t{padding:0 7px;font-size:12px}
+}
+/* ---------- dentro do painel (iframe): o topo é o do painel ---------- */
+.tool{top:0}
+.az{top:70px;bottom:44px}
+</style>
+</head>
+<body>
+<main id="main"></main>
+<nav class="az" id="az" aria-label="Índice A a Z"></nav>
+<div class="kb" id="kb"></div>
+<div id="ov"></div>
+<div class="toast" id="toast"></div>
+<script>
+const D=/*DADOS*/{};
+const CDN='https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const brl=c=>c==null?'—':'R$ '+(c/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const brl0=c=>'R$ '+Math.round((c||0)/100).toLocaleString('pt-BR');
+const fmtN=n=>n.toLocaleString('pt-BR');
+const horas=m=>!m?'nunca jogado':m<60?m+' min':(m/60).toLocaleString('pt-BR',{maximumFractionDigits:m<600?1:0})+' h';
+const ano=t=>t?new Date(t*1000).getFullYear():'em breve';
+const quando=t=>{if(!t)return '—';const d=(Date.now()/1000-t)/86400;return d<1?'hoje':d<2?'ontem':d<30?Math.floor(d)+' dias':d<365?Math.floor(d/30)+' meses':Math.floor(d/365)+' anos';};
+const hue=id=>(id*47)%360;
+const u=s=>s&&s[0]==='~'?CDN+s.slice(1):s;
+const letra=n=>{const c=n.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/^(the|a)\s+/i,'').charAt(0).toUpperCase();return /[A-Z]/.test(c)?c:'#';};
+const chave=n=>n.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/^(the|a)\s+/i,'').toLowerCase();
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800);}
+document.addEventListener('error',e=>{const im=e.target;if(im.tagName!=='IMG'||im.dataset.n==null)return;
+  if(im.dataset.alt){const a=im.dataset.alt;im.removeAttribute('data-alt');im.src=a;im.style.objectFit='contain';return;}
+  im.outerHTML=`<span class="ph" style="--h:${hue(+im.dataset.i)}">${esc(im.dataset.n)}</span>`;},true);
+
+/* ---------- dados ---------- */
+const G=D.G.map(r=>({appid:r[0],nome:r[1],capa_v:u(r[2]),fr:r[3],tenho:!!r[4],lista:!!r[5],lanc:r[6],preco:r[7],cheio:r[8],corte:r[9],min:r[10]||0,ult:r[11]||0,rpos:r[12],capa:u(r[13])}));
+const ID=Object.fromEntries(G.map(g=>[g.appid,g]));
+const C=D.C.filter(c=>c[6].length&&ID[c[0]]).map(c=>({g:ID[c[0]],tem:c[1],tot:c[2],hoje:c[4],menor:c[5],nome:ID[c[0]].nome,k:chave(ID[c[0]].nome),L:letra(ID[c[0]].nome),
+  falta:c[6].map(d=>({appid:d[0],nome:d[1],preco:d[2],cheio:d[3],corte:d[4],menor:d[5],classe:d[6]}))}));
+const CP=Object.fromEntries(C.map(c=>[c.g.appid,c]));
+const grupos={};G.forEach(g=>(grupos[g.fr.toLowerCase()]=grupos[g.fr.toLowerCase()]||{nome:g.fr,m:[]}).m.push(g));
+function item(nome,m,tipo){
+  m.sort((a,b)=>(!a.lanc)-(!b.lanc)||a.lanc-b.lanc);
+  const t=m.filter(g=>g.tenho),f=m.filter(g=>!g.tenho);
+  const rep=[...t].sort((a,b)=>b.min-a.min||b.lanc-a.lanc)[0]||m[0];
+  const dl=t.map(g=>CP[g.appid]).filter(Boolean);
+  return {tipo,nome,m,rep,tenho:t.length,total:m.length,falta:f,custo:f.reduce((s,g)=>s+(g.preco||0),0),
+    min:t.reduce((s,g)=>s+g.min,0),ult:Math.max(0,...t.map(g=>g.ult)),ultG:[...t].sort((a,b)=>b.ult-a.ult)[0],
+    valor:t.reduce((s,g)=>s+(g.cheio||g.preco||0),0),hoje:t.reduce((s,g)=>s+(g.preco||0),0),
+    dlcN:dl.reduce((s,c)=>s+c.falta.length,0),dlcR:dl.reduce((s,c)=>s+c.hoje,0),k:chave(nome),L:letra(nome)};
+}
+const FR=Object.values(grupos).filter(f=>f.m.length>1&&f.m.some(g=>g.tenho)).map(f=>item(f.nome,f.m,'fr'));
+const EMFR=new Set(FR.flatMap(f=>f.m.map(g=>g.appid)));
+const AV=G.filter(g=>g.tenho&&!EMFR.has(g.appid)).map(g=>item(g.nome,[g],'jogo'));
+const T=D.total;
+const CLASSE={historia:'História',conteudo:'Conteúdo',cosmetico:'Cosmético',atalho:'Atalho',extra:'Extra',pacote:'Pacote'};
+const ORDEM_CL=['historia','conteudo','pacote','extra','cosmetico','atalho'];
+
+/* ---------- estado ---------- */
+const S={o:'H2',sub:'bib',modo:{},q:'',ord:{},aberto:null,lista:[]};
+const modo=()=>S.modo[S.sub]||(S.sub==='bib'?'colecao':'capas');
+const ordKey=()=>S.sub==='bib'?modo():modo()==='texto'?'cptexto':'completar';
+const ORD={colecao:[['jogadas','Mais jogadas'],['recentes','Recentes'],['az','A–Z'],['completas','Mais completas'],['maiores','Maiores']],
+  franquias:[['completas','Mais completas'],['faltam','Mais faltando'],['barato','Mais barato de fechar'],['jogadas','Mais jogadas'],['az','A–Z']],
+  completar:[['promo','Em promoção'],['perto','Mais perto'],['barato','Mais barato'],['recentes','Jogado recentemente'],['az','A–Z']],
+  cptexto:[['promo','Em promoção'],['perto','Mais perto de fechar'],['barato','Mais barato de fechar'],['faltam','Mais faltando'],['az','A–Z']]};
+const ordem=()=>{const k=ordKey(),o=S.ord[k];return ORD[k].some(x=>x[0]===o)?o:ORD[k][0][0];};
+const SORT={jogadas:(a,b)=>b.min-a.min,recentes:(a,b)=>b.ult-a.ult,az:(a,b)=>a.k.localeCompare(b.k,'pt-BR'),
+  completas:(a,b)=>b.tenho/b.total-a.tenho/a.total||b.total-a.total,maiores:(a,b)=>b.total-a.total||b.tenho-a.tenho,
+  faltam:(a,b)=>b.falta.length-a.falta.length,perto:(a,b)=>b.tenho/b.total-a.tenho/a.total||a.falta.length-b.falta.length,
+  promo:(a,b)=>b.falta.filter(g=>g.corte).length-a.falta.filter(g=>g.corte).length||a.custo-b.custo,barato:(a,b)=>(a.falta.length?a.custo:9e12)-(b.falta.length?b.custo:9e12)};
+const SORTC={perto:(a,b)=>a.falta.length-b.falta.length||a.hoje-b.hoje,barato:(a,b)=>a.hoje-b.hoje,promo:(a,b)=>b.falta.filter(d=>d.corte).length-a.falta.filter(d=>d.corte).length,
+  recentes:(a,b)=>b.g.ult-a.g.ult,az:(a,b)=>a.k.localeCompare(b.k,'pt-BR')};
+const busca=x=>!S.q||x.nome.toLowerCase().includes(S.q)||x.m.some(g=>g.nome.toLowerCase().includes(S.q));
+
+/* ---------- peças ---------- */
+const imgV=g=>`<img src="${esc(g.capa_v||CDN+g.appid+'/library_600x900_2x.jpg')}" alt="" loading="lazy" data-n="${esc(g.nome)}" data-i="${g.appid}"${g.capa?` data-alt="${esc(g.capa)}"`:''}>`;
+function capa(g,o={}){
+  const f=!g.tenho,tag=o.div?'div':'button';
+  const pr=f&&!o.semPreco?`<span class="pr"><span>${g.corte?`<span class="c">-${g.corte}%</span>`:''}${g.preco!=null?brl(g.preco):'em breve'}</span>${g.preco!=null?`<span class="mais" data-mais="${g.appid}" title="Pôr no carrinho">+</span>`:''}</span>`:'';
+  return `<${tag} class="capa${f?' falta':''}"${o.div?'':` data-g="${g.appid}"`} title="${esc(g.nome)}">${imgV(g)}${!f&&o.ok?'<span class="ok">✓</span>':''}${f&&g.lista?'<span class="cor">♥</span>':''}${pr}</${tag}>`;
+}
+const bar=p=>`<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`;
+const legJogo=g=>`<div class="lg"><div class="n${g.tenho?'':' f'}" title="${esc(g.nome)}">${esc(g.nome)}</div><div class="a">${ano(g.lanc)} · ${g.tenho?`<b>${g.min?horas(g.min):'✓ tenho'}</b>`:`<b class="f">${brl(g.preco)}</b>`}</div></div>`;
+function fileira(lista,cw,leg){return `<div class="fil" style="--cw:${cw}px"><div class="trilho arr">${lista.map(g=>`<div>${capa(g,{ok:true})}${leg?legJogo(g):`<div class="ano">${ano(g.lanc)}${g.tenho&&g.min?' · '+horas(g.min):''}</div>`}</div>`).join('')}</div></div>`;}
+function vitItem(x,i){
+  if(x.tipo==='jogo')return `<div class="it" data-L="${x.L}"><button class="capa" data-nav data-it="${i}" title="${esc(x.nome)}">${imgV(x.rep)}</button>
+    <div class="nm">${esc(x.nome)}</div><div class="sub">${horas(x.min)}${x.ult?' · '+quando(x.ult):''}</div></div>`;
+  const comp=x.tenho===x.total;
+  return `<div class="it" data-L="${x.L}"><div class="pilha"><button class="capa" data-nav data-it="${i}" title="${esc(x.nome)}">${imgV(x.rep)}</button>
+    <span class="qt${comp?' ok':''}">${comp?'✓ ':''}${x.tenho} de ${x.total}</span><span class="pb"><i style="width:${100*x.tenho/x.total}%"></i></span></div>
+    <div class="nm">${esc(x.nome)}</div><div class="sub">${x.min?horas(x.min)+' jogadas':'nada jogado'}${x.falta.length?' · faltam '+x.falta.length:''}</div></div>`;
+}
+function tool(){const o=ordem(),V=S.sub==='bib'?[['colecao','▦ Coleção'],['franquias','☰ Franquias']]:[['texto','≡ Texto'],['capas','▦ Capas']];
+  return `<div class="tool"><div class="chips"><span>Ordem</span>${ORD[ordKey()].map(([v,l])=>`<button data-ord="${v}" aria-pressed="${v===o}">${l}</button>`).join('')}</div>
+   <span class="sp"></span><input id="q" type="search" placeholder="Buscar  ( / )" value="${esc(S.q)}">
+   <span class="views">${V.map(([v,t])=>`<button data-modo="${v}" aria-pressed="${modo()===v}">${t}</button>`).join('')}</span></div>`;}
+const legenda=`<div class="leg2"><span><i style="background:var(--tenho)"></i>tenho</span><span><i style="background:var(--lista)"></i>falta (♥ = na lista de desejos)</span></div>`;
+/* bloco de texto com altura fixa: sempre N linhas (as que sobram ficam em branco) */
+function linhasFixas(itens,N,fn){const l=itens.slice(0,N).map(fn);while(l.length<N)l.push('<li class="vz"></li>');return l.join('');}
+function tcFr(x,i,N,fp){return `<div class="tc" data-L="${x.L}"><h3><button data-it="${i}" data-nav title="${esc(x.nome)}">${esc(x.nome)}</button><small>${x.tenho} de ${x.total}</small></h3>
+  <div class="sub">${x.falta.length?`faltam ${x.falta.length} · ${brl(x.custo)} hoje`:'<span style="color:var(--verde)">completa ✓</span>'}${x.min?' · '+horas(x.min)+' jogadas':''}</div>${bar(100*x.tenho/x.total)}
+  <ul class="lst">${linhasFixas(fp?[...x.falta,...x.m.filter(g=>g.tenho)]:x.m,N,g=>`<li><span class="n${g.tenho?'':' f'}" title="${esc(g.nome)}">${esc(g.nome)}<span class="a">${ano(g.lanc)}</span></span><span class="s${g.tenho?'':' f'}">${g.tenho?'✓ '+(g.min?horas(g.min):'tenho'):`${g.lista?'<span style="color:var(--lista)">♥</span>':''}${g.corte?`<span class="pct">-${g.corte}%</span>`:''}${brl(g.preco)}`}</span></li>`)}</ul>
+  <button class="rod" data-it="${i}">${x.m.length>N?`+ ${x.m.length-N} jogos · `:''}abrir a franquia ›</button></div>`;}
+function tcCp(c,i,N){return `<div class="tc" data-L="${c.L}"><h3><button data-ic="${i}" data-nav title="${esc(c.nome)}">${esc(c.nome)}</button><small>faltam ${brl0(c.hoje)}</small></h3>
+  <div class="sub">tem ${c.tem} de ${c.tot} DLCs${c.falta.some(d=>d.corte)?` · <span style="color:var(--vtx)">${c.falta.filter(d=>d.corte).length} em promoção</span>`:''}</div>${bar(c.tot?100*c.tem/c.tot:0)}
+  <ul class="lst lstd">${linhasFixas([...c.falta].sort((a,b)=>(b.corte>0)-(a.corte>0)||a.preco-b.preco),N,d=>`<li><img src="${CDN+d.appid}/header.jpg" alt="" loading="lazy" data-n="" data-i="${d.appid}"><span class="n" style="color:var(--txt)" title="${esc(d.nome)}">${esc(d.nome)}</span><span class="s f">${d.corte?`<span class="pct">-${d.corte}%</span>`:''}${brl(d.preco)}<span class="mais" data-mais="${d.appid}">+</span></span></li>`)}</ul>
+  <button class="rod" data-ic="${i}">${c.falta.length>N?`+ ${c.falta.length-N} DLCs · `:''}abrir em tela cheia ›</button></div>`;}
+
+/* ---------- ficha da franquia ---------- */
+function dadosFr(x){const anos=x.m.map(g=>g.lanc).filter(Boolean);
+  return {de:anos.length?new Date(Math.min(...anos)*1000).getFullYear():null,ate:anos.length?new Date(Math.max(...anos)*1000).getFullYear():null,
+    jog:x.m.filter(g=>g.tenho&&g.min).sort((a,b)=>b.min-a.min),nunca:x.m.filter(g=>g.tenho&&!g.min),nl:x.falta.filter(g=>g.lista).length};}
+function cabFr(x,d,comTiles){return `<div><span class="chip">Franquia</span><span class="chip tenho">tenho ${x.tenho} de ${x.total}</span>${d.nl?`<span class="chip lista">♥ ${d.nl} na lista de desejos</span>`:''}</div>
+  <h1>${esc(x.nome)}</h1>
+  <div class="dsc">${d.de?(d.de===d.ate?d.de:`De ${d.de} a ${d.ate}`):'Sem data'} · ${x.total} jogos que o Hunter conhece${x.ultG&&x.ultG.ult?` · jogou por último <b style="color:#fff;font-weight:400">${esc(x.ultG.nome)}</b> (${quando(x.ultG.ult)})`:''}</div>
+  ${comTiles?`<div class="tiles">
+   <div class="d"><div class="k">Jogos</div><div class="v">${x.tenho} de ${x.total}</div><div class="s">${Math.round(100*x.tenho/x.total)}% da franquia</div></div>
+   <div><div class="k">Tempo jogado</div><div class="v">${x.min?horas(x.min):'—'}</div><div class="s">${d.jog.length?`em ${d.jog.length} jogo${d.jog.length>1?'s':''}`:'nada jogado ainda'}</div></div>
+   <div><div class="k">Para completar</div><div class="v${x.falta.length?' g':''}">${x.falta.length?brl0(x.custo):'✓'}</div><div class="s">${x.falta.length?x.falta.length+' jogo'+(x.falta.length>1?'s':'')+' hoje':'franquia completa'}</div></div>
+   <div><div class="k">DLCs que faltam</div><div class="v">${x.dlcN||'—'}</div><div class="s">${x.dlcN?brl0(x.dlcR)+' hoje':'nos seus jogos'}</div></div>
+   <div><div class="k">Valor</div><div class="v">${brl0(x.valor)}</div><div class="s">cheio · ${brl0(x.hoje)} hoje</div></div></div>`:''}
+  <div class="acoes">${x.falta.length?`<button class="btn verde" data-mais>Pôr os ${x.falta.length} que faltam no carrinho</button>`:''}<button class="btn" data-acao="Escolher a capa da franquia">Trocar a capa</button><button class="btn" data-acao="Juntar com outra franquia ou separar jogos">Juntar / separar</button></div>`;}
+function blocoTempo(d,n){const mx=d.jog[0]?d.jog[0].min:1;
+  return d.jog.length?`<div class="hb">${d.jog.slice(0,n).map(g=>`<span title="${esc(g.nome)}">${esc(g.nome)}</span><span class="t">${horas(g.min)}</span><div class="b"><i style="width:${100*g.min/mx}%"></i></div>`).join('')}</div>${d.jog.length>n?`<div class="vazio">+ ${d.jog.length-n} jogos com tempo</div>`:''}`:'<div class="vazio">Nenhum jogo da franquia jogado ainda.</div>';}
+function blocoNunca(d,n){return d.nunca.length?d.nunca.slice(0,n).map(g=>`<span class="tag" data-g="${g.appid}" title="${esc(g.nome)}">${esc(g.nome)}</span>`).join('')+(d.nunca.length>n?`<span class="vazio">+ ${d.nunca.length-n}</span>`:''):'<div class="vazio">Você jogou todos os que tem ✓</div>';}
+function blocoFalta(x,n){return x.falta.length?x.falta.slice(0,n).map(g=>`<div class="fl"><span class="n" title="${esc(g.nome)}">${g.lista?'♥ ':''}${esc(g.nome)}</span><span class="p">${g.corte?`<span class="pct">-${g.corte}%</span>`:''}${brl(g.preco)}${g.preco!=null?`<span class="mais" data-mais="${g.appid}">+</span>`:''}</span></div>`).join('')+(x.falta.length>n?`<div class="vazio" style="margin-top:6px">+ ${x.falta.length-n} (em P&B na fileira)</div>`:''):'<div style="color:var(--verde)">Franquia completa ✓</div><div class="vazio" style="margin-top:6px">Os que você nem listou chegam na Etapa 3.</div>';}
+const fundo=a=>`<div class="fundo" style="background-image:url('${CDN+a}/library_hero.jpg')"></div>`;
+const navOv=`<button class="x" data-fecha title="Fechar (Esc)">✕</button><button class="nav2 e" data-passo="-1" title="Anterior (←)">‹</button><button class="nav2 d" data-passo="1" title="Próxima (→)">›</button>`;
+/* F: tudo numa tela; os jogos numa fileira com setas, as informações logo abaixo */
+function fichaF(x){const d=dadosFr(x);
+  return `<div class="fx">${fundo(x.rep.appid)}${navOv}<div class="in"><div class="top"><div>${capa(x.rep,{div:true})}</div><div>${cabFr(x,d,true)}</div></div>
+   <h4>Jogos da franquia <span>${x.tenho} de ${x.total} · em ordem de lançamento${x.total>8?' · ‹ › nas pontas':''}</span>${bar(100*x.tenho/x.total)}</h4>
+   ${fileira(x.m,124,true)}
+   <div class="tres"><div><h4>Onde foi o seu tempo</h4><div class="cx">${blocoTempo(d,4)}</div></div>
+    <div><h4>Na estante, nunca jogados</h4><div class="cx">${blocoNunca(d,8)}</div></div>
+    <div><h4>O que falta</h4><div class="cx">${blocoFalta(x,4)}</div></div></div></div></div>`;}
+/* G: informações num painel fixo à direita; os jogos em grade à esquerda, quantos forem */
+function fichaG(x){const d=dadosFr(x);
+  return `<div class="fx">${fundo(x.rep.appid)}${navOv}<div class="fxG"><div class="in"><div class="top" style="grid-template-columns:170px minmax(0,1fr)"><div>${capa(x.rep,{div:true})}</div><div>${cabFr(x,d,false)}</div></div>
+   <h4>Jogos da franquia <span>em ordem de lançamento</span>${bar(100*x.tenho/x.total)}</h4>
+   <div class="fgr">${x.m.map(g=>`<div>${capa(g,{ok:true})}${legJogo(g)}</div>`).join('')}</div></div>
+   <aside class="lat"><div class="gruda">${kvFr(x,d)}
+    <h4>Onde foi o seu tempo</h4>${blocoTempo(d,5)}
+    <h4>O que falta</h4>${blocoFalta(x,5)}
+    ${d.nunca.length?`<h4>Nunca jogados</h4>${blocoNunca(d,6)}`:''}</div></aside></div></div>`;}
+const kvFr=(x,d)=>`<dl class="kv">
+    <dt>Jogos</dt><dd>${x.tenho} de ${x.total}<small>${Math.round(100*x.tenho/x.total)}%</small></dd>
+    <dt>Tempo jogado</dt><dd>${x.min?horas(x.min):'—'}<small>${d.jog.length?'em '+d.jog.length+' jogo'+(d.jog.length>1?'s':''):'nada jogado'}</small></dd>
+    <dt>Para completar</dt><dd class="${x.falta.length?'g':''}">${x.falta.length?brl0(x.custo):'✓'}<small>${x.falta.length?x.falta.length+' jogo'+(x.falta.length>1?'s':'')+' hoje':'completa'}</small></dd>
+    <dt>DLCs que faltam</dt><dd>${x.dlcN||'—'}<small>${x.dlcN?brl0(x.dlcR)+' hoje':''}</small></dd>
+    <dt>Valor cheio</dt><dd>${brl0(x.valor)}<small>hoje ${brl0(x.hoje)}</small></dd></dl>`;
+/* H: o layout da F, com a barra do G deitada embaixo dos jogos, de ponta a ponta e até o fim da ficha */
+function fichaH(x){const d=dadosFr(x),A=x.rep.appid,hdr=esc(x.rep.capa||CDN+A+'/header.jpg');
+  const info=`<div><span class="chip">Franquia</span><span class="chip tenho">${x.tenho===x.total?'✓ completa · ':''}tenho ${x.tenho} de ${x.total}</span>${d.nl?`<span class="chip lista">♥ ${d.nl} na lista de desejos</span>`:''}</div>
+    <h1>${esc(x.nome)}</h1><div class="dsc">${d.de?(d.de===d.ate?d.de:`De ${d.de} a ${d.ate}`):'Sem data'} · ${x.total} jogos que o Hunter conhece${x.ultG&&x.ultG.ult?` · jogou por último <b style="color:#fff;font-weight:400">${esc(x.ultG.nome)}</b> (${quando(x.ultG.ult)})`:''}</div>`;
+  const comPreco=x.falta.filter(g=>g.preco!=null);
+  const acoes=`<div class="acoes">${comPreco.length?`<button class="btn verde" data-mais="${comPreco.map(g=>g.appid)}">Pôr os ${comPreco.length} que faltam no carrinho</button>`:''}<button class="btn" data-juntar="${A}" title="Na ficha do jogo, em Informações: trocar a franquia">Juntar / separar</button></div>`;
+  const topo=S.o==='H1'?`<div class="ban"><img src="${CDN+A}/library_hero.jpg" alt="" data-n="" data-i="${A}" data-alt="${hdr}"><div class="banin"><div style="min-width:0">${info}</div>${acoes}</div></div>`
+    :`<div class="fundo2" style="background-image:url('${CDN+A}/library_hero.jpg')"></div><div class="in" style="padding-bottom:0;padding-top:24px"><div class="top2"><img class="hcap" src="${hdr}" alt="" data-n="" data-i="${A}"><div style="min-width:0">${info}<div style="margin-top:12px">${acoes}</div></div></div></div>`;
+  return `<div class="fx">${navOv}${topo}<div class="in" style="padding-bottom:0;padding-top:${S.o==='H1'?14:4}px">
+   <h4>Jogos da franquia <span>${x.tenho} de ${x.total} · em ordem de lançamento${x.total>7?' · arraste para o lado':''}</span>${bar(100*x.tenho/x.total)}</h4>
+   ${fileira(x.m,116,true)}</div>
+   <div class="faixa"><div>${kvFr(x,d)}</div><div><h4>Onde foi o seu tempo</h4>${blocoTempo(d,5)}</div><div><h4>O que falta</h4>${blocoFalta(x,5)}</div><div><h4>Nunca jogados</h4>${blocoNunca(d,8)}</div></div></div>`;}
+/* ficha de Completar: o jogo e as DLCs que faltam, por tipo */
+function fichaCp(c){const promo=c.falta.filter(d=>d.corte),barata=[...c.falta].sort((a,b)=>a.preco-b.preco)[0];
+  const grupos=ORDEM_CL.map(k=>[k,c.falta.filter(d=>d.classe===k)]).filter(g=>g[1].length);
+  const outros=c.falta.filter(d=>!ORDEM_CL.includes(d.classe));if(outros.length)grupos.push(['outros',outros]);
+  return `<div class="fx">${fundo(c.g.appid)}${navOv}<div class="in"><div class="top"><div>${capa(c.g,{div:true})}</div><div>
+   <div><span class="chip">Completar</span><span class="chip tenho">tem ${c.tem} de ${c.tot} DLCs</span>${promo.length?`<span class="chip promo">${promo.length} em promoção</span>`:''}</div>
+   <h1>${esc(c.nome)}</h1><div class="dsc">DLCs que contam (história, conteúdo e pacotes; cosméticos e atalhos só se você marcou) · ${c.g.min?horas(c.g.min)+' jogadas':'nunca jogado'}</div>
+   <div class="tiles"><div class="d"><div class="k">Faltam</div><div class="v">${c.falta.length}</div><div class="s">DLCs</div></div>
+    <div><div class="k">Hoje</div><div class="v">${brl0(c.hoje)}</div><div class="s">tudo que falta</div></div>
+    <div><div class="k">Nos pisos</div><div class="v g">${brl0(c.menor)}</div><div class="s">o menor de cada uma</div></div>
+    <div><div class="k">Em promoção</div><div class="v">${promo.length||'—'}</div><div class="s">${promo.length?brl0(promo.reduce((s,d)=>s+d.preco,0))+' hoje':'nenhuma agora'}</div></div>
+    <div><div class="k">Mais barata</div><div class="v">${brl(barata.preco)}</div><div class="s" title="${esc(barata.nome)}">${esc(barata.nome.length>40?barata.nome.slice(0,38)+'…':barata.nome)}</div></div></div>
+   <div class="acoes"><button class="btn verde" data-mais="${c.falta.map(d=>d.appid)}">Pôr todas no carrinho</button>${promo.length?`<button class="btn" data-mais="${promo.map(d=>d.appid)}">Pôr só as ${promo.length} em promoção</button>`:''}<button class="btn" data-g="${c.g.appid}">Abrir a ficha do jogo</button></div></div></div>
+   ${grupos.map(([k,l])=>`<h4>${CLASSE[k]||'Outras'} <span>${l.length} · ${brl(l.reduce((s,d)=>s+d.preco,0))}</span></h4><div class="dgr">${l.map(d=>`<div class="dl" data-d="${d.appid}"><div class="im">${d.corte?`<span class="pct c">-${d.corte}%</span>`:''}<img src="${CDN+d.appid}/header.jpg" alt="" loading="lazy" data-n="${esc(d.nome)}" data-i="${d.appid}"></div>
+     <div class="nm2" title="${esc(d.nome)}">${esc(d.nome)}</div><div class="b"><span style="color:#fff">${brl(d.preco)}</span><span style="display:flex;gap:6px;align-items:center"><span class="mn">menor ${brl(d.menor)}</span><span class="mais" data-mais="${d.appid}">+</span></span></div></div>`).join('')}</div>`).join('')}
+   </div></div>`;}
+
+/* ---------- páginas ---------- */
+const pagBib=()=>modo()==='colecao'?pagColecao():pagFranquias();
+function pagColecao(){const o=ordem();
+  if(modo()==='colecao'){const l=[...FR,...AV].filter(busca).sort(SORT[o]);S.lista=l;
+    return `<div class="pcab"><h2>Biblioteca</h2>${resumo()}</div>${tool()}<div class="vit">${l.map(vitItem).join('')}</div>`;}
+  const f=FR.filter(busca).sort(SORT[o]),a=AV.filter(busca).sort(o==='completas'||o==='maiores'?SORT.az:SORT[o]);S.lista=[...f,...a];
+  return `<div class="pcab"><h2>Coleção</h2>${resumo()}</div>${tool()}${legenda}<div class="tgrid">${f.map((x,i)=>tcFr(x,i,6)).join('')}</div>
+   <div class="secao"><h3>Jogos avulsos</h3><span>${a.length} jogos sem franquia</span></div>
+   <div class="avt">${a.map((x,i)=>`<button data-it="${f.length+i}" data-nav data-L="${x.L}" title="${esc(x.nome)}"><img src="${esc(x.rep.capa||CDN+x.rep.appid+'/header.jpg')}" alt="" loading="lazy" data-n="${esc(x.nome)}" data-i="${x.rep.appid}"><span style="min-width:0"><span class="nm" style="display:block">${esc(x.nome)}</span><span class="sb">${horas(x.min)}${x.ult?' · '+quando(x.ult):''}</span></span></button>`).join('')}</div>`;}
+const resumo=()=>`<span class="res"><b>${fmtN(D.n)}</b> jogos · <b>${FR.length}</b> franquias · <b>${AV.length}</b> avulsos · valor cheio <b>${brl0(T.cheio)}</b> · hoje <b>${brl0(T.hoje)}</b> · no piso <b class="g">${brl0(T.menor)}</b></span>`;
+function pagFranquias(){const o=ordem(),l=FR.filter(busca).sort(SORT[o]);S.lista=l;
+  const cab=`<div class="pcab"><h2>Biblioteca</h2><span class="res"><b>${l.length}</b> franquias · clique (ou Enter) abre em tela cheia · arraste a fileira para o lado</span></div>${tool()}`;
+  if(modo()==='texto')return cab+legenda+`<div class="tgrid">${l.map((x,i)=>tcFr(x,i,8)).join('')}</div>`;
+  return cab+`<div class="grid2">${l.map((x,i)=>`<div class="prat" data-L="${x.L}" data-it="${i}"><div class="cab"><h3><button data-it="${i}" data-nav title="${esc(x.nome)}">${esc(x.nome)}</button></h3><small>${x.tenho} de ${x.total}${x.falta.length?' · faltam '+brl0(x.custo):' · ✓ completa'}${x.min?' · '+horas(x.min):''}</small></div>
+    ${bar(100*x.tenho/x.total)}${fileira(x.m,104,false)}</div>`).join('')}</div>`;}
+/* Completar em texto: as franquias com algo faltando, no bloco da Coleção em texto da F (o que falta primeiro, em lilás) */
+function pagCompletarTexto(){const f=FR.filter(x=>x.falta.length&&busca(x)).sort(SORT[ordem()]);S.lista=f;
+  return `<div class="pcab"><h2>Completar</h2><span class="res"><b>${f.length}</b> franquias com jogo faltando · <b>${fmtN(f.reduce((s,x)=>s+x.falta.length,0))}</b> jogos · <b>${brl0(f.reduce((s,x)=>s+x.custo,0))}</b> hoje · clique abre a franquia</span></div>${tool()}${legenda}<div class="tgrid">${f.map((x,i)=>tcFr(x,i,6,true)).join('')}</div>`;}
+function pagCompletar(){if(modo()==='texto')return pagCompletarTexto();const o=ordem(),l=C.filter(c=>!S.q||c.nome.toLowerCase().includes(S.q)||c.falta.some(d=>d.nome.toLowerCase().includes(S.q))).sort(SORTC[o]);S.lista=l;
+  const tdl=l.reduce((s,c)=>s+c.falta.length,0),F3=true;
+  const cab=`<div class="pcab"><h2>Completar</h2><span class="res"><b>${l.length}</b> jogos com DLC faltando · <b>${fmtN(tdl)}</b> DLCs · <b>${brl0(T.falta_hoje)}</b> hoje · <b class="g">${brl0(T.falta_menor)}</b> nos pisos · clique abre em tela cheia</span></div>${tool()}`;
+  if(modo()==='texto')return cab+`<div class="tgrid">${l.slice(0,90).map((c,i)=>tcCp(c,i,6)).join('')}</div><div class="nota">Mostrando os 90 primeiros.</div>`;
+  const nD=F3?6:8,dc=F3?3:4;
+  return cab+`<div class="grid2" style="--n:${F3?3:2}">${l.slice(0,90).map((c,i)=>{const promo=c.falta.filter(d=>d.corte).length;const ds=[...c.falta].sort((a,b)=>(b.corte>0)-(a.corte>0)||a.preco-b.preco);const mostra=c.falta.length>nD?nD-1:nD;
+    return `<button class="cp" style="--cw:${F3?84:104}px" data-ic="${i}" data-nav data-L="${c.L}"><span class="capa">${imgV(c.g)}</span><span style="min-width:0;display:block">
+     <span class="nm" style="display:block" title="${esc(c.nome)}">${esc(c.nome)}</span><span class="sub" style="display:block">tem ${c.tem} de ${c.tot} · faltam <b>${brl(c.hoje)}</b>${promo?` · <span style="color:var(--vtx)">${promo} em promoção</span>`:''}</span>${bar(c.tot?100*c.tem/c.tot:0)}
+     <span class="dg" style="--dc:${dc}">${ds.slice(0,mostra).map(d=>`<span class="dl"><span class="im" style="display:block">${d.corte?`<span class="pct c">-${d.corte}%</span>`:''}<img src="${CDN+d.appid}/header.jpg" alt="" loading="lazy" data-n="${esc(d.nome)}" data-i="${d.appid}"></span><span class="b"><span style="color:#fff">${brl(d.preco)}</span></span></span>`).join('')}${c.falta.length>nD?`<span class="dlmais">+ ${c.falta.length-mostra}</span>`:''}</span></span></button>`;}).join('')}</div><div class="nota">Mostrando os 90 primeiros.</div>`;}
+const DESC={H1:'Ficha da franquia com o banner horizontal da biblioteca da Steam no topo (na proporção dele), o nome e as ações sobre o banner; jogos de ponta a ponta, centralizados; barra deitada até o fim. Completar: Capas abre em Em promoção; Texto = franquias com o que falta (em lilás).',
+  H2:'Dados de exemplo (parte da biblioteca; tempos e totais sintéticos). Ficha da franquia com a capa horizontal da loja ao lado do nome (o fundo é o banner na proporção dele, esmaecido); jogos de ponta a ponta, centralizados; barra deitada até o fim. Completar igual à H1.',
+  H0:'Biblioteca abre na Coleção (vitrine em pilha) e alterna com Franquias (2 por linha, arraste). Ficha da franquia = a F com a barra do G deitada embaixo dos jogos, de ponta a ponta e até o fim; os jogos numa fileira só, sem setas: arraste segurando o botão esquerdo.',
+  F0:'Ficha da franquia numa tela só: cabeçalho com os 5 números, os jogos numa fileira com setas (quantos forem) e, logo abaixo, tempo / nunca jogados / o que falta. Completar em 3 por linha com 6 DLCs.',
+  G:'Mesma Biblioteca e Completar; a ficha da franquia é a G com o painel ao lado indo até o fim da ficha (o conteúdo dele acompanha a rolagem).'};
+
+/* ---------- desenho ---------- */
+const SUBS=[['bib','Biblioteca','1'],['completar','Completar','2']];
+function desenha(){
+  $('#main').innerHTML={bib:pagBib,completar:pagCompletar}[S.sub]();
+  const tem=new Set($$('#main [data-L]').map(e=>e.dataset.L));
+  $('#az').innerHTML='#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(c=>`<button data-az="${c}"${tem.has(c)?'':' disabled'}>${c}</button>`).join('');
+  setas();kb();avisaPai('bib');
+}
+function setas(){$$('.trilho.arr').forEach(t=>{const at=()=>{t.style.setProperty('--fe',t.scrollLeft>4?'40px':'0px');t.style.setProperty('--fd',t.scrollLeft+t.clientWidth<t.scrollWidth-4?'64px':'0px');};at();t.onscroll=at;});}
+/* arrastar a fileira segurando o botão esquerdo; o clique que termina um arrasto não abre nada */
+let arr=null,semClique=false;
+document.addEventListener('pointerdown',e=>{if(e.button!==0)return;const t=e.target.closest('.trilho.arr');if(t)arr={t,x:e.clientX,s:t.scrollLeft,mov:false};});
+document.addEventListener('pointermove',e=>{if(!arr)return;const dx=e.clientX-arr.x;if(!arr.mov&&Math.abs(dx)>5){arr.mov=true;arr.t.classList.add('puxando');}if(arr.mov)arr.t.scrollLeft=arr.s-dx;});
+document.addEventListener('pointerup',()=>{if(!arr)return;if(arr.mov){semClique=true;setTimeout(()=>semClique=false,0);}arr.t.classList.remove('puxando');arr=null;});
+document.addEventListener('click',e=>{if(semClique){e.stopPropagation();e.preventDefault();semClique=false;}},true);
+document.addEventListener('dragstart',e=>{if(e.target.closest('.trilho'))e.preventDefault();});
+function kb(){$('#kb').innerHTML=$('#ov .ov')?'<span><kbd>← →</kbd>anterior / próxima</span><span><kbd>Esc</kbd>fechar</span><span><kbd>Tab</kbd>andar pelos botões</span>'
+  :'<span><kbd>← → ↑ ↓</kbd>andar</span><span><kbd>Enter</kbd>abrir em tela cheia</span><span><kbd>A–Z</kbd>pular para a letra</span><span><kbd>/</kbd>buscar</span><span><kbd>1</kbd><kbd>2</kbd>Biblioteca / Completar</span><span><kbd>T</kbd>alterna a visualização</span><span>arraste as fileiras</span>';}
+function abre(i){const x=S.lista[i];if(!x)return;
+  if(x.tipo==='jogo'){fichaJogo(x.rep.appid);return;}
+  S.aberto=i;$('#ov').innerHTML=`<div class="ov" data-ov>${x.tipo==='fr'?fichaH(x):fichaCp(x)}</div>`;
+  document.body.style.overflow='hidden';$('#ov .ov').scrollTop=0;setas();kb();$('#ov [data-fecha]').focus({preventScroll:true});}
+function fecha(){const i=S.aberto;$('#ov').innerHTML='';document.body.style.overflow='';S.aberto=null;kb();
+  const b=$(`#main [data-it="${i}"][data-nav],#main [data-ic="${i}"][data-nav]`);if(b){b.focus({preventScroll:true});b.scrollIntoView({block:'center'});}}
+function passo(d){const n=S.lista.length;let i=S.aberto;do{i=(i+d+n)%n;}while(S.lista[i].tipo==='jogo'&&i!==S.aberto);abre(i);}
+
+/* ---------- teclado ---------- */
+function navs(){return $$('#main [data-nav]').filter(e=>e.offsetParent);}
+function andar(dir){const l=navs();if(!l.length)return;const a=document.activeElement;let i=l.indexOf(a);
+  if(i<0){l[0].focus();return;}
+  if(dir==='l'||dir==='r'){const j=i+(dir==='r'?1:-1);if(l[j]){l[j].focus({preventScroll:true});ver(l[j]);}return;}
+  const r=a.getBoundingClientRect(),cx=r.left+r.width/2;let best=null,bd=1e9;
+  for(const e of l){const q=e.getBoundingClientRect();const dy=dir==='d'?q.top-r.bottom:r.top-q.bottom;if(dy<-2)continue;const d=dy*3+Math.abs(q.left+q.width/2-cx);if(d<bd){bd=d;best=e;}}
+  if(best){best.focus({preventScroll:true});ver(best);}}
+function ver(e){const t=e.getBoundingClientRect();if(t.top<110)scrollBy(0,t.top-130);else if(t.bottom>innerHeight-50)scrollBy(0,t.bottom-innerHeight+70);}
+function pular(L){const e=$(`#main [data-L="${L}"]`);if(!e){toast('Nada com '+L);return;}
+  const alvo=e.matches('[data-nav]')?e:e.querySelector('[data-nav]')||e;window.scrollTo({top:e.getBoundingClientRect().top+scrollY-110});alvo.focus&&alvo.focus({preventScroll:true});}
+document.addEventListener('keydown',e=>{
+  const tg=e.target,digitando=tg.tagName==='INPUT';
+  if(e.key==='Escape'){if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();}return;}
+  if(digitando||e.ctrlKey||e.altKey||e.metaKey)return;
+  if($('#ov .ov')){if(e.key==='ArrowLeft'||e.key==='ArrowRight'){passo(e.key==='ArrowRight'?1:-1);e.preventDefault();}return;}
+  const m={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d'}[e.key];
+  if(m){andar(m);e.preventDefault();return;}
+  if(e.key==='Enter'&&tg.matches('[data-it],[data-ic]')){e.preventDefault();abre(+(tg.dataset.it??tg.dataset.ic));return;}
+  if(e.key==='/'){e.preventDefault();const q=$('#q');q&&q.focus();return;}
+  if(['1','2'].includes(e.key)){S.sub=SUBS[+e.key-1][0];S.q='';desenha();scrollTo(0,0);return;}
+  if(e.key==='t'||e.key==='T'){S.modo[S.sub]=S.sub==='bib'?(modo()==='colecao'?'franquias':'colecao'):(modo()==='capas'?'texto':'capas');desenha();return;}
+  if(/^[a-z]$/i.test(e.key)){pular(e.key.toUpperCase());return;}
+});
+
+/* ---------- cliques ---------- */
+document.addEventListener('click',e=>{const x=e.target;let b;
+  if(x.matches('[data-ov]')){fecha();return;}
+  if(b=x.closest('#opc [data-o]')){S.o=b.dataset.o;S.q='';if(S.aberto!=null)fecha();desenha();scrollTo(0,0);return;}
+  if(b=x.closest('[data-sub]')){S.sub=b.dataset.sub;S.q='';desenha();b.blur();scrollTo(0,0);return;}
+  if(x.closest('[data-ext]')){if(PAI)PAI.dlcsPromo();return;}
+  if(b=x.closest('[data-modo]')){S.modo[S.sub]=b.dataset.modo;desenha();return;}
+  if(b=x.closest('[data-ord]')){S.ord[ordKey()]=b.dataset.ord;desenha();return;}
+  if(b=x.closest('[data-az]')){if(ordem()!=='az'){S.ord[ordKey()]='az';desenha();}pular(b.dataset.az);return;}
+  if(b=x.closest('[data-mais]')){e.stopPropagation();pedeCarr((b.dataset.mais||'').split(','));return;}
+  if(b=x.closest('[data-juntar]')){fichaJogo(+b.dataset.juntar);toast('Para juntar ou separar: na ficha do jogo, em Informações, use "trocar" na franquia');return;}
+  if(x.closest('[data-fecha]')){fecha();return;}
+  if(b=x.closest('[data-passo]')){passo(+b.dataset.passo);return;}
+  if(b=x.closest('[data-seta]')){e.stopPropagation();const t=b.parentElement.querySelector('.trilho');t.scrollLeft+=+b.dataset.seta*(t.clientWidth-60);return;}
+  if(b=x.closest('#main [data-g],#ov [data-g],[data-d]')){fichaJogo(+(b.dataset.g||b.dataset.d));return;}
+  if(b=x.closest('[data-it]')){abre(+b.dataset.it);return;}
+  if(b=x.closest('[data-ic]')){abre(+b.dataset.ic);return;}
+});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value.trim().toLowerCase();const p=e.target.selectionStart;desenha();const n=$('#q');n.focus();n.setSelectionRange(p,p);}});
+/* ---------- dentro do painel: a ficha do jogo, o carrinho e a loja são os do painel (window.parent.KH) ---------- */
+const PAI=(()=>{try{return parent!==window&&parent.KH?parent.KH:null;}catch(e){return null;}})();
+function avisaPai(aba){try{history.replaceState(null,'','#'+S.sub);}catch(e){}if(PAI&&PAI.sub)PAI.sub(aba,S.sub);}
+window.irSub=s=>{if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
+addEventListener('hashchange',()=>irSub(location.hash.slice(1)));
+const pedeCarr=(ids,mon)=>{ids=[...new Set(ids.filter(Boolean).map(Number))];if(!ids.length){toast('Nada para pôr no carrinho');return;}
+  if(PAI)PAI.carrinho(ids.map(a=>({appid:a,mon:mon?mon(a):false})));else toast('No carrinho (abra pelo painel)');};
+function fichaJogo(a){if(PAI)PAI.ficha(a,{});else toast('Abra pelo painel para ver a ficha do jogo');}
+{const h=location.hash.slice(1);if(SUBS.some(x=>x[0]===h))S.sub=h;}
+desenha();
+</script>
+</body>
+</html>
