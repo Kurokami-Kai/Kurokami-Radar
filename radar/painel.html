@@ -650,10 +650,10 @@ body.emframe{overflow:hidden}body.emframe .foot{display:none}
 [data-calor="2"]{background:#8a1520!important;color:#ffd6d9!important}
 [data-calor="3"]{background:#d63031!important;color:#fff!important}
 .pc,.pct{font-variant-numeric:tabular-nums;text-align:center;border-radius:2px}
-/* fundo vivo: duas manchas carmim girando devagar atrás de tudo (paradas se o sistema pede menos movimento) */
+/* fundo vivo: três manchas carmim girando devagar atrás de tudo (paradas se o sistema pede menos movimento) */
 body::after{content:"";position:fixed;z-index:-1;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;pointer-events:none;will-change:transform;
-  background:radial-gradient(circle at 28% 32%,#96001852 0,#96001800 24%),radial-gradient(circle at 74% 66%,#dc143c33 0,#dc143c00 22%),radial-gradient(circle at 62% 22%,#5c001040 0,#5c001000 20%);
-  animation:kh-gira 80s linear infinite}
+  background:radial-gradient(circle at 28% 32%,#b0001c99 0,#b0001c00 30%),radial-gradient(circle at 74% 66%,#ff1a3a5c 0,#ff1a3a00 26%),radial-gradient(circle at 60% 18%,#6a001470 0,#6a001400 24%);
+  animation:kh-gira 60s linear infinite}
 @keyframes kh-gira{to{transform:rotate(1turn)}}
 @media (prefers-reduced-motion:reduce){body::after{animation:none}}
 body.emframe::after{display:none}   /* Ofertas e Biblioteca desenham o próprio fundo */
@@ -1693,7 +1693,7 @@ async function finalizar(){
 }
 
 /* ================= status / ações ================= */
-const VERSAO_PAGINA='0.17.0';
+const VERSAO_PAGINA='0.17.1';
 function nVitrine(){return VIT?['selo','novo','igual','24m'].reduce((s,t)=>s+((VIT[t]||{}).total||0),0):null;}
 function atualizarStatus(){const el=$('#stTopo');if(el&&VIT)el.innerHTML=`<b>${nVitrine()}</b> na vitrine · ${fmtN(RES.na_lista)} na lista`;}
 async function carregarResumo(){

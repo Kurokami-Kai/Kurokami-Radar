@@ -16,7 +16,7 @@ Texto para a descrição do release (aparece na janela de atualização). A seç
 - **"Menor preço antes desta promoção"** (em *Vale a pena?*) deixou de repetir o preço de hoje em todas as caixas: conta só o que veio antes desta promoção, junta as janelas com o mesmo valor ("De sempre", "1 ano ou mais"), diz o mês e quanto o preço de agora está abaixo. E o veredito de Ofertas passou a usar a mesma regra: se o preço de hoje já apareceu dias antes em outra loja (a Steam acabou a promoção, a Nuuvem começou no dia seguinte), não diz mais "abaixo do menor em 2 anos".
 - **Colunas de Destaques alinhadas:** o desconto e o preço ficam em caixas de largura fixa, então o -90% e o -93% caem na mesma linha vertical de todos os outros; a loja (GMG, Nuuvem...) foi para baixo do preço. As caixinhas de desconto têm o mesmo tamanho em todo o painel.
 - **Capas maiores** na tabela com todos os filtros e no carrinho.
-- **Fundo vivo:** manchas carmim girando devagar atrás de tudo (paradas se o Windows estiver com "mostrar animações" desligado).
+- **Fundo vivo:** manchas carmim girando devagar atrás de tudo, bem visíveis também em Ofertas e na Biblioteca: os painéis ficaram meio transparentes e o vermelho passa por trás deles (paradas se o Windows estiver com "mostrar animações" desligado).
 - **Sem barras de rolagem** em todo o painel (Ofertas, Biblioteca, ficha do jogo, Configurações): a rolagem continua pela roda do mouse, pelo toque e pelo teclado.
 
 ## 0.17.0 (publicada em 2026-10-09)
