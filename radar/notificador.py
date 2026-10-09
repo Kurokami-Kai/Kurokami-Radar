@@ -70,7 +70,7 @@ class Notificador:
         if not self.b.meta("linha_de_base"):
             self.b.meta("linha_de_base", agora())
             self.b.commit()
-            notificar.mostrar("Kurokami Radar ativo",
+            notificar.mostrar("Kurokami Hunter ativo",
                               "%d jogos da sua lista já valem a pena agora.\nDaqui pra frente você recebe só as novidades." % len(alertas),
                               clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
             self.log("Linha de base: %d alertas atuais registrados sem notificar" % len(alertas))

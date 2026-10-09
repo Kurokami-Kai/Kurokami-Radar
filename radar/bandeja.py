@@ -11,16 +11,21 @@ from .servico import Servico, criar_log
 PORTA_TRAVA = 47811  # impede duas copias rodando ao mesmo tempo
 
 
-def desenhar_icone(cor_ponto=(102, 192, 244)):
+VERMELHO = (225, 29, 46)
+
+
+def desenhar_icone(cor_ponto=(255, 42, 61), tam=64):
+    """Mira preta e vermelha do Kurokami Hunter (o mesmo desenho do logo do painel). Desenha em 4x e reduz (bordas lisas)."""
     from PIL import Image, ImageDraw
-    im = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    k = max(4, -(-tam * 2 // 64))
+    im = Image.new("RGBA", (64 * k, 64 * k), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.ellipse((2, 2, 62, 62), fill=(23, 26, 33, 255), outline=(199, 213, 224, 255), width=3)
-    for r, a in ((22, 170), (14, 210)):
-        d.arc((32 - r, 32 - r, 32 + r, 32 + r), 200, 340, fill=(102, 192, 244, a), width=3)
-    d.line((32, 32, 50, 16), fill=(199, 213, 224, 255), width=3)
-    d.ellipse((26, 26, 38, 38), fill=cor_ponto + (255,))
-    return im
+    d.ellipse((2 * k, 2 * k, 62 * k, 62 * k), fill=(11, 11, 11, 255), outline=VERMELHO + (255,), width=4 * k)
+    d.ellipse((16 * k, 16 * k, 48 * k, 48 * k), outline=(138, 18, 32, 255), width=3 * k)
+    for x0, y0, x1, y1 in ((32, 8, 32, 19), (32, 45, 32, 56), (8, 32, 19, 32), (45, 32, 56, 32)):
+        d.line((x0 * k, y0 * k, x1 * k, y1 * k), fill=VERMELHO + (255,), width=5 * k)
+    d.ellipse((26 * k, 26 * k, 38 * k, 38 * k), fill=cor_ponto + (255,))
+    return im.resize((tam, tam), Image.LANCZOS)
 
 
 def abrir(caminho):
@@ -57,7 +62,7 @@ def main(esperar=False, abrir_painel=False):
             if time.time() < fim:
                 time.sleep(0.5)
                 continue
-            notificar.mostrar("Kurokami Radar", "Já está rodando: procure o ícone na bandeja, perto do relógio.\n"
+            notificar.mostrar("Kurokami Hunter", "Já está rodando: procure o ícone na bandeja, perto do relógio.\n"
                               "Depois de atualizar, use \"Reiniciar\" no menu dele.")
             return
     import pystray
@@ -109,9 +114,9 @@ def main(esperar=False, abrir_painel=False):
                 txt = "%d valendo a pena · %s" % (serv.ultimo[1], txt)
             if serv.estado == "erro":
                 txt = "erro na última checagem · " + txt
-        tray.title = ("Kurokami Radar%s\n%s" % (" (pausado)" if pausado() else "", txt))[:127]
+        tray.title = ("Kurokami Hunter%s\n%s" % (" (pausado)" if pausado() else "", txt))[:127]
         tray.icon = desenhar_icone((226, 166, 53) if serv.estado == "erro" else
-                                   (143, 152, 160) if pausado() else (102, 192, 244))
+                                   (143, 152, 160) if pausado() else (255, 42, 61))
 
     serv = Servico(log, ao_mudar=atualizar_titulo)
     from . import painel
@@ -156,7 +161,7 @@ def main(esperar=False, abrir_painel=False):
         pystray.MenuItem("Reiniciar", reiniciar),
         pystray.MenuItem("Sair", sair),
     )
-    tray = pystray.Icon("KurokamiRadar", icone, "Kurokami Radar", menu)
+    tray = pystray.Icon("KurokamiRadar", icone, "Kurokami Hunter", menu)
     def checar_versao():
         import time
         from . import atualizador, config as cfgm
@@ -166,12 +171,12 @@ def main(esperar=False, abrir_painel=False):
                 painel.CONTROLE["atualizacao"] = d
                 if d.get("tem_nova") and painel.CONTROLE.get("avisado") != d["nova"]:
                     painel.CONTROLE["avisado"] = d["nova"]
-                    notificar.mostrar("Kurokami Radar %s disponível" % d["nova"],
+                    notificar.mostrar("Kurokami Hunter %s disponível" % d["nova"],
                                       "Você tem a %s. Clique para atualizar (seus dados ficam)." % d["atual"],
                                       clique=painel.url() + "/acao?atualizar=1",
                                       botoes=[("Atualizar agora", painel.url() + "/acao?atualizar=1"), ("Ver novidades", d["pagina"])])
                     log("Versao nova disponivel: %s" % d["nova"])
-            for _ in range(24 * 60):  # de novo daqui a 1 dia (o Radar costuma ficar aberto)
+            for _ in range(24 * 60):  # de novo daqui a 1 dia (o Hunter costuma ficar aberto)
                 if serv.parar:
                     return
                 time.sleep(60)

@@ -1,6 +1,6 @@
 """Relacao da sua conta Steam com os jogos: seguidos e ignorados (spec 04, B).
 
-Fonte unica desses dados no Radar: nenhum outro modulo le rgFollowedApps nem rgIgnoredApps.
+Fonte unica desses dados no Hunter: nenhum outro modulo le rgFollowedApps nem rgIgnoredApps.
 Hoje vem do userdata.json (opcional, manual); se um dia vier da conta Steam, so esta funcao muda."""
 import json
 import os

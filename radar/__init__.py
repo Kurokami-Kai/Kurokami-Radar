@@ -1,2 +1,2 @@
-"""Kurokami Radar - monitor de promocoes da wishlist Steam."""
+"""Kurokami Hunter - monitor de promocoes da wishlist Steam."""
 VERSAO = "0.16.0"

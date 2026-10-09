@@ -1,32 +1,32 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kurokami Radar</title><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='29' fill='%23171a21' stroke='%23c7d5e0' stroke-width='4'/><circle cx='32' cy='32' r='7' fill='%2366c0f4'/></svg>">
+<title>Kurokami Hunter</title><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='29' fill='%230b0b0b' stroke='%23e11d2e' stroke-width='4'/><path d='M32 8v10M32 46v10M8 32h10M46 32h10' stroke='%23e11d2e' stroke-width='5' stroke-linecap='round'/><circle cx='32' cy='32' r='6' fill='%23ff2a3d'/></svg>">
 <style>
-/* Visual: Steam store chrome (topbar #171a21, page #1b2838, blue subnav, green discount block),
-   Steam library chrome on the Biblioteca tab. Dark by design: the brief is Valve's palette. */
+/* Visual: loja da Steam em tons de preto (amostra 8 de Ofertas): fundo #050505, painéis #0d0d0d-#1f1f1f,
+   acentos da Steam (azul #66c0f4, bloco de desconto verde). Símbolo do Kurokami Hunter em preto e vermelho. */
 :root{
-  --top:#171a21; --bg:#1b2838; --bg-deep:#0e141b; --bg-row:#16202d; --panel:#213145; --panel-hi:#2a475e;
-  --line:#2a3f5a; --text:#c7d5e0; --white:#ffffff; --muted:#8f98a0; --dim:#56707f; --blue:#66c0f4; --blue-dk:#417a9b;
-  --disc-bg:#4c6b22; --disc-fg:#beee11; --price-bg:#344654; --orig:#738895;
+  --top:#000000; --bg:#050505; --bg-deep:#000000; --bg-row:#0a0a0a; --panel:#121212; --panel-hi:#1f1f1f;
+  --line:#262626; --text:#d2d2d2; --white:#ffffff; --muted:#979797; --dim:#666666; --blue:#66c0f4; --blue-dk:#417a9b;
+  --disc-bg:#4c6b22; --disc-fg:#beee11; --price-bg:#262626; --orig:#8c8c8c;
   --go1:#75b022; --go2:#588a1b; --pos:#66c0f4; --mix:#b9a074; --neg:#a34c25;
-  --hover-a:#e3eaef; --hover-b:#c7d5e0; --hover-ink:#222d3d; --hover-sub:#556772;
-  --lib-side:#23262e; --lib-sel:#3d4450; --lib-bg:#1f2126;
+  --hover-a:#e6e6e6; --hover-b:#d2d2d2; --hover-ink:#1a1a1a; --hover-sub:#5c5c5c;
+  --lib-side:#0d0d0d; --lib-sel:#2a2a2a; --lib-bg:#080808;
   --font:"Motiva Sans",Arial,Helvetica,sans-serif;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
   color-scheme:dark;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --top:#171a21; --bg:#1b2838; --bg-deep:#0e141b; --bg-row:#16202d; --panel:#213145; --panel-hi:#2a475e;
-  --line:#2a3f5a; --text:#c7d5e0; --white:#ffffff; --muted:#8f98a0; --dim:#56707f; --blue:#66c0f4;
+  --top:#000000; --bg:#050505; --bg-deep:#000000; --bg-row:#0a0a0a; --panel:#121212; --panel-hi:#1f1f1f;
+  --line:#262626; --text:#d2d2d2; --white:#ffffff; --muted:#979797; --dim:#666666; --blue:#66c0f4;
 }}
 :root[data-theme="dark"]{
-  --top:#171a21; --bg:#1b2838; --bg-deep:#0e141b; --bg-row:#16202d; --panel:#213145; --panel-hi:#2a475e;
-  --line:#2a3f5a; --text:#c7d5e0; --white:#ffffff; --muted:#8f98a0; --dim:#56707f; --blue:#66c0f4;
+  --top:#000000; --bg:#050505; --bg-deep:#000000; --bg-row:#0a0a0a; --panel:#121212; --panel-hi:#1f1f1f;
+  --line:#262626; --text:#d2d2d2; --white:#ffffff; --muted:#979797; --dim:#666666; --blue:#66c0f4;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 520px at 50% 0,#2a4a6b55,transparent 70%),var(--bg)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 520px at 50% 0,#ffffff0a,transparent 70%),var(--bg)}
 a{color:var(--blue);text-decoration:none}
 a:hover{color:var(--white)}
 button{font-family:inherit}
@@ -36,15 +36,30 @@ button{font-family:inherit}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 /* ---------- top bar ---------- */
-.topbar{background:var(--top)}
+.topbar{background:var(--top);border-bottom:1px solid #ffffff14}
 .topbar .wrap{display:flex;align-items:center;gap:18px;min-height:64px;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:9px;color:var(--white);font-weight:700;letter-spacing:.06em;font-size:19px}
-.logo svg{flex:0 0 auto}
-.logo small{display:block;font-size:9.5px;letter-spacing:.24em;color:var(--muted);font-weight:400;margin-top:1px}
+.logo{display:flex;align-items:center;gap:10px;color:var(--white);font-weight:700;letter-spacing:.06em;font-size:19px;text-decoration:none;cursor:pointer;border-radius:3px}
+.logo:hover{color:var(--white)}
+.logo svg{flex:0 0 auto;overflow:visible;transition:filter .3s}
+.logo .logo-t{position:relative;display:block;line-height:1.05;padding-bottom:3px}
+.logo small{display:block;font-size:9.5px;letter-spacing:.34em;color:#e11d2e;font-weight:700;margin-top:2px;transition:letter-spacing .35s ease,color .35s}
+/* passa o mouse: a mira gira, o anel corre ao contrário, o ponto pulsa e um traço vermelho corre sob o nome */
+.logo .logo-t::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:linear-gradient(90deg,#e11d2e,#ff2a3d 60%,transparent);transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.kh-mira,.kh-anel,.kh-ponto{transform-box:fill-box;transform-origin:center;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.logo:hover svg,.logo:focus-visible svg{filter:drop-shadow(0 0 6px #e11d2ecc)}
+.logo:hover .kh-mira,.logo:focus-visible .kh-mira{transform:rotate(90deg) scale(.92)}
+.logo:hover .kh-anel,.logo:focus-visible .kh-anel{animation:khGira 2.4s linear infinite}
+.logo:hover .kh-ponto,.logo:focus-visible .kh-ponto{animation:khPulso 1s ease-in-out infinite}
+.logo:hover small,.logo:focus-visible small{letter-spacing:.5em;color:#ff2a3d}
+.logo:hover .logo-t::after,.logo:focus-visible .logo-t::after{transform:scaleX(1)}
+.logo:active .kh-ponto{transform:scale(.6)}
+@keyframes khGira{to{transform:rotate(-360deg)}}
+@keyframes khPulso{50%{transform:scale(1.45)}}
+@media (prefers-reduced-motion:reduce){.logo *,.logo .logo-t::after{animation:none!important;transition:none!important}}
 .nav{display:flex;gap:4px;flex-wrap:wrap}
 .nav button{background:none;border:0;color:#dcdedf;font-size:14px;letter-spacing:.04em;text-transform:uppercase;padding:20px 8px 16px;cursor:pointer;border-bottom:3px solid transparent}
 .nav button:hover{color:var(--white)}
-.nav button[aria-current="page"]{color:#1a9fff;border-bottom-color:#1a9fff}
+.nav button[aria-current="page"]{color:var(--blue);border-bottom-color:var(--blue)}
 .who{position:relative;margin-left:auto;display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
 .who b{color:#b8b6b4;font-weight:400}
 .btn-imp{background:linear-gradient(90deg,#06bfff 0%,#2d73ff 100%);border:0;color:#fff;border-radius:2px;padding:7px 12px;font-size:12px;cursor:pointer}
@@ -56,27 +71,27 @@ button{font-family:inherit}
 .cart-head{display:flex;align-items:baseline;gap:12px;margin:6px 0 10px}.cart-head h1{margin:0;font-size:26px;font-weight:300;color:#fff;letter-spacing:.02em}
 /* menus que abrem com o mouse em cima (Promoções, Configurações, conta), como os da loja */
 .dd{position:relative;display:flex}
-.ddm{display:none;position:absolute;top:100%;left:0;z-index:60;min-width:190px;background:#3d4450;box-shadow:0 0 12px #000c;padding:6px 0}
+.ddm{display:none;position:absolute;top:100%;left:0;z-index:60;min-width:190px;background:#1c1c1c;box-shadow:0 0 12px #000c;padding:6px 0}
 /* foco só pelo teclado: o foco do clique (ou de apertar e arrastar para fora) deixava o menu preso aberto */
 .dd:hover>.ddm,.dd:has(:focus-visible)>.ddm{display:block}
 .nav .dd>button::after{content:"▾";font-size:10px;opacity:.7;margin-left:5px}
 .nav .ddm button,.ddm a{display:block;width:100%;text-align:left;background:none;border:0;color:#dcdedf;font-size:13px;letter-spacing:.02em;text-transform:none;padding:8px 16px;cursor:pointer;text-decoration:none}
-.nav .ddm button:hover,.ddm a:hover{background:#dcdedf;color:#171a21}
+.nav .ddm button:hover,.ddm a:hover{background:#dcdedf;color:#000000}
 .ddm-dir{left:auto;right:0}
 .ddm-nome{padding:6px 16px 8px;color:#fff;font-size:13px;border-bottom:1px solid #ffffff1a;margin-bottom:4px;white-space:nowrap}
 .avatar{background:none;border:0;padding:0;cursor:pointer;display:block}
-.avatar img,.avatar span{display:grid;place-items:center;width:34px;height:34px;border:1px solid #66c0f4;background:#2a475e;color:#fff;font-size:15px}
+.avatar img,.avatar span{display:grid;place-items:center;width:34px;height:34px;border:1px solid #66c0f4;background:#1f1f1f;color:#fff;font-size:15px}
 #contaSteam{display:inline-flex;align-items:center;gap:6px;margin-left:8px}#contaSteam a{text-decoration:none;display:inline-block}.chip-steam{font-size:12px;color:var(--blue);background:rgba(103,193,245,.12);padding:5px 9px;border-radius:2px}
 
 /* ---------- store subnav ---------- */
-.subnav{margin-top:14px;background:linear-gradient(90deg,rgba(62,103,150,.92) 11.38%,rgba(58,120,177,.8) 25.23%,rgb(15,33,110) 100%);box-shadow:0 0 3px rgba(0,0,0,.4);display:flex;align-items:center;gap:6px;padding:5px;flex-wrap:wrap}
+.subnav{margin-top:14px;background:linear-gradient(90deg,#1c1c1c 0%,#121212 45%,#050505 100%);box-shadow:inset 0 0 0 1px #ffffff14;display:flex;align-items:center;gap:6px;padding:5px;flex-wrap:wrap}
 .subnav .lk{color:#e5e5e5;font-size:13px;padding:6px 10px;border-radius:2px;background:none;border:0;cursor:pointer}
-.subnav .lk:hover{background:linear-gradient(90deg,#fff 0%,#a2c4e1 100%);color:#111}
+.subnav .lk:hover{background:#dcdedf;color:#000}
 .subnav .lk b{font-weight:400;color:#a9d4f1}
-.subnav .lk:hover b{color:#174d79}
-.search{margin-left:auto;display:flex;align-items:center;background:#316282;border-radius:3px;box-shadow:inset 1px 1px 0 #0003;min-width:min(260px,100%);flex:0 1 260px}
+.subnav .lk:hover b{color:#000}
+.search{margin-left:auto;display:flex;align-items:center;background:#1c1c1c;border-radius:3px;box-shadow:inset 1px 1px 0 #0003;min-width:min(260px,100%);flex:0 1 260px}
 .search input{flex:1;min-width:0;background:none;border:0;color:#fff;font-size:13px;padding:7px 9px;outline:none;font-family:inherit}
-.search input::placeholder{color:#0e1c25;font-style:italic;opacity:.9}
+.search input::placeholder{color:#8c8c8c;font-style:italic;opacity:.9}
 .search span{padding:0 9px;color:#fff;display:flex}
 
 /* ---------- section headers (Steam home shelves) ---------- */
@@ -85,7 +100,7 @@ button{font-family:inherit}
 .shead .aside{color:var(--muted);font-size:12px}
 
 /* ---------- capsule art ---------- */
-.art{position:relative;display:block;aspect-ratio:460/215;overflow:hidden;background:#0b141e}
+.art{position:relative;display:block;aspect-ratio:460/215;overflow:hidden;background:#0a0a0a}
 .art img{display:block;width:100%;height:100%;object-fit:cover}
 .ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:9% 8%;
   background:radial-gradient(120% 90% at 85% 0%,hsl(var(--h) 55% 34% / .9),transparent 60%),linear-gradient(160deg,hsl(var(--h) 38% 22%),hsl(calc(var(--h) + 40) 45% 9%))}
@@ -108,7 +123,7 @@ button{font-family:inherit}
 /* small flags */
 .flags{display:flex;gap:4px;flex-wrap:wrap}
 .flag{font-size:10.5px;padding:2px 6px;border-radius:2px;background:rgba(103,193,245,.16);color:var(--blue);white-space:nowrap}
-.flag.top{background:#a3cf06;color:#1b2838;font-weight:700}
+.flag.top{background:#a3cf06;color:#050505;font-weight:700}
 .flag.cart{background:rgba(190,238,17,.14);color:var(--disc-fg)}
 .flag.own{background:rgba(255,255,255,.08);color:#d2d2d2}
 .flag.low{background:#c5262633;color:#ff8f7f}
@@ -123,7 +138,7 @@ button{font-family:inherit}
 .hero-art{display:block;min-width:0}
 .hero-stage .hero-art .art{aspect-ratio:auto;height:100%;min-height:300px}
 .hero-info h3 a{color:#fff}
-.hero-info{background:linear-gradient(180deg,#0f1922 0%,#16273a 100%);padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.hero-info{background:linear-gradient(180deg,#0a0a0a 0%,#111111 100%);padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
 .hero-info h3{margin:0;color:#fff;font-size:23px;font-weight:400;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero-why{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12px;color:var(--muted)}
 .hero-why b{color:var(--text);font-weight:400}
@@ -147,7 +162,7 @@ button{font-family:inherit}
 .shelf{position:relative}
 .shelf-track{display:grid;gap:10px;grid-template-columns:repeat(var(--per,4),minmax(0,1fr))}
 .cap{display:block;background:var(--bg-row);color:var(--text);box-shadow:0 0 5px rgba(0,0,0,.35);min-width:0;transition:none}
-.cap:hover{color:#fff;background:#203348}
+.cap:hover{color:#fff;background:#1c1c1c}
 .cap .meta{padding:7px 8px 8px;display:flex;flex-direction:column;gap:6px}
 .cap .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:#e5e5e5}
 .cap .row{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0}
@@ -159,11 +174,11 @@ button{font-family:inherit}
 .toolbar .count{color:var(--muted);font-size:12px}
 .toolbar .count b{color:#fff;font-weight:400}
 .toolbar label{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:6px}
-select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;font-family:inherit;font-size:12px;cursor:pointer}
+select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;font-family:inherit;font-size:12px;cursor:pointer}
 .views{margin-left:auto;display:flex;gap:2px}
 .views button{background:rgba(0,0,0,.25);border:0;color:var(--muted);width:30px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:2px}
 .views button:hover{color:#fff}
-.views button[aria-pressed="true"]{background:var(--blue);color:#0b2235}
+.views button[aria-pressed="true"]{background:var(--blue);color:#000000}
 .sum{color:var(--muted);font-size:12px;padding:2px 2px 8px}
 .sum b{color:var(--disc-fg);font-weight:400}
 
@@ -173,7 +188,7 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .srow:hover{background:linear-gradient(90deg,rgba(103,193,245,.17),rgba(0,0,0,.2))}
 .srow .art{width:120px}
 .srow .tt{min-width:0}
-.srow .tt div{color:#c7d5e0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow .tt div{color:#d2d2d2;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .srow:hover .tt div{color:#fff}
 .srow .tt .flags{margin-top:4px}
 .srow .rel{color:var(--muted);font-size:11px;text-align:right}
@@ -181,10 +196,10 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 
 /* compact table */
 .ctab{width:100%;border-collapse:collapse;font-size:12px}
-.ctab th{position:sticky;top:0;background:#16202d;color:var(--muted);font-weight:400;text-align:left;padding:6px 8px;z-index:1;white-space:nowrap}
+.ctab th{position:sticky;top:0;background:#0a0a0a;color:var(--muted);font-weight:400;text-align:left;padding:6px 8px;z-index:1;white-space:nowrap}
 .ctab th.n,.ctab td.n{text-align:right}
 .ctab td{padding:5px 8px;border-top:1px solid #ffffff0d;white-space:nowrap}
-.ctab tr:hover td{background:#203348;color:#fff}
+.ctab tr:hover td{background:#1c1c1c;color:#fff}
 .ctab td.t{max-width:340px;overflow:hidden;text-overflow:ellipsis}
 .ctab td .pctx{color:var(--disc-fg)}
 .ctab-wrap{overflow-x:auto}
@@ -197,16 +212,16 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 /* sidebar filter blocks (search page) */
 .side{display:flex;flex-direction:column;gap:12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 10px)}
 .blk{background:rgba(0,0,0,.2)}
-.blk h4{margin:0;background:linear-gradient(90deg,#3b6e8c,#2a475e 70%);color:#fff;font-weight:400;font-size:12px;padding:7px 10px;letter-spacing:.02em}
+.blk h4{margin:0;background:linear-gradient(90deg,#2a2a2a,#1f1f1f 70%);color:#fff;font-weight:400;font-size:12px;padding:7px 10px;letter-spacing:.02em}
 .blk .in{padding:10px}
 .chips{display:flex;flex-wrap:wrap;gap:4px}
 .chips button{background:rgba(103,193,245,.12);color:var(--blue);border:0;border-radius:2px;padding:5px 8px;font-size:12px;cursor:pointer}
 .chips button:hover{color:#fff}
-.chips button[aria-pressed="true"]{background:var(--blue);color:#0b2235}
+.chips button[aria-pressed="true"]{background:var(--blue);color:#000000}
 .tick{display:flex;align-items:center;gap:8px;padding:5px 2px;cursor:pointer;color:var(--text);font-size:12.5px;user-select:none}
-.tick input{appearance:none;width:15px;height:15px;border-radius:2px;background:#0e141b;box-shadow:inset 0 0 0 1px #2f4d64;margin:0;flex:0 0 auto;display:grid;place-items:center;cursor:pointer}
+.tick input{appearance:none;width:15px;height:15px;border-radius:2px;background:#000000;box-shadow:inset 0 0 0 1px #333333;margin:0;flex:0 0 auto;display:grid;place-items:center;cursor:pointer}
 .tick input:checked{background:var(--blue)}
-.tick input:checked::after{content:"";width:8px;height:4px;border:2px solid #0b2235;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.tick input:checked::after{content:"";width:8px;height:4px;border:2px solid #000000;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .tick .c{margin-left:auto;color:var(--dim);font-size:11px}
 .tick.off{opacity:.4;pointer-events:none}
 
@@ -214,17 +229,17 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 #hv{position:fixed;z-index:50;width:310px;pointer-events:none;opacity:0;transform:translateY(3px);transition:opacity .12s,transform .12s;
   background:linear-gradient(180deg,var(--hover-a) 5%,var(--hover-b) 95%);color:var(--hover-ink);box-shadow:0 0 12px #000;padding:11px 12px 12px;font-size:12px}
 #hv.on{opacity:1;transform:none}
-#hv h4{margin:0 0 2px;font-size:15px;font-weight:400;color:#222d3d;line-height:1.2}
+#hv h4{margin:0 0 2px;font-size:15px;font-weight:400;color:#1a1a1a;line-height:1.2}
 #hv .rel{color:#2f89bc;font-size:11px;margin-bottom:8px}
 #hv .art{margin:0 0 9px;box-shadow:0 0 3px #0005}
 #hv .kv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 8px;background:rgba(0,0,0,.06);margin-bottom:7px}
 #hv .kv span{color:var(--hover-sub)}
-#hv .kv b{font-weight:600;color:#1f2b3a;text-align:right}
+#hv .kv b{font-weight:600;color:#1a1a1a;text-align:right}
 #hv .revl{margin-bottom:7px;color:var(--hover-sub)}
 #hv .revl b{font-weight:600}
 #hv .revl .rv-pos{color:#1a73a8}#hv .revl .rv-mix{color:#8a6f2d}#hv .revl .rv-neg{color:#a34c25}
 #hv .tags{display:flex;gap:3px;flex-wrap:wrap}
-#hv .tags span{background:#96a3ae;color:#e3eaef;padding:2px 6px;font-size:11px;border-radius:2px}
+#hv .tags span{background:#8a8a8a;color:#e6e6e6;padding:2px 6px;font-size:11px;border-radius:2px}
 #hv .tags span.g{background:#5c7e10}
 #hv .tags span.r{background:#b4532f}
 #hv .tags span.v{background:#6b56b8}
@@ -235,26 +250,26 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 @media (hover:none){#hv{display:none}}
 
 /* ---------- library (Steam client) ---------- */
-.libtop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:20px;background:#0b0e12}
-.libtop>div{background:linear-gradient(180deg,#2a2e36,#22252c);padding:12px 14px}
-.libtop .k{color:#8b929a;font-size:11.5px}
+.libtop{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:20px;background:#000000}
+.libtop>div{background:linear-gradient(180deg,#1a1a1a,#141414);padding:12px 14px}
+.libtop .k{color:#8c8c8c;font-size:11.5px}
 .libtop .v{color:#fff;font-size:21px;margin-top:2px}
-.libtop .d{color:#8b929a;font-size:11px;margin-top:1px}
+.libtop .d{color:#8c8c8c;font-size:11px;margin-top:1px}
 .libtop .v.g{color:#a1cd44}
 .libbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
-.libbar .search{margin-left:0;background:#33373f;flex:1 1 220px}
-.libbar .search input::placeholder{color:#8b929a}
+.libbar .search{margin-left:0;background:#1c1c1c;flex:1 1 220px}
+.libbar .search input::placeholder{color:#8c8c8c}
 .shelfwin{display:grid;grid-template-columns:300px minmax(0,1fr);background:var(--lib-bg);box-shadow:0 0 8px #000a;height:min(78vh,760px);margin-bottom:40px}
 .llist{background:var(--lib-side);overflow-y:auto;border-right:1px solid #0006}
-.llist .grp{position:sticky;top:0;background:#23262e;color:#8b929a;font-size:11px;padding:7px 12px;letter-spacing:.04em;z-index:1;border-bottom:1px solid #0004}
-.lit{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:8px;padding:3px 10px 3px 12px;color:#b8bcbf;cursor:pointer;width:100%;background:none;border:0;text-align:left;font-size:12.5px}
-.lit:hover{background:#3d4450;color:#fff}
+.llist .grp{position:sticky;top:0;background:#0d0d0d;color:#8c8c8c;font-size:11px;padding:7px 12px;letter-spacing:.04em;z-index:1;border-bottom:1px solid #0004}
+.lit{display:grid;grid-template-columns:32px minmax(0,1fr) auto;align-items:center;gap:8px;padding:3px 10px 3px 12px;color:#bdbdbd;cursor:pointer;width:100%;background:none;border:0;text-align:left;font-size:12.5px}
+.lit:hover{background:#2a2a2a;color:#fff}
 .lit[aria-selected="true"]{background:#3e76cb;color:#fff}
 .lit .art{width:32px;aspect-ratio:1/1}
 .lit .art img{object-fit:cover}
 .lit .ph span{display:none}
 .lit .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lit .v{color:#8b929a;font-size:11px}
+.lit .v{color:#8c8c8c;font-size:11px}
 .lit[aria-selected="true"] .v{color:#dce7f7}
 .ldet{overflow-y:auto;position:relative}
 .lhero{position:relative;height:250px;overflow:hidden}
@@ -268,25 +283,25 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .btn-go.green{background:linear-gradient(90deg,var(--go1) 5%,var(--go2) 95%)}
 .btn-go:hover{filter:brightness(1.15);color:#fff}
 .lstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;margin:0 24px;background:#0003}
-.lstats>div{background:#2a2e36;padding:10px 12px}
-.lstats .k{color:#8b929a;font-size:11px}
+.lstats>div{background:#1a1a1a;padding:10px 12px}
+.lstats .k{color:#8c8c8c;font-size:11px}
 .lstats .v{color:#fff;font-size:17px;margin-top:2px}
 .lstats .v.g{color:#a1cd44}
 .ldl{margin:20px 24px 28px}
 .ldl h5{margin:0 0 6px;color:#fff;font-size:12px;font-weight:400;letter-spacing:.04em;text-transform:uppercase}
 .ldl .ctab td{border-top-color:#ffffff10}
-.ldl .ctab th{background:#22252c}
-.lempty{color:#8b929a;padding:24px}
+.ldl .ctab th{background:#141414}
+.lempty{color:#8c8c8c;padding:24px}
 .colgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:40px}
-.colcard{background:none;border:0;padding:0;cursor:pointer;text-align:left;color:#b8bcbf;font-size:12px}
+.colcard{background:none;border:0;padding:0;cursor:pointer;text-align:left;color:#bdbdbd;font-size:12px}
 .colcard .art{box-shadow:0 4px 12px #0009;transition:transform .12s}
 .colcard:hover .art{transform:scale(1.03);box-shadow:0 8px 20px #000c}
 .colcard .nm{margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#dfe3e6}
-.colcard .v{color:#8b929a}
+.colcard .v{color:#8c8c8c}
 
 /* ---------- bundles ---------- */
 .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;margin-bottom:40px}
-.bcard{background:linear-gradient(180deg,#203448,#16202d);box-shadow:0 0 5px #0007;display:flex;flex-direction:column}
+.bcard{background:linear-gradient(180deg,#161616,#0a0a0a);box-shadow:0 0 5px #0007;display:flex;flex-direction:column}
 .bcard .mos{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#000}
 .bcard .mos .art:first-child{grid-column:span 3}
 .bcard .bd{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
@@ -302,15 +317,15 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .howto{background:rgba(0,0,0,.25);padding:22px 24px;max-width:760px;margin:24px 0 40px;line-height:1.6;font-size:13.5px}
 .howto h3{margin:0 0 8px;color:#fff;font-weight:400;font-size:19px}
 .howto ol{padding-left:20px;margin:10px 0}
-.howto code{background:#0e141b;padding:1px 6px;border-radius:2px;color:#a9d4f1;font-size:12.5px}
+.howto code{background:#000000;padding:1px 6px;border-radius:2px;color:#a9d4f1;font-size:12.5px}
 .howto p{margin:8px 0;max-width:70ch}
 
-#impMenu{position:absolute;right:0;top:calc(100% + 4px);background:#3d4450;box-shadow:0 6px 18px #000b;z-index:40;display:flex;flex-direction:column;min-width:210px}
+#impMenu{position:absolute;right:0;top:calc(100% + 4px);background:#1c1c1c;box-shadow:0 6px 18px #000b;z-index:40;display:flex;flex-direction:column;min-width:210px}
 #impMenu[hidden]{display:none}
 #impMenu button{background:none;border:0;color:#dcdedf;text-align:left;padding:9px 12px;font-size:12.5px;cursor:pointer}
-#impMenu button:hover{background:#dcdedf;color:#171a21}
+#impMenu button:hover{background:#dcdedf;color:#000000}
 /* toast */
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:#3d4450;color:#fff;padding:10px 16px;box-shadow:0 4px 18px #000a;opacity:0;transition:.2s;z-index:60;font-size:13px;max-width:90vw;pointer-events:none}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:#2a2a2a;color:#fff;padding:10px 16px;box-shadow:0 4px 18px #000a;opacity:0;transition:.2s;z-index:60;font-size:13px;max-width:90vw;pointer-events:none}
 #toast.on{opacity:1;transform:translateX(-50%)}
 .foot{color:var(--dim);font-size:11.5px;text-align:center;padding:10px 0 34px}
 
@@ -339,7 +354,7 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
   letter-spacing:.06em;background:linear-gradient(180deg,#2a2210,#14110a);color:#f5c75b;border:1px solid #c9a03f;box-shadow:0 0 6px #f5b83d55}
 .selo svg{width:13px;height:13px}
 .pp{font-size:10.5px;padding:2px 6px;border-radius:2px;white-space:nowrap;font-weight:700}
-.pp-novo{background:#1a6fd1;color:#fff}.pp-raro{background:#8fd3ff;color:#0b2235}.pp-igual{background:#4c8a1c;color:#eaffd0}
+.pp-novo{background:#1a6fd1;color:#fff}.pp-raro{background:#8fd3ff;color:#000000}.pp-igual{background:#4c8a1c;color:#eaffd0}
 .pp-24m{background:#6a3fc0;color:#fff}.pp-ref{background:none;color:var(--dim);font-weight:400;padding:2px 0;white-space:normal;text-align:right;max-width:170px}
 @media(max-width:720px){.pp-ref{max-width:118px;font-size:10px}}
 .ppwrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
@@ -354,8 +369,8 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .status b{color:#b8b6b4;font-weight:400}
 .status .err{color:#e2a635}
 .tabsec[hidden]{display:none}
-.pill-novo{background:#beee11;color:#1b2838;font-weight:700;font-size:10px;padding:2px 6px;border-radius:2px}
-.flag.alert{background:#a3cf06;color:#1b2838;font-weight:700}
+.pill-novo{background:#beee11;color:#050505;font-weight:700;font-size:10px;padding:2px 6px;border-radius:2px}
+.flag.alert{background:#a3cf06;color:#050505;font-weight:700}
 .flag.piso{background:#c5262633;color:#ff8f7f}
 .flag.ks{background:#e2a63533;color:#f0c674}
 .flag.cmp{background:#3e76cb55;color:#cfe0ff}
@@ -364,15 +379,15 @@ select{background:#2a475e;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 #modal{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.72);display:flex;align-items:flex-start;justify-content:center;
   padding:calc(env(safe-area-inset-top,0px) + 24px) 12px 24px;overflow-y:auto}
 #modal[hidden]{display:none}
-.mbox{background:linear-gradient(180deg,#1f3349 0,#1b2838 260px);width:min(980px,100%);box-shadow:0 10px 50px #000;position:relative}
+.mbox{background:linear-gradient(180deg,#161616 0,#050505 260px);width:min(980px,100%);box-shadow:0 10px 50px #000;position:relative}
 .mclose{position:absolute;right:10px;top:10px;background:rgba(0,0,0,.5);border:0;color:#fff;width:34px;height:34px;font-size:20px;cursor:pointer;z-index:2}
-.mclose:hover{background:var(--blue);color:#0b2235}
+.mclose:hover{background:var(--blue);color:#000000}
 .seg{display:inline-flex;background:rgba(0,0,0,.3);border-radius:2px;overflow:hidden}
 .seg button{background:none;border:0;color:var(--muted);padding:6px 12px;cursor:pointer;font-size:12px}
-.seg button[aria-pressed="true"]{background:var(--blue);color:#0b2235}
+.seg button[aria-pressed="true"]{background:var(--blue);color:#000000}
 .chart{position:relative;background:rgba(0,0,0,.25);padding:8px}
 .chart svg{display:block;width:100%;height:240px}
-.chart .tip{position:absolute;pointer-events:none;background:#e3eaef;color:#222d3d;font-size:11.5px;padding:6px 8px;box-shadow:0 0 8px #000;white-space:nowrap;display:none}
+.chart .tip{position:absolute;pointer-events:none;background:#e6e6e6;color:#1a1a1a;font-size:11.5px;padding:6px 8px;box-shadow:0 0 8px #000;white-space:nowrap;display:none}
 .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .legend button{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.25);border:0;color:var(--text);font-size:11.5px;padding:4px 8px;cursor:pointer;border-radius:2px}
 .legend button[aria-pressed="false"]{opacity:.4}
@@ -384,10 +399,10 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .combo b{color:var(--disc-fg);font-weight:400;font-size:16px}
 .combo ul{margin:6px 0 0;padding-left:18px;font-size:12px}
 /* ficha do jogo (spec 09, amostra B+): capa vertical, logo, 5 números, fileira da franquia, duas colunas */
-.mbox.fx{width:min(1180px,100%);background:#0b0f15;overflow:hidden}
-.fx-fundo{position:absolute;inset:0 0 auto 0;height:600px;background:#0b0f15 center 25%/cover no-repeat}
-.fx-fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0b0f15 0%,#0b0f15e6 34%,#0b0f1599 70%,#0b0f1566 100%),linear-gradient(180deg,#0b0f1500 35%,#0b0f15 100%)}
-.fx-fundo.cor::after{background:linear-gradient(180deg,#0b0f1500 25%,#0b0f15 100%)}
+.mbox.fx{width:min(1180px,100%);background:#000000;overflow:hidden}
+.fx-fundo{position:absolute;inset:0 0 auto 0;height:600px;background:#000000 center 25%/cover no-repeat}
+.fx-fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#000000 0%,#000000e6 34%,#00000099 70%,#00000066 100%),linear-gradient(180deg,#00000000 35%,#000000 100%)}
+.fx-fundo.cor::after{background:linear-gradient(180deg,#00000000 25%,#000000 100%)}
 .fx-cab{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;padding:32px 32px 22px}
 .fx-vert{width:220px;aspect-ratio:2/3;object-fit:cover;box-shadow:0 14px 34px #000d;border-radius:4px;display:block;background:#000}
 .fx-vert[src*="/header"]{aspect-ratio:auto;object-fit:contain}.fx-capa img[src*="/header"]{object-fit:contain}   /* jogo sem capa vertical: a horizontal inteira */
@@ -403,7 +418,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-chip{font-size:12px;padding:2px 8px;border-radius:2px;background:#ffffff14;color:var(--text)}
 .fx-chip.tenho{background:var(--disc-bg);color:var(--disc-fg)}.fx-chip.lista{background:#4b3a6e;color:#e4d7ff}
 .fx-tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:920px}
-.fx-tile{background:#0e141bd0;backdrop-filter:blur(6px);padding:9px 12px 10px;border-top:2px solid #ffffff18;min-width:0}
+.fx-tile{background:#000000d0;backdrop-filter:blur(6px);padding:9px 12px 10px;border-top:2px solid #ffffff18;min-width:0}
 .fx-tile small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fx-tile b{display:block;color:#fff;font-weight:400;font-size:21px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fx-tile>span{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -428,12 +443,12 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-capa.atual img{outline:2px solid var(--blue);outline-offset:2px}
 .fx-capa .sel{position:absolute;top:4px;right:4px;font-size:11px;line-height:1;padding:3px 5px;border-radius:2px}
 .fx-capa .sel.ok{background:var(--disc-bg);color:var(--disc-fg)}.fx-capa .sel.cor{background:#4b3a6e;color:#e4d7ff}
-.fx-capa .nm{font-size:11px;margin-top:4px;line-height:1.25;height:2.5em;color:#acb2b8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fx-capa .nm{font-size:11px;margin-top:4px;line-height:1.25;height:2.5em;color:#b0b0b0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .fx-capa:hover .nm{color:#fff}
 .fx-capa .ano{font-size:11px;color:var(--dim)}.fx-capa .pr{color:var(--disc-fg)}
 .fx-seta{position:absolute;top:48px;width:52px;height:174px;border:0;cursor:pointer;color:#fff;font-size:30px;z-index:2;display:flex;align-items:center;justify-content:center}
 .fx-seta[hidden]{display:none}
-.fx-seta.e{left:32px;background:linear-gradient(90deg,#0b0f15 10%,#0b0f1500)}.fx-seta.d{right:32px;background:linear-gradient(270deg,#0b0f15 10%,#0b0f1500)}
+.fx-seta.e{left:32px;background:linear-gradient(90deg,#000000 10%,#00000000)}.fx-seta.d{right:32px;background:linear-gradient(270deg,#000000 10%,#00000000)}
 .fx-seta:hover{color:var(--blue)}
 .fx-corpo{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;padding:16px 32px 30px}
 .fx-pri,.fx-lat{display:flex;flex-direction:column;gap:14px;min-width:0}
@@ -454,7 +469,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-crit b{font-size:18px;color:#fff;font-weight:400}
 .fx-kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px;margin:0}.fx-kv dt{color:var(--muted)}.fx-kv dd{margin:0;min-width:0}
 .fx-troca{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.fx-troca input{flex:1;min-width:120px;background:#0e141b;border:0;color:#fff;padding:5px 8px;box-shadow:inset 0 0 0 1px #2f4d64;font-family:inherit}
+.fx-troca input{flex:1;min-width:120px;background:#000000;border:0;color:#fff;padding:5px 8px;box-shadow:inset 0 0 0 1px #333333;font-family:inherit}
 .fx-vazio{color:var(--dim);font-size:12px}
 @media (max-width:820px){
   /* estreito: capa e logo lado a lado; descrição, números e ações na largura toda */
@@ -466,37 +481,81 @@ select.mini{padding:3px 6px;font-size:11.5px}
   .fx-seta{display:none}
 }
 /* config */
-.cfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin:20px 0 40px}
-.cfg .blk .in{display:flex;flex-direction:column;gap:8px}
-.cfg label.f{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px}
-.cfg input[type=number],.cfg input[type=time]{width:92px;background:#0e141b;border:0;color:#fff;padding:6px 8px;border-radius:2px;font-family:inherit;box-shadow:inset 0 0 0 1px #2f4d64}
-.cfg .hint{color:var(--dim);font-size:11px;line-height:1.4}
-.lojas{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;max-height:300px;overflow:auto}
-.savebar{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);display:flex;justify-content:flex-end;gap:10px;align-items:center}
+.hint{color:var(--dim);font-size:11.5px;line-height:1.45}
+/* ---------- Configurações: menu lateral + linhas (título, explicação, controle), como as configurações da Steam ---------- */
+.cfgx{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin:18px 0 100px;align-items:start}
+.cfg-nav{position:sticky;top:12px;display:flex;flex-direction:column;background:#0d0d0d;border:1px solid #ffffff14;padding:6px 0}
+.cfg-nav button{position:relative;background:none;border:0;text-align:left;color:#dcdedf;padding:10px 16px 10px 20px;cursor:pointer;font:inherit;font-size:14px}
+.cfg-nav button small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.cfg-nav button:hover{background:#161616;color:#fff}
+.cfg-nav button[aria-selected="true"]{background:#1c1c1c;color:#fff}
+.cfg-nav button[aria-selected="true"]::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;background:#e11d2e}
+.cfg-sec>header{margin:0 0 14px}
+.cfg-sec h3{margin:0;font-size:24px;font-weight:300;color:#fff;letter-spacing:.01em}
+.cfg-sec>header p{margin:5px 0 0;color:var(--muted);font-size:13px;max-width:70ch}
+.cfg-card{background:#0d0d0d;border:1px solid #ffffff14;margin-bottom:16px}
+.cfg-card>h4{margin:0;padding:10px 18px;font-size:11.5px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid #ffffff0d}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px 18px;border-top:1px solid #ffffff0d}
+.cfg-card>h4+.cfg-row,.cfg-row:first-child{border-top:0}
+.cfg-row:hover{background:#111}
+.cfg-row.off{opacity:.45}
+.cfg-t{min-width:0}
+.cfg-t b{display:block;color:#e6e6e6;font-weight:400;font-size:14px}
+.cfg-t span{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.45;max-width:72ch}
+.cfg-c{flex:0 0 auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px}
+.cfg-sw{position:relative;display:inline-block;width:42px;height:22px;flex:0 0 auto;cursor:pointer}
+.cfg-sw input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer;z-index:1}
+.cfg-sw i{position:absolute;inset:0;background:#2a2a2a;border-radius:11px;transition:background .2s}
+.cfg-sw i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#8c8c8c;transition:transform .2s,background .2s}
+.cfg-sw input:checked+i{background:var(--blue)}
+.cfg-sw input:checked+i::after{transform:translateX(20px);background:#fff}
+.cfg-sw input:focus-visible+i{outline:2px solid var(--blue);outline-offset:2px}
+.cfg-num{display:inline-flex;align-items:center;background:#000;box-shadow:inset 0 0 0 1px #333;border-radius:2px}
+.cfg-num:focus-within{box-shadow:inset 0 0 0 1px var(--blue)}
+.cfg-num input{width:70px;background:none;border:0;color:#fff;padding:7px 8px;font:inherit;font-size:13px;text-align:right;outline:none;color-scheme:dark}
+.cfg-num em{font-style:normal;color:var(--muted);padding-right:10px;font-size:12px}
+.cfg-num.pre em{order:-1;padding:0 0 0 10px}
+.cfg-time{background:#000;border:0;color:#fff;padding:6px 8px;border-radius:2px;box-shadow:inset 0 0 0 1px #333;font:inherit;font-size:13px;color-scheme:dark}
+.cfg-nota{color:var(--muted);font-size:12px;line-height:1.5;padding:12px 18px;border-top:1px solid #ffffff0d;background:#0a0a0a}
+.cfg-in{padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.cfg-lojas{display:flex;flex-wrap:wrap;gap:6px;padding:14px 18px;border-top:1px solid #ffffff0d}
+.cfg-lj{position:relative;display:inline-flex;align-items:center;gap:7px;padding:6px 11px;background:#1a1a1a;color:var(--muted);border-radius:2px;cursor:pointer;font-size:12.5px;user-select:none}
+.cfg-lj input{position:absolute;opacity:0;pointer-events:none}
+.cfg-lj::before{content:"";width:7px;height:7px;border-radius:50%;background:#3d3d3d}
+.cfg-lj:hover{color:#fff}
+.cfg-lj:has(input:checked){background:rgba(103,193,245,.14);color:#fff;box-shadow:inset 0 0 0 1px #66c0f455}
+.cfg-lj:has(input:checked)::before{background:var(--blue)}
+.cfg-lj:has(input:focus-visible){outline:2px solid var(--blue);outline-offset:2px}
+.cfg-save{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:12px;background:#161616;border:1px solid #ffffff1f;box-shadow:0 10px 30px #000d;padding:9px 10px 9px 16px;color:#e6e6e6;font-size:13px;max-width:calc(100vw - 24px)}
+.cfg-save[hidden]{display:none}
+.cfg-save>span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#e11d2e;margin-right:9px;vertical-align:1px}
+.cfg-save .btn-go2{padding:8px 18px}
+@media (max-width:900px){.cfgx{grid-template-columns:minmax(0,1fr);gap:16px}.cfg-nav{position:static;flex-direction:row;overflow-x:auto;padding:0;scrollbar-width:none}.cfg-nav button{white-space:nowrap;padding:12px 14px}.cfg-nav button small{display:none}.cfg-nav button[aria-selected="true"]::before{left:10px;right:10px;top:auto;bottom:0;width:auto;height:3px}}
+@media (max-width:720px){.cfg-row{flex-wrap:wrap;gap:10px;padding:12px 14px}.cfg-c{width:100%;justify-content:flex-end}.cfg-save>span{display:none}}
 .btn-go2{background:linear-gradient(90deg,var(--go1) 5%,var(--go2) 95%);color:#fff;border:0;border-radius:2px;padding:10px 20px;font-size:14px;cursor:pointer}
 .btn-go2:hover{filter:brightness(1.15)}
 .nrow{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto;gap:12px;align-items:center;background:rgba(0,0,0,.2);padding:4px 10px 4px 4px;margin-bottom:2px;cursor:pointer}
-.nrow:hover{background:#203348}
+.nrow:hover{background:#1c1c1c}
 .nrow .q{color:var(--muted);font-size:11.5px;white-space:nowrap}
 .off{opacity:.5}
 #progTopo{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#66c0f4,#a1cd44);z-index:80;transition:width .4s}
 .status{cursor:pointer}
-#progBox{position:fixed;right:14px;top:70px;width:min(460px,92vw);background:#171a21;box-shadow:0 8px 30px #000c;z-index:75;padding:12px 14px;font-size:12px}
+#progBox{position:fixed;right:14px;top:70px;width:min(460px,92vw);background:#000000;box-shadow:0 8px 30px #000c;z-index:75;padding:12px 14px;font-size:12px}
 #progBox[hidden]{display:none}
 #progBox h5{margin:0 0 6px;color:#fff;font-size:13px;font-weight:400}
 #progBox .bar{height:8px}
-#progBox pre{margin:8px 0 0;max-height:260px;overflow:auto;background:#0e141b;color:#8f98a0;padding:8px;font-size:11px;white-space:pre-wrap}
+#progBox pre{margin:8px 0 0;max-height:260px;overflow:auto;background:#000000;color:#979797;padding:8px;font-size:11px;white-space:pre-wrap}
 .brow{background:rgba(0,0,0,.2);margin-bottom:2px}
 .brow .h{display:grid;grid-template-columns:120px minmax(0,1fr) 190px auto;gap:12px;align-items:center;padding:4px 10px 4px 4px;cursor:pointer}
-.brow .h:hover{background:#203348}
+.brow .h:hover{background:#1c1c1c}
 .brow .nm{color:#fff;font-size:14px}
-.prog{height:6px;background:#0e141b;border-radius:1px;overflow:hidden;margin-top:5px}.prog i{display:block;height:100%;background:linear-gradient(90deg,#4c6b22,#a1cd44)}
+.prog{height:6px;background:#000000;border-radius:1px;overflow:hidden;margin-top:5px}.prog i{display:block;height:100%;background:linear-gradient(90deg,#4c6b22,#a1cd44)}
 .brow .val{text-align:right;font-size:12px;color:var(--muted)}.brow .val b{display:block;color:var(--disc-fg);font-size:15px;font-weight:400}
 .brow .det{padding:4px 10px 10px 136px}
 .brow .det table{width:100%}
 .art.vert{aspect-ratio:2/3}
 .colgrid.vert{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
-.mbar{display:flex;height:14px;background:#0e141b;border-radius:2px;overflow:hidden;margin:6px 0}
+.mbar{display:flex;height:14px;background:#000000;border-radius:2px;overflow:hidden;margin:6px 0}
 .mbar i{display:block;height:100%}.mbar .t{background:linear-gradient(90deg,#4c6b22,#a1cd44)}.mbar .p{background:repeating-linear-gradient(45deg,#3e76cb 0 6px,#5a8fe0 6px 12px)}
 .mbar.fino{height:6px;margin:5px 0 0}
 .meta-col{background:rgba(0,0,0,.25);padding:12px 14px;margin:2px 0 14px}
@@ -504,7 +563,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .meta-col .l b{color:#fff;font-weight:400}
 .leg{display:inline-flex;align-items:center;gap:5px;margin-right:12px}.leg i{width:10px;height:10px;display:inline-block;border-radius:2px}
 .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:40px}
-.fcard{background:linear-gradient(180deg,#203448,#16202d);padding:12px;box-shadow:0 0 5px #0007}
+.fcard{background:linear-gradient(180deg,#161616,#0a0a0a);padding:12px;box-shadow:0 0 5px #0007}
 .fcard h3{margin:0 0 4px;color:#fff;font-weight:400;font-size:16px}
 .fcard .sub{color:var(--muted);font-size:12px;margin-bottom:8px}
 .fcard ul{list-style:none;margin:0;padding:0;font-size:12px;max-height:180px;overflow:auto}
@@ -512,7 +571,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fcard li.w span:first-child{color:var(--disc-fg)}
 .fcard li span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qr{background:#fff;padding:8px;display:inline-block;margin-top:6px}
-.lnk{word-break:break-all;font-size:11.5px;background:#0e141b;padding:6px 8px;border-radius:2px;color:#a9d4f1}
+.lnk{word-break:break-all;font-size:11.5px;background:#000000;padding:6px 8px;border-radius:2px;color:#a9d4f1}
 @media (max-width:720px){.brow .h{grid-template-columns:90px 1fr}.brow .val{grid-column:2;text-align:left}.brow .det{padding-left:10px}}
 .carr-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start;margin-bottom:40px}
 .crow{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto 28px;gap:12px;align-items:center;background:rgba(0,0,0,.2);padding:4px 8px 4px 4px;margin-bottom:2px}
@@ -530,7 +589,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .rhead button:hover{color:#ff8f7f}
 .res{display:flex;flex-direction:column;gap:3px}
 .ritem{display:grid;grid-template-columns:76px minmax(0,1fr) 22px;gap:8px;align-items:center;width:100%;background:rgba(0,0,0,.28);border:0;padding:4px 6px 4px 4px;color:inherit;font:inherit;text-align:left;cursor:pointer}
-.ritem:hover{background:#203348}
+.ritem:hover{background:#1c1c1c}
 .ritem .rb{display:flex;flex-direction:column;gap:2px;min-width:0}
 .ritem .rn{color:#fff;font-size:12px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ritem .motivo{font-size:11px;margin:0}
@@ -541,7 +600,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .tot{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0}
 .tot b{color:#fff;font-weight:400}
 .tot.big b{font-size:20px;color:var(--disc-fg)}
-.bar{height:8px;background:#0e141b;border-radius:2px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--go1),var(--go2))}
+.bar{height:8px;background:#000000;border-radius:2px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--go1),var(--go2))}
 .bar.over i{background:#d6492f}
 .cartbtn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:2px;background:rgba(103,193,245,.15);color:var(--blue);font-size:14px;cursor:pointer;flex:0 0 auto}
 .cartbtn:hover,.cartbtn.on{background:var(--disc-bg);color:var(--disc-fg)}
@@ -580,7 +639,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .tri.off{opacity:.45}
 .tri .tb{display:inline-flex;gap:1px}
 .tri .tb button{background:rgba(0,0,0,.3);border:0;color:var(--muted);width:24px;height:22px;cursor:pointer;font-size:12px}
-.tri .tb button[aria-pressed="true"][data-v=""]{background:#3d4450;color:#fff}
+.tri .tb button[aria-pressed="true"][data-v=""]{background:#2a2a2a;color:#fff}
 .tri .tb button[aria-pressed="true"][data-v="exigir"]{background:#4c8a1c;color:#fff}
 .tri .tb button[aria-pressed="true"][data-v="excluir"]{background:#a34c25;color:#fff}
 .tri.off .tb button{cursor:not-allowed}
@@ -590,7 +649,7 @@ details.blk>summary::-webkit-details-marker{display:none}
 details.blk>summary h4::after{content:"▾";float:right;opacity:.7}
 details.blk[open]>summary h4::after{content:"▴"}
 .pon{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue);margin-left:6px;vertical-align:middle}
-.pin{background:#0e141b;border:0;color:#fff;padding:5px 6px;border-radius:2px;box-shadow:inset 0 0 0 1px #2f4d64;font:inherit;font-size:12px;width:76px}
+.pin{background:#000000;border:0;color:#fff;padding:5px 6px;border-radius:2px;box-shadow:inset 0 0 0 1px #333333;font:inherit;font-size:12px;width:76px}
 .pfx .f{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px}
 .pfx input[type=date]{width:128px}
 .pbtns{display:flex;gap:6px}.pbtns button{flex:1;padding:7px 6px}
@@ -608,10 +667,10 @@ details.blk[open]>summary h4::after{content:"▴"}
 .ptab th sup{font-size:9px;margin-left:1px}
 .icos{width:46px}
 .ico{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:2px;font-size:11px;margin-right:2px}
-.ico-carr{background:#e2a635;color:#1b2838}.ico-lista{background:#4c8a1c;color:#fff}
+.ico-carr{background:#e2a635;color:#050505}.ico-lista{background:#4c8a1c;color:#fff}
 .pager{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:12px 0 30px}
 .pager button{background:rgba(103,193,245,.12);color:var(--blue);border:0;min-width:32px;height:30px;border-radius:2px;cursor:pointer}
-.pager button[aria-current="true"]{background:var(--blue);color:#0b2235}
+.pager button[aria-current="true"]{background:var(--blue);color:#000000}
 .pager button:disabled{opacity:.35;cursor:default}
 .pager span{color:var(--dim);align-self:center}
 .regua{background:rgba(26,111,209,.14);padding:8px 10px;font-size:12px;color:#cfe3ff;margin-top:8px}
@@ -627,10 +686,10 @@ details.blk[open]>summary h4::after{content:"▴"}
 </style></head><body>
 <header class="topbar">
   <div class="wrap">
-    <div class="logo">
-      <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#171a21" stroke="#c7d5e0" stroke-width="4"/><path d="M14 40a20 20 0 0 1 36 0" stroke="#66c0f4" stroke-width="3" fill="none" opacity=".7"/><path d="M22 38a11 11 0 0 1 20 0" stroke="#66c0f4" stroke-width="3" fill="none"/><path d="M32 32 50 16" stroke="#c7d5e0" stroke-width="4"/><circle cx="32" cy="32" r="6" fill="#66c0f4"/></svg>
-      <div>KUROKAMI<small>RADAR</small></div>
-    </div>
+    <a class="logo" href="#vale" id="logoHome" title="Página inicial">
+      <svg class="kh" width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><circle class="kh-disco" cx="32" cy="32" r="29" fill="#0b0b0b" stroke="#e11d2e" stroke-width="3.5"/><circle class="kh-anel" cx="32" cy="32" r="16" fill="none" stroke="#8a1220" stroke-width="2.5" stroke-dasharray="11.5 5.3"/><path class="kh-mira" d="M32 8v10M32 46v10M8 32h10M46 32h10" stroke="#e11d2e" stroke-width="4" stroke-linecap="round"/><circle class="kh-ponto" cx="32" cy="32" r="5" fill="#ff2a3d"/></svg>
+      <span class="logo-t">KUROKAMI<small>HUNTER</small></span>
+    </a>
     <nav class="nav" aria-label="Seções">
       <div class="dd"><button data-tab="vale" data-tabs="vale lista" aria-haspopup="true">Ofertas</button>
         <div class="ddm"><button data-tab="vale">Destaques</button><button data-tab="lista" data-ir="promo">Promoções</button><button data-tab="lista" data-ir="desejos">Lista de desejos</button></div></div>
@@ -701,7 +760,7 @@ details.blk[open]>summary h4::after{content:"▴"}
       <aside class="side"><div class="blk cbusca" id="cbusca"><h4>Adicionar jogo</h4><div class="in"><label class="search"><button class="lupa" id="buscaBtn" type="button" aria-label="Buscar jogo para o carrinho" title="Buscar"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg></button><span class="sr">Buscar jogo</span><input id="busca" type="search" placeholder="Nome, appid ou link da Steam" autocomplete="off"></label><div id="buscaRes" hidden></div></div></div>
         <div class="blk"><h4>Resumo do pedido</h4><div class="in" id="carrResumo"></div></div>
         <div class="blk"><h4>Orçamento</h4><div class="in"><label class="f" style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px">Quanto quero gastar (R$)
-          <input type="number" id="orc" min="0" step="10" style="width:90px;background:#0e141b;border:0;color:#fff;padding:6px 8px;border-radius:2px;box-shadow:inset 0 0 0 1px #2f4d64"></label>
+          <input type="number" id="orc" min="0" step="10" style="width:90px;background:#000000;border:0;color:#fff;padding:6px 8px;border-radius:2px;box-shadow:inset 0 0 0 1px #333333"></label>
           <div id="orcBar"></div></div></div></aside>
     </div>
   </section>
@@ -716,7 +775,7 @@ details.blk[open]>summary h4::after{content:"▴"}
     <div id="cfgForm"></div>
   </section>
 
-  <div class="foot wrap">Preços via <a href="https://isthereanydeal.com" target="_blank" rel="noopener">IsThereAnyDeal</a>, <a href="https://gg.deals" target="_blank" rel="noopener">GG.deals</a> e Steam · Kurokami Radar <span id="ver"></span></div>
+  <div class="foot wrap">Preços via <a href="https://isthereanydeal.com" target="_blank" rel="noopener">IsThereAnyDeal</a>, <a href="https://gg.deals" target="_blank" rel="noopener">GG.deals</a> e Steam · Kurokami Hunter <span id="ver"></span></div>
 </main>
 
 <div id="modal" hidden><div class="mbox fx" role="dialog" aria-modal="true" aria-label="Detalhes do jogo"><button class="mclose" aria-label="Fechar">×</button><div id="mbody"></div></div></div>
@@ -740,7 +799,7 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clea
 const ls={get(k,d){try{const v=localStorage.getItem('kr:'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem('kr:'+k,JSON.stringify(v));}catch(e){}}};
 async function api(p){const r=await fetch(p);if(!r.ok){const e=(await r.json().catch(()=>({}))).erro||r.status;toast('Erro: '+e);throw new Error(e);}return r.json();}
 async function post(p,d){let r;try{r=await fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d||{})});}
-  catch(e){toast('O Radar não respondeu. Ele está aberto na bandeja?');return {ok:false,erro:String(e)};}
+  catch(e){toast('O Hunter não respondeu. Ele está aberto na bandeja?');return {ok:false,erro:String(e)};}
   const j=await r.json().catch(()=>({ok:false,erro:'resposta inválida'}));if(!r.ok||j.ok===false){toast('Não deu certo: '+(j.erro||r.status));if(j.ok===undefined)j.ok=false;}return j;}
 function ph(name,id,small){return `<span class="ph${small?' sm':''}" style="--h:${hue(id)}"><span>${esc(name)}</span></span>`;}
 function art(id,name,url,o={}){
@@ -831,6 +890,7 @@ document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if
 /* ================= abas ================= */
 function setTab(t){S.tab=t;save();document.body.dataset.tab=t;try{history.replaceState(null,'','#'+t);}catch(e){}$$('.nav [data-tabs]').forEach(b=>b.setAttribute('aria-current',b.dataset.tabs.split(' ').includes(t)?'page':'false'));
   ['vale','lista','bib','carr','notif','cfg'].forEach(x=>$('#tab-'+x).hidden=x!==t);render();}
+$('#logoHome').addEventListener('click',e=>{e.preventDefault();setTab('vale');window.scrollTo({top:0,behavior:'smooth'});});
 $('.nav').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;
   if(b.dataset.ir==='desejos')aplicarP(P_DESEJOS);else if(b.dataset.ir==='promo')aplicarP(P_PADRAO);
   setTab(b.dataset.tab);if(b.closest('.ddm'))b.blur();});
@@ -874,7 +934,7 @@ $('#tab-vale').addEventListener('click',e=>{const v=e.target.closest('[data-vert
 $('#hero').addEventListener('click',e=>{const a=e.target.closest('[data-hero]'),d=e.target.closest('[data-heroi]');
   if(a){heroI+=+a.dataset.hero;renderVale();}else if(d){heroI=+d.dataset.heroi;renderVale();}});
 
-/* ================= promoções (explorador; filtros no Radar: /api/promocoes) ================= */
+/* ================= promoções (explorador; filtros no Hunter: /api/promocoes) ================= */
 // Promoções e Lista de desejos (menu Ofertas) abrem sempre com estes filtros (sempre só Jogo, como os Destaques); +18 fica oculto sem o campo adulto
 const P_PADRAO={desconto_min:50,analises_de:500,tipo:['jogo'],relacao:{tenho:'excluir'}};
 const P_DESEJOS={desconto_min:50,analises_de:500,tipo:['jogo'],relacao:{na_lista:'exigir',tenho:'excluir'}};
@@ -956,7 +1016,7 @@ function renderSide(){const r=PR||{contagens:{mostrar_so:{},tipo:{}},conta:{tem_
   $('#pSide').innerHTML=`<div class="blk"><h4>Buscar por nome</h4><div class="in"><input type="search" class="pin" id="pBusca" placeholder="nome do jogo" value="${esc(P.busca||'')}" style="width:100%"></div></div>
     <div class="blk"><h4>Sua relação com o jogo</h4><div class="in">${REL.map(([k,l])=>tri(k,l)).join('')}
       <label class="tick"><input type="checkbox" id="pQq" ${P.qualquer_um?'checked':''}>Qualquer um (os ✓ valem com OU)</label>
-      ${sem?`<div class="hint">Seguido e Ignorado vêm da sua conta Steam: ${temExt()&&parseFloat(document.documentElement.dataset.kurokamiExt)>=1.1?'abra qualquer página da loja da Steam (logado) e volte aqui':'precisa da extensão do Radar 1.1 ou mais nova (instale, ou recarregue-a em chrome://extensions) e de uma visita à loja da Steam logado'}.</div>`:''}</div></div>
+      ${sem?`<div class="hint">Seguido e Ignorado vêm da sua conta Steam: ${temExt()&&parseFloat(document.documentElement.dataset.kurokamiExt)>=1.1?'abra qualquer página da loja da Steam (logado) e volte aqui':'precisa da extensão do Hunter 1.1 ou mais nova (instale, ou recarregue-a em chrome://extensions) e de uma visita à loja da Steam logado'}.</div>`:''}</div></div>
     <div class="blk"><h4>Conteúdo adulto (+18)</h4><div class="in"><span class="seg" role="group" aria-label="Conteúdo adulto">${[['','Ocultar'],['mostrar','Mostrar'],['so','Só +18']].map(([v,t])=>`<button data-adulto="${v}" aria-pressed="${(P.adulto||'')===v}">${t}</button>`).join('')}</span>
       <div class="hint">Pela classificação da Steam (conteúdo sexual). Jogos da sua lista nunca são ocultados.</div></div></div>
     <div class="blk"><h4>Mostrar só</h4><div class="in">${['selo','novo','igual','24m'].map(t=>caixa('mostrar_so',t,TIPO_NOME[t],ct.mostrar_so[t],TIPO_COR[t])).join('')}</div></div>
@@ -1047,7 +1107,7 @@ $('#modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.clos
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modal').hidden)fecharModal();});
 function dlcMotivo(e){
   if(!e)return '';
-  const t=e.motivo==='falhou'?`A consulta de DLCs falhou em ${fmtISO(e.quando)}; o Radar tenta de novo na próxima verificação.`
+  const t=e.motivo==='falhou'?`A consulta de DLCs falhou em ${fmtISO(e.quando)}; o Hunter tenta de novo na próxima verificação.`
     :e.motivo==='sem_dlcs'?`A Steam não informou DLCs para este jogo (consultado em ${fmtISO(e.quando)}).`
     :e.fila?`Lista de DLCs ainda não consultada — verificação em andamento, ${fmtN(e.fila.atual)}/${fmtN(e.fila.total)} jogos.`
     :'Lista de DLCs ainda não consultada; entra na próxima verificação.';
@@ -1065,8 +1125,8 @@ function corDaCapa(url){return new Promise(r=>{const i=new Image();i.crossOrigin
   i.onload=()=>{try{const c=document.createElement('canvas');c.width=24;c.height=36;const x=c.getContext('2d');x.drawImage(i,0,0,24,36);
     const d=x.getImageData(0,0,24,36).data;let R=0,G=0,B=0,W=0;   // média pesada pela saturação: a cor da capa, não o cinza
     for(let k=0;k<d.length;k+=4){const w=Math.max(d[k],d[k+1],d[k+2])-Math.min(d[k],d[k+1],d[k+2])+8;R+=d[k]*w;G+=d[k+1]*w;B+=d[k+2]*w;W+=w;}
-    r(`rgb(${R/W*.55|0},${G/W*.55|0},${B/W*.55|0})`);}catch(e){r('#1b2838');}};
-  i.onerror=()=>r('#1b2838');i.src=url;});}
+    r(`rgb(${R/W*.55|0},${G/W*.55|0},${B/W*.55|0})`);}catch(e){r('#050505');}};
+  i.onerror=()=>r('#050505');i.src=url;});}
 function fxTile(l,v,sub,cls){return `<div class="fx-tile${cls?' '+cls:''}"><small>${l}</small><b>${v}</b>${sub?`<span>${sub}</span>`:''}</div>`;}
 function fxAnel(p){const r=14,c=2*Math.PI*r;return `<svg viewBox="0 0 34 34" width="34" height="34" aria-hidden="true"><circle cx="17" cy="17" r="${r}" fill="none" stroke="#ffffff1a" stroke-width="4"/><circle cx="17" cy="17" r="${r}" fill="none" stroke="#66c0f4" stroke-width="4" stroke-dasharray="${(c*p).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 17 17)"/></svg>`;}
 const fxBusca=(t,nada)=>MX===undefined?t:nada;
@@ -1097,7 +1157,7 @@ function fxAcoes(){
   const loja=`<a class="btn-ghost" href="${storeUrl(j.appid)}" target="_blank" rel="noopener">Página na Steam</a>`;
   if(MJ.tenho)return `<div class="fx-acoes"><a class="btn-go" href="steam://run/${j.appid}">▶ Jogar na Steam</a>${loja}${MJ.tenho_manual?bt('data-tenho="1"','Desfazer "já tenho"'):''}</div>`;
   return `<div class="fx-acoes">${bt(`data-mcart="${j.appid}"`,noC?'✓ No carrinho':'Pôr no carrinho','btn-go green')}${loja}${bt('data-tenho="1"','Já tenho')}
-    ${o.extra?bt(`data-desmonitorar="${j.appid}"`,'Parar de monitorar'):''}${MJ.steam_inteira?bt(`data-monitorar="${j.appid}" title="Entra na sua lista do Radar: alertas, todas as lojas, DLCs e keyshop"`,'Monitorar'):''}
+    ${o.extra?bt(`data-desmonitorar="${j.appid}"`,'Parar de monitorar'):''}${MJ.steam_inteira?bt(`data-monitorar="${j.appid}" title="Entra na sua lista do Hunter: alertas, todas as lojas, DLCs e keyshop"`,'Monitorar'):''}
     ${bt(`data-mudo="${MJ.mudo?0:1}"`,MJ.mudo?'Voltar a avisar':'Não avisar deste jogo')}
     ${MJ.dlcs.length?`<span class="seg" role="group" aria-label="Alertar por"><button data-modo="base" aria-pressed="${MJ.modo!=='completo'}">Alertar pelo base</button><button data-modo="completo" aria-pressed="${MJ.modo==='completo'}">Pelo completo</button></span>`:''}</div>`;
 }
@@ -1183,7 +1243,7 @@ function fxChips(){const o=MJ.item||IDX.get(MJ.jogo.appid)||{};
   return `<div class="fx-chips">${MJ.tenho?'<span class="fx-chip tenho">✓ Na sua biblioteca</span>':''}${MJ.na_lista?'<span class="fx-chip lista">♥ Na lista de desejos</span>':''}${seloBadge(MJ)}${flags(Object.assign({},o,{selo:false}))}</div>`;}
 function posFicha(){
   const f=$('#fxFundo'),a=MJ.jogo.appid,ss=MX&&MX.loja&&MX.loja.captura;
-  const pinta=c=>{f.classList.add('cor');f.style.background=`radial-gradient(120% 90% at 15% 0%,${c} 0%,#0b0f15 75%)`;};
+  const pinta=c=>{f.classList.add('cor');f.style.background=`radial-gradient(120% 90% at 15% 0%,${c} 0%,#000000 75%)`;};
   if(ss)f.style.backgroundImage=`url("${ss}")`;
   else if(MX!==undefined){if(MFUNDO[a])pinta(MFUNDO[a]);else corDaCapa(capaV(MJ.jogo)).then(c=>{MFUNDO[a]=c;if(MJ&&MJ.jogo.appid===a&&$('#fxFundo')===f)pinta(c);});}
   const t=$('#mbody .fx-trilho'),at=t&&t.querySelector('.atual');
@@ -1233,8 +1293,8 @@ function desenharGrafico(){
   const W=900,H=240,PL=58,PR=10,PT=10,PB=24;
   const maxY=Math.max(...vis.flatMap(([,p])=>p.map(x=>x[1])))*1.08||100;
   const X=t=>PL+(t-t0)/(agora-t0)*(W-PL-PR), Y=v=>PT+(1-v/maxY)*(H-PT-PB);
-  let g='';for(let i=0;i<=4;i++){const v=maxY*i/4;g+=`<line x1="${PL}" x2="${W-PR}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${PL-6}" y="${Y(v)+4}" fill="#8f98a0" font-size="11" text-anchor="end">${brl0(v)}</text>`;}
-  for(let i=0;i<=4;i++){const t=t0+(agora-t0)*i/4;g+=`<text x="${X(t)}" y="${H-6}" fill="#8f98a0" font-size="11" text-anchor="${i===0?'start':i===4?'end':'middle'}">${new Date(t).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','')}</text>`;}
+  let g='';for(let i=0;i<=4;i++){const v=maxY*i/4;g+=`<line x1="${PL}" x2="${W-PR}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${PL-6}" y="${Y(v)+4}" fill="#979797" font-size="11" text-anchor="end">${brl0(v)}</text>`;}
+  for(let i=0;i<=4;i++){const t=t0+(agora-t0)*i/4;g+=`<text x="${X(t)}" y="${H-6}" fill="#979797" font-size="11" text-anchor="${i===0?'start':i===4?'end':'middle'}">${new Date(t).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','')}</text>`;}
   const paths=vis.map(([n,p])=>{let d='';p.forEach((x,i)=>{d+=i?`H${X(x[0]).toFixed(1)}V${Y(x[1]).toFixed(1)}`:`M${X(x[0]).toFixed(1)},${Y(x[1]).toFixed(1)}`;});
     d+=`H${X(agora).toFixed(1)}`;return `<path d="${d}" fill="none" stroke="${cor[n]}" stroke-width="2"/>`;}).join('');
   box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${g}${paths}<line id="cur" y1="${PT}" y2="${H-PB}" stroke="rgba(255,255,255,.4)" visibility="hidden"/><rect x="${PL}" y="0" width="${W-PL-PR}" height="${H}" fill="transparent" id="ov"/></svg><div class="tip" id="tip"></div>`;
@@ -1270,9 +1330,9 @@ async function renderBib(){
   const univ=t.cheio+t.falta_cheio, pt=univ?100*t.cheio/univ:100, pp=univ?100*planC/univ:0;
   $('#bibMeta').innerHTML=`<div class="l"><span>Progresso da coleção, pelo preço cheio (seus jogos + DLCs que contam)</span><span><b>${pt.toFixed(1)}%</b>${planC?` → <b style="color:#8fb8ff">${(pt+pp).toFixed(1)}%</b> com o carrinho`:''}</span></div>
     <div class="mbar"><i class="t" style="width:${pt}%"></i><i class="p" style="width:${pp}%"></i></div>
-    <div class="l"><span><span class="leg"><i style="background:#a1cd44"></i>tenho ${brl0(t.cheio)}</span><span class="leg"><i style="background:#5a8fe0"></i>no carrinho ${brl0(planC)} (custa ${brl0(planH)} hoje)</span><span class="leg"><i style="background:#0e141b;box-shadow:inset 0 0 0 1px #2f4d64"></i>falta ${brl0(t.falta_cheio-planC)}</span></span>
+    <div class="l"><span><span class="leg"><i style="background:#a1cd44"></i>tenho ${brl0(t.cheio)}</span><span class="leg"><i style="background:#5a8fe0"></i>no carrinho ${brl0(planC)} (custa ${brl0(planH)} hoje)</span><span class="leg"><i style="background:#000000;box-shadow:inset 0 0 0 1px #333333"></i>falta ${brl0(t.falta_cheio-planC)}</span></span>
       <span>para completar: <b>${brl0(t.falta_hoje-planH)}</b> hoje${planH?' depois do carrinho':''}</span></div>`;
-  const notas=[];if(BD.sem_lista_dlc)notas.push(`${BD.sem_lista_dlc} jogos ainda sem lista de DLCs (o Radar completa em segundo plano)`);
+  const notas=[];if(BD.sem_lista_dlc)notas.push(`${BD.sem_lista_dlc} jogos ainda sem lista de DLCs (o Hunter completa em segundo plano)`);
   if(BD.sem_dados)notas.push(`${BD.sem_dados} itens sem página na loja (removidos ou ocultos; não entram na conta)`);if(!BD.atualizado)notas.push('a primeira leitura completa da biblioteca acontece na próxima checagem');
   $('#bibNote').textContent=notas.join(' · ');
   const q=S.bq;const J=BD.jogos.filter(g=>!q||g.nome.toLowerCase().includes(q));
@@ -1412,64 +1472,82 @@ async function renderNotif(){
 
 /* ================= configurações ================= */
 let CFG=null;
+const CFG_SECOES=[['avisos','Avisos','o que dispara um aviso'],['lojas','Lojas','de onde pode vir'],['notif','Notificações','no Windows, silêncio'],
+  ['freq','Frequência','de quanto em quanto tempo'],['steam','Steam inteira','todas as promoções'],['keyshops','Keyshops','GG.deals'],
+  ['dlc','DLCs','no custo completo'],['acesso','Celular e outros PCs','abrir pela rede']];
 async function renderCfg(){
   const d=await api('/api/config');CFG=d.config;const c=CFG;
   const lojas=[...new Set([...(d.lojas_itad||[]),...c.lojas])].sort((a,b)=>a.localeCompare(b));
   const marc=new Set(c.lojas.map(x=>x.toLowerCase()));
-  const num=(p,v,step,min,max)=>`<input type="number" data-k="${p}" value="${v}" step="${step||1}" min="${min??0}"${max!=null?` max="${max}"`:''}>`;
-  const chk=(p,v,l)=>`<label class="tick"><input type="checkbox" data-k="${p}" ${v?'checked':''}>${l}</label>`;
-  const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos;
-  $('#cfgForm').innerHTML=`<div class="cfg">
-   <div class="blk"><h4>Lojas que podem alertar</h4><div class="in">
-     <div class="lojas">${lojas.map(l=>`<label class="tick"><input type="checkbox" data-loja="${esc(l)}" ${marc.has(l.toLowerCase())?'checked':''}>${esc(l)}</label>`).join('')}</div>
-     ${chk('somente_drm_steam',c.somente_drm_steam,'Só chave ativável na Steam (DRM Steam)')}
-     <div class="hint">O Radar coleta todas as lojas; isto só decide de onde pode vir um alerta.</div></div></div>
-   <div class="blk"><h4>O que te avisa</h4><div class="in">
-     ${(()=>{const tp=a.tipos||{selo:true};return [['selo','~0,2 avisos por semana (0,7 em grandes promoções)'],['novo','~2 avisos por semana (6 em grandes promoções)'],
-       ['igual','~14 avisos por semana (34 em grandes promoções)'],['24m','~2 avisos por semana (3 em grandes promoções)']].map(([t,n])=>
-       `${chk('alerta.tipos.'+t,!!tp[t],TIPO_NOME[t])}<div class="hint" style="margin:-2px 0 8px 23px">${esc(TIPO_DESC[t])} · ${n}</div>`).join('');})()}
-     <label class="f">Desconto mínimo (%) ${num('alerta.desconto_minimo',a.desconto_minimo,5,0,100)}</label>
-     <div class="hint">Vale para Novo recorde, Igual e Menor em 2 anos.</div>
-     <label class="f">Selo Kurokami: desconto mínimo (%) ${num('alerta.selo_corte_minimo',a.selo_corte_minimo??0,5,0,100)}</label>
-     <div class="hint">Ligar um tipo não dispara avisos de tudo o que já está assim: você recebe um resumo e, daí em diante, só os próximos. Análises da Steam não decidem avisos.</div>
-     <label class="f">Tolerância acima do menor histórico (%) ${num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50)}</label>
-     <label class="f">Modo completo: dias de observação ${num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365)}</label></div></div>
-   <div class="blk"><h4>Promoções da Steam inteira</h4><div class="in">
-     ${chk('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam (aba Promoções → Steam inteira)')}
-     <label class="f">Atualizar a cada (minutos) ${num('intervalos_minutos.steam_inteira',iv.steam_inteira??60,15,30,1440)}</label>
-     <div class="hint">Também atualiza no "Verificar agora". Cada consulta substitui a anterior (não acumula espaço): ~1 MB num dia comum, ~16 MB e ~3 min em grande promoção. Não gera avisos: os avisos continuam só para a sua lista.</div></div></div>
-   <div class="blk"><h4>Keyshops (via GG.deals)</h4><div class="in">
-     ${chk('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata')}
-     <div class="hint">Desligado por padrão: a GG.deals dava muito alarme falso. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".</div>
-     <label class="f">Abaixo de (R$) ${num('keyshops.preco_maximo',k.preco_maximo,1,0)}</label>
-     <label class="f">ou abaixo de % do menor oficial ${num('keyshops.pct_do_menor_oficial',k.pct_do_menor_oficial,5,0,100)}</label></div></div>
-   <div class="blk"><h4>DLCs no custo completo</h4><div class="in">
-     ${chk('dlc.ignorar_cosmeticos',dl.ignorar_cosmeticos,'Ignorar cosméticos')}
-     ${chk('dlc.ignorar_extras',dl.ignorar_extras,'Ignorar extras (trilha, artbook)')}
-     ${chk('dlc.ignorar_atalhos',dl.ignorar_atalhos,'Ignorar atalhos e moedas')}
-     ${chk('dlc.ignorar_pacotes',dl.ignorar_pacotes,'Ignorar pacotes que juntam outras DLCs')}
-     ${chk('dlc.ignorar_gratis',dl.ignorar_gratis,'Ignorar DLCs gratuitas')}
-     <div class="hint">Cada DLC pode ser reclassificada na janela do jogo.</div></div></div>
-   <div class="blk"><h4>Notificações</h4><div class="in">
-     ${chk('notificacoes.ativas',n.ativas!==false,'Notificar no Windows')}
-     <label class="f">Máximo por checagem ${num('notificacoes.max_por_rodada',n.max_por_rodada??5,1,1,20)}</label>
-     <label class="f">Avisar de novo se cair (R$) ${num('notificacoes.melhora_minima_reais',n.melhora_minima_reais??0.5,0.5,0)}</label>
-     <label class="f">Avisar quando faltar (horas) para acabar ${num('notificacoes.termina_em_breve_horas',n.termina_em_breve_horas??24,1,0,168)}</label>
-     <div class="hint">Vale para o que está no carrinho ou que avisa. 0 desliga.</div>
-     ${chk('notificacoes.silencio.ativo',si.ativo,'Horário de silêncio')}
-     <label class="f">De <input type="time" data-k="notificacoes.silencio.de" value="${esc(si.de||'23:00')}"></label>
-     <label class="f">Até <input type="time" data-k="notificacoes.silencio.ate" value="${esc(si.ate||'08:00')}"></label></div></div>
-   <div class="blk"><h4>Frequência (minutos)</h4><div class="in">
-     <label class="f">Preços nas lojas (ITAD) ${num('intervalos_minutos.itad',iv.itad,5,10)}</label>
-     <label class="f">Keyshops (GG.deals) ${num('intervalos_minutos.ggdeals',iv.ggdeals,10,60)}</label>
-     <label class="f">Catálogo da Steam ${num('intervalos_minutos.steam',iv.steam,30,60)}</label>
-     <div class="hint">A GG.deals só atualiza de hora em hora; menos que 60 não ajuda.</div>
-     <label class="f">Verificação completa a cada (dias) ${num('verificacao_completa_dias',c.verificacao_completa_dias??7,1,0,90)}</label>
-     <button class="btn-ghost" id="btnTudo" type="button">Fazer a verificação completa agora</button>
-     <div class="hint">Rápida (a cada ${iv.itad} min e no "Verificar agora"): preços em todas as lojas. Completa: também catálogo da Steam, biblioteca, listas de DLC, edições, bundles e histórico, sem limite de ritmo. A primeira é sempre completa. 0 = completa só quando você pedir.</div></div></div>
-   <div class="blk"><h4>Acesso pelo celular / outros PCs</h4><div class="in" id="acesso">carregando…</div></div>
-  </div><div class="savebar"><button class="btn-go2" id="cfgSave">Salvar configurações</button></div>`;
-  $('#cfgSave').addEventListener('click',salvarCfg);renderAcesso();
+  // peças: linha (título, explicação, controle), interruptor e número com unidade
+  const row=(t,h,ctl)=>`<div class="cfg-row"><div class="cfg-t"><b>${t}</b>${h?`<span>${h}</span>`:''}</div><div class="cfg-c">${ctl}</div></div>`;
+  const sw=(p,v,t)=>`<label class="cfg-sw"><input type="checkbox" data-k="${p}" ${v?'checked':''} aria-label="${esc(t)}"><i></i></label>`;
+  const num=(p,v,step,min,max,un,pre)=>`<span class="cfg-num${pre?' pre':''}"><input type="number" data-k="${p}" value="${v}" step="${step||1}" min="${min??0}"${max!=null?` max="${max}"`:''}>${un?`<em>${un}</em>`:''}</span>`;
+  const swRow=(p,v,t,h)=>row(t,h,sw(p,v,t));
+  const sec=(id,t,p,corpo)=>`<section class="cfg-sec" data-sec="${id}" hidden><header><h3>${t}</h3>${p?`<p>${p}</p>`:''}</header>${corpo}</section>`;
+  const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
+  const FREQ={selo:'~0,2 avisos por semana (0,7 em grandes promoções)',novo:'~2 avisos por semana (6 em grandes promoções)',
+    igual:'~14 avisos por semana (34 em grandes promoções)','24m':'~2 avisos por semana (3 em grandes promoções)'};
+  const atual=ls.get('cfgSec','avisos');
+  $('#cfgForm').innerHTML=`<div class="cfgx">
+   <nav class="cfg-nav" role="tablist" aria-label="Seções das configurações">${CFG_SECOES.map(([id,t,sub])=>
+     `<button type="button" role="tab" data-sec="${id}" aria-selected="${id===atual}">${t}<small>${sub}</small></button>`).join('')}</nav>
+   <div class="cfg-main">
+   ${sec('avisos','Avisos','Que tipo de preço vira notificação. Ligar um tipo não dispara avisos de tudo o que já está assim: você recebe um resumo e, daí em diante, só os próximos.',
+     `<div class="cfg-card"><h4>Tipos de aviso</h4>${['selo','novo','igual','24m'].map(t=>swRow('alerta.tipos.'+t,!!tp[t],TIPO_NOME[t],`${esc(TIPO_DESC[t])} · ${FREQ[t]}`)).join('')}</div>
+     <div class="cfg-card"><h4>Limites</h4>
+      ${row('Desconto mínimo','Vale para Novo recorde, Igual e Menor em 2 anos.',num('alerta.desconto_minimo',a.desconto_minimo,5,0,100,'%'))}
+      ${row('Selo Kurokami: desconto mínimo','Corte só para o Selo.',num('alerta.selo_corte_minimo',a.selo_corte_minimo??0,5,0,100,'%'))}
+      ${row('Tolerância acima do menor histórico','',num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50,'%'))}
+      ${row('Modo completo: dias de observação','',num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365,'dias'))}
+      <div class="cfg-nota">Análises da Steam não decidem avisos.</div></div>`)}
+   ${sec('lojas','Lojas','O Hunter coleta todas as lojas; aqui você decide de quais pode vir um alerta.',
+     `<div class="cfg-card">${swRow('somente_drm_steam',c.somente_drm_steam,'Só chave ativável na Steam','Só alerta quando a chave ativa na Steam (DRM Steam).')}
+      ${row('Lojas que podem alertar',`<span id="ljN"></span>`,'<button class="btn-ghost" type="button" data-lj="1">Todas</button><button class="btn-ghost" type="button" data-lj="0">Nenhuma</button>')}
+      <div class="cfg-lojas">${lojas.map(l=>`<label class="cfg-lj"><input type="checkbox" data-loja="${esc(l)}" ${marc.has(l.toLowerCase())?'checked':''}>${esc(l)}</label>`).join('')}</div></div>`)}
+   ${sec('notif','Notificações','Os avisos aparecem no canto da tela do Windows. O histórico fica em Configurações → Notificações.',
+     `<div class="cfg-card">${swRow('notificacoes.ativas',n.ativas!==false,'Notificar no Windows','')}
+      ${row('Máximo por checagem','',num('notificacoes.max_por_rodada',n.max_por_rodada??5,1,1,20))}
+      ${row('Avisar de novo se cair','Um jogo já avisado só avisa de novo se baixar pelo menos isto.',num('notificacoes.melhora_minima_reais',n.melhora_minima_reais??0.5,0.5,0,null,'R$',1))}
+      ${row('Avisar quando a promoção estiver acabando','Vale para o que está no carrinho ou que avisa. 0 desliga.',num('notificacoes.termina_em_breve_horas',n.termina_em_breve_horas??24,1,0,168,'horas antes'))}
+      ${row('Horário de silêncio','Sem notificações nesse intervalo.',`${sw('notificacoes.silencio.ativo',si.ativo,'Horário de silêncio')}<span>de</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.de" value="${esc(si.de||'23:00')}"><span>até</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.ate" value="${esc(si.ate||'08:00')}">`)}</div>`)}
+   ${sec('freq','Frequência','De quanto em quanto tempo o Hunter busca preços. A primeira verificação é sempre completa.',
+     `<div class="cfg-card"><h4>Verificação rápida</h4>
+      ${row('Preços nas lojas (ITAD)',`A cada ${iv.itad} min e no "Verificar agora": preços em todas as lojas.`,num('intervalos_minutos.itad',iv.itad,5,10,null,'min'))}
+      ${row('Keyshops (GG.deals)','A GG.deals só atualiza de hora em hora; menos que 60 não ajuda.',num('intervalos_minutos.ggdeals',iv.ggdeals,10,60,null,'min'))}
+      ${row('Catálogo da Steam','',num('intervalos_minutos.steam',iv.steam,30,60,null,'min'))}</div>
+     <div class="cfg-card"><h4>Verificação completa</h4>
+      ${row('Fazer a completa a cada','Também catálogo da Steam, biblioteca, listas de DLC, edições, bundles e histórico, sem limite de ritmo. 0 = só quando você pedir.',num('verificacao_completa_dias',c.verificacao_completa_dias??7,1,0,90,'dias'))}
+      ${row('Verificação completa agora','Acompanhe pelo status no topo.','<button class="btn-ghost" id="btnTudo" type="button">Começar agora</button>')}</div>`)}
+   ${sec('steam','Steam inteira','Todas as promoções da Steam, além da sua lista (Ofertas → Promoções → Steam inteira).',
+     `<div class="cfg-card">${swRow('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam','Não gera avisos: os avisos continuam só para a sua lista.')}
+      ${row('Atualizar a cada','Também atualiza no "Verificar agora". Cada consulta substitui a anterior: ~1 MB num dia comum, ~16 MB e ~3 min em grande promoção.',num('intervalos_minutos.steam_inteira',iv.steam_inteira??60,15,30,1440,'min'))}</div>`)}
+   ${sec('keyshops','Keyshops','Preços de lojas de chaves, via GG.deals. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".',
+     `<div class="cfg-card">${swRow('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata','Desligado por padrão: a GG.deals dava muito alarme falso.')}
+      ${row('Abaixo de','',num('keyshops.preco_maximo',k.preco_maximo,1,0,null,'R$',1))}
+      ${row('ou abaixo de','Porcentagem do menor preço oficial.',num('keyshops.pct_do_menor_oficial',k.pct_do_menor_oficial,5,0,100,'%'))}</div>`)}
+   ${sec('dlc','DLCs','O que entra no custo completo de um jogo (jogo + DLCs). Cada DLC pode ser reclassificada na ficha do jogo.',
+     `<div class="cfg-card">${swRow('dlc.ignorar_cosmeticos',dl.ignorar_cosmeticos,'Ignorar cosméticos','Skins, roupas, visuais.')}
+      ${swRow('dlc.ignorar_extras',dl.ignorar_extras,'Ignorar extras','Trilha sonora, artbook.')}
+      ${swRow('dlc.ignorar_atalhos',dl.ignorar_atalhos,'Ignorar atalhos e moedas','')}
+      ${swRow('dlc.ignorar_pacotes',dl.ignorar_pacotes,'Ignorar pacotes que juntam outras DLCs','')}
+      ${swRow('dlc.ignorar_gratis',dl.ignorar_gratis,'Ignorar DLCs gratuitas','')}</div>`)}
+   ${sec('acesso','Celular e outros PCs','Abrir o painel pelo celular ou por outro computador da mesma rede Wi-Fi. Esta parte salva na hora.',
+     `<div class="cfg-card"><div class="cfg-in" id="acesso">carregando…</div></div>`)}
+   </div></div>
+   <div class="cfg-save" id="cfgSaveBar" hidden><span>Alterações não salvas</span><button class="btn-ghost" id="cfgDesc" type="button">Descartar</button><button class="btn-go2" id="cfgSave" type="button">Salvar</button></div>`;
+  const f=$('#cfgForm'),q=x=>[...f.querySelectorAll(x)];
+  const mostrar=id=>{if(!CFG_SECOES.some(x=>x[0]===id))id='avisos';ls.set('cfgSec',id);
+    q('.cfg-nav [data-sec]').forEach(b=>b.setAttribute('aria-selected',b.dataset.sec===id));q('.cfg-sec').forEach(x=>x.hidden=x.dataset.sec!==id);};
+  mostrar(atual);
+  f.querySelector('.cfg-nav').addEventListener('click',e=>{const b=e.target.closest('[data-sec]');if(b)mostrar(b.dataset.sec);});
+  const contaLojas=()=>{const t=q('[data-loja]');$('#ljN').textContent=`${t.filter(x=>x.checked).length} de ${t.length} marcadas`;};contaLojas();
+  const sujo=()=>{$('#cfgSaveBar').hidden=false;};
+  if(!f.dataset.ouvindo){f.dataset.ouvindo=1;  // #cfgForm fica; os ouvintes entram uma vez só (re-render e Descartar não somam)
+  f.addEventListener('click',e=>{const b=e.target.closest('[data-lj]');if(!b)return;q('[data-loja]').forEach(x=>x.checked=b.dataset.lj==='1');contaLojas();sujo();});
+  const mudou=e=>{if(e.target.closest('#acesso')||!e.target.matches('[data-k],[data-loja]'))return;if(e.target.dataset.loja!=null)contaLojas();sujo();};
+  f.addEventListener('input',mudou);f.addEventListener('change',mudou);}
+  $('#cfgSave').addEventListener('click',salvarCfg);$('#cfgDesc').addEventListener('click',()=>{renderCfg();toast('Alterações descartadas');});renderAcesso();
   $('#btnTudo').addEventListener('click',async()=>{const r=await post('/api/atualizar_tudo');if(r.ok)toast('Atualização completa começou. Acompanhe pelo status no topo.');});
 }
 async function renderAcesso(){
@@ -1491,6 +1569,7 @@ async function salvarCfg(){
   $$('#cfgForm [data-k]').forEach(el=>{const v=el.type==='checkbox'?el.checked:(el.type==='number'||el.dataset.num)?(el.value===''?0:+el.value):el.value;setPath(c,el.dataset.k,v);});
   c.lojas=$$('#cfgForm [data-loja]').filter(el=>el.checked).map(el=>el.dataset.loja);
   const r=await post('/api/config',{config:c});toast(r.ok?'Salvo. Vale a partir da próxima checagem (use "Verificar agora").':'Erro: '+(r.erro||'?'));
+  if(r.ok){CFG=c;$('#cfgSaveBar').hidden=true;}
 }
 
 /* ================= conta Steam (topo) ================= */
@@ -1498,7 +1577,7 @@ async function carregarConta(){
   const el=$('#contaSteam');if(!el)return;
   let c;try{c=(await api('/api/config')).config;}catch(e){return;}
   const p=String(c.perfil_steam||''),local=['localhost','127.0.0.1'].includes(location.hostname),id=/^\d{17}$/.test(p);
-  const dica='Você confirma na página da própria Steam. O Radar só recebe o seu SteamID: nunca a senha, token ou cookie.';
+  const dica='Você confirma na página da própria Steam. O Hunter só recebe o seu SteamID: nunca a senha, token ou cookie.';
   if(!p){el.innerHTML=local?`<a class="btn-imp" href="/kurokami/steam/entrar" title="${esc(dica)}">Entrar pela Steam</a>`:'<span class="chip-steam" title="Abra o painel no próprio PC (localhost) para entrar pela Steam">Entrar: só no PC</span>';return;}
   const pf=(RES&&RES.perfil)||{},curto=p.replace(/\/+$/,'').split('/').pop(),nome=pf.nome||(id?'Steam …'+p.slice(-4):curto.slice(0,16));
   const url=id?`https://steamcommunity.com/profiles/${p}/`:/^https:\/\/steamcommunity\.com\//.test(p)?p:`https://steamcommunity.com/id/${encodeURIComponent(curto)}/`;
@@ -1508,7 +1587,7 @@ async function carregarConta(){
 /* QR (endereço do painel para o celular, em Configurações) */
 function comQR(fn){if(window.QRCode)return fn();const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';sc.integrity='sha384-3zSEDfvllQohrq0PHL1fOXJuC/jSOO34H46t6UQfobFOmxE5BpjjaIJY5F2/bMnU';sc.crossOrigin='anonymous';sc.onload=fn;document.head.appendChild(sc);}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharBusca();});
-/* ---- Finalizar pedido: abre o carrinho da Steam com o pedido no endereço; a extensão do Radar põe os itens lá ---- */
+/* ---- Finalizar pedido: abre o carrinho da Steam com o pedido no endereço; a extensão do Hunter põe os itens lá ---- */
 /* assistente da extensão: neste PC, sem a extensão, uma faixa no topo pede permissão e conduz a instalação.
    O navegador não deixa programa nenhum instalar extensão sozinho; o usuário liga o Modo do desenvolvedor e arrasta a pasta. */
 const temExt=()=>!!document.documentElement.dataset.kurokamiExt;
@@ -1521,8 +1600,8 @@ function faixaExt(forcar){
   let depois=false;try{depois=!!sessionStorage.getItem('kr:ext_depois');}catch(e){}
   if(!forcar&&(ls.get('ext_nao',0)||depois))return;
   const d=document.createElement('div');d.id='aviso-ext';
-  d.style.cssText='background:#2a475e;color:#fff;padding:10px 16px;text-align:center;font-size:12.5px;line-height:1.7';
-  d.innerHTML=`O <b>Finalizar pedido</b> põe os jogos no carrinho da Steam sozinho com a <b>extensão do Radar</b>. Instalar agora? É uma vez só e leva menos de um minuto.
+  d.style.cssText='background:#1f1f1f;color:#fff;padding:10px 16px;text-align:center;font-size:12.5px;line-height:1.7';
+  d.innerHTML=`O <b>Finalizar pedido</b> põe os jogos no carrinho da Steam sozinho com a <b>extensão do Hunter</b>. Instalar agora? É uma vez só e leva menos de um minuto.
     <button class="btn-imp" id="extSim" type="button" style="margin-left:8px">Instalar</button> <button class="btn-ghost" id="extDepois" type="button">Agora não</button> <button class="btn-ghost" id="extNunca" type="button">Não perguntar mais</button>`;
   document.body.prepend(d);
   $('#extSim').onclick=instalarExt;
@@ -1539,13 +1618,13 @@ async function instalarExt(){
     <li><b>Arraste a pasta <code>extensao</code></b> do Explorador para a página de extensões. Ou clique em <b>Carregar sem compactação</b> e escolha a pasta${copiado?' (o caminho já está copiado: cole na barra de endereço da janela)':''}: <code style="user-select:all;word-break:break-all">${esc(r.pasta)}</code></li>
     <li>Volte aqui e clique em <b>Pronto</b>.</li></ol>
     <button class="btn-imp" id="extPronto" type="button">Pronto</button> <button class="btn-ghost" id="extFechar" type="button">Fechar</button>
-    <span style="font-size:11px;color:#c7d5e0;margin-left:8px">Ela só age na página do carrinho da Steam; o Radar nunca vê senha, token ou cookie.</span></div>`;
+    <span style="font-size:11px;color:#d2d2d2;margin-left:8px">Ela só age na página do carrinho da Steam; o Hunter nunca vê senha, token ou cookie.</span></div>`;
   $('#extPronto').onclick=()=>{try{sessionStorage.setItem('kr:ext_conferir','1');}catch(e){}location.reload();};
   $('#extFechar').onclick=()=>d.remove();
 }
 function conferirExt(){   // depois do "Pronto": a página recarregou; a extensão marcou o <html>?
   let conferir=false;try{conferir=!!sessionStorage.getItem('kr:ext_conferir');sessionStorage.removeItem('kr:ext_conferir');}catch(e){}
-  if(conferir&&temExt()){toast('Extensão do Radar instalada ✓ O Finalizar pedido já põe os jogos no carrinho da Steam.');return;}
+  if(conferir&&temExt()){toast('Extensão do Hunter instalada ✓ O Finalizar pedido já põe os jogos no carrinho da Steam.');return;}
   if(conferir){faixaExt(true);toast('Ainda não encontrei a extensão. Clique em Instalar para ver os passos de novo.');return;}
   faixaExt(false);
 }
@@ -1553,13 +1632,13 @@ async function finalizar(){
   if(!CD)return;
   const nota=$('#finalNota');nota.innerHTML='';
   if(!(CD.itens.filter(c=>!c.possuido).length+CD.bundles.length)){toast('O carrinho está vazio.');return;}
-  if(!temExt()){faixaExt(true);window.scrollTo(0,0);toast('Instale a extensão do Radar (faixa no topo) e clique em Finalizar pedido de novo.');return;}
+  if(!temExt()){faixaExt(true);window.scrollTo(0,0);toast('Instale a extensão do Hunter (faixa no topo) e clique em Finalizar pedido de novo.');return;}
   const w=window.open('about:blank','_blank');if(w)w.opener=null;   // abre já, no clique (o navegador não bloqueia); a Steam não alcança o painel
   const b=$('#btnFinalizar');b.disabled=true;let r;try{r=await post('/api/steam/carrinho');}finally{b.disabled=false;}
   if(!r.ok){if(w)w.close();toast('Erro: '+(r.erro||'?'));}
   else{
     if(w)w.location=r.url;else nota.innerHTML=`<a class="btn-ghost" href="${esc(r.url)}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir o carrinho da Steam</a>`;
-    toast(`${r.n} item(ns) a caminho do carrinho da Steam: a extensão do Radar adiciona na aba que abriu. Conclua o pagamento lá.`);
+    toast(`${r.n} item(ns) a caminho do carrinho da Steam: a extensão do Hunter adiciona na aba que abriu. Conclua o pagamento lá.`);
   }
   if((r.sem_pacote||[]).length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#e2a635;font-size:11.5px">Sem pacote conhecido (abra a página): ${r.sem_pacote.map(esc).join(', ')}</div>`);
 }
@@ -1572,21 +1651,21 @@ async function carregarResumo(){
   RES=await api('/api/resumo');$('#ver').textContent=RES.versao;
   if(RES.userdata_dias!=null&&RES.userdata_dias>30&&!$('#aviso-ud')){const d=document.createElement('div');d.id='aviso-ud';
     d.style.cssText='background:#3e76cb;color:#fff;padding:8px 16px;text-align:center;font-size:12.5px';
-    d.innerHTML=`Seu <b>userdata.json</b> tem ${RES.userdata_dias} dias: DLCs compradas depois disso não aparecem como suas. Abra a loja da Steam logado (com a extensão do Radar 1.1 ou mais nova ele se atualiza sozinho) ou use "Já tenho" no jogo.`;
+    d.innerHTML=`Seu <b>userdata.json</b> tem ${RES.userdata_dias} dias: DLCs compradas depois disso não aparecem como suas. Abra a loja da Steam logado (com a extensão do Hunter 1.1 ou mais nova ele se atualiza sozinho) ou use "Já tenho" no jogo.`;
     document.body.prepend(d);}
   const at=RES.atualizacao;if(at&&at.tem_nova&&!$('#aviso-att')){const d=document.createElement('div');d.id='aviso-att';
     d.style.cssText='background:#4c6b22;color:#fff;padding:8px 16px;text-align:center;font-size:13px';
-    d.innerHTML=`Versão nova do Kurokami Radar: <b>${esc(at.nova)}</b> (você tem a ${esc(at.atual)}). <button id="btnAtt" style="margin-left:10px;background:#beee11;color:#1b2838;border:0;padding:4px 10px;cursor:pointer;font-weight:bold">Atualizar agora</button> <a href="${esc(at.pagina)}" target="_blank" rel="noopener" style="color:#d9f99d;margin-left:8px">novidades</a>`;
+    d.innerHTML=`Versão nova do Kurokami Hunter: <b>${esc(at.nova)}</b> (você tem a ${esc(at.atual)}). <button id="btnAtt" style="margin-left:10px;background:#beee11;color:#050505;border:0;padding:4px 10px;cursor:pointer;font-weight:bold">Atualizar agora</button> <a href="${esc(at.pagina)}" target="_blank" rel="noopener" style="color:#d9f99d;margin-left:8px">novidades</a>`;
     document.body.prepend(d);$('#btnAtt').onclick=async()=>{await post('/api/atualizar_app');toast('Abrindo a janela de atualização…');};}
   const bf=RES.biblioteca_falhou;if($('#aviso-bib')&&!bf)$('#aviso-bib').remove();
   if(bf&&!$('#aviso-bib')){const d=document.createElement('div');d.id='aviso-bib';
     d.style.cssText='background:#a8611c;color:#fff;padding:8px 16px;text-align:center;font-size:12.5px';
     const recusada=/\b(401|403)\b/.test(bf.erro||'');
-    d.innerHTML=`A biblioteca não atualizou em ${fmtISO(bf.quando)}: a API da Steam falhou (${esc(bf.erro||'')}).${bf.mantida?' Mantive a biblioteca anterior.':''}${recusada?' A chave da Web API foi recusada: gere outra em steamcommunity.com/dev/apikey e cole em <b>Chaves e perfil…</b> (botão direito no ícone do Radar, perto do relógio).':''}`;
+    d.innerHTML=`A biblioteca não atualizou em ${fmtISO(bf.quando)}: a API da Steam falhou (${esc(bf.erro||'')}).${bf.mantida?' Mantive a biblioteca anterior.':''}${recusada?' A chave da Web API foi recusada: gere outra em steamcommunity.com/dev/apikey e cole em <b>Chaves e perfil…</b> (botão direito no ícone do Hunter, perto do relógio).':''}`;
     document.body.prepend(d);}
   if(RES.versao!==VERSAO_PAGINA&&!$('#aviso-versao')){const d=document.createElement('div');d.id='aviso-versao';
     d.style.cssText='background:#d6492f;color:#fff;padding:10px 16px;text-align:center;font-size:13px';
-    d.innerHTML=`O Radar que está rodando é a versão <b>${esc(RES.versao)}</b>, mas os arquivos são da <b>${VERSAO_PAGINA}</b>. Clique com o direito no ícone da bandeja → <b>Sair</b> e abra de novo (ou "Reiniciar", nas versões novas).`;
+    d.innerHTML=`O Hunter que está rodando é a versão <b>${esc(RES.versao)}</b>, mas os arquivos são da <b>${VERSAO_PAGINA}</b>. Clique com o direito no ícone da bandeja → <b>Sair</b> e abra de novo (ou "Reiniciar", nas versões novas).`;
     document.body.prepend(d);}
   const P=RES.progresso||{};const pct=P.total?Math.round(100*P.atual/P.total):null;
   let t=`<span id="stTopo"><b>${nVitrine()??'…'}</b> na vitrine · ${fmtN(RES.na_lista)} na lista</span>`;
@@ -1605,8 +1684,8 @@ function renderProg(){const P=RES.progresso||{};const u=P.ultima;const min=s=>s>
       ${P.total?`<div class="bar"><i style="width:${100*P.atual/P.total}%"></i></div>`:''}<pre>${esc((P.log||[]).join('\n'))}</pre>`:
     `<h5>Nenhuma verificação rodando agora</h5>
      ${u?`<div>Última: ${u.modo==='completa'?'completa':'rápida'}, ${u.ok?'ok':'<span style="color:#ef6f6a">com erro</span>'} em ${min(u.duracao)} · ${esc(u.resumo||'')}</div>`:''}
-     <div style="margin-top:6px;color:#8f98a0">Próxima rápida: ${fmtISO(RES.proxima)||'—'} · Última completa: ${fmtISO(RES.ult_completa)||'nunca'}${RES.completa_dias?` · completa a cada ${RES.completa_dias} dias`:''}</div>
-     <div style="margin-top:6px;color:#8f98a0">Rápida: preços nas lojas (a cada 30 min). Completa: também catálogo, biblioteca, DLCs, edições e histórico, sem limite de ritmo.</div>
+     <div style="margin-top:6px;color:#979797">Próxima rápida: ${fmtISO(RES.proxima)||'—'} · Última completa: ${fmtISO(RES.ult_completa)||'nunca'}${RES.completa_dias?` · completa a cada ${RES.completa_dias} dias`:''}</div>
+     <div style="margin-top:6px;color:#979797">Rápida: preços nas lojas (a cada 30 min). Completa: também catálogo, biblioteca, DLCs, edições e histórico, sem limite de ritmo.</div>
      ${(P.log||[]).length?`<pre>${esc(P.log.join('\n'))}</pre>`:''}`;}
 $('#status').addEventListener('click',()=>{$('#progBox').hidden=!$('#progBox').hidden;if(!$('#progBox').hidden)renderProg();});
 document.addEventListener('click',e=>{if(!e.target.closest('#progBox')&&!e.target.closest('#status'))$('#progBox').hidden=true;});

@@ -8,7 +8,7 @@
 - 08 — Layout em etapas: inventário, referência, base visual, uma aba por vez, celular (a escrever)
 
 ## Feitas
-- [06 — Login Steam: "Entrar pela Steam" (OpenID) feito em v0.16.0; o QR foi descartado e o carrinho vai pela extensão do Radar](specs/06-login-steam.md)
+- [06 — Login Steam: "Entrar pela Steam" (OpenID) feito em v0.16.0; o QR foi descartado e o carrinho vai pela extensão do Hunter](specs/06-login-steam.md)
 - [04 — Vitrine, aba Promoções e avisos por tipo de recorde (feito em v0.15.0)](specs/04-vitrine-promocoes-e-avisos.md)
 - [01 — Raridade v2, Selo Kurokami e fim da avaliação como métrica (feito em v0.14.0)](specs/01-selo-kurokami-e-raridade.md)
 - [02 — DLCs não aparecem (feito em v0.13.0)](specs/02-dlcs-nao-aparecem.md)
@@ -17,7 +17,7 @@
 
 Em ordem aproximada de valor. Nada aqui foi iniciado.
 
-- **Vídeo de abertura do painel** (pedido do dono, 09/10, "coisa para depois"): uma animação curta ao abrir o Radar.
+- **Vídeo de abertura do painel** (pedido do dono, 09/10, "coisa para depois"): uma animação curta ao abrir o Hunter.
 - **Telegram**: mesmo alerta no celular fora de casa (bot gratuito; token no keyring).
 - **Bundles de outras lojas** (Humble, Fanatical) via ITAD `games/bundles/v2`.
 - **Hype Games e 2Game**: fora da ITAD; só lendo o site (frágil).

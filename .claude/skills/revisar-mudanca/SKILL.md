@@ -1,6 +1,6 @@
 ---
 name: revisar-mudanca
-description: Checklist final antes de dar uma tarefa do Kurokami Radar por concluída (checagens automáticas, revisão do diff, docs, versão, o que testar no Windows). Use sempre ao terminar qualquer mudança de código, antes de responder "pronto" ao usuário.
+description: Checklist final antes de dar uma tarefa do Kurokami Hunter por concluída (checagens automáticas, revisão do diff, docs, versão, o que testar no Windows). Use sempre ao terminar qualquer mudança de código, antes de responder "pronto" ao usuário.
 ---
 
 # Revisar mudança

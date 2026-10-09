@@ -1,7 +1,7 @@
 # Estrutura de arquivos
 
 ```
-Kurokami Radar/
+Kurokami Hunter/
 ├── radar.py                 # CLI e ponto de entrada (também do .exe); sem args no .exe = bandeja
 ├── radar/                   # pacote principal
 │   ├── __init__.py          # VERSAO (fonte única da versão)
@@ -51,7 +51,7 @@ Kurokami Radar/
 │   ├── medir_spec04.py      # spec 04: vitrine, avisos de hoje (regra atual × só Selo), userdata, DLCs em promoção, tempo do /api/lista
 │   ├── testar_openid.py     # testes sem rede da validação do OpenID (recusas: state, endereço, assinatura, nonce); entra no checar.py
 │   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê; --retrato grava os preços
-│   ├── regua_steam.py       # spec 04 (1c): o Radar × "só a Steam" nos recordes raros, storeLow da ITAD e custo do histórico da Steam inteira
+│   ├── regua_steam.py       # spec 04 (1c): o Hunter × "só a Steam" nos recordes raros, storeLow da ITAD e custo do histórico da Steam inteira
 │   ├── testar_piso.py       # testes sintéticos do piso, Lendário, Selo (só G), tipos e "Costuma voltar", sem rede nem banco
 │   ├── testar_avisos.py     # regra de aviso da 0.15 numa cópia do banco (só Selo, ligar/desligar tipos, resumo ao ligar)
 │   ├── testar_promocoes.py  # /api/promocoes e /api/vitrine numa cópia do banco (tempos, filtros, ordenação, 400)

@@ -1,6 +1,6 @@
 # Arquitetura
 
-Kurokami Radar é um app **local** de Windows (Python 3.12) que monitora a lista de desejos da Steam em várias lojas, guarda o histórico de preços em SQLite, notifica pela central do Windows e serve um painel web em `http://localhost/kurokami`. Não existe servidor do projeto: cada usuário roda tudo no próprio PC, com as próprias chaves de API.
+Kurokami Hunter é um app **local** de Windows (Python 3.12) que monitora a lista de desejos da Steam em várias lojas, guarda o histórico de preços em SQLite, notifica pela central do Windows e serve um painel web em `http://localhost/kurokami`. Não existe servidor do projeto: cada usuário roda tudo no próprio PC, com as próprias chaves de API.
 
 ## Visão geral
 
@@ -22,7 +22,7 @@ Kurokami Radar é um app **local** de Windows (Python 3.12) que monitora a lista
 
 - **Processo único.** A bandeja é o processo principal. O serviço de coleta e o servidor do painel são threads dele. Uma porta-trava (`127.0.0.1:47811`) impede duas cópias.
 - **Janelas Tk** (chaves, atualização) rodam em **processo separado** (`KurokamiRadar.exe chaves` / `atualizar-app`), porque o pystray ocupa a thread principal.
-- **Notificações**: `notificar.py` monta XML de toast e chama PowerShell (`-EncodedCommand`, janela oculta). O app se registra em `HKCU\Software\Classes\AppUserModelId\Kurokami.Radar` para aparecer com nome e ícone.
+- **Notificações**: `notificar.py` monta XML de toast e chama PowerShell (`-EncodedCommand`, janela oculta). O app se registra em `HKCU\Software\Classes\AppUserModelId\Kurokami.Hunter` para aparecer com nome e ícone.
 
 ## Fontes de dados e o papel de cada uma
 
@@ -84,10 +84,10 @@ Linha de base na primeira vez (não dispara nada em massa) → ao **ligar um tip
 
 ## Conta Steam (opcional)
 
-**Entrar pela Steam** (`steam_openid.py`, OpenID 2.0, opcional): só o SteamID, gravado em `perfil_steam`. **Finalizar pedido** (aba Carrinho): `POST /api/steam/carrinho` devolve o endereço `store.steampowered.com/cart/#kurokami=…` com os pacotes/bundles e modos; o painel o abre numa aba e a extensão do Radar (`extensao/`: `carrinho.js` na página do carrinho, `fundo.js` faz as chamadas a `IAccountCartService`, `painel.js` só marca `data-kurokami-ext` no painel) põe os itens com a sessão da própria página, confere e recarrega. Sem a extensão, o painel (só no próprio PC) mostra ao abrir uma faixa "Instalar a extensão do carrinho?" (Instalar / Agora não, pela sessão / Não perguntar mais, `localStorage kr:ext_nao`); Instalar abre a página de extensões do navegador padrão e a pasta, copia o caminho e explica: ligar o Modo do desenvolvedor e arrastar a pasta. "Pronto" recarrega e confere a marca. Programa nenhum consegue instalar extensão sozinho: o Chrome desligou o `--load-extension` em 2025 e registro/políticas só aceitam extensões da Chrome Web Store. Ver `docs/decisoes.md`, "Login Steam".
+**Entrar pela Steam** (`steam_openid.py`, OpenID 2.0, opcional): só o SteamID, gravado em `perfil_steam`. **Finalizar pedido** (aba Carrinho): `POST /api/steam/carrinho` devolve o endereço `store.steampowered.com/cart/#kurokami=…` com os pacotes/bundles e modos; o painel o abre numa aba e a extensão do Hunter (`extensao/`: `carrinho.js` na página do carrinho, `fundo.js` faz as chamadas a `IAccountCartService`, `painel.js` só marca `data-kurokami-ext` no painel) põe os itens com a sessão da própria página, confere e recarrega. Sem a extensão, o painel (só no próprio PC) mostra ao abrir uma faixa "Instalar a extensão do carrinho?" (Instalar / Agora não, pela sessão / Não perguntar mais, `localStorage kr:ext_nao`); Instalar abre a página de extensões do navegador padrão e a pasta, copia o caminho e explica: ligar o Modo do desenvolvedor e arrastar a pasta. "Pronto" recarrega e confere a marca. Programa nenhum consegue instalar extensão sozinho: o Chrome desligou o `--load-extension` em 2025 e registro/políticas só aceitam extensões da Chrome Web Store. Ver `docs/decisoes.md`, "Login Steam".
 
 ## Distribuição
 
 - **Pelo código**: `KurokamiRadar_Setup_vX.bat` (payload base64 de um zip) instala em `C:\Kurokami Radar`.
-- **Instalado**: GitHub Actions → PyInstaller (onedir, windowed) → Inno Setup → `KurokamiRadar_Setup_vX.exe` em Releases. Programa em `%LOCALAPPDATA%\Programs\Kurokami Radar`, dados em `%LOCALAPPDATA%\Kurokami Radar` (`caminhos.py` decide pelo `sys.frozen`).
+- **Instalado**: GitHub Actions → PyInstaller (onedir, windowed) → Inno Setup → `KurokamiRadar_Setup_vX.exe` em Releases. Programa em `%LOCALAPPDATA%\Programs\Kurokami Hunter` (quem instalou antes da 0.17 continua em `...\Kurokami Radar`: o Inno Setup reaproveita a pasta), dados em `%LOCALAPPDATA%\Kurokami Radar` (`caminhos.py` decide pelo `sys.frozen`).
 - **Atualização**: `atualizador.py` consulta `api.github.com/repos/<atualizacao.repo>/releases/latest` ao abrir e a cada 24 h; baixa o `.exe` do release e roda `/VERYSILENT`; o instalador reabre o app (`Check: WizardSilent`).

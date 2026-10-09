@@ -1,6 +1,6 @@
 ---
 name: kurokami-code
-description: Fluxo padrão para qualquer tarefa de programação no Kurokami Radar (funcionalidade nova, correção, ajuste visual, refatoração). Use SEMPRE no início de uma tarefa de código neste repositório, mesmo que o pedido pareça pequeno; ela diz qual outra skill abrir e em que ordem trabalhar.
+description: Fluxo padrão para qualquer tarefa de programação no Kurokami Hunter (funcionalidade nova, correção, ajuste visual, refatoração). Use SEMPRE no início de uma tarefa de código neste repositório, mesmo que o pedido pareça pequeno; ela diz qual outra skill abrir e em que ordem trabalhar.
 ---
 
 # Kurokami Code — por onde começar

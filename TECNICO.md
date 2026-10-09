@@ -1,14 +1,14 @@
-# Kurokami Radar — detalhes técnicos
+# Kurokami Hunter — detalhes técnicos
 
 Monitora a lista de desejos da Steam em várias lojas, guarda o histórico de preços num banco local e avisa pela central de notificações do Windows quando um jogo chega no menor histórico com os seus filtros.
 
 ## Uso diário
 
-- `pyw radar.py bandeja` abre o Radar na bandeja, perto do relógio. Ele checa sozinho a cada `intervalos_minutos.itad` (30 min) e notifica.
+- `pyw radar.py bandeja` abre o Hunter na bandeja, perto do relógio. Ele checa sozinho a cada `intervalos_minutos.itad` (30 min) e notifica.
 - `py radar.py inicio instalar` faz ele abrir sozinho quando você entra no Windows (tarefa agendada; sem admin, vira um atalho em Inicializar). `inicio remover` desfaz.
 - **Painel** em http://127.0.0.1:8787 (clique no ícone da bandeja): abas *Vale a pena*, *Lista de desejos* (filtros, três visualizações, cartão ao passar o mouse), *Notificações* e *Configurações*. Clicar num jogo abre o histórico de preços por loja, as lojas agora, as formas de comprar e as DLCs, que dá para reclassificar ali mesmo. O painel só aceita conexões do próprio PC.
 - **Carrinho** (aba do painel): simule uma compra. Ponha jogos pelo **+** das listas, pela ficha do jogo, pela busca ou trazendo o carrinho da Steam. Escolha a loja de cada um, veja total, economia, quanto falta para os pisos e um orçamento. Se um bundle da Steam cobrir 2+ jogos do carrinho mais barato, ele aparece embaixo, já descontando o que você tem.
-- **Adicionar jogo**: busque por nome, appid ou link da Steam. "Só monitorar" coloca um jogo fora da lista de desejos no Radar (fica em `extras` no config); ele ganha preços de todas as lojas e alertas como os outros.
+- **Adicionar jogo**: busque por nome, appid ou link da Steam. "Só monitorar" coloca um jogo fora da lista de desejos no Hunter (fica em `extras` no config); ele ganha preços de todas as lojas e alertas como os outros.
 - **Biblioteca** (aba do painel): valor da coleção (cheio, hoje e no menor histórico), quanto falta para completar cada jogo com as DLCs que contam (com as faltantes em promoção destacadas e + para o carrinho), franquias (quantos jogos você tem de cada e quais delas estão na sua lista) e a coleção em grade. A biblioteca é relida 1x por dia; as listas de DLC dos seus jogos se completam em segundo plano.
 - **Celular / outro PC**: em Configurações → *Acesso pelo celular*, ligue a rede local. Aparece um link e um QR code com um código de acesso; só aparelhos que abrirem esse link entram. O Windows pode pedir permissão do firewall: escolha "Redes privadas".
 - `py radar.py painel` abre só o painel, sem a bandeja.
@@ -31,18 +31,18 @@ Teste a notificação com `py radar.py testar-notificacao`. Se não aparecer: Co
    - **IsThereAnyDeal** (obrigatória) — isthereanydeal.com/apps/my
    - **GG.deals** (opcional, para keyshops) — gg.deals/settings, seção Connections
 
-As chaves ficam no **Gerenciador de Credenciais do Windows** (Credenciais do Windows → *Kurokami Radar*), nunca em arquivo. Para trocar depois: `py radar.py chaves` (ou `py radar.py chaves --terminal` sem janela). Para conferir: `py radar.py testar`.
+As chaves ficam no **Gerenciador de Credenciais do Windows** (Credenciais do Windows → *Kurokami Radar*, nome antigo mantido), nunca em arquivo. Para trocar depois: `py radar.py chaves` (ou `py radar.py chaves --terminal` sem janela). Para conferir: `py radar.py testar`.
 
 ## Instalador .exe (sem Python)
 
-O instalador `KurokamiRadar_Setup_vX.exe` instala o Radar para o seu usuário (sem administrador), com atalho no menu Iniciar, opção de abrir com o Windows e desinstalador em "Aplicativos instalados". O programa vai para `%LOCALAPPDATA%\Programs\Kurokami Radar` e os seus dados (banco, config, carrinho, userdata) para `%LOCALAPPDATA%\Kurokami Radar`. Na primeira vez, ele copia sozinho os dados de `C:\Kurokami Radar`, fecha a versão antiga que rodava pelo código e remove a inicialização automática dela.
+O instalador `KurokamiRadar_Setup_vX.exe` instala o Hunter para o seu usuário (sem administrador), com atalho no menu Iniciar, opção de abrir com o Windows e desinstalador em "Aplicativos instalados". O programa vai para `%LOCALAPPDATA%\Programs\Kurokami Radar` e os seus dados (banco, config, carrinho, userdata) para `%LOCALAPPDATA%\Kurokami Radar`. Na primeira vez, ele copia sozinho os dados de `C:\Kurokami Radar`, fecha a versão antiga que rodava pelo código e remove a inicialização automática dela.
 
 Duas formas de gerar o instalador:
 
 - **GitHub (recomendado):** suba esta pasta para um repositório **privado**. O arquivo `.github/workflows/gerar-instalador.yml` faz o GitHub montar o .exe num Windows na nuvem. Para gerar: aba *Actions* → *Gerar instalador* → *Run workflow*, e baixe em *Artifacts*. Ou crie uma tag `v0.9.0` e o instalador aparece em *Releases*. O `.gitignore` impede que `dados/`, `config.json` e `userdata.json` sejam enviados.
 - **No seu PC:** instale o Inno Setup 6 e rode `gerar_setup.bat`; o instalador sai em `output\`.
 
-**Atualização automática:** o Radar instalado consulta `api.github.com/repos/<atualizacao.repo>/releases/latest` ao abrir e a cada 24h. O repositório precisa ser **público** e o release precisa ter o `.exe` anexado (o workflow faz isso). Para publicar uma versão: suba os arquivos, mude `VERSAO` em `radar/__init__.py` e publique um release com a tag `vX.Y.Z` igual.
+**Atualização automática:** o Hunter instalado consulta `api.github.com/repos/<atualizacao.repo>/releases/latest` ao abrir e a cada 24h. O repositório precisa ser **público** e o release precisa ter o `.exe` anexado (o workflow faz isso). Para publicar uma versão: suba os arquivos, mude `VERSAO` em `radar/__init__.py` e publique um release com a tag `vX.Y.Z` igual.
 
 Sem assinatura digital (paga), o Windows pode mostrar "editor desconhecido" na primeira execução: *Mais informações → Executar assim mesmo*.
 
@@ -59,7 +59,7 @@ py radar.py verificar
 - `verificar` faz a coleta completa e lista o que dispararia notificação agora. **A primeira vez demora**: detalhes da Steam, conteúdo das edições, DLCs, bundles e importação do histórico de cada jogo na ITAD. Partes que usam a loja da Steam (conteúdo de edições e, se a chave não liberar o `GetDLCForApps`, a lista de DLCs) vão a ~1,6s por jogo e ficam em cache por 2 a 4 semanas. Se fechar no meio, retoma de onde parou.
 
 ### Edições "parciais"
-A Steam às vezes vende uma parte do jogo mais barata no mesmo app — o HITMAN World of Assassination tem a "Part One" a R$ 8,89 ao lado do jogo inteiro. O Radar reconhece o pacote que é o jogo de verdade e marca as partes como **parciais** (não servem para completar). A ITAD acompanha o pacote certo; a GG.deals pega a parte (o HITMAN aparece lá a R$ 8,09), então nesses jogos os números da GG.deals, inclusive keyshop, não entram no histórico nem disparam alerta.
+A Steam às vezes vende uma parte do jogo mais barata no mesmo app — o HITMAN World of Assassination tem a "Part One" a R$ 8,89 ao lado do jogo inteiro. O Hunter reconhece o pacote que é o jogo de verdade e marca as partes como **parciais** (não servem para completar). A ITAD acompanha o pacote certo; a GG.deals pega a parte (o HITMAN aparece lá a R$ 8,09), então nesses jogos os números da GG.deals, inclusive keyshop, não entram no histórico nem disparam alerta.
 
 ### DRM
 Com `somente_drm_steam`, só valem ofertas que a ITAD marca como chave Steam, mais a própria Steam. Oferta com DRM desconhecido fica de fora. Quando a mesma loja aparece duas vezes (outra edição), fica a mais barata com chave Steam.

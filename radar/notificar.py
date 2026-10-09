@@ -18,10 +18,10 @@ def registrar_app(icone=None):
         return
     import winreg
     with winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\Classes\AppUserModelId\%s" % APP_ID) as k:
-        winreg.SetValueEx(k, "DisplayName", 0, winreg.REG_SZ, "Kurokami Radar")
+        winreg.SetValueEx(k, "DisplayName", 0, winreg.REG_SZ, "Kurokami Hunter")
         if icone and os.path.isfile(icone):
             winreg.SetValueEx(k, "IconUri", 0, winreg.REG_SZ, icone)
-        winreg.SetValueEx(k, "IconBackgroundColor", 0, winreg.REG_SZ, "FF1B2838")
+        winreg.SetValueEx(k, "IconBackgroundColor", 0, winreg.REG_SZ, "FF050505")
 
 
 def capa(appid, url):

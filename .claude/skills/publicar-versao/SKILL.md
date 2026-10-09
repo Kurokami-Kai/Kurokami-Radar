@@ -1,6 +1,6 @@
 ---
 name: publicar-versao
-description: Prepara uma versão nova do Kurokami Radar para o GitHub Releases (número de versão nos dois lugares, checagens, referência, docs, texto do release). Use quando o usuário pedir para "lançar", "publicar", "fechar versão", "subir para o GitHub" ou "gerar o instalador".
+description: Prepara uma versão nova do Kurokami Hunter para o GitHub Releases (número de versão nos dois lugares, checagens, referência, docs, texto do release). Use quando o usuário pedir para "lançar", "publicar", "fechar versão", "subir para o GitHub" ou "gerar o instalador".
 ---
 
 # Publicar versão

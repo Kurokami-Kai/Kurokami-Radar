@@ -1,4 +1,4 @@
-"""Em que parte da checagem o Radar esta (para o painel e o icone da bandeja)."""
+"""Em que parte da checagem o Hunter esta (para o painel e o icone da bandeja)."""
 import collections
 import threading
 import time

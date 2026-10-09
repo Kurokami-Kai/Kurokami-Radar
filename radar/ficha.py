@@ -1,7 +1,7 @@
 """Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca em lote) e guardado em ficha_cache:
 descricao, captura de tela e informacoes da loja (appdetails), tempo para zerar, jogadores e notas (Augmented Steam,
 servico de terceiro sem contrato: se falhar, a ficha abre sem o quadro) e as conquistas da conta. Tambem a fileira
-da franquia (so com os jogos que o Radar conhece: biblioteca e lista) e o tempo jogado (gravado pela coleta)."""
+da franquia (so com os jogos que o Hunter conhece: biblioteca e lista) e o tempo jogado (gravado pela coleta)."""
 import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
@@ -87,7 +87,7 @@ def jogado(b, a):
 
 
 def fileira(b, ctx, a, nome, marcadas):
-    """A franquia do jogo entre os que o Radar conhece (biblioteca e lista), em ordem de lancamento, com o preco de
+    """A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
     agora (lojas marcadas) dos que voce nao tem. "nomes": as franquias com 2+ jogos, para o "trocar" da ficha."""
     J = ctx.jogos
     conhecidos = [x for x in ctx.possuidos | ctx.lista if (J.get(x) or {}).get("tipo") == "jogo" and J[x].get("nome")]

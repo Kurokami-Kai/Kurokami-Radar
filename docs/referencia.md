@@ -3,7 +3,7 @@
 Gerado a partir do código (assinatura + primeira parte da docstring). Para regenerar: `py tools/gerar_referencia.py`.
 
 ## `radar.py`
-KUROKAMI RADAR - linha de comando (o app instalado usa os mesmos comandos: KurokamiRadar.exe <comando>)
+KUROKAMI HUNTER - linha de comando (o app instalado usa os mesmos comandos: KurokamiRadar.exe <comando>)
 
 - `brl(c)`
 - `pedir_chaves_se_faltar()`
@@ -25,7 +25,7 @@ KUROKAMI RADAR - linha de comando (o app instalado usa os mesmos comandos: Kurok
 - `main()`
 
 ## `radar/__init__.py`
-Kurokami Radar - monitor de promocoes da wishlist Steam.
+Kurokami Hunter - monitor de promocoes da wishlist Steam.
 
 
 ## `radar/analise.py`
@@ -72,9 +72,9 @@ Atualizacao pelo GitHub Releases: verifica, baixa o instalador novo e instala po
 - `repo()`
 - `verificar()` — {"atual","nova","tem_nova","url_exe","pagina","notas"} ou {"erro": ...}
 - `baixar(url, progresso)`
-- `instalar(instalador)` — Roda o instalador em silencio, separado deste processo; ele fecha o Radar, instala e abre a versao nova.
+- `instalar(instalador)` — Roda o instalador em silencio, separado deste processo; ele fecha o Hunter, instala e abre a versao nova.
 - `abrir_janela_separada()` — Abre a janela de atualizacao num processo proprio (a bandeja ocupa a thread principal).
-- `janela()` — Kurokami Radar (Atualizar): mostra as versoes e atualiza com um clique.
+- `janela()` — Kurokami Hunter (Atualizar): mostra as versoes e atualiza com um clique.
 
 ## `radar/banco.py`
 SQLite local. Precos sao gravados so quando mudam, entao o historico
@@ -114,7 +114,7 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
 ## `radar/bandeja.py`
 Icone na bandeja do Windows. Roda o servico em segundo plano.
 
-- `desenhar_icone(cor_ponto)`
+- `desenhar_icone(cor_ponto, tam)` — Mira preta e vermelha do Kurokami Hunter (o mesmo desenho do logo do painel). Desenha em 4x e reduz (bordas lisas).
 - `abrir(caminho)`
 - `abrir_log()` — Abre o log; se ainda nao existe (nada foi registrado), cria vazio antes.
 - `_comando_atual()`
@@ -179,7 +179,7 @@ Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca em lote) 
 - `augmented(appid)` — HLTB em minutos (FF VII Remake: 1935 = 32 h, como no site), jogadores e notas de usuarios/criticos.
 - `extras(b, cfg, a, tenho, log_erro)` — {loja, aug, conq}: do cache ou buscados em paralelo (o que faltar ou venceu). Fonte que falhou vem None.
 - `jogado(b, a)`
-- `fileira(b, ctx, a, nome, marcadas)` — A franquia do jogo entre os que o Radar conhece (biblioteca e lista), em ordem de lancamento, com o preco de
+- `fileira(b, ctx, a, nome, marcadas)` — A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
 
 ## `radar/ggdeals.py`
 GG.deals: melhor preco oficial e de keyshop + menores historicos de cada um.
@@ -262,7 +262,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_ler_q(qs)` — Valida o q= de /api/promocoes. Campo ou valor desconhecido -> PedidoInvalido; ausente = sem filtro.
 - `_filtros(f)` — {grupo: predicado}; as contagens de um grupo usam todos os outros.
 - `_ordenar(itens, ordem)` — Ordena pelos campos na ordem dada; sem valor sempre por ultimo; empate final pelo appid.
-- `api_promocoes(qs)` — Explorador da aba Promocoes: filtra, conta e pagina no Radar (pensando na Steam inteira, spec 07).
+- `api_promocoes(qs)` — Explorador da aba Promocoes: filtra, conta e pagina no Hunter (pensando na Steam inteira, spec 07).
 - `api_vitrine(_q)` — Prateleiras de Ofertas → Destaques (antiga "Vale a pena"): um bloco por tipo (exclusivo), so jogos (sem DLCs), sem os que voce tem. O Selo vale com
 - `_rar_info(an)` — O 'por que essa raridade' da ficha.
 - `_estado_dlcs(b, a, j)` — Por que a ficha nao tem DLCs: falhou, a Steam nao informou ou ainda nao consultada (com a fila, se rodando).
@@ -285,7 +285,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `post_tenho(d)` — Marca/desmarca "ja tenho" (para compras feitas depois do userdata.json).
 - `post_silenciar(d)`
 - `post_atualizar_tudo(_d)`
-- `_itens_para_steam()` — Itens da Steam do carrinho do Radar (pacote ou bundle) para mandar ao carrinho da conta; descobre na hora o pacote que falta.
+- `_itens_para_steam()` — Itens da Steam do carrinho do Hunter (pacote ou bundle) para mandar ao carrinho da conta; descobre na hora o pacote que falta.
 - `post_atualizar_app(_d)`
 - `post_sair(_d)`
 - `api_notificacoes(_q)`
@@ -310,15 +310,15 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
   - `_pagina_pin(erro)`
   - `_entrar()`
   - `_json(obj, code)`
-  - `_steam_openid(u)` — Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Radar.
+  - `_steam_openid(u)` — Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Hunter.
   - `do_GET()`
   - `do_POST()`
 - `iniciar(abrir)`
-- `reiniciar()` — Troca entre so-este-PC e rede local sem fechar o Radar.
+- `reiniciar()` — Troca entre so-este-PC e rede local sem fechar o Hunter.
 - `url()`
 
 ## `radar/progresso.py`
-Em que parte da checagem o Radar esta (para o painel e o icone da bandeja).
+Em que parte da checagem o Hunter esta (para o painel e o icone da bandeja).
 
 - `iniciar(modo)`
 - `etapa(nome, total)`

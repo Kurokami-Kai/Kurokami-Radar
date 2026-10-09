@@ -53,4 +53,4 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 
 ## Segredos
 
-Chaves (`steam`, `itad`, `ggdeals`) ficam no **Gerenciador de Credenciais** (keyring, serviço `Kurokami Radar`); variáveis `KUROKAMI_<NOME>_KEY` têm prioridade (útil em testes). Nunca gravar chave em arquivo nem em log.
+Chaves (`steam`, `itad`, `ggdeals`) ficam no **Gerenciador de Credenciais** (keyring, serviço `Kurokami Hunter`); variáveis `KUROKAMI_<NOME>_KEY` têm prioridade (útil em testes). Nunca gravar chave em arquivo nem em log.

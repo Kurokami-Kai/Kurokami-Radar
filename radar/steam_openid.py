@@ -1,6 +1,6 @@
 """Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.
-O usuario confirma na pagina da propria Steam; o Radar so recebe o SteamID. Nenhuma senha, token ou cookie
-da Steam chega ao Radar. Tudo em memoria (state e nonces); so o SteamID vai para o config."""
+O usuario confirma na pagina da propria Steam; o Hunter so recebe o SteamID. Nenhuma senha, token ou cookie
+da Steam chega ao Hunter. Tudo em memoria (state e nonces); so o SteamID vai para o config."""
 import calendar
 import re
 import secrets
@@ -68,11 +68,11 @@ def concluir(query, base, confirmar=_confirmar_na_steam, agora=None):
     with _lock:
         criado = _pendentes.pop(state, None)   # uso unico: reenviar o mesmo retorno falha
     if criado is None or agora - criado > VALIDADE:
-        raise LoginInvalido("O pedido de entrada expirou ou não foi feito por este Radar. Tente de novo.")
+        raise LoginInvalido("O pedido de entrada expirou ou não foi feito por este Hunter. Tente de novo.")
     if p.get("openid.ns") != NS or p.get("openid.mode") != "id_res":
         raise LoginInvalido("A Steam não confirmou a entrada.")
     if p.get("openid.op_endpoint") != ENDPOINT or p.get("openid.return_to") != _retorno(base, state):
-        raise LoginInvalido("Resposta que não veio da Steam para este Radar.")
+        raise LoginInvalido("Resposta que não veio da Steam para este Hunter.")
     m = RE_ID.match(p.get("openid.claimed_id", ""))
     if not m or p.get("openid.identity") != p.get("openid.claimed_id"):
         raise LoginInvalido("A Steam não devolveu um SteamID válido.")

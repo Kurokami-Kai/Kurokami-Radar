@@ -6,12 +6,12 @@ from tkinter import ttk
 from . import config, credenciais
 from .validar import DICAS, testar, testar_perfil
 
-AZUL, FUNDO, PAINEL, TEXTO, FRACO = "#66c0f4", "#1b2838", "#2a475e", "#c7d5e0", "#8f98a0"
+AZUL, FUNDO, PAINEL, TEXTO, FRACO = "#66c0f4", "#050505", "#1f1f1f", "#d2d2d2", "#979797"
 
 
 def abrir():
     raiz = tk.Tk()
-    raiz.title("Kurokami Radar - perfil e chaves")
+    raiz.title("Kurokami Hunter - perfil e chaves")
     raiz.configure(bg=FUNDO)
     raiz.resizable(False, False)
     raiz.attributes("-topmost", True)
@@ -36,7 +36,7 @@ def abrir():
     lk.grid(row=2, column=1, sticky="w")
     lk.bind("<Button-1>", lambda e: webbrowser.open("https://steamcommunity.com/my/profile"))
     var_perfil = tk.StringVar(value=config.carregar().get("perfil_steam") or "")
-    ent_p = tk.Entry(raiz, textvariable=var_perfil, width=52, bg="#0e141b", fg="white", insertbackground="white",
+    ent_p = tk.Entry(raiz, textvariable=var_perfil, width=52, bg="#000000", fg="white", insertbackground="white",
                      relief="flat", font=("Consolas", 10))
     ent_p.grid(row=3, column=0, columnspan=2, sticky="we", padx=(18, 6), pady=(2, 0), ipady=5)
     st_p = tk.Label(raiz, text="Cole o link do perfil (ex.: https://steamcommunity.com/id/seunome) ou o SteamID64.",
@@ -51,7 +51,7 @@ def abrir():
         url = "https://" + onde.split("https://")[-1].split(" ")[0]
         link.bind("<Button-1>", lambda e, u=url: webbrowser.open(u))
         var = tk.StringVar(value=credenciais.ler(nome) or "")
-        ent = tk.Entry(raiz, textvariable=var, show="•", width=52, bg="#0e141b", fg="white", insertbackground="white",
+        ent = tk.Entry(raiz, textvariable=var, show="•", width=52, bg="#000000", fg="white", insertbackground="white",
                        relief="flat", font=("Consolas", 10))
         ent.grid(row=linha + 1, column=0, columnspan=2, sticky="we", padx=(18, 6), pady=(2, 0), ipady=5)
         menu = tk.Menu(raiz, tearoff=0)

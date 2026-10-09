@@ -1,4 +1,4 @@
-// Kurokami Radar: faz as duas chamadas do carrinho da conta (ler e adicionar) para a pagina do carrinho da Steam.
+// Kurokami Hunter: faz as duas chamadas do carrinho da conta (ler e adicionar) para a pagina do carrinho da Steam.
 // Fica aqui (e nao na pagina) porque a extensao pode chamar api.steampowered.com sem esbarrar no CORS.
 // O token vem da propria pagina da Steam e so vai para a Steam; nada e guardado.
 const METODOS = { GetCart: 'GET', AddItemsToCart: 'POST' };

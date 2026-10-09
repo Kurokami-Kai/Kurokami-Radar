@@ -466,7 +466,7 @@ def _ordenar(itens, ordem):
 
 
 def api_promocoes(qs):
-    """Explorador da aba Promocoes: filtra, conta e pagina no Radar (pensando na Steam inteira, spec 07)."""
+    """Explorador da aba Promocoes: filtra, conta e pagina no Hunter (pensando na Steam inteira, spec 07)."""
     f = _ler_q(qs)
     itens, cfg, conta = linhas_promocoes()
     steam_info = {"ligada": bool(cfg.get("steam_inteira", True)), "quando": None, "itens": 0}
@@ -1048,13 +1048,13 @@ def post_silenciar(d):
 def post_atualizar_tudo(_d):
     s = CONTROLE["servico"]
     if not s:
-        return {"ok": False, "erro": "So funciona com o Radar aberto na bandeja."}
+        return {"ok": False, "erro": "So funciona com o Hunter aberto na bandeja."}
     s.agora(completo=True)
     return {"ok": True}
 
 
 def _itens_para_steam():
-    """Itens da Steam do carrinho do Radar (pacote ou bundle) para mandar ao carrinho da conta; descobre na hora o pacote que falta."""
+    """Itens da Steam do carrinho do Hunter (pacote ou bundle) para mandar ao carrinho da conta; descobre na hora o pacote que falta."""
     cfg = config.carregar()
     b = Banco()
     # quem ainda nao tem o pacote (subid) conhecido: pergunta a Steam agora, numa consulta so
@@ -1177,8 +1177,8 @@ def post_pausar(_d):
 # ------------------------------------------------------------------ carrinho da Steam pela extensao do navegador
 def post_steam_carrinho(_d):
     """Monta o endereco do carrinho da Steam com o pedido (#kurokami=PAIS:p<subid>[-modo],b<bundleid>[-modo]).
-    Quem poe no carrinho e a extensao do Radar (pasta extensao/), com a sessao da propria pagina da Steam:
-    o Radar nao ve token, cookie nem senha."""
+    Quem poe no carrinho e a extensao do Hunter (pasta extensao/), com a sessao da propria pagina da Steam:
+    o Hunter nao ve token, cookie nem senha."""
     itens = _itens_para_steam()
     partes, sem = [], []
     for i in itens:
@@ -1224,7 +1224,7 @@ def post_steam_extensao(d):
     (o assistente do painel: o usuario liga o Modo do desenvolvedor e arrasta a pasta para a pagina)."""
     import subprocess
     if not os.path.isfile(os.path.join(caminhos.PASTA_EXTENSAO, "manifest.json")):
-        return {"ok": False, "erro": "Pasta da extensão não encontrada: reinstale o Radar."}
+        return {"ok": False, "erro": "Pasta da extensão não encontrada: reinstale o Hunter."}
     r = {"ok": True, "pasta": caminhos.PASTA_EXTENSAO}
     if d.get("navegador"):
         nav = _navegador_padrao()
@@ -1240,15 +1240,15 @@ def post_steam_extensao(d):
 def post_steam_conta(d):
     """Dados da sua conta Steam que a extensao leu na loja, com a sessao da pagina (senha, token e cookie nunca chegam
     aqui): biblioteca com DLCs, lista de desejos, seguidos, ignorados e carrinho. So se o SteamID for o do perfil do
-    Radar: grava como userdata.json na pasta de dados (o formato do arquivo salvo a mao) e marca ja os possuidos."""
+    Hunter: grava como userdata.json na pasta de dados (o formato do arquivo salvo a mao) e marca ja os possuidos."""
     sid = str(d.get("steamid") or "")
     b = Banco()
     try:
         meu = str(b.meta("steamid") or "")
         if not meu:
-            return {"ok": False, "erro": "Configure o seu perfil Steam no Radar antes."}
+            return {"ok": False, "erro": "Configure o seu perfil Steam no Hunter antes."}
         if sid != meu:
-            return {"ok": False, "erro": "A Steam aberta no navegador é de outra conta: o Radar não usou os dados dela."}
+            return {"ok": False, "erro": "A Steam aberta no navegador é de outra conta: o Hunter não usou os dados dela."}
 
         def ids(k):
             v = d.get(k) or []
@@ -1256,7 +1256,7 @@ def post_steam_conta(d):
                 raise ValueError("lista invalida: %s" % k)
             return sorted({x for x in v if type(x) is int and x > 0})
         if not ids("possuidos"):
-            return {"ok": False, "erro": "A Steam devolveu a biblioteca vazia: o Radar manteve a anterior."}
+            return {"ok": False, "erro": "A Steam devolveu a biblioteca vazia: o Hunter manteve a anterior."}
         u = {"rgOwnedApps": ids("possuidos"), "rgWishlist": ids("desejos"), "rgFollowedApps": ids("seguidos"),
              "rgIgnoredApps": ids("ignorados"), "rgAppsInCart": ids("carrinho"),
              "kurokami": {"fonte": "extensao", "steamid": sid, "quando": datetime.now(timezone.utc).isoformat(timespec="seconds")}}
@@ -1344,13 +1344,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def _pagina_pin(self, erro=""):
         dados = ("<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'>"
-                 "<title>Kurokami Radar</title><body style='background:#1b2838;color:#c7d5e0;font:16px Arial;display:flex;"
+                 "<title>Kurokami Hunter</title><body style='background:#050505;color:#d2d2d2;font:16px Arial;display:flex;"
                  "min-height:90vh;align-items:center;justify-content:center'><form method=post action='/entrar' "
-                 "style='background:#171a21;padding:28px;max-width:320px;width:100%%;box-shadow:0 0 20px #000'>"
-                 "<h2 style='color:#fff;margin:0 0 6px;letter-spacing:.06em'>KUROKAMI RADAR</h2>"
-                 "<p style='color:#8f98a0;font-size:13px'>Digite o PIN que aparece no PC, em Configurações → Acesso pelo celular.</p>"
+                 "style='background:#000000;padding:28px;max-width:320px;width:100%%;box-shadow:0 0 20px #000'>"
+                 "<h2 style='color:#fff;margin:0 0 6px;letter-spacing:.06em'>KUROKAMI HUNTER</h2>"
+                 "<p style='color:#979797;font-size:13px'>Digite o PIN que aparece no PC, em Configurações → Acesso pelo celular.</p>"
                  "<input name=pin inputmode=numeric autocomplete=one-time-code maxlength=6 autofocus "
-                 "style='width:100%%;font-size:28px;letter-spacing:.4em;text-align:center;padding:10px;background:#0e141b;"
+                 "style='width:100%%;font-size:28px;letter-spacing:.4em;text-align:center;padding:10px;background:#000000;"
                  "border:0;color:#fff;box-sizing:border-box'>%s<button style='margin-top:12px;width:100%%;padding:12px;"
                  "border:0;background:linear-gradient(90deg,#75b022,#588a1b);color:#fff;font-size:15px'>Entrar</button>"
                  "</form>") % ("<p style='color:#ef6f6a;font-size:13px'>%s</p>" % erro if erro else "")
@@ -1387,7 +1387,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(dados)
 
     def _steam_openid(self, u):
-        """Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Radar."""
+        """Entrar pela Steam (OpenID). So pelo proprio PC: outro aparelho nao pode trocar a conta do Hunter."""
         from . import steam_openid
         if not self._local() or not self._host_local():
             return self._json({"erro": "so pelo proprio PC"}, 403)
@@ -1406,7 +1406,7 @@ class Handler(BaseHTTPRequestHandler):
                 destino = CAMINHO + "?steam=ok"
             except steam_openid.LoginInvalido as e:
                 import html
-                dados = ("<!doctype html><meta charset=utf-8><body style='background:#1b2838;color:#c7d5e0;font:15px Arial;padding:30px'>"
+                dados = ("<!doctype html><meta charset=utf-8><body style='background:#050505;color:#d2d2d2;font:15px Arial;padding:30px'>"
                          "<h3 style='color:#fff'>Não consegui entrar pela Steam</h3><p>%s</p>"
                          "<p><a style='color:#66c0f4' href='%s'>Voltar ao painel</a></p>" % (html.escape(str(e)), CAMINHO)).encode("utf-8")
                 self.send_response(400)
@@ -1438,8 +1438,8 @@ class Handler(BaseHTTPRequestHandler):
             if "atualizar" in q:
                 from . import atualizador
                 atualizador.abrir_janela_separada()
-                dados = ("<!doctype html><meta charset=utf-8><body style='background:#1b2838;color:#c7d5e0;font:15px Arial;padding:30px'>"
-                         "<h3 style='color:#fff'>Abrindo a atualização do Kurokami Radar…</h3><p>Pode fechar esta aba.</p>").encode("utf-8")
+                dados = ("<!doctype html><meta charset=utf-8><body style='background:#050505;color:#d2d2d2;font:15px Arial;padding:30px'>"
+                         "<h3 style='color:#fff'>Abrindo a atualização do Kurokami Hunter…</h3><p>Pode fechar esta aba.</p>").encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Content-Length", str(len(dados)))
@@ -1447,8 +1447,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(dados)
                 return
             post_silenciar({"appid": int(q["silenciar"][0])})
-            dados = ("<!doctype html><meta charset=utf-8><body style='background:#1b2838;color:#c7d5e0;font:15px Arial;padding:30px'>"
-                     "<h3 style='color:#fff'>Pronto: o Radar não avisa mais desse jogo.</h3>"
+            dados = ("<!doctype html><meta charset=utf-8><body style='background:#050505;color:#d2d2d2;font:15px Arial;padding:30px'>"
+                     "<h3 style='color:#fff'>Pronto: o Hunter não avisa mais desse jogo.</h3>"
                      "<p>Para desfazer, abra o jogo no <a style='color:#66c0f4' href='%s'>painel</a>.</p>" % CAMINHO).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
@@ -1469,7 +1469,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         f = GET.get(u.path)
         if not f:
-            return self._json({"erro": "o Radar aberto (versao %s) nao tem %s. Reinicie o Radar pela bandeja." % (VERSAO, u.path)}, 404)
+            return self._json({"erro": "o Hunter aberto (versao %s) nao tem %s. Reinicie o Hunter pela bandeja." % (VERSAO, u.path)}, 404)
         try:
             self._json(f(parse_qs(u.query)))
         except PedidoInvalido as e:
@@ -1495,7 +1495,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"erro": "so pelo proprio painel, neste PC"}, 403)
         f = POST.get(urlparse(self.path).path)
         if not f:
-            return self._json({"erro": "o Radar aberto (versao %s) nao tem %s. Reinicie o Radar pela bandeja." % (VERSAO, self.path)}, 404)
+            return self._json({"erro": "o Hunter aberto (versao %s) nao tem %s. Reinicie o Hunter pela bandeja." % (VERSAO, self.path)}, 404)
         try:
             n = int(self.headers.get("Content-Length") or 0)
             d = json.loads(self.rfile.read(n) or b"{}")
@@ -1530,7 +1530,7 @@ def iniciar(abrir=False):
 
 
 def reiniciar():
-    """Troca entre so-este-PC e rede local sem fechar o Radar."""
+    """Troca entre so-este-PC e rede local sem fechar o Hunter."""
     import time
     antigo = CONTROLE.get("srv")
     if antigo:

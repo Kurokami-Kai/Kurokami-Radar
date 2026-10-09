@@ -1,9 +1,9 @@
 ---
 name: economia-de-contexto
-description: Regras de economia de tokens do Kurokami Radar - painel.html só por função (tools/mapa.py), leitura/testes no subagente explorador, revisão no revisor, /clear e /compact, docs por seção, relatório enxuto e esforço por tipo de tarefa. Use sempre que for ler arquivos grandes, buscar, testar, revisar diff ou a conversa estiver longa.
+description: Regras de economia de tokens do Kurokami Hunter - painel.html só por função (tools/mapa.py), leitura/testes no subagente explorador, revisão no revisor, /clear e /compact, docs por seção, relatório enxuto e esforço por tipo de tarefa. Use sempre que for ler arquivos grandes, buscar, testar, revisar diff ou a conversa estiver longa.
 ---
 
-# Economia de contexto (Kurokami Radar)
+# Economia de contexto (Kurokami Hunter)
 
 Complementa a skill geral `~/.claude/skills/economia-de-contexto` (buscar antes de abrir, ler por trechos, cortar saídas, não reler o que editou). Aqui ficam só as regras deste projeto.
 

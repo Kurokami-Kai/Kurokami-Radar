@@ -1,9 +1,9 @@
 """
-KUROKAMI RADAR - linha de comando (o app instalado usa os mesmos comandos: KurokamiRadar.exe <comando>)
+KUROKAMI HUNTER - linha de comando (o app instalado usa os mesmos comandos: KurokamiRadar.exe <comando>)
 Uso:
-  py radar.py bandeja             abre o Radar na bandeja: checa sozinho, notifica e serve o painel (pyw = sem janela)
+  py radar.py bandeja             abre o Hunter na bandeja: checa sozinho, notifica e serve o painel (pyw = sem janela)
   py radar.py painel              so o painel no navegador, sem a bandeja (http://127.0.0.1:8787)
-  py radar.py inicio instalar     abre o Radar sozinho ao entrar no Windows (inicio remover desfaz)
+  py radar.py inicio instalar     abre o Hunter sozinho ao entrar no Windows (inicio remover desfaz)
   py radar.py ciclo               uma rodada completa com notificacoes, mostrando tudo no terminal
   py radar.py testar-notificacao  manda uma notificacao de exemplo (--selo: SELO KUROKAMI; --tipo novo|igual|24m)
   py radar.py chaves              grava/atualiza as chaves no Gerenciador de Credenciais
@@ -246,7 +246,7 @@ def cmd_dlcs(cfg, args):
 
 
 def menu():
-    print("KUROKAMI RADAR %s\n" % VERSAO)
+    print("KUROKAMI HUNTER %s\n" % VERSAO)
     opcoes = [("Abrir na bandeja (checa, notifica e serve o painel)", ["bandeja"]), ("Abrir só o painel", ["painel"]), ("Verificar promoções agora", ["verificar"]),
               ("Iniciar com o Windows", ["inicio", "instalar"]), ("Testar notificação", ["testar-notificacao"]),
               ("Cadastrar / trocar chaves", ["chaves"]),
@@ -373,7 +373,7 @@ def cmd_classificar(cfg, args):
 
 
 def main():
-    ap = argparse.ArgumentParser(prog="radar", description="Kurokami Radar %s" % VERSAO)
+    ap = argparse.ArgumentParser(prog="radar", description="Kurokami Hunter %s" % VERSAO)
     sub = ap.add_subparsers(dest="cmd")
     s = sub.add_parser("chaves"); s.add_argument("--terminal", action="store_true", help="sem janela, digitando no terminal")
     sub.add_parser("testar")
@@ -391,7 +391,7 @@ def main():
     s = sub.add_parser("dlcs"); s.add_argument("jogo", nargs="+")
     s = sub.add_parser("classificar"); s.add_argument("jogo"); s.add_argument("trecho"); s.add_argument("classe")
     s = sub.add_parser("conteudo"); s.add_argument("jogo"); s.add_argument("edicao"); s.add_argument("dlcs")
-    sub.add_parser("atualizar-app", help="procura e instala a versao nova do Radar")
+    sub.add_parser("atualizar-app", help="procura e instala a versao nova do Hunter")
     s = sub.add_parser("bandeja"); s.add_argument("--esperar", action="store_true", help=argparse.SUPPRESS)
     s.add_argument("--abrir", action="store_true", help="abre o painel no navegador ao iniciar")
     sub.add_parser("painel")

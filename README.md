@@ -1,4 +1,4 @@
-# Kurokami Radar
+# Kurokami Hunter
 
 Monitora a sua **lista de desejos da Steam** em dezenas de lojas, guarda o **histórico de preços** no seu PC e avisa pela **central de notificações do Windows** quando um jogo chega no menor preço em muito tempo (Selo Kurokami) ou nos tipos de recorde que você escolher. Tem um painel no navegador com lista, biblioteca de colecionador, carrinho simulado com bundles e acesso pelo celular.
 
@@ -12,7 +12,7 @@ Tudo roda no seu PC. Nada é enviado para servidor nenhum além das consultas à
 2. Abra o arquivo. Se o Windows mostrar *"O Windows protegeu o computador"*, clique em **Mais informações → Executar assim mesmo** (o programa não tem assinatura digital paga).
 3. Siga o instalador. Não precisa de administrador nem de Python.
 
-No fim, o Radar abre sozinho e mostra a janela **Perfil e chaves**. É só preencher como explicado abaixo.
+No fim, o Hunter abre sozinho e mostra a janela **Perfil e chaves**. É só preencher como explicado abaixo.
 
 ---
 
@@ -33,16 +33,16 @@ As chaves ficam guardadas no **Gerenciador de Credenciais do Windows** (nunca nu
 2. Copie o endereço. Fica como `https://steamcommunity.com/id/seunome` ou `https://steamcommunity.com/profiles/7656119...`.
 3. Cole no campo **Seu perfil Steam**.
 
-**Ou entre pela Steam** (como no ITAD ou na SteamDB): no painel, botão *Entrar pela Steam* no canto superior direito (em qualquer aba); depois de entrar, ali fica o seu avatar (ver perfil, trocar de conta). Você confirma na página da própria Steam e o Radar só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel no próprio PC.
+**Ou entre pela Steam** (como no ITAD ou na SteamDB): no painel, botão *Entrar pela Steam* no canto superior direito (em qualquer aba); depois de entrar, ali fica o seu avatar (ver perfil, trocar de conta). Você confirma na página da própria Steam e o Hunter só recebe o seu SteamID: nunca a senha, nem token, nem cookie. Só funciona abrindo o painel no próprio PC.
 
-**Carrinho direto (extensão do Radar):** na aba Carrinho, *Finalizar pedido* abre o carrinho da Steam e a extensão do Radar põe os jogos lá sozinha, com a sessão que o seu navegador já tem (o Radar nunca vê senha, token ou cookie). Instale a extensão uma vez (Chrome, Edge, Brave ou Opera): ao abrir o painel, o Radar pergunta se quer instalar e, em *Instalar*, abre a página de extensões e a pasta; ligue o *Modo do desenvolvedor* e arraste a pasta para a página. À mão: abra `chrome://extensions` (no Edge, `edge://extensions`), ligue o *Modo do desenvolvedor*, clique em *Carregar sem compactação* e escolha a pasta `extensao` da instalação do Radar. Ela só age na página do carrinho da Steam e só adiciona: nunca tira nada.
+**Carrinho direto (extensão do Hunter):** na aba Carrinho, *Finalizar pedido* abre o carrinho da Steam e a extensão do Hunter põe os jogos lá sozinha, com a sessão que o seu navegador já tem (o Hunter nunca vê senha, token ou cookie). Instale a extensão uma vez (Chrome, Edge, Brave ou Opera): ao abrir o painel, o Hunter pergunta se quer instalar e, em *Instalar*, abre a página de extensões e a pasta; ligue o *Modo do desenvolvedor* e arraste a pasta para a página. À mão: abra `chrome://extensions` (no Edge, `edge://extensions`), ligue o *Modo do desenvolvedor*, clique em *Carregar sem compactação* e escolha a pasta `extensao` da instalação do Hunter. Ela só age na página do carrinho da Steam e só adiciona: nunca tira nada.
 
 **A lista de desejos precisa estar pública.** Na Steam: *Perfil → Editar perfil → Configurações de privacidade → Detalhes dos jogos = Público*. Se estiver privada, a janela avisa "a lista de desejos veio vazia".
 
 ### Chave da IsThereAnyDeal (obrigatória, gratuita)
 
 1. Crie uma conta em **isthereanydeal.com** (canto superior direito, *Sign in*).
-2. Acesse **isthereanydeal.com/apps/my** e clique para **registrar um app**. O nome pode ser qualquer um (ex.: `Kurokami Radar`).
+2. Acesse **isthereanydeal.com/apps/my** e clique para **registrar um app**. O nome pode ser qualquer um (ex.: `Kurokami Hunter`).
 3. Na página do app, copie o campo **API Key**.
    ⚠️ Não é o *OAuth Client ID* nem o *Client Secret*.
 4. Cole no campo **IsThereAnyDeal**.
@@ -67,9 +67,9 @@ Clique em **Salvar**. Cada campo é testado na hora: ✓ verde está certo; ✗ 
 
 ## 3. Opcional: suas DLCs, seguidos e ignorados (`userdata.json`)
 
-A Steam só informa publicamente os **jogos** que você tem, não as **DLCs**, nem os jogos que você **segue** ou **ignorou** na loja. Sem isso, o Radar não sabe quais DLCs você já comprou (afeta a aba Biblioteca e o preço de bundles) e os filtros "Seguido" e "Ignorado" de Promoções ficam desligados.
+A Steam só informa publicamente os **jogos** que você tem, não as **DLCs**, nem os jogos que você **segue** ou **ignorou** na loja. Sem isso, o Hunter não sabe quais DLCs você já comprou (afeta a aba Biblioteca e o preço de bundles) e os filtros "Seguido" e "Ignorado" de Promoções ficam desligados.
 
-**Jeito automático (recomendado):** com a extensão do Radar instalada (a mesma do carrinho, versão 1.1 ou mais nova), abra qualquer página da loja da Steam logado e depois o painel. A extensão lê esses dados com a sessão do próprio navegador (o Radar nunca vê senha, token ou cookie) e o Radar guarda no `userdata.json`. Só vale se a conta aberta no navegador for a do seu perfil no Radar. Se você já tinha a extensão, recarregue-a em `chrome://extensions` depois de atualizar o Radar.
+**Jeito automático (recomendado):** com a extensão do Hunter instalada (a mesma do carrinho, versão 1.1 ou mais nova), abra qualquer página da loja da Steam logado e depois o painel. A extensão lê esses dados com a sessão do próprio navegador (o Hunter nunca vê senha, token ou cookie) e o Hunter guarda no `userdata.json`. Só vale se a conta aberta no navegador for a do seu perfil no Hunter. Se você já tinha a extensão, recarregue-a em `chrome://extensions` depois de atualizar o Hunter.
 
 **Jeito manual:**
 
@@ -83,7 +83,7 @@ Repita de vez em quando: o painel avisa quando o arquivo tiver mais de 30 dias. 
 
 ## 4. Usando
 
-- O Radar fica no **ícone perto do relógio**. Ele checa os preços sozinho a cada 30 minutos.
+- O Hunter fica no **ícone perto do relógio**. Ele checa os preços sozinho a cada 30 minutos.
 - **Clique no ícone** para abrir o painel (`http://localhost/kurokami`).
 - **A primeira checagem demora** (uns 10 a 40 minutos, conforme o tamanho da sua lista): ela importa o histórico de cada jogo e lê DLCs e bundles. Depois, cada checagem leva segundos.
 - Na primeira vez ele **não** dispara uma enxurrada de avisos: registra o que já está em promoção e daí em diante avisa só as novidades.
@@ -95,7 +95,7 @@ Repita de vez em quando: o painel avisa quando o arquivo tiver mais de 30 dias. 
 - As **análises da Steam** aparecem como informação, mas não decidem avisos: o jogo já está na sua lista de desejos.
 - **Biblioteca:** valor da sua coleção, quanto falta para completar cada jogo com as DLCs, séries, coleção e **DLCs em promoção** (as que faltam nos seus jogos e estão com desconto agora).
 - **Carrinho:** só itens da Steam (jogos e bundles): veja o total e escolha, item a item, se entra **para a sua conta**, **de presente** ou **privado**. Para adicionar jogos, use **Adicionar jogo**, ao lado do resumo do pedido (nome, appid ou link da Steam): **um clique** no resultado já põe o jogo no carrinho (e passa a monitorá-lo), e a lista continua aberta para adicionar mais (Esc fecha). *Finalizar pedido* respeita a escolha e não repete o que já está no carrinho da Steam.
-- **Configurações:** lojas, **O que te avisa** (Selo Kurokami ligado; Novo recorde, Igual ao recorde e Menor em 2 anos você liga se quiser, cada um com quantos avisos costuma dar por semana), desconto mínimo, keyshops, tipos de DLC, notificações e acesso pelo celular. Ligar um tipo não enche a tela de avisos: chega um resumo e, daí em diante, só os próximos.
+- **Configurações:** em seções, com um menu do lado (Avisos, Lojas, Notificações, Frequência, Steam inteira, Keyshops, DLCs, Celular e outros PCs); ao mudar algo aparece embaixo a barra **Salvar**. Tem lojas, **Avisos** (Selo Kurokami ligado; Novo recorde, Igual ao recorde e Menor em 2 anos você liga se quiser, cada um com quantos avisos costuma dar por semana), desconto mínimo, keyshops, tipos de DLC, notificações e acesso pelo celular. Ligar um tipo não enche a tela de avisos: chega um resumo e, daí em diante, só os próximos.
 
 ### Pelo celular
 
@@ -110,18 +110,18 @@ Em **Configurações → Acesso pelo celular**, ligue a opção. Aparece um ende
 | A notificação não aparece | *Configurações do Windows → Sistema → Notificações*: deixe ativado e desligue o *Não incomodar*. |
 | "Lista de desejos vazia" | Deixe *Detalhes dos jogos* como **Público** na privacidade da Steam. |
 | Chave recusada | Copie de novo; na IsThereAnyDeal use o campo **API Key**. |
-| O painel não abre | Clique com o direito no ícone → **Reiniciar**. Se não houver ícone, abra o *Kurokami Radar* pelo menu Iniciar. |
+| O painel não abre | Clique com o direito no ícone → **Reiniciar**. Se não houver ícone, abra o *Kurokami Hunter* pelo menu Iniciar. |
 | Quero ver o que aconteceu | Ícone → **Ver log**. |
 
 ## 6. Atualizar
 
-O Radar procura versão nova **sempre que abre** e uma vez por dia enquanto fica aberto. Quando tem, chega uma notificação e aparece uma faixa verde no painel com **Atualizar agora**: ele baixa, instala por cima e abre de novo sozinho. Seus dados e chaves ficam.
+O Hunter procura versão nova **sempre que abre** e uma vez por dia enquanto fica aberto. Quando tem, chega uma notificação e aparece uma faixa verde no painel com **Atualizar agora**: ele baixa, instala por cima e abre de novo sozinho. Seus dados e chaves ficam.
 
-Se preferir na mão: menu Iniciar → **Kurokami Radar (Atualizar)**, ou ícone → **Procurar atualização…**
+Se preferir na mão: menu Iniciar → **Kurokami Hunter (Atualizar)**, ou ícone → **Procurar atualização…**
 
 ## 7. Desinstalar
 
-*Configurações do Windows → Aplicativos → Aplicativos instalados → Kurokami Radar → Desinstalar*. Os seus dados ficam em `%LOCALAPPDATA%\Kurokami Radar`; apague essa pasta se quiser remover tudo. As chaves ficam em *Gerenciador de Credenciais → Credenciais do Windows → Kurokami Radar*.
+*Configurações do Windows → Aplicativos → Aplicativos instalados → Kurokami Hunter → Desinstalar*. Os seus dados ficam em `%LOCALAPPDATA%\Kurokami Radar`; apague essa pasta se quiser remover tudo. As chaves ficam em *Gerenciador de Credenciais → Credenciais do Windows → Kurokami Radar* (nome antigo, mantido para não perder as chaves).
 
 ---
 

@@ -31,7 +31,7 @@ def instalar():
     r = subprocess.run(["schtasks", "/Create", "/TN", TAREFA, "/TR", tr, "/SC", "ONLOGON", "/RL", "LIMITED", "/F"],
                        capture_output=True, text=True)
     if r.returncode == 0:
-        return "Tarefa agendada criada: o Radar abre sozinho quando você entrar no Windows."
+        return "Tarefa agendada criada: o Kurokami Hunter abre sozinho quando você entrar no Windows."
     lnk = _atalho()
     ps = ("$s=(New-Object -ComObject WScript.Shell).CreateShortcut('%s');$s.TargetPath='%s';$s.Arguments='%s';"
           "$s.WorkingDirectory='%s';$s.Save()") % (lnk, exe, args.replace("'", "''"), caminhos.BASE)
@@ -46,4 +46,4 @@ def remover():
     subprocess.run(["schtasks", "/Delete", "/TN", TAREFA, "/F"], capture_output=True)
     if os.path.isfile(_atalho()):
         os.remove(_atalho())
-    return "O Radar nao inicia mais sozinho com o Windows."
+    return "O Kurokami Hunter nao inicia mais sozinho com o Windows."

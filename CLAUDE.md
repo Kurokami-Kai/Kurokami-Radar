@@ -1,4 +1,4 @@
-# Kurokami Radar — instruções para o Claude Code
+# Kurokami Hunter — instruções para o Claude Code
 
 App local de Windows (Python 3.12) que monitora a lista de desejos da Steam em várias lojas, guarda histórico em SQLite, notifica no Windows e serve um painel em `http://localhost/kurokami`. Usuários: o dono do repositório e amigos, via instalador do GitHub Releases. Responda e escreva mensagens/UI em **português**.
 
@@ -35,7 +35,8 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Dinheiro em centavos; datas em UTC ISO.
 - Nada pessoal no repositório: `config.json`, `userdata.json` e `dados/` estão no `.gitignore`. Chaves só no keyring.
 - Arquivo novo que o `.exe` precise ler → adicionar ao `--add-data` do workflow e do `gerar_setup.bat`.
-- Visual do painel segue a loja da Steam, **em tons de preto** (ver `docs/decisoes.md`, "Produto").
+- Visual do painel segue a loja da Steam, **em tons de preto**; símbolo em preto e vermelho (ver `docs/decisoes.md`, "Produto").
+- Nome visível: **Kurokami Hunter**. Pasta de dados, keyring, `KurokamiRadar.exe`, nome do instalador, repositório e pacote `radar/` continuam com o nome antigo de propósito (lista em `docs/decisoes.md`, "Produto"): não renomeie.
 - Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança.
 - Ao terminar cada tarefa, depois de `py tools/checar.py` dar `ok`: faça o commit e o push **sem perguntar**. Só pergunte antes de comandos que reescrevem histórico (`reset`, `rebase`, `push --force`) ou que apagam arquivos fora do projeto.
 - **Publicar = você cria e envia a tag `vX.Y.Z`**, só quando o dono disser "publique". Antes: `VERSAO`/`VERSAO_PAGINA` iguais e a seção `## X.Y.Z` em `docs/novidades.md` (vira a descrição do release; sem ela o workflow falha). Ver skill `publicar-versao`.

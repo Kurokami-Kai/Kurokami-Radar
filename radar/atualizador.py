@@ -1,5 +1,5 @@
 """Atualizacao pelo GitHub Releases: verifica, baixa o instalador novo e instala por cima (dados ficam).
-So funciona no Radar instalado (.exe); pelo codigo, avisa e mostra o link."""
+So funciona no Hunter instalado (.exe); pelo codigo, avisa e mostra o link."""
 import json
 import os
 import re
@@ -64,7 +64,7 @@ def baixar(url, progresso=None):
 
 
 def instalar(instalador):
-    """Roda o instalador em silencio, separado deste processo; ele fecha o Radar, instala e abre a versao nova."""
+    """Roda o instalador em silencio, separado deste processo; ele fecha o Hunter, instala e abre a versao nova."""
     subprocess.Popen([instalador, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CLOSEAPPLICATIONS"],
                      creationflags=0x00000008 | 0x00000200 if os.name == "nt" else 0,  # DETACHED | NEW_GROUP
                      close_fds=True)
@@ -81,15 +81,15 @@ def abrir_janela_separada():
 
 
 def janela():
-    """Kurokami Radar (Atualizar): mostra as versoes e atualiza com um clique."""
+    """Kurokami Hunter (Atualizar): mostra as versoes e atualiza com um clique."""
     import threading
     import tkinter as tk
     import webbrowser
     from tkinter import ttk
 
-    AZUL, FUNDO, TEXTO, FRACO = "#66c0f4", "#1b2838", "#c7d5e0", "#8f98a0"
+    AZUL, FUNDO, TEXTO, FRACO = "#66c0f4", "#050505", "#d2d2d2", "#979797"
     raiz = tk.Tk()
-    raiz.title("Kurokami Radar - atualização")
+    raiz.title("Kurokami Hunter - atualização")
     raiz.configure(bg=FUNDO)
     raiz.resizable(False, False)
     raiz.attributes("-topmost", True)
@@ -99,11 +99,11 @@ def janela():
         est.theme_use("clam")
     except tk.TclError:
         pass
-    est.configure("K.TButton", background="#2a475e", foreground="white", borderwidth=0, padding=(12, 6))
+    est.configure("K.TButton", background="#1f1f1f", foreground="white", borderwidth=0, padding=(12, 6))
     est.map("K.TButton", background=[("active", AZUL)])
-    est.configure("K.Horizontal.TProgressbar", troughcolor="#0e141b", background="#75b022", borderwidth=0)
+    est.configure("K.Horizontal.TProgressbar", troughcolor="#000000", background="#75b022", borderwidth=0)
 
-    tk.Label(raiz, text="Kurokami Radar", bg=FUNDO, fg="white", font=("Segoe UI", 15)).pack(anchor="w", padx=20, pady=(16, 0))
+    tk.Label(raiz, text="Kurokami Hunter", bg=FUNDO, fg="white", font=("Segoe UI", 15)).pack(anchor="w", padx=20, pady=(16, 0))
     st = tk.Label(raiz, text="Procurando versão nova…", bg=FUNDO, fg=TEXTO, font=("Segoe UI", 10), justify="left", wraplength=440)
     st.pack(anchor="w", padx=20, pady=(6, 4))
     notas = tk.Label(raiz, text="", bg=FUNDO, fg=FRACO, font=("Segoe UI", 9), justify="left", wraplength=440)
@@ -121,7 +121,7 @@ def janela():
         def trabalho():
             try:
                 arq = baixar(info["url_exe"], lambda f, t: raiz.after(0, lambda: barra.config(value=100 * f / t if t else 0)))
-                raiz.after(0, lambda: st.config(text="Instalando… o Radar fecha e abre de novo sozinho em alguns segundos."))
+                raiz.after(0, lambda: st.config(text="Instalando… o Hunter fecha e abre de novo sozinho em alguns segundos."))
                 instalar(arq)
                 raiz.after(2500, raiz.destroy)
             except Exception as e:

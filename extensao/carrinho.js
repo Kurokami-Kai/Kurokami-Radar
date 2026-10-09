@@ -1,6 +1,6 @@
-// Kurokami Radar: poe no carrinho da Steam o pedido que o painel mandou no endereco
+// Kurokami Hunter: poe no carrinho da Steam o pedido que o painel mandou no endereco
 // (store.steampowered.com/cart/#kurokami=BR:p123,b456-presente,p789-privado).
-// Usa a sessao que a propria pagina da Steam ja tem; o token nunca sai deste navegador nem vai para o Radar.
+// Usa a sessao que a propria pagina da Steam ja tem; o token nunca sai deste navegador nem vai para o Hunter.
 // So adiciona o que ainda nao esta no carrinho (em qualquer modo) e confere lendo de volta; nunca remove nada.
 (() => {
   const PENDENTE = 'kurokami_pedido', AVISO = 'kurokami_aviso', VALIDADE = 15 * 60 * 1000;
@@ -16,8 +16,8 @@
       d.onclick = e => { if (e.target === d) d.remove(); };
       document.body.appendChild(d);
     }
-    d.style.background = tipo === 'erro' ? '#8b2f22' : tipo === 'aviso' ? '#7a5a12' : tipo === 'ok' ? '#4c6b22' : '#2a475e';
-    d.textContent = 'Kurokami Radar: ' + texto;
+    d.style.background = tipo === 'erro' ? '#8b2f22' : tipo === 'aviso' ? '#7a5a12' : tipo === 'ok' ? '#4c6b22' : '#1f1f1f';
+    d.textContent = 'Kurokami Hunter: ' + texto;
     if (link) {
       const a = document.createElement('a');
       a.href = link.href;

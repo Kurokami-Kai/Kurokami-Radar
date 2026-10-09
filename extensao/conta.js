@@ -1,6 +1,6 @@
-// Kurokami Radar: em qualquer pagina da loja da Steam, le (com a sessao da propria pagina) o que a sua conta tem:
+// Kurokami Hunter: em qualquer pagina da loja da Steam, le (com a sessao da propria pagina) o que a sua conta tem:
 // biblioteca com DLCs, lista de desejos, seguidos, ignorados e carrinho. Guarda so neste navegador; o painel do
-// Radar (localhost) busca daqui ao abrir. Senha, token e cookie nunca saem da Steam.
+// Hunter (localhost) busca daqui ao abrir. Senha, token e cookie nunca saem da Steam.
 (async () => {
   const CHAVE = 'kurokami_conta', INTERVALO = 10 * 60 * 1000;
   let info = {};

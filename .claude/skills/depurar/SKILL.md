@@ -1,11 +1,11 @@
 ---
 name: depurar
-description: Roteiro para investigar bugs e comportamentos estranhos do Kurokami Radar com o mínimo de tentativa e erro (coletar evidência, hipótese, teste, correção pequena). Use sempre que o usuário relatar erro, print de tela estranha, notificação errada, preço errado, algo que "não puxou" ou travou.
+description: Roteiro para investigar bugs e comportamentos estranhos do Kurokami Hunter com o mínimo de tentativa e erro (coletar evidência, hipótese, teste, correção pequena). Use sempre que o usuário relatar erro, print de tela estranha, notificação errada, preço errado, algo que "não puxou" ou travou.
 ---
 
 # Depurar
 
-Método geral: se a skill **`systematic-debugging`** (obra/superpowers) estiver instalada, siga as 4 fases dela (causa raiz antes de qualquer correção; 3 correções falhas = questionar a arquitetura). Esta skill só acrescenta **onde buscar evidência no Radar**.
+Método geral: se a skill **`systematic-debugging`** (obra/superpowers) estiver instalada, siga as 4 fases dela (causa raiz antes de qualquer correção; 3 correções falhas = questionar a arquitetura). Esta skill só acrescenta **onde buscar evidência no Hunter**.
 
 ## 1. Evidência antes de código
 Peça/colete só o necessário:
@@ -16,7 +16,7 @@ Peça/colete só o necessário:
 - Versão rodando × versão dos arquivos (faixa vermelha no painel indica processo antigo).
 
 ## 2. Hipótese explícita
-Escreva 1 a 3 causas prováveis e o que confirmaria cada uma. Confira `docs/decisoes.md`: muitos sintomas já têm causa conhecida (preço "grátis", fuso, pacote parcial, Radar antigo servindo página nova…).
+Escreva 1 a 3 causas prováveis e o que confirmaria cada uma. Confira `docs/decisoes.md`: muitos sintomas já têm causa conhecida (preço "grátis", fuso, pacote parcial, Hunter antigo servindo página nova…).
 
 ## 3. Reproduzir sem rede
 Com uma cópia do banco do usuário (skill `testar-sem-rede`), chame a função suspeita direto e mostre o valor errado. Só então corrija.

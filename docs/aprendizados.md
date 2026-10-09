@@ -2,6 +2,12 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — Kurokami Hunter: nome, paleta preta, logo, Configurações
+- **Classe nova colidiu com uma antiga** (`.crow` já era a linha do carrinho e virou grid): o grep por `^\.crow` não achou porque a regra estava depois de `}` na mesma linha. Prefixe classes novas da aba (`cfg-…`) e liste as regras que casam pelo JS (`cssRules` + `matches`) quando o layout sair estranho.
+- **Trocar paleta por mapa de hex** (40 tons, com alfa preservado) + varredura pelo DOM em todas as abas e na ficha (`getComputedStyle`, azul com pouca luz) achou zero sobras; mais barato que olhar print por print.
+- **Renomear em massa protege identificadores:** a troca de "Radar" nos docs mudou o nome do keyring no README (as chaves continuam em `Kurokami Radar`); conferir com `git grep` cada nome que o código usa (pasta, keyring, tarefa, exe, instalador) depois da troca.
+- **Script Python no scratchpad lendo em modo texto troca CRLF por LF** no `painel.html` (o Git normaliza, sem estrago); para docs com CRLF, grave com `newline` de CRLF.
+
 ## 2026-10-09 — spec 09: Ofertas, oitava rodada (ficha curta, recortes, orçamento)
 - **"Os melhores que cabem" em ordem gulosa levou 2 jogos com R$ 100** (os imperdíveis caros entram primeiro): para orçamento, mochila pela economia (9 jogos). Conferir a saída com 4 valores antes de mostrar.
 - **Encurtar texto expôs uma contradição** (duas datas diferentes para "volta"): ao resumir, escolha uma fonte só para cada pergunta.
@@ -23,13 +29,6 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Pane escondida mede zero:** `innerWidth` 0 e `visibilityState` hidden deram larguras 0 e alturas absurdas; chame `resize_window` antes de medir e confira `innerWidth`. Com a pane escondida, `focus()` não dispara `focusin`: teste pelo caminho do código (`andar`), não pelo evento.
 - **Conte cada grupo antes de mostrar:** "Vem aí" em 45 dias pegava 361 de 573 jogos (quase todo jogo entra em promoção todo mês); com "no menor preço, 4+ das 6" caiu para 52 e passou a dizer algo.
 
-## 2026-10-09 — spec 09: Ofertas, da O1/O2 à quarta rodada (previsão medida)
-- **Medir antes de propor a métrica:** a nota feita à mão parecia razoável, mas o backtest mostrou que quase todo preço volta (96% em 12 meses) e que "costuma voltar" quase não separa; o que separa é a 1ª vez nesse preço. O "último preço", chamado de covarde, é o melhor previsor (67%): a resposta foi mostrar a confiança medida.
-- **Revisor no backtest pegou 4 erros reais:** "6 de 6" misturando jogos com 2–3 promoções, comparação usando a data futura, grade do ajuste batendo no limite (mudou a conclusão: a Gama-Poisson empata) e grupos de 15–27 casos virando regra. Rode o revisor antes de escrever os números nos docs.
-- **Não rodar coleta pelo Radar do dono para encher amostra** (puxei 14 min de ITAD sem pedir; ele cortou). Amostra = API de listagem + banco em modo leitura. O Radar em `localhost` é o instalado (banco em `%LOCALAPPDATA%`), não o `dados/` do código.
-- **Amostras servidas por `http.server` só de `dados/amostras`** (launch.json "amostras"); arquivo local não abre no navegador do app e servir `dados/` inteiro expõe o banco.
-- **Prints do navegador do app seguem instáveis:** medir pelo DOM num laço (página × filtro), `resize_window` 1440×900 logo antes do print; capas pretas = `loading=lazy` ainda carregando.
-
 ## 2026-10-09 — spec 09 Etapa 2: amostras da Biblioteca (resumo)
 - Amostra com dados pessoais vai para `dados/` (fora do Git); medir pelo DOM num laço (opção × página × modo) em vez de prints; arquivo local acima de ~512 KB não abre no navegador do app; `Set-Content` grava BOM e aspas quebram o commit no PowerShell 5.1 (use `git commit -F`); hash, não `appid % 5`, para dado sintético; cinco rodadas com dados reais fecharam a H2.
 
@@ -47,6 +46,7 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Rota nova testada chamando a função direto** numa cópia do banco (`caminhos.RAIZ_DADOS/ARQ_BANCO` trocados no script): mais barato que subir o `painel_copia.py`.
 
 ## Antigas, resumidas (até 08/10)
+- **Ofertas O1 à 4ª rodada (09/10):** medir antes de propor métrica (backtest: o "último preço" prevê 67%); revisor no backtest pegou 4 erros reais; não rodar coleta pelo app do dono para encher amostra (amostra = API de listagem + banco em modo leitura); amostras só por `http.server` de `dados/amostras`; prints instáveis: medir pelo DOM.
 - **Ofertas, +18, biblioteca com 401 (08/10, madrugada):** "jogo que tenho aparece" era a biblioteca vazia (`grep "biblioteca:" radar.log` antes de mexer em filtro); a Query já traz `content_descriptorids`; `painel_copia.py` morto deixa `kr-painel-*` no %TEMP% (apague); a rota é `/api/...` na raiz; explorador + revisor pegaram 2 erros reais.
 - **Steam inteira, recordes e menus (08/10, noite):** confira 3 itens na loja antes de perseguir contagem da SteamDB; a ITAD tem cota (~100 chamadas em 5 min): espaçar sondagens e parar no primeiro 429; `.py` de edição no scratchpad com `assert count == 1`; navegue com `?v=N` para o navegador do app largar o `painel.html` velho.
 - **Steam inteira e extensão (08/10):** peça gzip antes de achar algo pesado (1,5 MB → 150 KB); ordenar estável do último critério ao primeiro em vez de `cmp_to_key`; teste de desempenho com cópia do banco + linhas sintéticas chamando `painel.api_promocoes` direto; reescrever histórico com `git filter-branch` e `git bundle` de backup; a página da Steam dá para conferir sem login no navegador do app.

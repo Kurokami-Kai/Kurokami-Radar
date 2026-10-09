@@ -19,7 +19,7 @@ SAIDA = os.path.join(RAIZ, "output")
 os.makedirs(os.path.join(EXT, "icones"), exist_ok=True)
 os.makedirs(SAIDA, exist_ok=True)
 
-base = desenhar_icone().resize((512, 512))
+base = desenhar_icone(tam=512)
 for t in (16, 32, 48, 128):
     base.resize((t, t)).save(os.path.join(EXT, "icones", "%d.png" % t))
 base.resize((300, 300)).save(os.path.join(SAIDA, "loja-edge-logo-300.png"))
