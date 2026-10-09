@@ -2,6 +2,12 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — spec 09: Ofertas, sétima rodada (filtro escondido, Bons e baratos, preto)
+- **`cat > arquivo` sem heredoc travou o Bash 2 min** esperando entrada: scripts sempre pelo Write no scratchpad.
+- **O porto 8802 das amostras pode estar com o servidor de outra conversa:** navegue direto para `http://127.0.0.1:8802/<arquivo>` (serve a mesma pasta) em vez de subir outro.
+- **"Bem avaliado" só pela % premia brinquedo de R$ 2** (gatos, pato a 97–99%): somar o peso das análises e exigir preço cheio mínimo antes de chamar de descoberta.
+- **Contar o filtro antes de mostrar a coluna** de novo valeu: o -50% escondido cortou a Lista de 208 para 118 e tirou sozinho o "AAA recente caro".
+
 ## 2026-10-09 — spec 09: Ofertas, sexta rodada (piso e patamar)
 - **A amostra e o backtest discordavam na definição:** o backtest chama de "último preço" a promoção que acabou de acabar; a amostra pulava a promoção de agora. Antes de dizer que a previsão é "a medida", confira se a página usa os mesmos pontos de dados do backtest.
 - **Ouvir a intuição do dono e medir:** "novo patamar" virou uma pergunta de 20 linhas no backtest e mudou o texto da previsão. O revisor pegou queda de 1–2% contando como "preço novo" e a penúltima promoção como "patamar de antes": com 10% mínimo, mediana das 3 e grupo de controle, a conclusão ficou (62%), com outros números.
@@ -42,13 +48,8 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **`painel_copia.py` morto à força deixa a cópia do banco no %TEMP%** (`kr-painel-*`, havia 16): apague depois do teste. A rota é `/api/...` na raiz, não `/kurokami/api`.
 - **Subagente explorador para o mapa das abas + revisor no fim** pegou 2 erros reais (faixa afirmando "chave recusada" para qualquer erro; 500 com banco ocupado).
 
-## 2026-10-08 (noite) — recordes da Steam inteira, menus no topo
-- **Antes de perseguir uma contagem da SteamDB, confira 3 itens na loja** (`appdetails`): os 40 mil dela eram promoções já acabadas (fila de atualização cheia, o aviso amarelo dela diz).
-- **A ITAD tem cota (~100 chamadas em 5 min)** e as minhas sondagens seguidas gastaram a cota do teste seguinte (429 com `Retry-After` 210 s): espaçar sondagens e, no código, parar no primeiro 429 em vez de esperar dentro do laço.
-- **Arquivo .py de edição no scratchpad + `assert count == 1`** funcionou sem retrabalho (o único heredoc tentado quebrou de novo nas aspas).
-- **O navegador do app guardou o `painel.html` velho:** depois de editar, navegue com `?v=N` para forçar a página nova.
-
 ## Antigas, resumidas (até 08/10)
+- **Steam inteira, recordes e menus (08/10, noite):** confira 3 itens na loja antes de perseguir contagem da SteamDB; a ITAD tem cota (~100 chamadas em 5 min): espaçar sondagens e parar no primeiro 429; `.py` de edição no scratchpad com `assert count == 1`; navegue com `?v=N` para o navegador do app largar o `painel.html` velho.
 - **Steam inteira e extensão (08/10):** peça gzip antes de achar algo pesado (1,5 MB → 150 KB); ordenar estável do último critério ao primeiro em vez de `cmp_to_key`; teste de desempenho com cópia do banco + linhas sintéticas chamando `painel.api_promocoes` direto; reescrever histórico com `git filter-branch` e `git bundle` de backup; a página da Steam dá para conferir sem login no navegador do app.
 - **Scripts de edição:** Write num `.py` do scratchpad (heredoc quebra aspas, crases e `\`), `assert s.count(a) == 1` antes de cada troca, trecho único (inclua a linha de cima) e corte só entre marcadores nomeados, com `git diff --stat` logo depois.
 - **Testes:** `painel_copia.py` velho pode seguir vivo em outra porta (use `--porta 8801`); `tools/rodar_instalado.py` para o caminho real (achou o que os sintéticos não acharam); teste que mexe na conta guarda o conteúdo a cada passo; `GetCart` só lê. Medir na fonte (`Query` precisa de `sort: 2`).

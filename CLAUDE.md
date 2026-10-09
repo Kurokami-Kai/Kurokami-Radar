@@ -35,7 +35,7 @@ Leia só o que a tarefa pede, nesta ordem de utilidade:
 - Dinheiro em centavos; datas em UTC ISO.
 - Nada pessoal no repositório: `config.json`, `userdata.json` e `dados/` estão no `.gitignore`. Chaves só no keyring.
 - Arquivo novo que o `.exe` precise ler → adicionar ao `--add-data` do workflow e do `gerar_setup.bat`.
-- Visual do painel segue a loja da Steam (ver `docs/decisoes.md`, "Produto").
+- Visual do painel segue a loja da Steam, **em tons de preto** (ver `docs/decisoes.md`, "Produto").
 - Depois de mudar comportamento: atualize **você mesmo, sem perguntar**, o `CLAUDE.md` (se a mudança afetar algo descrito aqui), o `README.md` (usuário) e os docs afetados em `docs/`, no mesmo trabalho da mudança.
 - Ao terminar cada tarefa, depois de `py tools/checar.py` dar `ok`: faça o commit e o push **sem perguntar**. Só pergunte antes de comandos que reescrevem histórico (`reset`, `rebase`, `push --force`) ou que apagam arquivos fora do projeto.
 - **Publicar = você cria e envia a tag `vX.Y.Z`**, só quando o dono disser "publique". Antes: `VERSAO`/`VERSAO_PAGINA` iguais e a seção `## X.Y.Z` em `docs/novidades.md` (vira a descrição do release; sem ela o workflow falha). Ver skill `publicar-versao`.
