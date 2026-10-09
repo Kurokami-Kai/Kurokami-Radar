@@ -1,6 +1,6 @@
 # Spec 07 — Promoções da Steam inteira
 
-Status: **implementada em 08/10/2026; revisada na mesma noite com recordes e histórico (não publicada; o dono testa antes)** · Pedido do dono em 08/10/2026 ("puxar todos os jogos da Steam, não só os da lista de desejos") · Base: spec 04, item 1.6 e Etapa 1c · Skills: `kurokami-code`, `coleta-e-apis`, `banco-e-migracao`, `editar-painel`
+Status: **feito em v0.17.0** (implementada em 08/10/2026 e revisada na mesma noite com recordes e histórico) · Pedido do dono em 08/10/2026 ("puxar todos os jogos da Steam, não só os da lista de desejos") · Base: spec 04, item 1.6 e Etapa 1c · Skills: `kurokami-code`, `coleta-e-apis`, `banco-e-migracao`, `editar-painel`
 
 O dono pediu e saiu ("só pare se encontrar algum problema"); as decisões abaixo foram tomadas sem ele e estão marcadas **[decidido]** para revisar.
 

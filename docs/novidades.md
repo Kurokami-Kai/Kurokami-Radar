@@ -2,7 +2,7 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
-## 0.17.0 (a publicar)
+## 0.17.0 (publicada em 2026-10-09)
 - **Novo nome: Kurokami Hunter** (antes Kurokami Radar), com **símbolo novo**: uma mira preta e vermelha, no painel, na aba do navegador, no ícone perto do relógio, no instalador e na extensão. Os seus dados, chaves e configurações continuam onde estavam; os atalhos do menu Iniciar e da área de trabalho passam a se chamar Kurokami Hunter.
 - **Ofertas novas** (Destaques, Promoções e Lista de desejos; teclas 1, 2 e 3): cada promoção ganha um **veredito** (*Imperdível*, *Menor preço*, *Pode esperar*, *Preço de costume*, *Vem aí*) e duas frases medidas no seu histórico: **quando deve vir a próxima promoção** e **se esse preço costuma voltar**. Destaques com o carrossel das 10 melhores da sua lista e as colunas Melhores ofertas, Menores históricos, **Bons e baratos** e Lista de desejos; Promoções com recortes em cartões (Imperdíveis, Grandes por pouco, Das suas séries...) e os filtros num botão; Lista de desejos com o **orçamento** ("com R$ 100 você leva 9 jogos por R$ 97,80") e a visão por franquias. A ficha do jogo mostra o veredito e tem ‹ › para passar ao próximo da lista. A tabela antiga, com todos os filtros, continua no menu Ofertas.
 - **Biblioteca nova:** a **Coleção** em capas, uma pilha por franquia ("3 de 5", horas jogadas, quantos faltam), ou as **Franquias** em prateleiras de arrastar; a **ficha da franquia** em tela cheia (os jogos em ordem de lançamento, onde foi o seu tempo, o que falta, nunca jogados); e o **Completar** com as DLCs que faltam, as em promoção primeiro. Índice A–Z, `/` para buscar e as setas para andar pelas capas.
