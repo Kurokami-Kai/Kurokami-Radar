@@ -2,9 +2,10 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
-## 2026-10-09 — spec 09: duas opções para a aba Ofertas (O1/O2)
+## 2026-10-09 — spec 09: duas opções para a aba Ofertas (O1/O2) e a segunda rodada (O3/O4)
+- **Medir a cobertura antes de ranquear:** "as mais raras" parecia simples, mas 248 de 250 jogos da Steam inteira não têm histórico; a amostra estima pela marca da ITAD e marca com `*`.
+- **Desestruturar o retorno de uma função que às vezes devolve 0** (`const [m,est]=espera(o)`) derrubou a página inteira em silêncio: testar `typeof` das constantes no navegador achou a linha.
 - **Amostra de Ofertas sem copiar o banco:** a API do Radar aberto (`/api/vitrine`, `/api/promocoes` com `por_pagina` 250) já dá tudo; só a franquia veio do banco (`series.franquias`). Rotas ficam na raiz (`/api/...`), não em `/kurokami/api/`. As contagens batem com a vitrine filtrando `corte >= desconto_minimo`.
-- **CSS da referência injetado pelo gerador** (lê o `<style>` de `09-referencia-biblioteca.html`): a amostra herda o visual H2 sem duplicar.
 - **Prints do navegador do app seguem instáveis** (tempo esgotado, escala errada, quadro velho): cada `navigate` para arquivo local abre aba nova; medir pelo DOM (alturas, colunas, erros num laço por opção × página × modo) e usar `zoom` só para conferir.
 - **Caminho Windows em string Python sem `r` e com barra invertida antes de dígito** (`specs` + barra + `09`) vira byte nulo: use barras normais.
 
