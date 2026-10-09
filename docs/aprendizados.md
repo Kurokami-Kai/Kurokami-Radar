@@ -2,6 +2,12 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — spec 09: Ofertas, sexta rodada (piso e patamar)
+- **A amostra e o backtest discordavam na definição:** o backtest chama de "último preço" a promoção que acabou de acabar; a amostra pulava a promoção de agora. Antes de dizer que a previsão é "a medida", confira se a página usa os mesmos pontos de dados do backtest.
+- **Ouvir a intuição do dono e medir:** "novo patamar" virou uma pergunta de 20 linhas no backtest e mudou o texto da previsão. O revisor pegou queda de 1–2% contando como "preço novo" e a penúltima promoção como "patamar de antes": com 10% mínimo, mediana das 3 e grupo de controle, a conclusão ficou (62%), com outros números.
+- **Critério em reais, não só em %:** "imperdível" sem ganho mínimo em R$ punha um jogo de R$ 4 no topo.
+- **`.full` com 100vw desalinha da página** (a largura conta a barra de rolagem); meça as bordas pelo DOM depois de a animação de entrada terminar.
+
 ## 2026-10-09 — spec 09: Ofertas, quinta rodada (três modelos A/B/C)
 - **Amostra nova sem o Radar aberto:** os dados da amostra anterior estão embutidos no HTML (`const D=`); extrair dali + banco em modo leitura evitou API e rede.
 - **Pane escondida mede zero:** `innerWidth` 0 e `visibilityState` hidden deram larguras 0 e alturas absurdas; chame `resize_window` antes de medir e confira `innerWidth`. Com a pane escondida, `focus()` não dispara `focusin`: teste pelo caminho do código (`andar`), não pelo evento.

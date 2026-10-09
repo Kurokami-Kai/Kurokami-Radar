@@ -17,6 +17,7 @@
 
 Em ordem aproximada de valor. Nada aqui foi iniciado.
 
+- **Vídeo de abertura do painel** (pedido do dono, 09/10, "coisa para depois"): uma animação curta ao abrir o Radar.
 - **Telegram**: mesmo alerta no celular fora de casa (bot gratuito; token no keyring).
 - **Bundles de outras lojas** (Humble, Fanatical) via ITAD `games/bundles/v2`.
 - **Hype Games e 2Game**: fora da ITAD; só lendo o site (frágil).

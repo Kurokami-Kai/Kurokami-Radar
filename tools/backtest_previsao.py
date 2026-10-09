@@ -371,6 +371,33 @@ def rodar(b, marc, _dmin):
     out["B"]["concU"] = {str(c): sum(v) / len(v) for c, v in concU.items()}
     out["B"]["concU_n"] = {str(c): len(v) for c, v in concU.items()}
     out["B"]["faixa3"] = sum(faixa3) / max(1, len(faixa3))
+    # novo patamar: a promoção que acabou foi um preço novo, pelo menos 10% abaixo de todas as anteriores (de sempre)
+    # ou de todas as dos 24 meses antes (sem ser o de sempre). A próxima repete o preço novo, cai mais, fica entre ou
+    # volta ao patamar de antes (mediana das 3 promoções anteriores)? Controle: a última não foi preço novo.
+    print("\nPARTE B · depois de um preço novo (10%+ abaixo das anteriores): a próxima...")
+    pat, jogos = defaultdict(Counter), defaultdict(set)
+    for x in B:
+        pp = [v for _pe, v in x["past"]]
+        ult, ant = pp[-1], pp[:-1]
+        ant24 = [v for pe, v in x["past"][:-1] if pe[0] >= x["past"][-1][0][0] - 730 * DIA]
+        g = ("todos" if ult <= 0.9 * min(ant) else "24m" if ult >= min(ant) - tol(min(ant)) and ant24 and ult <= 0.9 * min(ant24)
+             else "controle" if ult >= min(ant) - tol(min(ant)) else None)
+        if not g:
+            continue        # caiu menos de 10%: fica fora dos dois grupos
+        base = statistics.median(ant[-3:])
+        r = ("repetiu" if abs(x["p"] - ult) <= tol(ult) else "caiu" if x["p"] < ult else
+             "voltou" if x["p"] >= base - tol(base) else "entre")
+        pat[g][r] += 1
+        jogos[g].add(x["a"])
+    out["B"]["patamar"] = {}
+    for g in ("todos", "24m", "controle"):
+        c = pat[g]
+        n = sum(c.values())
+        if not n:
+            continue
+        print("  %-8s n=%5d (%4d jogos) · repetiu %3.0f%% · caiu mais %3.0f%% · ficou entre %3.0f%% · voltou ao de antes (ou mais) %3.0f%%" % (
+            g, n, len(jogos[g]), *(100 * c[k] / n for k in ("repetiu", "caiu", "entre", "voltou"))))
+        out["B"]["patamar"][g] = {"n": n, "jogos": len(jogos[g]), **{k: c[k] / n for k in ("repetiu", "caiu", "entre", "voltou")}}
     # data: intervalo mediano x próximo evento em que o jogo esteve no ano anterior
     print("\nPARTE B · data da próxima promoção (erro em dias)")
     errs = defaultdict(list)
