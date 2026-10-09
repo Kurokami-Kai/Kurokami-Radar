@@ -1,6 +1,7 @@
-"""Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca em lote) e guardado em ficha_cache:
+"""Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca na coleta) e guardado em ficha_cache:
 descricao, captura de tela e informacoes da loja (appdetails), tempo para zerar, jogadores e notas (Augmented Steam,
-servico de terceiro sem contrato: se falhar, a ficha abre sem o quadro) e as conquistas da conta. Tambem a fileira
+servico de terceiro sem contrato: se falhar, a ficha abre sem o quadro) e as conquistas da conta. O HLTB de uma franquia
+inteira vem junto ao abrir a ficha da franquia (hltb_lote, ate 60 jogos, o mesmo cache). Tambem a fileira
 da franquia (so com os jogos que o Hunter conhece: biblioteca e lista) e o tempo jogado (gravado pela coleta)."""
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -79,6 +80,40 @@ def extras(b, cfg, a, tenho, log_erro=None):
             if log_erro:
                 log_erro("cache da ficha", e)
     return {f: (None if d.get("falhou") else d) for f, d in out.items()}
+
+
+def hltb_lote(b, appids, log_erro=None, maximo=60):
+    """{appid: {story, extras, complete} em minutos, ou None}: o HLTB de varios jogos (ficha da franquia), do mesmo
+    cache da ficha; os que faltam vem do Augmented Steam em paralelo (no maximo `maximo` por pedido)."""
+    out, buscar = {}, []
+    for a in appids:
+        c = _do_cache(b, a, "aug")
+        if c is None:
+            buscar.append(a)
+        else:
+            out[a] = c.get("hltb")
+    buscar = buscar[:maximo]
+    if buscar:
+        with ThreadPoolExecutor(6) as ex:
+            fut = {a: ex.submit(augmented, a) for a in buscar}
+        novos = []
+        for a, fu in fut.items():
+            try:
+                d = fu.result() or {}
+                if not any(v for v in d.values()):
+                    d = {"vazio": True}
+            except Exception as e:
+                d = {"falhou": str(e)[:200]}
+            out[a] = d.get("hltb")
+            novos.append((a, "aug", json.dumps(d), agora()))
+        try:
+            b.con.executemany("INSERT OR REPLACE INTO ficha_cache VALUES(?,?,?,?)", novos)
+            b.commit()
+        except Exception as e:   # banco ocupado pela coleta: responde sem guardar
+            b.con.rollback()
+            if log_erro:
+                log_erro("cache do HLTB", e)
+    return out
 
 
 def jogado(b, a):

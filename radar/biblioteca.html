@@ -184,6 +184,10 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .fl .n{color:var(--lista);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fl .p{display:flex;gap:6px;align-items:center;white-space:nowrap}
 .vazio{color:var(--fraco);font-size:13px}
+.lj{display:inline-block;margin-left:5px;padding:0 4px;border-radius:2px;background:#000c;box-shadow:inset 0 0 0 1px #d2d2d2;color:#fff;font-size:10px;font-weight:600;letter-spacing:.03em;line-height:15px;vertical-align:1px;white-space:nowrap;font-style:normal}
+.fx h4.hlt{color:var(--sinal)}
+.hlr{font-size:13px;margin:-4px 0 10px;color:var(--txt)}.hlr b{color:var(--sinal);font-weight:400;font-size:20px;margin-right:4px}
+.hlb{grid-template-columns:minmax(0,1fr) auto}.hlb .t{white-space:nowrap}.hlb .b{background:var(--vbg)}.hlb .t{color:var(--vtx)}.hlb span[data-g]{cursor:pointer}.hlb span[data-g]:hover{color:var(--azul)}
 /* F: uma tela só */
 .tres{display:grid;grid-template-columns:1.2fr 1fr 1.2fr;gap:14px}
 .tres h4{margin-top:18px}
@@ -268,7 +272,7 @@ document.addEventListener('error',e=>{const im=e.target;if(im.tagName!=='IMG'||i
   im.outerHTML=`<span class="ph" style="--h:${hue(+im.dataset.i)}">${esc(im.dataset.n)}</span>`;},true);
 
 /* ---------- dados ---------- */
-const G=D.G.map(r=>({appid:r[0],nome:r[1],capa_v:u(r[2]),fr:r[3],tenho:!!r[4],lista:!!r[5],lanc:r[6],preco:r[7],cheio:r[8],corte:r[9],min:r[10]||0,ult:r[11]||0,rpos:r[12],capa:u(r[13])}));
+const G=D.G.map(r=>({appid:r[0],nome:r[1],capa_v:u(r[2]),fr:r[3],tenho:!!r[4],lista:!!r[5],lanc:r[6],preco:r[7],cheio:r[8],corte:r[9],min:r[10]||0,ult:r[11]||0,rpos:r[12],capa:u(r[13]),loja:r[14]||'Steam'}));
 const ID=Object.fromEntries(G.map(g=>[g.appid,g]));
 const C=D.C.filter(c=>c[6].length&&ID[c[0]]).map(c=>({g:ID[c[0]],tem:c[1],tot:c[2],hoje:c[4],menor:c[5],nome:ID[c[0]].nome,k:chave(ID[c[0]].nome),L:letra(ID[c[0]].nome),
   falta:c[6].map(d=>({appid:d[0],nome:d[1],preco:d[2],cheio:d[3],corte:d[4],menor:d[5],classe:d[6]}))}));
@@ -293,7 +297,7 @@ const ORDEM_CL=['historia','conteudo','pacote','extra','cosmetico','atalho'];
 
 /* ---------- estado ---------- */
 const S={o:'H2',sub:'bib',modo:{},q:'',ord:{},aberto:null,lista:[]};
-const modo=()=>S.modo[S.sub]||(S.sub==='bib'?'colecao':'capas');
+const modo=()=>S.modo[S.sub]||(S.sub==='bib'?'colecao':'texto');
 const ordKey=()=>S.sub==='bib'?modo():modo()==='texto'?'cptexto':'completar';
 const ORD={colecao:[['jogadas','Mais jogadas'],['recentes','Recentes'],['az','A–Z'],['completas','Mais completas'],['maiores','Maiores']],
   franquias:[['completas','Mais completas'],['faltam','Mais faltando'],['barato','Mais barato de fechar'],['jogadas','Mais jogadas'],['az','A–Z']],
@@ -309,14 +313,20 @@ const SORTC={perto:(a,b)=>a.falta.length-b.falta.length||a.hoje-b.hoje,barato:(a
 const busca=x=>!S.q||x.nome.toLowerCase().includes(S.q)||x.m.some(g=>g.nome.toLowerCase().includes(S.q));
 
 /* ---------- peças ---------- */
+/* a loja do preço: quem não é a Steam ganha etiqueta; o + põe no carrinho dessa loja */
+const LJC={'GreenManGaming':'GMG','Epic Game Store':'Epic','Humble Store':'Humble','Microsoft Store':'Microsoft','IndieGala Store':'IndieGala'};
+const lojaCurta=l=>LJC[l]||String(l).replace(/^GamesPlanet .*/,'GamesPlanet').replace(/ Store$/,'');
+const foraSteam=g=>!g.tenho&&g.preco!=null&&g.loja&&g.loja!=='Steam';
+const lojaTag=g=>foraSteam(g)?`<i class="lj" title="Este preço é na ${esc(g.loja)}, não na Steam">${esc(lojaCurta(g.loja))}</i>`:'';
+const maisT=g=>foraSteam(g)?`Pôr no carrinho da ${esc(g.loja)}`:'Pôr no carrinho da Steam';
 const imgV=g=>`<img src="${esc(g.capa_v||CDN+g.appid+'/library_600x900_2x.jpg')}" alt="" loading="lazy" data-n="${esc(g.nome)}" data-i="${g.appid}"${g.capa?` data-alt="${esc(g.capa)}"`:''}>`;
 function capa(g,o={}){
   const f=!g.tenho,tag=o.div?'div':'button';
-  const pr=f&&!o.semPreco?`<span class="pr"><span>${g.corte?`<span class="c">-${g.corte}%</span>`:''}${g.preco!=null?brl(g.preco):'em breve'}</span>${g.preco!=null?`<span class="mais" data-mais="${g.appid}" title="Pôr no carrinho">+</span>`:''}</span>`:'';
+  const pr=f&&!o.semPreco?`<span class="pr"><span>${g.corte?`<span class="c">-${g.corte}%</span>`:''}${g.preco!=null?brl(g.preco)+lojaTag(g):'em breve'}</span>${g.preco!=null?`<span class="mais" data-mais="${g.appid}" title="${maisT(g)}">+</span>`:''}</span>`:'';
   return `<${tag} class="capa${f?' falta':''}"${o.div?'':` data-g="${g.appid}"`} title="${esc(g.nome)}">${imgV(g)}${!f&&o.ok?'<span class="ok">✓</span>':''}${f&&g.lista?'<span class="cor">♥</span>':''}${pr}</${tag}>`;
 }
 const bar=p=>`<div class="bar"><i style="width:${Math.max(0,Math.min(100,p))}%"></i></div>`;
-const legJogo=g=>`<div class="lg"><div class="n${g.tenho?'':' f'}" title="${esc(g.nome)}">${esc(g.nome)}</div><div class="a">${ano(g.lanc)} · ${g.tenho?`<b>${g.min?horas(g.min):'✓ tenho'}</b>`:`<b class="f">${brl(g.preco)}</b>`}</div></div>`;
+const legJogo=g=>`<div class="lg"><div class="n${g.tenho?'':' f'}" title="${esc(g.nome)}">${esc(g.nome)}</div><div class="a">${ano(g.lanc)} · ${g.tenho?`<b>${g.min?horas(g.min):'✓ tenho'}</b>`:`<b class="f">${brl(g.preco)}</b>${lojaTag(g)}`}</div></div>`;
 function fileira(lista,cw,leg){return `<div class="fil" style="--cw:${cw}px"><div class="trilho arr">${lista.map(g=>`<div>${capa(g,{ok:true})}${leg?legJogo(g):`<div class="ano">${ano(g.lanc)}${g.tenho&&g.min?' · '+horas(g.min):''}</div>`}</div>`).join('')}</div></div>`;}
 function vitItem(x,i){
   if(x.tipo==='jogo')return `<div class="it" data-L="${x.L}"><button class="capa" data-nav data-it="${i}" title="${esc(x.nome)}">${imgV(x.rep)}</button>
@@ -335,7 +345,7 @@ const legenda=`<div class="leg2"><span><i style="background:var(--tenho)"></i>te
 function linhasFixas(itens,N,fn){const l=itens.slice(0,N).map(fn);while(l.length<N)l.push('<li class="vz"></li>');return l.join('');}
 function tcFr(x,i,N,fp){return `<div class="tc" data-L="${x.L}"><h3><button data-it="${i}" data-nav title="${esc(x.nome)}">${esc(x.nome)}</button><small>${x.tenho} de ${x.total}</small></h3>
   <div class="sub">${x.falta.length?`faltam ${x.falta.length} · ${brl(x.custo)} hoje`:'<span style="color:var(--verde)">completa ✓</span>'}${x.min?' · '+horas(x.min)+' jogadas':''}</div>${bar(100*x.tenho/x.total)}
-  <ul class="lst">${linhasFixas(fp?[...x.falta,...x.m.filter(g=>g.tenho)]:x.m,N,g=>`<li><span class="n${g.tenho?'':' f'}" title="${esc(g.nome)}">${esc(g.nome)}<span class="a">${ano(g.lanc)}</span></span><span class="s${g.tenho?'':' f'}">${g.tenho?'✓ '+(g.min?horas(g.min):'tenho'):`${g.lista?'<span style="color:var(--lista)">♥</span>':''}${g.corte?`<span class="pct">-${g.corte}%</span>`:''}${brl(g.preco)}`}</span></li>`)}</ul>
+  <ul class="lst">${linhasFixas(fp?[...x.falta,...x.m.filter(g=>g.tenho)]:x.m,N,g=>`<li><span class="n${g.tenho?'':' f'}" title="${esc(g.nome)}">${esc(g.nome)}<span class="a">${ano(g.lanc)}</span></span><span class="s${g.tenho?'':' f'}">${g.tenho?'✓ '+(g.min?horas(g.min):'tenho'):`${g.lista?'<span style="color:var(--lista)">♥</span>':''}${g.corte?`<span class="pct">-${g.corte}%</span>`:''}${brl(g.preco)}${lojaTag(g)}`}</span></li>`)}</ul>
   <button class="rod" data-it="${i}">${x.m.length>N?`+ ${x.m.length-N} jogos · `:''}abrir a franquia ›</button></div>`;}
 function tcCp(c,i,N){return `<div class="tc" data-L="${c.L}"><h3><button data-ic="${i}" data-nav title="${esc(c.nome)}">${esc(c.nome)}</button><small>faltam ${brl0(c.hoje)}</small></h3>
   <div class="sub">tem ${c.tem} de ${c.tot} DLCs${c.falta.some(d=>d.corte)?` · <span style="color:var(--vtx)">${c.falta.filter(d=>d.corte).length} em promoção</span>`:''}</div>${bar(c.tot?100*c.tem/c.tot:0)}
@@ -359,7 +369,23 @@ function cabFr(x,d,comTiles){return `<div><span class="chip">Franquia</span><spa
 function blocoTempo(d,n){const mx=d.jog[0]?d.jog[0].min:1;
   return d.jog.length?`<div class="hb">${d.jog.slice(0,n).map(g=>`<span title="${esc(g.nome)}">${esc(g.nome)}</span><span class="t">${horas(g.min)}</span><div class="b"><i style="width:${100*g.min/mx}%"></i></div>`).join('')}</div>${d.jog.length>n?`<div class="vazio">+ ${d.jog.length-n} jogos com tempo</div>`:''}`:'<div class="vazio">Nenhum jogo da franquia jogado ainda.</div>';}
 function blocoNunca(d,n){return d.nunca.length?d.nunca.slice(0,n).map(g=>`<span class="tag" data-g="${g.appid}" title="${esc(g.nome)}">${esc(g.nome)}</span>`).join('')+(d.nunca.length>n?`<span class="vazio">+ ${d.nunca.length-n}</span>`:''):'<div class="vazio">Você jogou todos os que tem ✓</div>';}
-function blocoFalta(x,n){return x.falta.length?x.falta.slice(0,n).map(g=>`<div class="fl"><span class="n" title="${esc(g.nome)}">${g.lista?'♥ ':''}${esc(g.nome)}</span><span class="p">${g.corte?`<span class="pct">-${g.corte}%</span>`:''}${brl(g.preco)}${g.preco!=null?`<span class="mais" data-mais="${g.appid}">+</span>`:''}</span></div>`).join('')+(x.falta.length>n?`<div class="vazio" style="margin-top:6px">+ ${x.falta.length-n} (em P&B na fileira)</div>`:''):'<div style="color:var(--verde)">Franquia completa ✓</div><div class="vazio" style="margin-top:6px">Os que você nem listou chegam na Etapa 3.</div>';}
+function blocoFalta(x,n){return x.falta.length?x.falta.slice(0,n).map(g=>`<div class="fl"><span class="n" title="${esc(g.nome)}">${g.lista?'♥ ':''}${esc(g.nome)}</span><span class="p">${g.corte?`<span class="pct">-${g.corte}%</span>`:''}${brl(g.preco)}${lojaTag(g)}${g.preco!=null?`<span class="mais" data-mais="${g.appid}" title="${maisT(g)}">+</span>`:''}</span></div>`).join('')+(x.falta.length>n?`<div class="vazio" style="margin-top:6px">+ ${x.falta.length-n} (em P&B na fileira)</div>`:''):'<div style="color:var(--verde)">Franquia completa ✓</div><div class="vazio" style="margin-top:6px">Os que você nem listou chegam na Etapa 3.</div>';}
+/* HowLongToBeat (pelo Augmented Steam, o mesmo cache da ficha do jogo): o que falta para zerar, do mais curto ao mais longo */
+const HL={},HLvoo=new Set(),HLerro=new Set();   // HL: appid → {story, extras, complete} em minutos, ou null (sem dado); ausente = ainda não buscou
+function blocoHltb(x,n){const t=x.m.filter(g=>g.tenho);
+  if(t.some(g=>!(g.appid in HL)))return HLerro.has(x.k)?'<div class="vazio">Não consegui falar com o HowLongToBeat agora. Abra a franquia de novo daqui a pouco.</div>':'<div class="vazio">Buscando no HowLongToBeat…</div>';
+  const c=t.filter(g=>HL[g.appid]&&HL[g.appid].story);
+  if(!c.length)return '<div class="vazio">O HowLongToBeat não tem os tempos destes jogos.</div>';
+  const falta=g=>Math.max(0,HL[g.appid].story-g.min),pend=c.filter(g=>falta(g)>0).sort((a,b)=>falta(a)-falta(b)),feitos=c.length-pend.length;
+  if(!pend.length)return `<div class="hlr"><b>✓</b> Você já jogou o tempo da história de todos os ${c.length}.</div>`;
+  return `<div class="hlr"><b>${horas(pend.reduce((s,g)=>s+falta(g),0))}</b> de história para zerar ${pend.length>1?'os '+pend.length:'o que falta'}${feitos?` · ${feitos} já passa${feitos>1?'ram':'ou'} do tempo ✓`:''}</div>
+   <div class="hb hlb">${pend.slice(0,n).map(g=>{const h=HL[g.appid];return `<span title="${esc(g.nome)}: ${g.min?'jogou '+horas(g.min)+' de ':''}${horas(h.story)} de história${h.complete?' · '+horas(h.complete)+' para 100%':''}" data-g="${g.appid}">${esc(g.nome)}</span><span class="t">${g.min?'faltam ':''}${horas(falta(g))}</span><div class="b"><i style="width:${Math.min(100,100*g.min/h.story)}%"></i></div>`;}).join('')}</div>${pend.length>n?`<div class="vazio">+ ${pend.length-n} jogos · do mais curto ao mais longo</div>`:''}`;}
+function pedeHltb(x){const t=x.m.filter(g=>g.tenho&&!(g.appid in HL)&&!HLvoo.has(g.appid)).map(g=>g.appid);if(!t.length)return;
+  const ids=t.slice(0,60);t.slice(60).forEach(a=>{HL[a]=null;});ids.forEach(a=>HLvoo.add(a));HLerro.delete(x.k);
+  const pinta=()=>{const el=document.getElementById('hltb');if(el&&el.dataset.k===x.k)el.innerHTML=blocoHltb(x,5);};
+  fetch('/api/hltb?appids='+ids.join(',')).then(r=>r.ok?r.json():Promise.reject(r.status))
+    .then(d=>{const h=d.hltb||{};ids.forEach(a=>{if(a in h)HL[a]=h[a]||null;});})   // o que não veio fica para a próxima vez
+    .catch(()=>{HLerro.add(x.k);}).finally(()=>{ids.forEach(a=>HLvoo.delete(a));pinta();});}
 const fundo=a=>`<div class="fundo" style="background-image:url('${CDN+a}/library_hero.jpg')"></div>`;
 const navOv=`<button class="x" data-fecha title="Fechar (Esc)">✕</button><button class="nav2 e" data-passo="-1" title="Anterior (←)">‹</button><button class="nav2 d" data-passo="1" title="Próxima (→)">›</button>`;
 /* F: tudo numa tela; os jogos numa fileira com setas, as informações logo abaixo */
@@ -396,7 +422,7 @@ function fichaH(x){const d=dadosFr(x),A=x.rep.appid,hdr=esc(x.rep.capa||CDN+A+'/
   return `<div class="fx">${navOv}${topo}<div class="in" style="padding-bottom:0;padding-top:${S.o==='H1'?14:4}px">
    <h4>Jogos da franquia <span>${x.tenho} de ${x.total} · em ordem de lançamento${x.total>7?' · arraste para o lado':''}</span>${bar(100*x.tenho/x.total)}</h4>
    ${fileira(x.m,116,true)}</div>
-   <div class="faixa"><div>${kvFr(x,d)}</div><div><h4>Onde foi o seu tempo</h4>${blocoTempo(d,5)}</div><div><h4>O que falta</h4>${blocoFalta(x,5)}</div><div><h4>Nunca jogados</h4>${blocoNunca(d,8)}</div></div></div>`;}
+   <div class="faixa"><div>${kvFr(x,d)}</div><div><h4>Onde foi o seu tempo</h4>${blocoTempo(d,5)}</div><div><h4>O que falta</h4>${blocoFalta(x,5)}</div><div><h4 class="hlt">HowLongToBeat</h4><div id="hltb" data-k="${esc(x.k)}">${(setTimeout(()=>pedeHltb(x)),blocoHltb(x,5))}</div></div></div></div>`;}
 /* ficha de Completar: o jogo e as DLCs que faltam, por tipo */
 function fichaCp(c){const promo=c.falta.filter(d=>d.corte),barata=[...c.falta].sort((a,b)=>a.preco-b.preco)[0];
   const grupos=ORDEM_CL.map(k=>[k,c.falta.filter(d=>d.classe===k)]).filter(g=>g[1].length);
@@ -520,12 +546,13 @@ document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value.t
 /* ---------- dentro do painel: a ficha do jogo, o carrinho e a loja são os do painel (window.parent.KH) ---------- */
 const PAI=(()=>{try{return parent!==window&&parent.KH?parent.KH:null;}catch(e){return null;}})();
 function avisaPai(aba){try{history.replaceState(null,'','#'+S.sub);}catch(e){}if(PAI&&PAI.sub)PAI.sub(aba,S.sub);}
-window.irSub=s=>{if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
+window.irSub=s=>{const [s0,m0]=String(s).split(':');if(m0&&SUBS.some(x=>x[0]===s0)){S.modo[s0]=m0;if(s0===S.sub&&S.aberto==null){desenha();return;}}s=s0;
+  if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
 addEventListener('hashchange',()=>irSub(location.hash.slice(1)));
 const pedeCarr=(ids,mon)=>{ids=[...new Set(ids.filter(Boolean).map(Number))];if(!ids.length){toast('Nada para pôr no carrinho');return;}
-  if(PAI)PAI.carrinho(ids.map(a=>({appid:a,mon:mon?mon(a):false})));else toast('No carrinho (abra pelo painel)');};
+  if(PAI)PAI.carrinho(ids.map(a=>({appid:a,mon:mon?mon(a):false,loja:ID[a]?ID[a].loja:'Steam'})));else toast('No carrinho (abra pelo painel)');};
 function fichaJogo(a){if(PAI)PAI.ficha(a,{});else toast('Abra pelo painel para ver a ficha do jogo');}
-{const h=location.hash.slice(1);if(SUBS.some(x=>x[0]===h))S.sub=h;}
+{const [h,m]=location.hash.slice(1).split(':');if(SUBS.some(x=>x[0]===h)){S.sub=h;if(m)S.modo[h]=m;}}
 desenha();
 /* calor do desconto: até -49% frio, -50% morno, -75% quente, -90% brasa (ver docs/decisoes.md, "Produto") */
 const calorDe=n=>n>=90?3:n>=75?2:n>=50?1:0;

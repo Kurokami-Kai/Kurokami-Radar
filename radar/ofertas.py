@@ -170,13 +170,18 @@ def _montar_biblioteca():
         conhecidos = [x for x in ctx.possuidos | ctx.lista if (J.get(x) or {}).get('tipo') == 'jogo' and J[x].get('nome')]
         itens = [{'appid': x, 'nome': J[x]['nome'], 'franquia': J[x].get('franquia')} for x in conhecidos]
         fr = series.franquias(itens, {r['appid']: r['nome'] for r in b.q('SELECT appid, nome FROM franquia_manual')})
+        # o que falta: o preço de agora mais barato nas lojas marcadas, com a loja (o + põe no carrinho dessa loja)
+        marc = painel._marcadas(config.carregar())
+        atuais = b.ofertas_atuais([x for x in conhecidos if x not in ctx.possuidos])
         G = []
         for x in conhecidos:
             j = J[x]
             m, u = tempo.get(x, (None, None))
+            o = None if x in ctx.possuidos else painel._melhor_oferta([o for o in atuais.get(x, []) if o['loja'].lower() in marc])
+            pr = [o['preco'], o.get('cheio') or o['preco'], o.get('corte') or 0, o['loja']] if o else \
+                [j.get('preco_steam'), j.get('cheio_steam'), j.get('desconto_steam') or 0, 'Steam']
             G.append([x, j['nome'], curta(j.get('capa_v')), fr[x], 1 if x in ctx.possuidos else 0, 1 if x in ctx.lista else 0,
-                      j.get('lancamento') or 0, j.get('preco_steam'), j.get('cheio_steam'), j.get('desconto_steam') or 0,
-                      m, u, j.get('rpos') or 0, curta(j.get('capa'))])
+                      j.get('lancamento') or 0, pr[0], pr[1], pr[2], m, u, j.get('rpos') or 0, curta(j.get('capa')), pr[3]])
         # jogos da lista que não são de nenhuma franquia que você tem não aparecem em lugar nenhum: ficam de fora
         minhas = {g[3].lower() for g in G if g[4]}
         G = [g for g in G if g[4] or g[3].lower() in minhas]

@@ -83,7 +83,7 @@ config.json            preferências (sem segredos)
 userdata.json          retrato da conta Steam (DLCs possuídas, seguidos, ignorados, carrinho; a extensão grava) — pessoal
 dados/radar.sqlite3    banco (WAL)
 dados/radar.log        log rotativo (1 MB × 3)
-dados/carrinho.json    carrinho simulado (arquivo próprio para não disputar lock com a coleta)
+dados/carrinho.json    carrinho simulado: [{appid, modo, loja} | {bundle, modo}] (arquivo próprio para não disputar lock com a coleta)
 dados/painel_token.txt PIN de 6 dígitos do acesso pela rede
 dados/capas/<appid>.jpg imagens das notificações
 dados/alertas.html     página de reserva

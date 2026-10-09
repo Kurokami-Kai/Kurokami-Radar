@@ -171,13 +171,14 @@ Classificacao automatica de DLCs pelo nome (pt/en). O painel vai permitir
 - `ignorada(classe, preco, cfg_dlc)`
 
 ## `radar/ficha.py`
-Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca em lote) e guardado em ficha_cache:
+Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca na coleta) e guardado em ficha_cache:
 
 - `_do_cache(b, a, fonte)`
 - `_num(v)`
 - `_url(v)` — Servico de terceiro sem contrato: so link https vai para a pagina.
 - `augmented(appid)` — HLTB em minutos (FF VII Remake: 1935 = 32 h, como no site), jogadores e notas de usuarios/criticos.
 - `extras(b, cfg, a, tenho, log_erro)` — {loja, aug, conq}: do cache ou buscados em paralelo (o que faltar ou venceu). Fonte que falhou vem None.
+- `hltb_lote(b, appids, log_erro, maximo)` — {appid: {story, extras, complete} em minutos, ou None}: o HLTB de varios jogos (ficha da franquia), do mesmo
 - `jogado(b, a)`
 - `fileira(b, ctx, a, nome, marcadas)` — A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
 
@@ -260,6 +261,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `rede_local()`
 - `_fim(oferta, jogo)` — Quando a promocao acaba (epoch), pela ITAD ou pela Steam.
 - `_marcadas(cfg)`
+- `_melhor_oferta(ofs)` — A oferta mais barata; no empate, a da Steam (o carrinho dela vai sozinho pela extensao).
 - `_ultimos_por_loja(b, appids)`
 - `_minimos(b, appids)`
 - `_idade_userdata()`
@@ -284,9 +286,12 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `api_jogo(q)`
 - `_ficha_local(b, ctx, cfg, a, r)` — O que a ficha nova (spec 09) le junto, sem rede: a fileira da franquia e o tempo jogado.
 - `api_jogo_extra(q)` — O que a ficha busca na rede ao abrir (descricao e captura, HLTB e notas, conquistas), com cache: vem depois
+- `api_hltb(q)` — Tempo para zerar (HowLongToBeat, em minutos) dos jogos de uma franquia: ?appids=1,2,3 (até 60).
 - `post_franquia(d)` — Troca a franquia do jogo a mao (juntar = escolher uma que existe; separar = nome novo); vazio volta ao automatico.
 - `_jogo_steam(b, cfg, ctx, a)` — Ficha de um item da Steam inteira (fora da lista): o historico das lojas marcadas pela ITAD, baixado na hora
+- `_oferta_do_item(pedida, todas, marc)` — A oferta que vale para um item do carrinho: a da loja escolhida; se ela parou de vender, a da Steam
 - `_ler_carrinho()`
+- `_lojas_padrao(appids)` — Loja de cada jogo que entra no carrinho sem loja escolhida: a oferta mais barata de agora nas lojas
 - `_gravar_carrinho(itens)`
 - `api_carrinho(_q)` — Carrinho simulado: jogos/DLCs (com a loja escolhida) e bundles da Steam (com o preco para voce).
 - `_modo(m)` — Como o item entra no carrinho da Steam: para a conta, de presente ou compra privada.
