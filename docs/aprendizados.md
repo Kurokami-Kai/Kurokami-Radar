@@ -2,6 +2,10 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — Esc abre e fecha a busca
+- **Pulei o teste ("mudança simples") e quebrou tudo:** `function buscar` no topo do script já é `window.buscar`; reatribuir `window.buscar=k=>...buscar()` virou recursão infinita e matou também o `/`. Nunca dar a um embrulho o nome da função global; testar mesmo quando parece simples.
+- **`navigate` para a mesma URL com outro `#` não recarrega:** os erros no console eram da página antiga; usar `location.reload()`.
+
 ## 2026-10-09 — busca com / em toda a aba Ofertas
 - **"O / não funciona" era a sub-aba sem caixa:** o atalho só focava `#q`, que não existe em Destaques (a que abre primeiro). Ler o handler de teclado antes de testar achou na hora.
 - **Tecla com foco no painel não chega no iframe:** repassar pelo painel (`window.buscar` da página). E AltGr chega como Ctrl+Alt: testar a tecla `/` antes do filtro de modificadores.
