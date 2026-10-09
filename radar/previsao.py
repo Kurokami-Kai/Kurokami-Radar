@@ -135,12 +135,26 @@ class Previsor:
         if not segs:
             return None
         eps = analise.episodios(segs)
+        if em_promo and p is not None and eps and eps[-1][1] >= AGORA - 1:
+            # a promocao de agora comeca no preco de agora (o mesmo corte da analise.analisar): se na mesma onda
+            # (uma loja acabou, outra comecou) o preco ja esteve igual ou menor, esse trecho e uma promocao anterior.
+            # Sem isso, 43,62 na Steam ate 30/09 e 43,62 na Nuuvem desde 01/10 viravam "abaixo do menor em 2 anos".
+            ini_p = AGORA
+            for s in reversed(segs):
+                if s[2] is None or not analise._igual(s[2], p):
+                    break
+                ini_p = s[0]
+            a0, a1, _mc = eps[-1]
+            antes = [s for s in segs if a0 <= s[0] < ini_p and s[4] > 0]
+            if antes and ini_p < AGORA:
+                depois = [s[4] for s in segs if s[1] > ini_p and s[4] > 0]
+                eps[-1:] = [(a0, ini_p, max(s[4] for s in antes)), (ini_p, a1, max(depois + [corte or 0]))]
         pe = []
         for e in eps:
             v = [s[2] for s in segs if s[2] and s[0] < e[1] and s[1] > e[0] and s[3] > 0]
             pe.append(min(v) if v else None)
         atual = eps[-1] if em_promo and eps and eps[-1][1] >= AGORA - 1 else None
-        past = [(e, q) for e, q in zip(eps, pe) if q and (not atual or e[1] < atual[0])]
+        past = [(e, q) for e, q in zip(eps, pe) if q and (not atual or e[1] <= atual[0])]
         out = {'desde': mm(segs[0][0])}
         if past:
             mn = min(past, key=lambda x: (x[1], -x[0][0]))

@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — histórico em uma linha + faixa; "antes desta promoção" coerente
+- **"Contraditório" eram duas definições de "esta promoção":** `analise` corta no preço de agora, `previsao` na onda de episódios (folga de 1 dia entre lojas). Imprimir os `segs`/`eps` do jogo do print (script no scratchpad lendo o banco) achou em 1 rodada; depois contar quantos mudam (19/218).
+- **Episódio dividido precisa de `<=` no "passado"** (`e[1] <= atual[0]`): com `<` a parte de antes sumia e nada mudava.
+- **Faixa por loja contra o maior preço da própria loja** pinta lojas regionais de -90% o ano todo: mostrar só as que alertam por padrão.
+
 ## 2026-10-09 — abas da ficha, lojas em tabela, notas alinhadas
 - **"Fica fixado bugado" era o foco:** clicar na aba 1 e apertar 2 deixava o contorno de `:focus-visible` na 1 (o teclado liga o anel). Passar o foco para a aba escolhida e tirar o contorno dela resolveu.
 - **Tabela larga em duas colunas estoura** no painel de ~1100 px: lojas na largura toda e as formas de comprar embaixo.

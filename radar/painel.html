@@ -271,6 +271,7 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .pisos{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;margin-top:10px}
 .pisos div{background:rgba(0,0,0,.25);padding:6px 8px;font-size:11.5px;color:var(--muted)}
 .pisos b{display:block;color:#fff;font-weight:400;font-size:14px}
+.pisos small{display:block;color:var(--dim);font-size:11px}.pisos div>span{display:block;margin-top:4px;font-size:11.5px;color:var(--dim)}.pisos div>span.on{color:var(--disc-fg)}
 .pisos div.on{box-shadow:inset 0 -3px 0 var(--disc-fg)}
 
 .status{color:var(--muted);font-size:12px;text-align:right;line-height:1.35}
@@ -294,12 +295,19 @@ select{background:#1f1f1f;color:#fff;border:0;border-radius:2px;padding:6px 8px;
 .seg button{background:none;border:0;color:var(--muted);padding:6px 12px;cursor:pointer;font-size:12px}
 .seg button[aria-pressed="true"]{background:var(--sinal);color:#000000}
 .chart{position:relative;background:rgba(0,0,0,.25);padding:8px}
-.chart svg{display:block;width:100%;height:240px}
+.chart svg{display:block;width:100%;height:auto}
 .chart .tip{position:absolute;pointer-events:none;background:#e6e6e6;color:#1a1a1a;font-size:11.5px;padding:6px 8px;box-shadow:0 0 8px #000;white-space:nowrap;display:none}
 .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .legend button{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.25);border:0;color:var(--text);font-size:11.5px;padding:4px 8px;cursor:pointer;border-radius:2px}
 .legend button[aria-pressed="false"]{opacity:.4}
 .legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.legend>span{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);padding:4px 8px}.legend i.tr{height:0;border-top:2px dashed #8c8c8c;border-radius:0}
+.chart .tip .pc{background:#d63031;color:#fff;padding:0 4px;font-size:11px}
+.ff{display:grid;grid-template-columns:130px repeat(var(--n),minmax(0,1fr));gap:2px;align-items:center}
+.ff i{height:16px;background:#ffffff0d}.ff i.v{background:none}.ff i[title]:hover{outline:1px solid #fff;outline-offset:-1px}
+.ff-l{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px}.ff-l.m{color:var(--text)}
+.ff-x{font-size:11px;color:var(--dim);white-space:nowrap;overflow:visible;padding-top:4px}
+.ff-leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:10px;font-size:11.5px;color:var(--muted)}.ff-leg span{display:flex;align-items:center;gap:6px}.ff-leg i{width:12px;height:12px;background:#ffffff0d}
 select.mini{padding:3px 6px;font-size:11.5px}
 .ctab .tag{font-size:10.5px;padding:1px 5px;border-radius:2px;background:rgba(255,255,255,.08);color:#d2d2d2;margin-left:6px}
 .ctab tr.marc td:first-child{color:#fff}
@@ -340,7 +348,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-car{position:relative;padding:4px 32px 10px}
 .fx-car .topo2{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px}
 .fx-car .topo2 h3{margin:0}
-.fx-car .q{color:var(--muted);font-size:12px}
+.fx-car .q{color:var(--muted);font-size:12px}.fx h3 .q{text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px;margin-left:6px}
 .fx-prog{width:150px;height:4px;background:#ffffff14}.fx-prog i{display:block;height:100%;background:var(--sinal)}
 .fx-trilho{display:flex;gap:12px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;padding:6px 2px 4px;scroll-snap-type:x proximity}
 .fx-trilho::-webkit-scrollbar{display:none}
@@ -375,7 +383,6 @@ select.mini{padding:3px 6px;font-size:11.5px}
   /* a ficha ocupa a altura da tela: cabeçalho fixo, só o painel de baixo rola (quase nunca precisa) */
   .mbox.fx{display:flex;flex-direction:column;height:min(calc(100dvh - 48px),1000px)}.mbox.fx #mbody{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
   .fx-painel{flex:1 1 auto;min-height:0;overflow-y:auto}
-  .fx-painel .chart svg{height:clamp(200px,calc(100dvh - 590px),440px)}
 }
 .fx-cx{background:var(--bg-deep);padding:14px 16px}
 .fx-vered{border-left:3px solid var(--sinal)}.fx-vered .t{font-size:16px;color:#fff;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -1012,8 +1019,7 @@ function porqueVolta(m){const o=IDX.get(m.jogo.appid)||{};
   const ref=m.piso_ref&&m.corte>0?`${volta?'<br>':''}Menor preço antes desta promoção: <b>${esc(pisoRefTxt(m.piso_ref))}</b>`:'';
   const regua=m.regua_steam?`<div class="regua">${esc(m.regua_steam.texto)}</div>`:'';
   return selo||volta||ref?`<div class="porque">${selo}${volta}${ref}</div>${regua}`:regua;}
-const CORES=['#ff4757','#e6e6e6','#ff9ea6','#8c8c8c','#c0392b','#ffd6d9','#5c5c5c','#ea2027','#b0b0b0','#8a1520'];   /* lojas no gráfico: vermelhos e cinzas */
-let MJ=null, MVIS=new Set(), MRANGE=365;
+let MJ=null, MRANGE=365, MTODAS=false;
 let MSEQ=0;
 async function abrirJogo(appid,op){
   const meu=++MSEQ;MOP=op||{};
@@ -1024,9 +1030,6 @@ async function abrirJogo(appid,op){
   const extra=fetch('/api/jogo_extra?appid='+appid).then(r=>r.ok?r.json():{falhou:true}).catch(()=>({falhou:true}));
   let j;try{j=await api('/api/jogo?appid='+appid);}catch(e){if(meu===MSEQ)$('#mbody').innerHTML=`<div class="empty">Erro: ${esc(e.message)}</div>`;return;}
   if(meu!==MSEQ)return;MJ=j;
-  const marc=new Set(MJ.lojas.filter(l=>l.marcada).map(l=>l.loja));
-  MVIS=new Set(Object.keys(MJ.historico).filter(l=>marc.has(l)||l==='Completo (Steam)'||l==='GG.deals keyshop'));
-  if(!MVIS.size)MVIS=new Set(Object.keys(MJ.historico).slice(0,3));
   renderModal();
   const x=await extra;if(meu===MSEQ&&!$('#modal').hidden){MX=x;renderModal();}
 }
@@ -1121,16 +1124,32 @@ function fxVale(){
     const pv=porqueVolta(MJ),t=!MJ.selo&&MJ.corte>0&&TITULO_TIPO[MJ.tipo_oferta];
     if(MOP.vered)s+=fxVered(MOP.vered);
     else if(pv||t)s+=`<div class="fx-cx fx-vered">${t?`<div class="t">${recPill({tipo_oferta:MJ.tipo_oferta,corte:MJ.corte,piso_ref:MJ.piso_ref})}${t}</div>`:''}${pv}</div>`;
-    if(o.pisos)s+=`<div><h3>Menor preço nas lojas que alertam</h3><div class="pisos tnum">${[['3m','3 meses'],['6m','6 meses'],['9m','9 meses'],['1a','1 ano'],['sempre','De sempre']].map(([k,t])=>`<div class="${o.preco!=null&&o.pisos[k]!=null&&o.preco<=o.pisos[k]?'on':''}">${t}<b>${brl(o.pisos[k])}</b></div>`).join('')}</div>
-      ${o.piso_geral!=null&&o.piso!=null&&o.piso_geral<o.piso?`<div class="fx-vazio" style="margin-top:6px">Em lojas que não alertam já teve ${brl(o.piso_geral)}.</div>`:''}</div>`;
+    s+=fxPisos(o);
   }
   return s||`<div class="fx-vazio">${MJ.corte>0?'Ainda sem histórico para dizer se vale a pena.':'Sem promoção agora: o Hunter avisa quando o preço cair.'}</div>`;
+}
+/* "menor preço antes desta promoção" pelo melhor preço de cada dia nas lojas que alertam (o mesmo do gráfico):
+   o preço de agora fica fora, senão toda janela repetia o preço de hoje; janelas com o mesmo valor viram uma caixa só */
+function fxPisos(o){
+  const {env,marc}=fxEnvMarc();if(!env.length)return '';
+  const agora=Date.now(),p=o.preco!=null?o.preco:(MJ.lojas.filter(l=>l.marcada&&l.atual!=null).map(l=>l.atual).sort((a,b)=>a-b)[0]??null),promo=MJ.corte>0&&p!=null;let ini=agora;
+  if(promo)for(let i=env.length-1;i>=0&&env[i][1]<=p+tolP(p);i--)ini=env[i][0];   // como analise._igual: o preço de agora ou menor
+  const menor=d=>{const t0=agora-d*DIA_MS;let m=null;
+    env.forEach((x,i)=>{const f=i+1<env.length?env[i+1][0]:agora;if(f>t0&&x[0]<ini&&(!m||x[1]<=m[0]))m=[x[1],Math.min(f,ini)];});return m;};
+  const J=[[90,'3 meses'],[180,'6 meses'],[365,'1 ano'],[730,'2 anos'],[1e6,'De sempre']].map(([d,t])=>[t,menor(d)]).filter(x=>x[1]);
+  const titulo=`${promo?'Menor preço antes desta promoção':'Menor preço'} <span class="q">${marc?'nas lojas que alertam':'em todas as lojas'}</span>`;
+  const geral=o.piso_geral!=null&&o.piso!=null&&o.piso_geral<o.piso?`<div class="fx-vazio" style="margin-top:6px">Em lojas que não alertam já teve ${brl(o.piso_geral)}.</div>`:'';
+  if(!J.length)return `<div><h3>${titulo}</h3><div class="fx-vazio">Antes desta promoção não há preço registrado: ela começou junto com o histórico.</div>${geral}</div>`;
+  const G=[];J.forEach(([t,m])=>{const u=G[G.length-1];if(u&&u.v===m[0])u.t.push(t);else G.push({v:m[0],q:m[1],t:[t]});});
+  const rot=t=>t.length===1?t[0]:t[t.length-1]==='De sempre'?(t.length===J.length?'De sempre':t[0]+' ou mais'):t[0]+' a '+t[t.length-1];
+  const cmp=v=>!promo?'':p<v-tolP(v)?`<span class="on">agora ${brl(v-p)} a menos</span>`:p<=v+tolP(v)?'<span>agora igual</span>':`<span>agora ${brl(p-v)} a mais</span>`;
+  return `<div><h3>${titulo}</h3><div class="pisos tnum" style="grid-template-columns:repeat(${G.length},minmax(0,1fr));max-width:${G.length*230}px">${G.map(g=>`<div class="${promo&&p<g.v-tolP(g.v)?'on':''}">${rot(g.t)}<b>${brl(g.v)}</b><small>em ${fmtMes(g.q-1)}</small>${cmp(g.v)}</div>`).join('')}</div>${geral}</div>`;
 }
 /* painel 2: histórico de preços */
 function fxHist(){let s='';
   if(Object.keys(MJ.historico).length)s+=`<div><h3>Histórico de preços <span class="seg">${[[90,'3 meses'],[365,'1 ano'],[1095,'3 anos'],[99999,'Tudo']].map(([d,t])=>`<button data-range="${d}" aria-pressed="${MRANGE===d}">${t}</button>`).join('')}</span></h3>
     ${MJ.steam_inteira?`<div class="fx-vazio" style="color:${MJ.aviso_hist?'#ff8a94':''};margin-bottom:6px">${MJ.aviso_hist?'Sem histórico: '+esc(MJ.aviso_hist)+'.':'Fora da sua lista: histórico das suas lojas marcadas (IsThereAnyDeal); das outras lojas só o menor preço. Para alertas e todas as lojas, use Monitorar.'}</div>`:''}
-    <div class="chart" id="chart"></div><div class="legend" id="legend"></div></div>`;
+    <div class="chart" id="chart"></div><div class="legend" id="legend"></div></div><div class="fx-faixa" id="faixa"></div>`;
   return s||'<div class="fx-vazio">Sem histórico de preços ainda.</div>';
 }
 function fxCaminhos(){let s='';
@@ -1237,7 +1256,7 @@ function fxMedir(){   // "mais" só se a descrição não coube; setas só onde 
   const t=$('#mbody .fx-trilho');if(!t)return;
   $('#mbody .fx-seta.e').hidden=t.scrollLeft<4;$('#mbody .fx-seta.d').hidden=t.scrollLeft+t.clientWidth>=t.scrollWidth-4;
 }
-addEventListener('resize',()=>{if(MJ&&!$('#modal').hidden)fxMedir();});
+addEventListener('resize',()=>{if(MJ&&!$('#modal').hidden){fxMedir();if($('#chart'))desenharGrafico();}});
 $('#mbody').addEventListener('click',async e=>{
   const ab=e.target.closest('[data-aba]');if(ab){fxAba(ab.dataset.aba);return;}
   const fc=e.target.closest('[data-ficha]');if(fc){e.preventDefault();abrirJogo(+fc.dataset.ficha);return;}
@@ -1249,7 +1268,7 @@ $('#mbody').addEventListener('click',async e=>{
     if((await post('/api/franquia',{appid:MJ.jogo.appid,nome})).ok===false)return;
     MTROCA=false;toast(nome?'Franquia: '+nome:'Franquia automática de volta');try{MJ=await api('/api/jogo?appid='+MJ.jogo.appid);}catch(_){}renderModal();return;}
   const r=e.target.closest('[data-range]');if(r){MRANGE=+r.dataset.range;renderModal();return;}
-  const l=e.target.closest('[data-serie]');if(l){const s=l.dataset.serie;MVIS.has(s)?MVIS.delete(s):MVIS.add(s);desenharGrafico();return;}
+  const l=e.target.closest('[data-todas]');if(l){MTODAS=!MTODAS;desenharGrafico();return;}
   const th=e.target.closest('[data-tenho]');if(th){if(MJ.tenho&&!MJ.tenho_manual){toast('Já está na sua biblioteca da Steam');return;}const novo=!MJ.tenho_manual;await post('/api/tenho',{appid:MJ.jogo.appid,tenho:novo});
     toast(novo?'Marcado como seu: sai dos alertas e do carrinho':'Desmarcado');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();FR.bib.velho=FR.vale.velho=true;return;}
   const mu=e.target.closest('[data-mudo]');if(mu){await post('/api/silenciar',{appid:MJ.jogo.appid,mudo:mu.dataset.mudo==='1'});toast(mu.dataset.mudo==='1'?'Sem alertas para este jogo':'Alertas de volta');
@@ -1262,31 +1281,79 @@ $('#mbody').addEventListener('click',async e=>{
 });
 $('#mbody').addEventListener('change',async e=>{const s=e.target.closest('[data-dlc]');if(!s)return;
   await post('/api/dlc',{appid:+s.dataset.dlc,classe:s.value});toast('Classificação salva');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();});
+/* o gráfico da ficha: uma linha só com o melhor preço de cada dia (degraus por baixo de todas as lojas que alertam);
+   a linha cinza soma as outras lojas e a keyshop. Desenhado no tamanho real da caixa (sem esticar letras). */
+const tolP=v=>Math.max(10,v*.01), DIA_MS=864e5;
+const fmtMes=t=>new Date(t).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','');
+function fxMarcadas(){const m=new Set(MJ.lojas.filter(l=>l.marcada).map(l=>l.loja));if(m.has('Steam'))m.add('Steam (direto)');return m;}
+function fxSeries(filtro){   // [[loja, [[t, preço]...]]] sem o pacote completo e sem brinde (R$ 0)
+  return Object.entries(MJ.historico).filter(([n])=>n!=='Completo (Steam)'&&filtro(n))
+    .map(([n,p])=>[n,p.map(x=>[Date.parse(x[0]),x[1]]).filter(x=>x[1]>0).sort((a,b)=>a[0]-b[0])]).filter(([,p])=>p.length);}
+function fxEnvelope(series){   // degraus [início, preço, loja]: o menor preço valendo em cada momento
+  const ts=[...new Set(series.flatMap(([,p])=>p.map(x=>x[0])))].sort((a,b)=>a-b),ix=series.map(()=>-1),out=[];
+  for(const t of ts){let v=null,lj=null;
+    series.forEach(([n,p],k)=>{while(ix[k]+1<p.length&&p[ix[k]+1][0]<=t)ix[k]++;if(ix[k]>=0&&(v==null||p[ix[k]][1]<v)){v=p[ix[k]][1];lj=n;}});
+    const u=out[out.length-1];if(!u||u[1]!==v||u[2]!==lj)out.push([t,v,lj]);}
+  return out;}
+function fxEnvMarc(){const m=fxMarcadas(),s=fxSeries(n=>m.has(n));return s.length?{env:fxEnvelope(s),marc:true}:{env:fxEnvelope(fxSeries(()=>true)),marc:false};}
+const noTempo=(env,t)=>{let r=null;for(const x of env){if(x[0]>t)break;r=x;}return r;};
+function recorta(env,t0){const a=noTempo(env,t0);return (a?[[t0,a[1],a[2]]]:[]).concat(env.filter(x=>x[0]>t0));}
 function desenharGrafico(){
-  const box=$('#chart'),leg=$('#legend');const series=Object.entries(MJ.historico);
-  const cor={};series.forEach(([n],i)=>cor[n]=CORES[i%CORES.length]);
-  leg.innerHTML=series.map(([n,p])=>`<button data-serie="${esc(n)}" aria-pressed="${MVIS.has(n)}"><i style="background:${cor[n]}"></i>${esc(n)}</button>`).join('');
-  const agora=Date.now(),t0=MRANGE>=99999?Math.min(...series.flatMap(([,p])=>p.map(x=>Date.parse(x[0])))):agora-MRANGE*864e5;
-  const vis=series.filter(([n])=>MVIS.has(n)).map(([n,p])=>{
-    const pts=p.map(x=>[Date.parse(x[0]),x[1]]).sort((a,b)=>a[0]-b[0]);
-    const antes=pts.filter(x=>x[0]<t0).pop();const dentro=pts.filter(x=>x[0]>=t0);
-    return [n,(antes?[[t0,antes[1]]]:[]).concat(dentro)];}).filter(([,p])=>p.length);
-  if(!vis.length){box.innerHTML='<div class="empty" style="padding:30px">Sem dados no período. Marque lojas na legenda.</div>';return;}
-  const W=900,H=240,PL=58,PR=10,PT=10,PB=24;
-  const maxY=Math.max(...vis.flatMap(([,p])=>p.map(x=>x[1])))*1.08||100;
-  const X=t=>PL+(t-t0)/(agora-t0)*(W-PL-PR), Y=v=>PT+(1-v/maxY)*(H-PT-PB);
-  let g='';for(let i=0;i<=4;i++){const v=maxY*i/4;g+=`<line x1="${PL}" x2="${W-PR}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${PL-6}" y="${Y(v)+4}" fill="#979797" font-size="11" text-anchor="end">${brl0(v)}</text>`;}
-  for(let i=0;i<=4;i++){const t=t0+(agora-t0)*i/4;g+=`<text x="${X(t)}" y="${H-6}" fill="#979797" font-size="11" text-anchor="${i===0?'start':i===4?'end':'middle'}">${new Date(t).toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','')}</text>`;}
-  const paths=vis.map(([n,p])=>{let d='';p.forEach((x,i)=>{d+=i?`H${X(x[0]).toFixed(1)}V${Y(x[1]).toFixed(1)}`:`M${X(x[0]).toFixed(1)},${Y(x[1]).toFixed(1)}`;});
-    d+=`H${X(agora).toFixed(1)}`;return `<path d="${d}" fill="none" stroke="${cor[n]}" stroke-width="2"/>`;}).join('');
-  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${g}${paths}<line id="cur" y1="${PT}" y2="${H-PB}" stroke="rgba(255,255,255,.4)" visibility="hidden"/><rect x="${PL}" y="0" width="${W-PL-PR}" height="${H}" fill="transparent" id="ov"/></svg><div class="tip" id="tip"></div>`;
+  const box=$('#chart'),leg=$('#legend');if(!box)return;
+  const agora=Date.now(),{env:em,marc}=fxEnvMarc(),et=fxEnvelope(fxSeries(()=>true));
+  if(!em.length){box.innerHTML='<div class="empty" style="padding:30px">Sem histórico de preços.</div>';leg.innerHTML='';$('#faixa').innerHTML='';return;}
+  const t0=MRANGE>=99999?em[0][0]:agora-MRANGE*DIA_MS;
+  const A=recorta(em,t0),B=recorta(et,t0),difere=B.some(x=>{const y=noTempo(A,x[0]);return !y||x[1]<y[1]-tolP(y[1]);});
+  const o=MJ.item||IDX.get(MJ.jogo.appid)||{},cheio=(MJ.lojas.find(l=>l.loja===o.loja)||{}).cheio||MJ.jogo.cheio_steam;
+  const todas=MTODAS&&difere,mm=fxMarcadas(),nOut=marc?fxSeries(n=>!mm.has(n)&&!/^GG\.deals/.test(n)).length:0;
+  leg.innerHTML=`<span><i style="background:#ff4757"></i>Melhor preço ${marc?'nas lojas que alertam':'em todas as lojas'}</span>
+    ${difere||nOut?`<button data-todas aria-pressed="${MTODAS}" title="Mostra as lojas que não alertam: a linha cinza no gráfico e as linhas delas na faixa de baixo"><i style="background:#8c8c8c"></i>Outras lojas e keyshop</button>`:''}${cheio?'<span><i class="tr"></i>Preço cheio</span>':''}`;
+  if(!A.length){box.innerHTML='<div class="empty" style="padding:30px">Sem dados no período.</div>';fxFaixa(t0,agora);return;}
+  const W=Math.max(320,box.clientWidth-16),H=Math.round(innerWidth>820?Math.min(300,Math.max(180,innerHeight-700)):200),PL=58,PR=14,PT=14,PB=24;
+  const vis=A.concat(todas?B:[]),maxY=Math.max(cheio||0,...vis.map(x=>x[1]))*1.1||100;
+  const X=t=>PL+(t-t0)/(agora-t0)*(W-PL-PR),Y=v=>PT+(1-v/maxY)*(H-PT-PB);
+  const degraus=E=>E.map((x,i)=>(i?`H${X(x[0]).toFixed(1)}V`:`M${X(x[0]).toFixed(1)},`)+Y(x[1]).toFixed(1)).join('')+`H${X(agora).toFixed(1)}`;
+  let g='';for(let i=0;i<=4;i++){const v=maxY*i/4;g+=`<line x1="${PL}" x2="${W-PR}" y1="${Y(v)}" y2="${Y(v)}" stroke="#ffffff12"/><text x="${PL-8}" y="${Y(v)+4}" fill="#979797" font-size="11" text-anchor="end">${brl0(v)}</text>`;}
+  for(let i=0;i<=4;i++){const t=t0+(agora-t0)*i/4;g+=`<text x="${X(t)}" y="${H-6}" fill="#979797" font-size="11" text-anchor="${i===0?'start':i===4?'end':'middle'}">${fmtMes(t)}</text>`;}
+  if(cheio&&cheio<maxY)g+=`<line x1="${PL}" x2="${W-PR}" y1="${Y(cheio)}" y2="${Y(cheio)}" stroke="#8c8c8c" stroke-dasharray="4 4"/><text x="${W-PR}" y="${Y(cheio)-5}" fill="#979797" font-size="11" text-anchor="end">cheio ${brl(cheio)}</text>`;
+  const dA=degraus(A),hoje=A[A.length-1][1],mn=A.reduce((m,x)=>x[1]<m[1]?x:m,A[0]);
+  const lbl=(x,y,t,ancora)=>`<text x="${x}" y="${y}" fill="#fff" font-size="12" text-anchor="${ancora}" paint-order="stroke" stroke="#000" stroke-width="3">${t}</text>`;
+  const ehHoje=Math.abs(mn[1]-hoje)<=tolP(hoje);
+  const marcas=`<circle cx="${X(agora)}" cy="${Y(hoje)}" r="4.5" fill="#ff4757"/>${lbl(X(agora)-8,Y(hoje)-9,'hoje '+brl(hoje)+(ehHoje?' · o menor do período':''),'end')}`
+    +(ehHoje?'':`<circle cx="${X(Math.max(mn[0],t0))}" cy="${Y(mn[1])}" r="3.5" fill="#fff"/>${lbl(Math.min(X(Math.max(mn[0],t0))+8,W-PR-150),Y(mn[1])+16,'menor do período '+brl(mn[1]),'start')}`);
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}<path d="${dA}V${Y(0)}H${X(A[0][0])}Z" fill="#ff475714"/>
+    ${todas?`<path d="${degraus(B)}" fill="none" stroke="#8c8c8c" stroke-width="1.5" stroke-dasharray="2 3"/>`:''}<path d="${dA}" fill="none" stroke="#ff4757" stroke-width="2.2"/>${marcas}
+    <line id="cur" y1="${PT}" y2="${H-PB}" stroke="#ffffff66" visibility="hidden"/><rect x="${PL}" y="0" width="${W-PL-PR}" height="${H}" fill="transparent"/></svg><div class="tip" id="tip"></div>`;
   const svg=box.querySelector('svg'),tip=$('#tip'),cur=box.querySelector('#cur');
-  svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*W;if(x<PL){tip.style.display='none';return;}
-    const t=t0+(x-PL)/(W-PL-PR)*(agora-t0);cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.setAttribute('visibility','visible');
-    const linhas=vis.map(([n,p])=>{const v=p.filter(q=>q[0]<=t).pop();return v?`<div><span style="color:${cor[n]}">■</span> ${esc(n)}: <b>${brl(v[1])}</b></div>`:'';}).join('');
-    tip.innerHTML=`<div style="margin-bottom:3px"><b>${new Date(t).toLocaleDateString('pt-BR')}</b></div>${linhas}`;tip.style.display='block';
-    const px=e.clientX-box.getBoundingClientRect().left;tip.style.left=Math.min(px+12,box.clientWidth-tip.offsetWidth-4)+'px';tip.style.top='12px';});
+  svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W;if(x<PL){tip.style.display='none';return;}
+    const t=t0+(x-PL)/(W-PL-PR)*(agora-t0),a=noTempo(A,t),b=todas&&noTempo(B,t);cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.setAttribute('visibility','visible');
+    const pc=v=>cheio&&v<cheio?` <span class="pc">-${Math.round((1-v/cheio)*100)}%</span>`:'';
+    tip.innerHTML=`<div style="margin-bottom:3px"><b>${new Date(t).toLocaleDateString('pt-BR')}</b></div>${a?`<div><span style="color:#d63031">■</span> <b>${brl(a[1])}</b>${pc(a[1])} na ${esc(a[2])}</div>`:''}
+      ${b&&(!a||b[1]<a[1])?`<div><span style="color:#8c8c8c">■</span> ${brl(b[1])} na ${esc(b[2])}</div>`:''}`;
+    tip.style.display='block';const px=e.clientX-box.getBoundingClientRect().left;tip.style.left=Math.min(px+12,box.clientWidth-tip.offsetWidth-4)+'px';tip.style.top='12px';});
   svg.addEventListener('mouseleave',()=>{tip.style.display='none';cur.setAttribute('visibility','hidden');});
+  fxFaixa(t0,agora);
+}
+/* faixa de promoções: uma linha por loja, um quadrado por mês (por semana em 3 meses), na cor do maior desconto */
+function fxFaixa(t0,agora){
+  const el=$('#faixa');if(!el)return;const m=fxMarcadas();
+  const so=!MTODAS&&[...m].some(n=>MJ.historico[n]);   // por padrão só as lojas que alertam; as outras no botão da legenda
+  const S=fxSeries(n=>!/^GG\.deals/.test(n)&&!(n==='Steam (direto)'&&MJ.historico.Steam)&&(!so||m.has(n)))
+    .sort((a,b)=>(m.has(b[0])-m.has(a[0]))||a[0].localeCompare(b[0]));
+  const C=[];   // colunas [início, fim, rótulo]
+  if(agora-t0<=100*DIA_MS)for(let a=t0;a<agora;a+=7*DIA_MS)C.push([a,Math.min(a+7*DIA_MS,agora),new Date(a).toLocaleDateString('pt-BR',{day:'numeric',month:'short'}).replace('.','')]);
+  else{const d=new Date(t0);d.setDate(1);d.setHours(0,0,0,0);
+    while(d.getTime()<agora){const a=d.getTime();d.setMonth(d.getMonth()+1);C.push([Math.max(a,t0),Math.min(d.getTime(),agora),fmtMes(a)]);}}
+  const linhas=S.map(([n,p])=>{const cheio=Math.max(...p.map(x=>x[1]));
+    const cel=C.map(([a,b,r])=>{let v=null;p.forEach((x,i)=>{const f=i+1<p.length?p[i+1][0]:agora;if(x[0]<b&&f>a&&(v==null||x[1]<v))v=x[1];});
+      if(v==null)return '<i class="v"></i>';const pc=Math.round((1-v/cheio)*100);
+      return pc<5?`<i title="${esc(n)} · ${r}: sem promoção (${brl(v)})"></i>`:`<i data-calor="${calorDe(pc)}" title="${esc(n)} · ${r}: até -${pc}% (${brl(v)})"></i>`;});
+    return cel.some(c=>c!=='<i class="v"></i>')?`<span class="ff-l${m.has(n)?' m':''}" title="${esc(n)}">${esc(n)}</span>${cel.join('')}`:'';}).filter(Boolean);
+  if(!linhas.length){el.innerHTML='';return;}
+  const k=Math.ceil(C.length/7);
+  el.innerHTML=`<h3>Promoções por loja <span class="q">${C.length>16?'um quadrado por mês':'um quadrado por '+(agora-t0<=100*DIA_MS?'semana':'mês')} · passe o mouse para ver o preço</span></h3>
+    <div class="ff" style="--n:${C.length}">${linhas.join('')}<span></span>${C.map((c,i)=>`<span class="ff-x">${i%k?'':c[2]}</span>`).join('')}</div>
+    <div class="ff-leg"><span><i></i>sem promoção</span><span><i data-calor="0"></i>até -49%</span><span><i data-calor="1"></i>-50%</span><span><i data-calor="2"></i>-75%</span><span><i data-calor="3"></i>-90% ou mais</span><span class="fx-vazio">${so?'só as lojas que alertam (as outras em "Outras lojas e keyshop")':'loja em branco = alerta'}</span></div>`;
 }
 
 /* ================= Ofertas e Biblioteca: páginas próprias (radar/ofertas.html e biblioteca.html) num iframe =================
