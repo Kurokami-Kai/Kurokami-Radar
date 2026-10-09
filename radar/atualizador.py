@@ -87,7 +87,7 @@ def janela():
     import webbrowser
     from tkinter import ttk
 
-    AZUL, FUNDO, TEXTO, FRACO = "#66c0f4", "#050505", "#d2d2d2", "#979797"
+    AZUL, FUNDO, TEXTO, FRACO = "#ff7675", "#050505", "#d2d2d2", "#979797"
     raiz = tk.Tk()
     raiz.title("Kurokami Hunter - atualização")
     raiz.configure(bg=FUNDO)
@@ -135,12 +135,12 @@ def janela():
     def mostrar(d):
         info.update(d)
         if d.get("erro"):
-            st.config(text="Não consegui verificar: %s." % d["erro"], fg="#e2a635")
+            st.config(text="Não consegui verificar: %s." % d["erro"], fg="#ff8a94")
             if d.get("pagina"):
                 b_pag.pack(side="right", padx=4)
             return
         if not d["tem_nova"]:
-            st.config(text="Você já está na versão mais nova (%s)." % d["atual"], fg="#a1cd44")
+            st.config(text="Você já está na versão mais nova (%s)." % d["atual"], fg="#ffffff")
             return
         st.config(text="Versão nova disponível: %s (você tem a %s)." % (d["nova"], d["atual"]), fg="white")
         if d.get("notas"):

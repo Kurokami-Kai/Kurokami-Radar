@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Biblioteca · Kurokami Hunter</title>
 <style>
-:root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#666666;--azul:#ff4655;--verde:#ff4655;--vbg:#6e0a14;--vtx:#ff8a94;--borda:#ffffff14;--lista:#ff4655;--tenho:#f0f0f0}
+/* paleta Kurokami (Flat UI Colors; tons escuros pelo Paletton), a mesma do painel.html: --acao #d63031 botão de compra,
+   --sinal #ff4757 o que está ativo/importa, --azul #ff7675 texto clicável, calor #262626 → #4a1016 → #8a1520 → #d63031 → #ff4757 */
+:root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#7f7f7f;--azul:#ff7675;--sinal:#ff4757;--acao:#d63031;--acao2:#ea2027;--verde:#ff4757;--vbg:#4a1016;--vtx:#ff8a94;--borda:#ffffff14;--lista:#ff4757;--tenho:#f0f0f0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
 button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--azul);outline-offset:3px}
+:focus-visible{outline:2px solid var(--sinal);outline-offset:3px}
 .esc{position:sticky;top:0;z-index:30;background:#000;border-bottom:1px solid var(--borda);padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
 .esc b{color:#fff;font-weight:400;letter-spacing:.03em}
 .seg{display:inline-flex;background:var(--pan);border-radius:3px;overflow:hidden}
 .seg button{background:none;border:0;color:var(--fraco);padding:6px 14px;cursor:pointer}
-.seg button[aria-pressed=true]{background:var(--azul);color:#000000}
+.seg button[aria-pressed=true]{background:var(--sinal);color:#000000}
 .esc .desc{color:var(--fraco);font-size:12.5px;flex:1 1 380px}
 .topbar{background:var(--bg2);position:sticky;top:44px;z-index:20}
 .topbar .w{max-width:1240px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:26px;height:56px}
@@ -23,7 +25,7 @@ button{font:inherit;color:inherit}
 .nav>div,.nav>button{position:relative;display:flex;align-items:center}
 .nav .t{background:none;border:0;color:#dcdedf;text-transform:uppercase;font-size:14px;letter-spacing:.04em;padding:0 12px;height:100%;cursor:pointer}
 .nav .t:hover{color:var(--azul)}
-.nav .t.on{color:var(--azul);box-shadow:inset 0 -3px 0 var(--azul)}
+.nav .t.on{color:#fff;box-shadow:inset 0 -3px 0 var(--sinal)}
 .ddm{display:none;position:absolute;top:100%;left:0;min-width:250px;background:#1c1c1c;box-shadow:0 6px 18px #000a;padding:6px 0;z-index:40}
 .nav>div:hover .ddm,.nav>div:focus-within .ddm{display:block}
 .ddm button{display:flex;justify-content:space-between;width:100%;text-align:left;background:none;border:0;color:#dcdedf;padding:8px 16px;font-size:13.5px;cursor:pointer}
@@ -59,11 +61,11 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .capa .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:12px;color:#fff;background:linear-gradient(160deg,hsl(var(--h) 35% 28%),hsl(var(--h) 40% 12%))}
 .capa.falta img,.capa.falta .ph{filter:grayscale(1) brightness(.55)}
 .capa.falta:hover img,.capa.falta:focus-visible img{filter:grayscale(.2) brightness(.85)}
-.capa .ok{position:absolute;top:6px;left:6px;background:var(--vbg);color:var(--vtx);font-size:11px;padding:1px 6px;border-radius:2px}
+.capa .ok{position:absolute;top:6px;left:6px;background:#262626;color:#e6e6e6;font-size:11px;padding:1px 6px;border-radius:2px}
 .capa .cor{position:absolute;top:6px;right:6px;color:var(--lista);font-size:15px;text-shadow:0 0 4px #000}
 .capa .pr{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:4px;background:linear-gradient(transparent,#000d 40%);padding:16px 6px 6px;font-size:12.5px;color:#fff}
 .capa .pr .c{background:var(--vbg);color:var(--vtx);font-size:11px;padding:0 4px;margin-right:4px}
-.mais{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:2px;background:linear-gradient(90deg,#b3121f,#7a0c15);color:#ffd6d9;cursor:pointer;font-size:15px;line-height:1;flex:none}
+.mais{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:0;border-radius:2px;background:var(--acao);color:#fff;cursor:pointer;font-size:15px;line-height:1;flex:none}
 .vit{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:26px 20px}
 .it{min-width:0}
 .pilha{position:relative;padding:8px 8px 0 0}
@@ -72,7 +74,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .pilha .capa{z-index:1;box-shadow:0 6px 16px #0009}
 .it:hover .capa img,.it .capa:focus-visible img{transform:scale(1.035)}
 .it .qt{position:absolute;z-index:2;left:6px;top:14px;background:#000c;color:#fff;font-size:12px;padding:2px 7px;border-radius:2px}
-.it .qt.ok{background:var(--vbg);color:var(--vtx)}
+.it .qt.ok{background:#262626;color:#e6e6e6}
 .it .pb{position:absolute;z-index:2;left:0;right:8px;bottom:0;height:4px;background:#000a}.it .pb i{display:block;height:100%;background:var(--verde)}
 .it .nm{color:#fff;margin-top:8px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .it .sub{color:var(--fraco);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -80,8 +82,9 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .secao h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:0}
 .secao span{color:var(--fraco);font-size:12.5px}
 .bar{height:6px;background:#ffffff12;position:relative;margin:6px 0}.bar i{position:absolute;inset:0 auto 0 0;background:var(--verde)}
-.btn{border:0;padding:0 16px;height:38px;border-radius:2px;cursor:pointer;background:#ff465533;color:var(--azul);font-size:14px}
-.btn.verde{background:linear-gradient(90deg,#b3121f,#7a0c15);color:#ffd6d9}
+.btn{border:0;padding:0 16px;height:38px;border-radius:2px;cursor:pointer;background:#262626;color:#e6e6e6;font-size:14px}
+.btn:hover{background:#3a3a3a;color:#fff}
+.btn.verde{background:var(--acao);color:#fff}.btn.verde:hover{background:var(--acao2)}
 .btn:hover{filter:brightness(1.15)}
 .pct{background:var(--vbg);color:var(--vtx);padding:1px 5px;font-size:12px}
 .grid2{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:14px}
@@ -154,7 +157,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .fx .top .capa{box-shadow:0 10px 30px #000c;cursor:default}
 .fx h1{font-size:34px;font-weight:400;color:#fff;margin:4px 0 6px;line-height:1.15;text-shadow:0 2px 8px #000}
 .chip{display:inline-block;font-size:12.5px;padding:3px 9px;border-radius:2px;background:#ffffff14;color:var(--txt);margin:0 6px 6px 0}
-.chip.tenho{background:var(--vbg);color:var(--vtx)}.chip.lista{background:#3d1a1e;color:#ffd6d9}.chip.promo{background:#b3121f;color:#fff}
+.chip.tenho{background:#262626;color:#e6e6e6}.chip.lista{background:#4a1016;color:#ffd6d9}.chip.promo{background:var(--acao);color:#fff}
 .fx .dsc{color:var(--txt);font-size:14px;margin:4px 0 12px}
 .tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-bottom:12px}
 .tiles>div{background:#0d0d0dd9;padding:10px 12px;border-top:3px solid transparent;min-width:0}
@@ -173,7 +176,7 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .cx{background:var(--pan);padding:12px 14px}
 .hb{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:2px 10px;font-size:13px;align-items:center}
 .hb span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hb .b{grid-column:1/-1;height:4px;background:#ffffff10;margin-bottom:6px}.hb .b i{display:block;height:100%;background:var(--azul)}
+.hb .b{grid-column:1/-1;height:4px;background:#ffffff10;margin-bottom:6px}.hb .b i{display:block;height:100%;background:var(--sinal)}
 .hb .t{text-align:right;color:var(--fraco)}
 .tag{display:inline-block;background:#ffffff10;padding:3px 8px;margin:0 6px 6px 0;font-size:12.5px;cursor:pointer;border-radius:2px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
 .tag:hover{background:#ffffff22}
@@ -229,6 +232,13 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 /* ---------- dentro do painel (iframe): o topo é o do painel ---------- */
 .tool{top:0}
 .az{top:70px;bottom:44px}
+.mais:hover{background:var(--acao2)}
+/* calor (paleta Kurokami): a cor cresce com a força do desconto, do cinza (frio) ao vermelho cheio (brasa).
+   data-calor é posto pelo JS em todo .pct/.pc; !important vence as cores fixas de cada caixa. */
+[data-calor="0"]{background:#262626!important;color:#c8c8c8!important}
+[data-calor="1"]{background:#4a1016!important;color:#ff8a94!important}
+[data-calor="2"]{background:#8a1520!important;color:#ffd6d9!important}
+[data-calor="3"]{background:#d63031!important;color:#fff!important;font-weight:700}
 </style>
 </head>
 <body>
@@ -517,6 +527,10 @@ const pedeCarr=(ids,mon)=>{ids=[...new Set(ids.filter(Boolean).map(Number))];if(
 function fichaJogo(a){if(PAI)PAI.ficha(a,{});else toast('Abra pelo painel para ver a ficha do jogo');}
 {const h=location.hash.slice(1);if(SUBS.some(x=>x[0]===h))S.sub=h;}
 desenha();
+/* calor do desconto: até -49% frio, -50% morno, -75% quente, -90% brasa (ver docs/decisoes.md, "Produto") */
+const calorDe=n=>n>=90?3:n>=75?2:n>=50?1:0;
+function aquecer(){document.querySelectorAll('.pct,.pc').forEach(e=>{const m=/(\d+)\s*%/.exec(e.textContent),q=m?String(calorDe(+m[1])):null;if(!q)delete e.dataset.calor;else if(e.dataset.calor!==q)e.dataset.calor=q;});}
+let aqPend=0;new MutationObserver(()=>{if(!aqPend)aqPend=requestAnimationFrame(()=>{aqPend=0;aquecer();});}).observe(document.body,{childList:true,subtree:true});aquecer();
 </script>
 </body>
 </html>

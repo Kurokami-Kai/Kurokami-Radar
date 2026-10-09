@@ -15,7 +15,7 @@ main{max-width:1000px;margin:0 auto;padding:16px}
  padding:6px 10px 6px 6px;margin-bottom:2px;color:inherit;text-decoration:none}
 .row:hover{background:linear-gradient(90deg,rgba(103,193,245,.17),rgba(0,0,0,.2))}
 .row img{width:184px;height:86px;object-fit:cover;display:block;background:#0a0a0a}
-.n{color:#fff;font-size:15px}.m{color:#979797;font-size:12px;margin-top:4px}.m b{color:#66c0f4;font-weight:400}
+.n{color:#fff;font-size:15px}.m{color:#979797;font-size:12px;margin-top:4px}.m b{color:#ff7675;font-weight:400}
 .pb{display:flex;height:34px}.pct{background:#4c6b22;color:#beee11;font-size:18px;padding:0 8px;display:flex;align-items:center}
 .prs{background:#262626;color:#beee11;padding:0 9px;display:flex;align-items:center;font-size:14px;min-width:90px;justify-content:flex-end}
 .foot{color:#666666;font-size:11px;text-align:center;padding:20px}

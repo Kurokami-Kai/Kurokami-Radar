@@ -23,7 +23,7 @@ description: Como editar o painel web do Kurokami Hunter (radar/painel.html - HT
 
 ## Regras
 - Todo texto vindo de dado passa por `esc()`.
-- Visual da loja Steam (cores `--blue`, `--disc-bg`, `--price-bg`…); use as variáveis do `:root`.
+- Só preto e vermelho, cada vermelho com um papel: `--acao` (comprar), `--sinal` (ativo/importante), `--blue` (clicável); botão secundário cinza; desconto pela escala `data-calor` (ver `docs/decisoes.md`, "Paleta por papel"). Use as variáveis do `:root`.
 - Pensar no celular: o painel também abre no telefone (media queries `max-width:720px/900px`).
 - Campo novo de API → documentar em `docs/api.md` e criar no `painel.py`.
 - Mudou o painel junto com o servidor → mesma versão em `VERSAO_PAGINA` e `radar/__init__.py`.

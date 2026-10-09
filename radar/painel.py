@@ -1431,7 +1431,7 @@ class Handler(BaseHTTPRequestHandler):
                 import html
                 dados = ("<!doctype html><meta charset=utf-8><body style='background:#050505;color:#d2d2d2;font:15px Arial;padding:30px'>"
                          "<h3 style='color:#fff'>Não consegui entrar pela Steam</h3><p>%s</p>"
-                         "<p><a style='color:#66c0f4' href='%s'>Voltar ao painel</a></p>" % (html.escape(str(e)), CAMINHO)).encode("utf-8")
+                         "<p><a style='color:#ff7675' href='%s'>Voltar ao painel</a></p>" % (html.escape(str(e)), CAMINHO)).encode("utf-8")
                 self.send_response(400)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Content-Length", str(len(dados)))
@@ -1472,7 +1472,7 @@ class Handler(BaseHTTPRequestHandler):
             post_silenciar({"appid": int(q["silenciar"][0])})
             dados = ("<!doctype html><meta charset=utf-8><body style='background:#050505;color:#d2d2d2;font:15px Arial;padding:30px'>"
                      "<h3 style='color:#fff'>Pronto: o Hunter não avisa mais desse jogo.</h3>"
-                     "<p>Para desfazer, abra o jogo no <a style='color:#66c0f4' href='%s'>painel</a>.</p>" % CAMINHO).encode("utf-8")
+                     "<p>Para desfazer, abra o jogo no <a style='color:#ff7675' href='%s'>painel</a>.</p>" % CAMINHO).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(dados)))
@@ -1498,7 +1498,7 @@ class Handler(BaseHTTPRequestHandler):
                 from html import escape
                 dados = ("<!doctype html><meta charset=utf-8><body style='background:#050505;color:#d2d2d2;font:15px Arial;padding:40px'>"
                          "<h3 style='color:#fff;font-weight:400'>Não consegui montar esta página.</h3><p>%s</p>"
-                         "<p><a style='color:#66c0f4' href='javascript:location.reload()'>Tentar de novo</a> · o erro foi para o radar.log.</p>"
+                         "<p><a style='color:#ff7675' href='javascript:location.reload()'>Tentar de novo</a> · o erro foi para o radar.log.</p>"
                          % escape(str(e))).encode("utf-8")
                 self.send_response(500)
                 self.send_header("Content-Type", "text/html; charset=utf-8")

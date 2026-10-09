@@ -6,7 +6,7 @@ from tkinter import ttk
 from . import config, credenciais
 from .validar import DICAS, testar, testar_perfil
 
-AZUL, FUNDO, PAINEL, TEXTO, FRACO = "#66c0f4", "#050505", "#1f1f1f", "#d2d2d2", "#979797"
+AZUL, FUNDO, PAINEL, TEXTO, FRACO = "#ff7675", "#050505", "#1f1f1f", "#d2d2d2", "#979797"
 
 
 def abrir():
@@ -80,7 +80,7 @@ def abrir():
         raiz.update_idletasks()
         okp, msgp, _sid = testar_perfil(perfil)
         if okp:
-            st_p.config(text="✓ " + msgp, fg="#a1cd44")
+            st_p.config(text="✓ " + msgp, fg="#ffffff")
             if salvar:
                 cfg = config.carregar()
                 cfg["perfil_steam"] = perfil
@@ -94,7 +94,7 @@ def abrir():
             if not v:
                 obrig = credenciais.CHAVES[nome][2]
                 st.config(text="obrigatória" if obrig else ("sem chave: keyshops ficam de fora" if nome == "ggdeals" else
-                          "sem chave: a biblioteca vem do userdata.json"), fg="#e2a635" if obrig else FRACO)
+                          "sem chave: a biblioteca vem do userdata.json"), fg="#ff8a94" if obrig else FRACO)
                 tudo_ok &= not obrig
                 if salvar:
                     credenciais.gravar(nome, None)
@@ -103,11 +103,11 @@ def abrir():
             raiz.update_idletasks()
             ok, msg = testar(nome, v)
             if ok:
-                st.config(text="✓ funcionando (%d caracteres)" % len(v), fg="#a1cd44")
+                st.config(text="✓ funcionando (%d caracteres)" % len(v), fg="#ffffff")
                 if salvar:
                     credenciais.gravar(nome, v)
             elif "sem resposta" in msg:
-                st.config(text="não deu para testar agora (%s). %s" % (msg, "Salva mesmo assim." if salvar else ""), fg="#e2a635")
+                st.config(text="não deu para testar agora (%s). %s" % (msg, "Salva mesmo assim." if salvar else ""), fg="#ff8a94")
                 if salvar:
                     credenciais.gravar(nome, v)
             else:
