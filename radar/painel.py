@@ -491,7 +491,7 @@ def api_promocoes(qs):
 
 
 def api_vitrine(_q):
-    """Prateleiras de Ofertas → Destaques (antiga "Vale a pena"): um bloco por tipo (exclusivo), sem os jogos que voce tem. O Selo vale com
+    """Prateleiras de Ofertas → Destaques (antiga "Vale a pena"): um bloco por tipo (exclusivo), so jogos (sem DLCs), sem os que voce tem. O Selo vale com
     qualquer corte (o selo_corte_minimo ja esta nele); os outros blocos so com corte >= desconto_minimo."""
     itens, cfg, _conta = linhas_promocoes()
     al = cfg["alerta"]
@@ -499,7 +499,7 @@ def api_vitrine(_q):
     lig = analise.tipos_ligados(al)
     out = {"avisa": {t: t in lig for t in analise.TIPOS}, "desconto_minimo": dmin}
     for t, n in (("selo", 10), ("novo", 8), ("igual", 8), ("24m", 8)):
-        bl = [o for o in itens if o["tipo_oferta"] == t and not o["tenho"] and (t == "selo" or o["corte"] >= dmin)]
+        bl = [o for o in itens if o["tipo_oferta"] == t and o["tipo"] == "jogo" and not o["tenho"] and (t == "selo" or o["corte"] >= dmin)]
         bl.sort(key=lambda o: (-(o["corte"] or 0), o["preco"] if o["preco"] is not None else 10**12, o["appid"]))
         out[t] = {"total": len(bl), "itens": bl[:n]}
     out["na_lista"] = sum(1 for o in itens if o["na_lista"])
