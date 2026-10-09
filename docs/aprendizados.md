@@ -2,6 +2,12 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — spec 09 Etapa 2: três amostras da Biblioteca
+- **Amostra com dados pessoais vai para `dados/`** (ignorada pelo Git): script no scratchpad chama `painel.api_biblioteca` + `series.franquias` numa cópia do banco e injeta o JSON no modelo HTML.
+- **Ordem padrão antes de ordenar:** `tool()` fixava a ordem depois do `sort` e a 1ª pintura saiu sem ordem; testar cada tela num laço JS (opção × página × modo) achou isso mais rápido que prints.
+- **Prints do navegador do app falham depois de `resize_window`** (a pane muda de largura e limpa a emulação): confira pelo DOM (`getBoundingClientRect`, contagens) em vez de insistir.
+- **DLCs possuídas = 0 sem `userdata.json`:** antes de concluir "bug no Completar", `grep userdata radar.log`.
+
 ## 2026-10-08 (madrugada do 09) — v0.16.0 publicada; spec 09 Etapa 1 (ficha B+)
 - **Medir a fonte no banco antes da regra:** contar as `franquia` da Steam por nº de nomes distintos mostrou na hora as editoras (WB Games, Team17 Digital...); a regra "nomes muito diferentes" da spec não separava (Sonic tem 8 nomes em 10 jogos).
 - **Heredoc quebrou aspas pela 4ª vez** (script de docs): para textos com aspas, sempre Write num `.py` do scratchpad.

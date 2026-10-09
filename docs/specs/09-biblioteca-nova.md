@@ -1,6 +1,6 @@
 # Spec 09 — Biblioteca nova: Coleção por franquias, ficha estilo PlayStation
 
-Status: **Etapa 1 feita** (08/10; vai na 0.17.0); Etapas 2 e 3 ainda em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
+Status: **Etapa 1 feita** (08/10; vai na 0.17.0); Etapa 2 com três amostras para o dono escolher (09/10); Etapa 3 em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
 
 ## Etapas
 1. **Ficha nova (decidida: B+ com fundo de captura de tela).** **A referência visual é a amostra B+ de [09-amostras-ficha.html](09-amostras-ficha.html)** (dono: "ficou perfeito"): siga o layout, as medidas e os blocos dela. Inclui: a mesma ficha em Ofertas, Promoções e Biblioteca; arte da biblioteca (`logo.png`, capa vertical do `capa_v`) e captura de tela de fundo (`appdetails.screenshots`, cache); fileira de 5 números; fileira da franquia com setas (só com os jogos que o Radar já conhece: biblioteca e lista); duas colunas (veredito/pisos/histórico | preço por loja, HLTB, crítica, informações); HLTB, jogadores e notas pelo Augmented Steam (servidor, cache de 30 dias, sem chamar em lote); tempo jogado e última vez pelo `GetOwnedGames` (`include_appinfo`/`playtime_forever`, `rtime_last_played`); "trocar" franquia à mão. Conquistas (`GetPlayerAchievements`) podem ficar para o fim da etapa, se pesar.
@@ -12,6 +12,13 @@ Status: **Etapa 1 feita** (08/10; vai na 0.17.0); Etapas 2 e 3 ainda em discuss�
 - Franquia automática: a da Steam menos serviços e editoras (medido: EA Play, WB Games, Team17 Digital, Bandai Namco Entertainment), com herança pelo nome; "trocar" grava em `franquia_manual`. No banco do dono: 199 franquias com 2+ jogos, FINAL FANTASY com 30.
 - Conquistas: só "N de M" e o anel (as mais raras precisariam de mais uma chamada: ficou de fora).
 - **Ainda não:** o "Ver a franquia inteira ›" (depende da Etapa 2), e a Biblioteca (Coleção/Franquias) ainda agrupa só pelo nome; a Etapa 2 passa a usar `series.franquias`.
+
+## Etapa 2: três opções para escolher (09/10)
+Amostra com os dados reais do dono em `dados/amostras-biblioteca.html` (pasta ignorada pelo Git: biblioteca, lista e tempo jogado são pessoais). Em todas: menu **Biblioteca ▾** no topo (Coleção · Franquias · Completar · "DLCs dos meus jogos em promoção ↗", que abre Promoções com Tipo DLC + Tenho o jogo base) e a barra de Promoções (busca, Ordenar, ≡ Texto / ▦ Capas).
+- **A · Três páginas separadas:** Coleção = só o que tenho (grade de capas com tempo jogado; texto = tabela com tempo, última vez, lançamento); Franquias = prateleiras com setas, o que falta em P&B com preço e ♥; Completar = jogo + fileira das DLCs que faltam. Totais só na Coleção; barra de progresso em Completar.
+- **B · Coleção por franquia (pedido original):** Coleção = seções por franquia com capas quebrando linha, P&B no meio, "Avulsos" no fim; texto = tabela agrupada por franquia. Franquias e Completar = blocos lado a lado que abrem ao clicar (ocupam a linha inteira).
+- **C · Lista lateral (cliente Steam):** lista à esquerda, conteúdo à direita. Coleção filtra por Todos/Jogados recentemente/Nunca jogados/Sem franquia/uma franquia; Franquias e Completar mostram a escolhida com a arte `library_hero` no topo.
+- Medido nos dados: 634 jogos, 757 na lista, 135 franquias com algo que tenho (197 com 2+ jogos conhecidos), 278 jogos com DLC faltando. **DLCs possuídas = 0** porque falta o `userdata.json` (a extensão ainda não sincronizou): sem ele, Completar mostra todas as DLCs como faltando.
 
 ## Pedido (dono, 08/10)
 - A aba está mal disposta. Hoje: **Completar · Franquias · Coleção · DLCs em promoção** (botões no topo da aba).
