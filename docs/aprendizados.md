@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — spec 09: Ofertas, quinta rodada (três modelos A/B/C)
+- **Amostra nova sem o Radar aberto:** os dados da amostra anterior estão embutidos no HTML (`const D=`); extrair dali + banco em modo leitura evitou API e rede.
+- **Pane escondida mede zero:** `innerWidth` 0 e `visibilityState` hidden deram larguras 0 e alturas absurdas; chame `resize_window` antes de medir e confira `innerWidth`. Com a pane escondida, `focus()` não dispara `focusin`: teste pelo caminho do código (`andar`), não pelo evento.
+- **Conte cada grupo antes de mostrar:** "Vem aí" em 45 dias pegava 361 de 573 jogos (quase todo jogo entra em promoção todo mês); com "no menor preço, 4+ das 6" caiu para 52 e passou a dizer algo.
+
 ## 2026-10-09 — spec 09: Ofertas, da O1/O2 à quarta rodada (previsão medida)
 - **Medir antes de propor a métrica:** a nota feita à mão parecia razoável, mas o backtest mostrou que quase todo preço volta (96% em 12 meses) e que "costuma voltar" quase não separa; o que separa é a 1ª vez nesse preço. O "último preço", chamado de covarde, é o melhor previsor (67%): a resposta foi mostrar a confiança medida.
 - **Revisor no backtest pegou 4 erros reais:** "6 de 6" misturando jogos com 2–3 promoções, comparação usando a data futura, grade do ajuste batendo no limite (mudou a conclusão: a Gama-Poisson empata) e grupos de 15–27 casos virando regra. Rode o revisor antes de escrever os números nos docs.
