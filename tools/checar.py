@@ -94,6 +94,8 @@ if r.returncode:
 import json  # noqa: E402
 try:
     man = json.load(open("extensao/manifest.json", encoding="utf-8"))
+    if len(man.get("description", "")) > 132:  # limite das lojas do Edge e do Chrome
+        falhas.append("extensao: description com %d caracteres (maximo 132)" % len(man["description"]))
     js_ext = [man["background"]["service_worker"]] + [j for c in man["content_scripts"] for j in c["js"]]
     for j in js_ext:
         if not os.path.isfile(os.path.join("extensao", j)):

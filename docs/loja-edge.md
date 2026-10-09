@@ -6,6 +6,8 @@ Roteiro para o dono publicar a extensão do carrinho. O pacote sai de `py tools/
 1. Conta de desenvolvedor do Edge (grátis): https://partner.microsoft.com/dashboard/microsoftedge/overview, com a sua conta Microsoft. Nome do editor: o que deve aparecer na loja (ex.: "Kurokami").
 2. `py tools/gerar_extensao.py` → `output/kurokami-radar-extensao-<versão>.zip` e `output/loja-edge-logo-300.png`.
 
+O `description` do `manifest.json` tem no máximo **132 caracteres** (a loja recusa o pacote acima disso; o `checar.py` confere).
+
 ## Formulário
 - **Pacote:** o ZIP acima.
 - **Disponibilidade:** "Oculto" (só quem tem o link instala; o Hunter abre o link) ou "Público". Mercados: todos, ou só Brasil.
