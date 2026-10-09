@@ -2,6 +2,10 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — spec 09: Ofertas, oitava rodada (ficha curta, recortes, orçamento)
+- **"Os melhores que cabem" em ordem gulosa levou 2 jogos com R$ 100** (os imperdíveis caros entram primeiro): para orçamento, mochila pela economia (9 jogos). Conferir a saída com 4 valores antes de mostrar.
+- **Encurtar texto expôs uma contradição** (duas datas diferentes para "volta"): ao resumir, escolha uma fonte só para cada pergunta.
+
 ## 2026-10-09 — spec 09: Ofertas, sétima rodada (filtro escondido, Bons e baratos, preto)
 - **`cat > arquivo` sem heredoc travou o Bash 2 min** esperando entrada: scripts sempre pelo Write no scratchpad.
 - **O porto 8802 das amostras pode estar com o servidor de outra conversa:** navegue direto para `http://127.0.0.1:8802/<arquivo>` (serve a mesma pasta) em vez de subir outro.
@@ -42,13 +46,8 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Amostras de layout em HTML com dados reais + navegador do app:** o arquivo abre como cópia estática (`data:`), então recarregar não pega a edição: navegue de novo (abre outra aba; pegue o `tabId` em `tabs_context`) e use `resize_window` 1280×1000 com a pane escondida para print nítido.
 - **Rota nova testada chamando a função direto** numa cópia do banco (`caminhos.RAIZ_DADOS/ARQ_BANCO` trocados no script): mais barato que subir o `painel_copia.py`.
 
-## 2026-10-08 (madrugada) — Ofertas, +18, ficha da Steam inteira, biblioteca com 401
-- **"Jogo que eu tenho aparece" era a biblioteca vazia, não filtro:** o log mostrou `HTTP Error 401` desde 07/10 20:31 e `biblioteca: 0 itens`. Antes de mexer em filtro, `grep "biblioteca:" radar.log`.
-- **A Query da Steam já devolve `content_descriptorids`** sem pedir nada no `data_request` (3 e 4 = sexual): medir com 1 chamada antes de planejar etapa extra.
-- **`painel_copia.py` morto à força deixa a cópia do banco no %TEMP%** (`kr-painel-*`, havia 16): apague depois do teste. A rota é `/api/...` na raiz, não `/kurokami/api`.
-- **Subagente explorador para o mapa das abas + revisor no fim** pegou 2 erros reais (faixa afirmando "chave recusada" para qualquer erro; 500 com banco ocupado).
-
 ## Antigas, resumidas (até 08/10)
+- **Ofertas, +18, biblioteca com 401 (08/10, madrugada):** "jogo que tenho aparece" era a biblioteca vazia (`grep "biblioteca:" radar.log` antes de mexer em filtro); a Query já traz `content_descriptorids`; `painel_copia.py` morto deixa `kr-painel-*` no %TEMP% (apague); a rota é `/api/...` na raiz; explorador + revisor pegaram 2 erros reais.
 - **Steam inteira, recordes e menus (08/10, noite):** confira 3 itens na loja antes de perseguir contagem da SteamDB; a ITAD tem cota (~100 chamadas em 5 min): espaçar sondagens e parar no primeiro 429; `.py` de edição no scratchpad com `assert count == 1`; navegue com `?v=N` para o navegador do app largar o `painel.html` velho.
 - **Steam inteira e extensão (08/10):** peça gzip antes de achar algo pesado (1,5 MB → 150 KB); ordenar estável do último critério ao primeiro em vez de `cmp_to_key`; teste de desempenho com cópia do banco + linhas sintéticas chamando `painel.api_promocoes` direto; reescrever histórico com `git filter-branch` e `git bundle` de backup; a página da Steam dá para conferir sem login no navegador do app.
 - **Scripts de edição:** Write num `.py` do scratchpad (heredoc quebra aspas, crases e `\`), `assert s.count(a) == 1` antes de cada troca, trecho único (inclua a linha de cima) e corte só entre marcadores nomeados, com `git diff --stat` logo depois.
