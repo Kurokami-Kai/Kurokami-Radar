@@ -11,6 +11,8 @@
 :root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#7f7f7f;--azul:#ff7675;--sinal:#ff4757;--acao:#d63031;--acao2:#ea2027;--verde:#ff4757;--vbg:#4a1016;--vtx:#ff8a94;--borda:#ffffff14;--lista:#ff4757;--tenho:#f0f0f0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
+/* sem barras de rolagem em lugar nenhum (a rolagem continua pela roda, toque e teclado) */
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--sinal);outline-offset:3px}
 .esc{position:sticky;top:0;z-index:30;background:#000;border-bottom:1px solid var(--borda);padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
@@ -408,7 +410,7 @@ body.mod-C main{max-width:1680px;padding:18px 24px 90px}
 /* C: histórico à vista */
 .cwrap{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:24px;align-items:start}
 .cl{min-width:0}
-.painel{position:sticky;top:112px;max-height:calc(100vh - 150px);overflow:auto;background:var(--pan);box-shadow:0 6px 20px #0008;scrollbar-width:thin}
+.painel{position:sticky;top:112px;max-height:calc(100vh - 150px);overflow:auto;background:var(--pan);box-shadow:0 6px 20px #0008}
 .pimg img,.pimg .ph{width:100%;aspect-ratio:460/215;object-fit:cover;display:flex;align-items:center;justify-content:center}
 .pin{padding:12px 16px 16px}
 .pin h3{color:#fff;font-weight:400;font-size:22px;margin:6px 0 10px;line-height:1.15}

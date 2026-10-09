@@ -30,6 +30,8 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.4;-webkit-font-smoothing:antialiased}
+/* sem barras de rolagem em lugar nenhum (a rolagem continua pela roda, toque e teclado) */
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none}
 body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 90% 520px at 50% 0,#ffffff0a,transparent 70%),var(--bg)}
 a{color:var(--blue);text-decoration:none}
 a:hover{color:var(--white)}
@@ -376,7 +378,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-aba[aria-selected="true"]{background:#1a0a0c;border-top-color:var(--sinal)}.fx-aba[aria-selected="true"] b{color:var(--sinal)}.fx-aba[aria-selected="true"] .k{color:#fff;box-shadow:inset 0 0 0 1px var(--sinal)}
 .fx-painel{position:relative;display:flex;flex-direction:column;gap:14px;padding:6px 32px 26px;max-width:1180px;width:100%;margin:0 auto}
 .fx-painel>*{flex-shrink:0}
-.fx-painel{scrollbar-width:thin;scrollbar-color:#ffffff30 transparent;scrollbar-gutter:stable}
+
 .fx-2c{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start}
 .fx-painel .fx-car{padding:0}.fx-painel .fx-seta.e{left:0}.fx-painel .fx-seta.d{right:0}.fx-painel .fx-capa{width:132px}
 @media (min-width:821px){

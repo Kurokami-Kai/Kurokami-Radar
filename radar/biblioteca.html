@@ -10,6 +10,8 @@
 :root{--bg:#050505;--bg2:#000000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#7f7f7f;--azul:#ff7675;--sinal:#ff4757;--acao:#d63031;--acao2:#ea2027;--verde:#ff4757;--vbg:#4a1016;--vtx:#ff8a94;--borda:#ffffff14;--lista:#ff4757;--tenho:#f0f0f0}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
+/* sem barras de rolagem em lugar nenhum (a rolagem continua pela roda, toque e teclado) */
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--sinal);outline-offset:3px}
 .esc{position:sticky;top:0;z-index:30;background:#000;border-bottom:1px solid var(--borda);padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}

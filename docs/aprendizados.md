@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — sem barras de rolagem; teste de fundo
+- **"Fundo não aparece" em Ofertas era cobertura, não cor:** `.prat`/`.lane`/`.full` são `#0d0d0d` opacos na largura toda; achar pelo DOM (`elementFromPoint` + fundo não transparente) antes de mexer nos gradientes.
+- **Testar fundo sem editar arquivo:** `<style id=fundoTeste>` injetado no painel e nos dois iframes + barra de botões flutuante deixou o dono comparar ao vivo.
+- **`scrollbar-width` numa classe vence o `*`:** a `.painel` de Ofertas tinha `thin` e mantinha a barra.
+
 ## 2026-10-09 — histórico em uma linha + faixa; "antes desta promoção" coerente
 - **"Contraditório" eram duas definições de "esta promoção":** `analise` corta no preço de agora, `previsao` na onda de episódios (folga de 1 dia entre lojas). Imprimir os `segs`/`eps` do jogo do print (script no scratchpad lendo o banco) achou em 1 rodada; depois contar quantos mudam (19/218).
 - **Episódio dividido precisa de `<=` no "passado"** (`e[1] <= atual[0]`): com `<` a parte de antes sumia e nada mudava.
