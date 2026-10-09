@@ -31,6 +31,12 @@ Amostra em `dados/amostras-biblioteca-2.html` (mesmos dados). Nas duas: capa da 
 - **D · Vitrine + ficha em tela cheia:** franquias e avulsos misturados na mesma vitrine; a ficha da franquia abre por cima, com ‹ › (← →) para a vizinha. Franquias e Completar em 3 por linha.
 - **E · Estante que abre no lugar:** franquias primeiro, avulsos embaixo em capas menores; a ficha da franquia abre embaixo da linha clicada (com "abrir em tela cheia"). Franquias em 2 prateleiras com setas por linha; Completar em 2 por linha.
 
+## Retorno sobre D/E e terceira rodada: F e G (09/10)
+- Dono: abrir **em tela cheia** (D) é melhor que abrir no lugar (E: clica e ainda tem de rolar). **Franquias: 2 por linha como na E, abrindo em tela cheia como na D.** Completar: entre D (pouca informação) e E (muita), sempre abrindo em tela cheia. Ficha da franquia: os jogos empurravam as informações para baixo (FINAL FANTASY) ou cortavam o texto com "…" (Spider-Man). **Telas de texto assimétricas (alvenaria) ficam ruins de ver.**
+- Amostra em `dados/amostras-biblioteca-3.html`. Nas duas: Coleção da D (vitrine em pilha); Franquias com 2 prateleiras por linha; Completar abre a **ficha de completar** em tela cheia (jogo, 5 números, DLCs agrupadas por tipo, "pôr todas" / "só as em promoção"); **texto em blocos de altura fixa** (sempre N linhas; as que sobram ficam em branco; "+ N · abrir ›" no rodapé); números da ficha sem corte (o texto de baixo quebra linha).
+- **F · Ficha numa tela só:** cabeçalho com os 5 números, jogos numa fileira com setas (os 30 do FINAL FANTASY cabem) e logo abaixo três caixas (onde foi o seu tempo, nunca jogados, o que falta): 864 px de altura, cabe numa tela de 900. Completar em 3 por linha com 6 DLCs.
+- **G · Ficha com painel ao lado:** jogos em grade à esquerda (todos visíveis) e um painel fixo à direita com os números, o tempo e o que falta, que acompanha a rolagem. Completar em 2 por linha com 8 DLCs.
+
 ## Pedido (dono, 08/10)
 - A aba está mal disposta. Hoje: **Completar · Franquias · Coleção · DLCs em promoção** (botões no topo da aba).
 - Deve ficar parecida com **Ofertas** (menu no topo com subpáginas, talvez).
