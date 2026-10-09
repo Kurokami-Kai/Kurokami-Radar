@@ -23,6 +23,13 @@ Status: **em discussão** (rascunho de 08/10, respostas do dono na mesma noite; 
 - **HLTB do Augmented Steam vem em minutos** (FF VII Remake: 1935 = 32 h, como no site). A API responde com CORS aberto, mas buscar pelo servidor com cache.
 - **Três amostras para escolher:** [09-amostras-ficha.html](09-amostras-ficha.html) (abre no navegador; A = biblioteca da Steam, banner largo e coluna lateral; B = PlayStation, capa vertical e fundo do banner, sequências logo abaixo e abas; C = cartões, faixa curta do banner e blocos em grade). Cada uma nos dois estados.
 
+## Escolha da base (08/10, noite): B aprimorada ("B+" nas amostras)
+- Dono: gostou da B (PlayStation), mas (1) a imagem repetida atrás é ruim, porque o banner é a mesma arte da capa; (2) a barra de rolagem da fileira da franquia é feia; (3) as informações ficavam menos práticas que na A.
+- **B+:** capa vertical à esquerda, logo, etiquetas, descrição de 3 linhas ("mais"), **fileira de 5 números** (sem ter: melhor preço, termina, análises, para zerar, crítica; tendo: tempo jogado, conquistas com anel, para zerar com o seu %, análises, preço na Steam) e ações. **Fundo sem repetir a capa**, duas opções para o dono escolher: captura de tela do jogo escurecida (`appdetails.screenshots`, 1 chamada com cache) ou **cor da capa** (média ponderada pela saturação, num canvas de 24×36; o CDN da Steam manda `Access-Control-Allow-Origin: *`, então dá no navegador).
+- **Fileira da franquia sem barra de rolagem:** setas ‹ › nas pontas (somem no começo e no fim), abre centrada no jogo atual, ano embaixo de cada capa, barra "tenho 23 de 30" e "Ver a franquia inteira ›". No celular, arrasta com o dedo.
+- **Corpo em duas colunas, como a A:** à esquerda o veredito (tipo de recorde + costuma voltar), menores preços e histórico; ou, tendo, o seu progresso (conquistas, DLCs) e o histórico. À direita, **preço agora por loja** (com keyshop), How Long to Beat (barra com o marcador "você"), crítica e informações.
+- Jogos novos guardam a capa vertical em caminho com hash: usar o `capa_v` do banco, não montar a URL.
+
 ## Hoje (o que existe)
 - `api_biblioteca` (`painel.py`) devolve totais (valor cheio, hoje, piso, para completar), `jogos[]` com `falta[]` (DLCs que faltam) e as séries agrupadas pelo nome (o campo `franquia` da Steam mistura coisas como "EA Play").
 - `renderBib` (`painel.html`, seção `biblioteca`): faixa de totais, barra "Progresso da coleção" com o carrinho, e os quatro segmentos com ordenações próprias (`BSORTS`).

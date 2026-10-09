@@ -85,6 +85,62 @@ h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;
 .C .grade{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;padding:14px 24px 24px}
 .C .s4{grid-column:span 4}.C .s5{grid-column:span 5}.C .s7{grid-column:span 7}.C .s8{grid-column:span 8}.C .s12{grid-column:span 12}
 .C .cx{border-top:2px solid #ffffff10}
+/* ---------- B+: PlayStation aprimorada ---------- */
+.P{background:#0b0f15;position:relative}
+.P .fundo{position:absolute;inset:0 0 auto 0;height:600px;background:#0b0f15 center 25%/cover no-repeat}
+.P .fundo.cap::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0b0f15 0%,#0b0f15e6 34%,#0b0f1599 70%,#0b0f1566 100%),linear-gradient(180deg,#0b0f1500 35%,#0b0f15 100%)}
+.P .fundo.cor::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0b0f1500 25%,#0b0f15 100%)}
+.P .cab{position:relative;display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;padding:32px 32px 22px}
+.P .vert{width:220px;aspect-ratio:2/3;object-fit:cover;box-shadow:0 14px 34px #000d;border-radius:4px}
+.P .info{display:flex;flex-direction:column;gap:12px;min-width:0}
+.P .logo{max-width:360px;max-height:96px;display:block;filter:drop-shadow(0 3px 10px #000)}
+.P .desc{margin:0;max-width:760px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.P .desc.aberta{-webkit-line-clamp:unset}
+.P .mais{background:none;border:0;color:var(--azul);font:inherit;font-size:12px;padding:0;cursor:pointer;align-self:flex-start;margin-top:-6px}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:920px}
+.tile{background:#0e141bd0;backdrop-filter:blur(6px);padding:9px 12px 10px;border-top:2px solid #ffffff18;min-width:0}
+.tile small{display:block;color:var(--fraco);font-size:11px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile b{display:block;color:#fff;font-weight:400;font-size:21px;line-height:1.3;white-space:nowrap}
+.tile span{display:block;color:var(--fraco);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile.verde{border-top-color:var(--verde)}.tile.verde b{color:var(--vtx)}
+.tile .pc{display:inline;background:var(--vbg);color:var(--vtx);font-size:13px;padding:1px 5px;margin-right:6px;vertical-align:4px}
+.tile .anel{display:flex;align-items:center;gap:10px}.tile .anel svg{flex:0 0 34px}
+.P .acoes{display:flex;flex-wrap:wrap;gap:8px}
+.car{position:relative;padding:4px 32px 10px}
+.car .topo2{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px}
+.car .topo2 h3{margin:0}
+.car .prog{width:150px;height:4px;background:#ffffff14}.car .prog i{display:block;height:100%;background:var(--verde)}
+.car .topo2 .q{color:var(--fraco);font-size:12px}
+.car .topo2 a{margin-left:auto;font-size:13px}
+.car .trilho{display:flex;gap:12px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;padding:6px 2px 4px;scroll-snap-type:x proximity}
+.car .trilho::-webkit-scrollbar{display:none}
+.car .capa{width:116px;scroll-snap-align:start}
+.car .capa img{border-radius:3px;transition:transform .15s}.car .capa:hover img{transform:translateY(-3px)}
+.car .capa .nm{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.25;height:2.5em;color:#acb2b8}
+.car .capa .ano{font-size:11px;color:#56707f}
+.car .seta{position:absolute;top:48px;width:52px;height:174px;border:0;cursor:pointer;color:#fff;font-size:30px;z-index:2;display:flex;align-items:center;justify-content:center}
+.car .seta[hidden]{display:none}
+.car .seta.e{left:32px;background:linear-gradient(90deg,#0b0f15 10%,#0b0f1500)}.car .seta.d{right:32px;background:linear-gradient(270deg,#0b0f15 10%,#0b0f1500)}
+.car .seta:hover{color:var(--azul)}
+.P .corpo{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;padding:16px 32px 30px}
+.P .pri,.P .lat{display:flex;flex-direction:column;gap:14px;min-width:0}
+.vered{border-left:3px solid #1a6fd1}.vered .t{font-size:16px;color:#fff;margin-bottom:4px}
+.lojas .l{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--borda);font-size:13px}
+.lojas .l:last-child{border:0}.lojas .l.melhor{color:var(--vtx)}.lojas .l .sub{color:var(--fraco)}
+.linha{position:relative;margin:4px 0 30px;height:8px;background:#ffffff12;border-radius:4px}
+.linha i{position:absolute;top:0;bottom:0;left:0;border-radius:4px}
+.linha .m{position:absolute;top:-24px;transform:translateX(-50%);font-size:11px;color:var(--fraco);white-space:nowrap}
+.linha .m::after{content:"";position:absolute;left:50%;top:18px;width:1px;height:14px;background:#ffffff40}
+.linha .voce{position:absolute;top:14px;transform:translateX(-50%);font-size:11px;color:var(--azul);white-space:nowrap}
+.linha .voce::before{content:"▲";display:block;text-align:center;font-size:9px;line-height:1}
+.barra2{height:6px;background:#ffffff12;margin:6px 0 2px}.barra2 i{display:block;height:100%;background:var(--azul)}
+.periodo{float:right}.periodo button{padding:4px 10px;font-size:12px}
+.dlcs .l{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--borda)}
+@media (max-width:820px){
+  .P .cab{grid-template-columns:110px minmax(0,1fr);gap:14px;padding:18px 16px}.P .vert{width:110px}.P .logo{max-width:200px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.P .corpo{grid-template-columns:1fr;padding:14px 16px}.car{padding:4px 16px 10px}
+  .car .seta{display:none}
+}
 @media (max-width:820px){
   .A .corpo{grid-template-columns:1fr}.A .hero{height:180px}.A .hero .logo{max-width:220px;left:16px}
   .B .cab{grid-template-columns:110px 1fr;gap:14px;padding:20px 16px}.B .cab .vert{width:110px}.B .lado{grid-template-columns:1fr}.B .seq,.B .abas,.B .aba{padding-left:16px;padding-right:16px}
@@ -96,7 +152,8 @@ h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;
 <body>
 <div class="topo">
   <h1>Ficha do jogo · 3 amostras</h1>
-  <span class="seg" id="amostra"><button data-a="A" aria-pressed="true">A · Biblioteca da Steam</button><button data-a="B">B · PlayStation</button><button data-a="C">C · Cartões</button></span>
+  <span class="seg" id="amostra"><button data-a="P" aria-pressed="true">B+ · PlayStation aprimorada</button><button data-a="A">A · Biblioteca da Steam</button><button data-a="B">B · PlayStation</button><button data-a="C">C · Cartões</button></span>
+  <span class="seg" id="fundoSel" title="Fundo do topo da ficha"><button data-f="cap" aria-pressed="true">Fundo: captura de tela</button><button data-f="cor">Fundo: cor da capa</button></span>
   <span class="seg" id="estado"><button data-e="oferta" aria-pressed="true">Não tenho (Ofertas)</button><button data-e="tenho">Tenho (Biblioteca)</button></span>
 </div>
 <p class="nota">Esboço para decidir o layout: dados reais do seu banco, da Steam e do Augmented Steam (HLTB, Metacritic, OpenCritic, jogadores) de 08/10. A mesma ficha abre em Ofertas, Promoções e Biblioteca; só mudam os blocos conforme você tem o jogo ou não. Conquistas são ilustrativas (ainda não buscamos). Nenhum botão funciona.</p>
@@ -104,6 +161,9 @@ h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;
 <script>
 const CDN='https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/';
 const img=(a,f)=>CDN+a+'/'+f;
+// jogos novos guardam a capa vertical num caminho com hash: o painel usa o capa_v do banco
+const CAPAV={1004640:'1004640/988d2f00c81b45d6aab89e5a1737d0737165f905/library_600x900_2x.jpg',3259780:'3259780/21d8a7c692803448c79426fc88910d8658a058a8/library_capsule_2x.jpg'};
+const capaV=a=>CAPAV[a]?CDN+CAPAV[a]:img(a,'library_600x900_2x.jpg');
 const brl=c=>'R$ '+(c/100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 const horas=m=>(m/60).toLocaleString('pt-BR',{maximumFractionDigits:1})+' h';
 const SERIE=[[39140,'FINAL FANTASY VII',1],[377840,'FINAL FANTASY IX',1],[359870,'FINAL FANTASY X/X-2 HD',1],[39210,'FINAL FANTASY XIV Online',0,1,5299],
@@ -150,7 +210,7 @@ function precos(g){return g.tenho?`<div class="cx"><h3>Seus números</h3><div cl
    <div><h3>Menor preço nas lojas que alertam</h3><div class="pisos">${['3 meses','6 meses','9 meses','1 ano','De sempre'].map((n,i)=>`<div><small>${n}</small>${brl(g.pisos[i])}</div>`).join('')}</div></div>`;}
 function historico(){return `<div><h3>Histórico de preços</h3><div class="grafico cx" style="padding:10px">${grafico()}</div>${legenda()}</div>`;}
 function serie(g,tit){return `<h3>${tit||'Da mesma franquia'} <span style="color:var(--fraco);text-transform:none;letter-spacing:0">· FINAL FANTASY · tenho 23 de 30</span></h3><div class="serie">${SERIE.map(([a,n,t,l,p])=>
-  `<div class="capa${t?'':' falta'}${a===g.appid?' atual':''}" title="${n}${t?' (tenho)':l?' (na lista de desejos)':' (não tenho)'}"><img loading="lazy" src="${img(a,'library_600x900_2x.jpg')}" alt="">
+  `<div class="capa${t?'':' falta'}${a===g.appid?' atual':''}" title="${n}${t?' (tenho)':l?' (na lista de desejos)':' (não tenho)'}"><img loading="lazy" src="${capaV(a)}" alt="">
    ${t?'<span class="sel ok">✓</span>':l?'<span class="sel cor">♥</span>':''}<div class="nm">${n}</div>${!t&&p?`<div class="pr">${brl(p)}</div>`:''}</div>`).join('')}</div>`;}
 function acoes(g){return g.tenho?`<button class="btn azul">▶ Jogar na Steam</button><button class="btn">Página na loja</button><button class="btn">DLCs</button>`
   :`${precoBox(g)}<button class="btn verde">Pôr no carrinho</button><button class="btn">Página na Steam</button><button class="btn">Já tenho</button>`;}
@@ -189,11 +249,70 @@ C(g){return `<div class="C"><button class="x">✕</button>
 function precosOferta(g){return `<div class="cx">${precoBox(g)} <span style="margin-left:10px">Na ${g.loja} hoje · termina ${g.fim}</span></div><div style="margin-top:14px">${historico()}</div>`;}
 function detalhes(g){return `<div class="lado"><div class="cx">${info(g)}</div><div class="cx">${crit(g)}${g.keyshop?`<div style="margin-top:12px;font-size:13px"><span style="color:var(--fraco)">Keyshop</span> ${g.keyshop}</div>`:''}</div></div>`;}
 
-let A='A',E='oferta';
-function desenhar(){document.getElementById('ficha').innerHTML=R[A](J[E]);
+
+// ---------- B+ ----------
+const SS={1358700:'1358700/ss_d156e745a495ddc388719dda35bba83ec5195006.1920x1080.jpg',1462040:'1462040/ss_55903e74751601e42fb7f858d5c07ec048386ce2.1920x1080.jpg'};
+const ANO={39140:2013,39210:2014,377840:2016,359870:2016,595520:2018,637650:2018,1026680:2019,1462040:2022,1608070:2022,1358700:2023,2515020:2024,2909400:2025,1004640:2025,3259780:'em breve'};
+const ORDEM=[39140,39210,377840,359870,595520,637650,1026680,1462040,1608070,1358700,2515020,2909400,1004640,3259780];
+const LOJAS={1358700:[['Nuuvem',5997,'−70% · até 13/10'],['Steam',19990,''],['GreenManGaming',19990,''],['Epic Game Store',19990,'sem chave Steam'],['Humble Store',20065,''],['Keyshop (GG.deals)',6431,'menor R$ 63,75']]};
+let F='cap';
+function corDaCapa(a){return new Promise(r=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>{const c=document.createElement('canvas');c.width=24;c.height=36;const x=c.getContext('2d');x.drawImage(i,0,0,24,36);
+  const d=x.getImageData(0,0,24,36).data;let R=0,G=0,B=0,W=0;for(let k=0;k<d.length;k+=4){const mx=Math.max(d[k],d[k+1],d[k+2]),mn=Math.min(d[k],d[k+1],d[k+2]);const w=(mx-mn)+8;R+=d[k]*w;G+=d[k+1]*w;B+=d[k+2]*w;W+=w;}
+  r([R/W,G/W,B/W].map(v=>Math.round(v)));};i.onerror=()=>r([27,40,56]);i.src=img(a,'library_600x900_2x.jpg');});}
+function tile(l,v,sub,cls){return `<div class="tile${cls?' '+cls:''}"><small>${l}</small><b>${v}</b>${sub?`<span>${sub}</span>`:''}</div>`;}
+function anel(p){const r=14,c=2*Math.PI*r;return `<svg viewBox="0 0 34 34" width="34" height="34"><circle cx="17" cy="17" r="${r}" fill="none" stroke="#ffffff1a" stroke-width="4"/><circle cx="17" cy="17" r="${r}" fill="none" stroke="#66c0f4" stroke-width="4" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 17 17)"/></svg>`;}
+function tilesP(g){return g.tenho
+  ?`<div class="tiles">${tile('Tempo jogado',horas(g.jogado),'última vez '+g.ultima.replace(' de 2026',''))}
+     <div class="tile"><small>Conquistas</small><div class="anel">${anel(g.conq[0]/g.conq[1])}<div><b>${g.conq[0]}/${g.conq[1]}</b></div></div><span>${Math.round(g.conq[0]/g.conq[1]*100)}% para platinar</span></div>
+     ${tile('Para zerar',horas(g.hltb[0]),'você: '+Math.round(g.jogado/g.hltb[0]*100)+'% · '+horas(g.hltb[2])+' tudo')}
+     ${tile('Análises','86%','Muito positivas')}${tile('Na Steam hoje',`<span class="pc">−${g.corte}%</span>${brl(g.preco)}`,'para dar de presente','verde')}</div>`
+  :`<div class="tiles">${tile('Melhor preço',`<span class="pc">−${g.corte}%</span>${brl(g.preco)}`,'na '+g.loja+' · de '+brl(g.cheio),'verde')}${tile('Termina','em 5 dias','13 de out, 23h59')}
+     ${tile('Análises','82%','Muito positivas · 3.793')}${tile('Para zerar',horas(g.hltb[0]),horas(g.hltb[2])+' para completar')}${tile('Crítica',g.meta+' · '+g.oc,'Metacritic · OpenCritic')}</div>`;}
+function carrossel(g){const tenho=23,total=30;const por=Object.fromEntries(SERIE.map(x=>[x[0],x]));
+  return `<div class="car"><div class="topo2"><h3>Sequências e franquia</h3><span class="q">FINAL FANTASY · tenho ${tenho} de ${total}</span><span class="prog"><i style="width:${tenho/total*100}%"></i></span><a href="#">Ver a franquia inteira ›</a></div>
+   <button class="seta e" data-car="-1" aria-label="anteriores">‹</button><button class="seta d" data-car="1" aria-label="próximos">›</button>
+   <div class="trilho">${ORDEM.map(a=>{const [,n,t,l,p]=por[a];return `<div class="capa${t?'':' falta'}${a===g.appid?' atual':''}" title="${n}${t?' (tenho)':l?' (na lista de desejos)':' (não tenho)'}"><img loading="lazy" src="${capaV(a)}" alt="">
+     ${t?'<span class="sel ok">✓</span>':l?'<span class="sel cor">♥</span>':''}<div class="nm">${n}</div><div class="ano">${ANO[a]}${!t&&p?` · <span class="pr">${brl(p)}</span>`:''}</div></div>`;}).join('')}</div></div>`;}
+function linhaHltb(g){const m=g.hltb[2],pc=v=>Math.min(100,v/m*100),cores=['#66c0f4','#66c0f488','#ffffff30'],nomes=['História principal','Principal + extras','Completacionista'];
+  return `<div class="linha">${[2,1,0].map(k=>`<i style="width:${pc(g.hltb[k])}%;background:${cores[k]}"></i>`).join('')}
+    ${g.tenho?`<i style="width:${pc(g.jogado)}%;background:var(--verde)"></i><span class="voce" style="left:${Math.max(3,pc(g.jogado))}%">você ${horas(g.jogado)}</span>`:''}</div>
+    ${nomes.map((n,k)=>`<div class="l"><span><i style="display:inline-block;width:9px;height:9px;margin-right:7px;background:${cores[k]}"></i>${n}</span><span>${horas(g.hltb[k])}</span></div>`).join('')}`;}
+function ladoP(g){const lojas=LOJAS[g.appid];
+  return `${lojas?`<div class="cx lojas"><h3>Preço agora por loja</h3>${lojas.map(([n,v,sub],i)=>`<div class="l${i?'':' melhor'}"><span>${n}${sub?` <span class="sub">· ${sub}</span>`:''}</span><span>${brl(v)}</span></div>`).join('')}</div>`:''}
+    <div class="cx hltb"><h3>How Long to Beat</h3>${linhaHltb(g)}<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:8px"><span style="color:var(--fraco)">dados do HowLongToBeat</span><a href="#">Mais informações ↗</a></div></div>
+    <div class="cx">${crit(g)}<div style="font-size:12px;color:var(--fraco);margin-top:8px">Pico de jogadores: ${g.jog[1].toLocaleString('pt-BR')}</div></div>
+    <div class="cx">${info(g)}</div>`;}
+function priP(g){if(g.tenho)return `<div class="cx"><h3>Seu progresso</h3>
+    <div style="font-size:13px;color:var(--fraco)">Conquistas · ${g.conq[0]} de ${g.conq[1]}</div><div class="barra2"><i style="width:${g.conq[0]/g.conq[1]*100}%"></i></div>
+    <div style="font-size:12px;color:var(--fraco);margin-bottom:12px">Faltam ${g.conq[1]-g.conq[0]} para platinar · as mais raras: "Pro Gamer" (0,9%), "Hard Mode" (2%)</div>
+    <div class="dlcs"><div class="l"><span>✓ EPISODE INTERmission (Yuffie)</span><span style="color:var(--fraco)">tenho</span></div><div class="l"><span>✓ Trilha sonora digital</span><span style="color:var(--fraco)">tenho</span></div></div></div>
+    <div><h3>Histórico de preços <span class="seg periodo"><button>3 meses</button><button aria-pressed="true">1 ano</button><button>Tudo</button></span></h3><div class="grafico cx" style="padding:10px">${grafico(200)}</div>${legenda()}</div>`;
+  return `<div class="cx vered"><div class="t"><span class="chip rec" style="margin:0 8px 0 0">Novo recorde</span>Nunca esteve tão barato</div>
+    <div class="volta">Costuma voltar: <b>nunca teve esse desconto</b> · 0 vezes com −65% ou mais em 2 anos · antes, o menor foi R$ 74,99 (−62%, 02/2026)</div></div>
+    <div><h3>Menor preço nas lojas que alertam</h3><div class="pisos">${['3 meses','6 meses','9 meses','1 ano','De sempre'].map((n,i)=>`<div><small>${n}</small>${brl(g.pisos[i])}</div>`).join('')}</div></div>
+    <div><h3>Histórico de preços <span class="seg periodo"><button>3 meses</button><button aria-pressed="true">1 ano</button><button>Tudo</button></span></h3><div class="grafico cx" style="padding:10px">${grafico(200)}</div>${legenda()}</div>`;}
+R.P=g=>`<div class="P"><div class="fundo ${F}" id="fundoP"></div><button class="x">✕</button>
+  <div class="cab"><img class="vert" src="${img(g.appid,'library_600x900_2x.jpg')}" alt="">
+    <div class="info"><img class="logo" src="${img(g.appid,'logo.png')}" alt="${g.nome}"><div>${chips(g)}</div>
+      <p class="desc">${g.desc}</p><button class="mais" data-mais>mais</button>${tilesP(g)}<div class="acoes">${acoes(g).replace(/<span class="preco">[\s\S]*?<\/b><\/span><\/span>/,'')}</div></div></div>
+  ${carrossel(g)}
+  <div class="corpo"><div class="pri">${priP(g)}</div><div class="lat">${ladoP(g)}</div></div></div>`;
+async function posP(){const f=document.getElementById('fundoP');if(!f)return;const g=J[E];
+  if(F==='cap')f.style.backgroundImage=`url('https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${SS[g.appid]}')`;
+  else{const [r,gg,b]=await corDaCapa(g.appid);const k=.55;const c=`rgb(${r*k|0},${gg*k|0},${b*k|0})`;f.style.background=`radial-gradient(120% 90% at 15% 0%,${c} 0%,#0b0f15 75%)`;}
+  const t=document.querySelector('.car .trilho');if(!t)return;const at=t.querySelector('.atual');if(at)t.scrollLeft=at.offsetLeft-t.clientWidth/2+at.clientWidth/2;
+  const setas=()=>{document.querySelector('.car .seta.e').hidden=t.scrollLeft<4;document.querySelector('.car .seta.d').hidden=t.scrollLeft+t.clientWidth>=t.scrollWidth-4;};
+  t.addEventListener('scroll',setas,{passive:true});setas();}
+let A='P',E='oferta';
+function desenhar(){document.getElementById('ficha').innerHTML=R[A](J[E]);posP();
+  document.getElementById('fundoSel').hidden=A!=='P';document.querySelectorAll('#fundoSel button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===F));
   document.querySelectorAll('#amostra button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.a===A));
   document.querySelectorAll('#estado button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.e===E));}
 document.addEventListener('click',e=>{const a=e.target.closest('[data-a]'),s=e.target.closest('[data-e]'),t=e.target.closest('[data-aba]');
+  const f=e.target.closest('[data-f]'),c=e.target.closest('[data-car]'),m=e.target.closest('[data-mais]');
+  if(f){F=f.dataset.f;desenhar();return;}
+  if(c){const t=c.parentElement.querySelector('.trilho');t.scrollBy({left:+c.dataset.car*t.clientWidth*.8});return;}
+  if(m){const d=m.previousElementSibling;d.classList.toggle('aberta');m.textContent=d.classList.contains('aberta')?'menos':'mais';return;}
   if(a){A=a.dataset.a;desenhar();}else if(s){E=s.dataset.e;desenhar();}
   else if(t){const p=t.parentElement;p.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b===t));
     p.parentElement.querySelectorAll('.aba').forEach((d,i)=>d.classList.toggle('on',i===+t.dataset.aba));}});
