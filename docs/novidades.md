@@ -3,7 +3,7 @@
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
 ## 0.17.2
-- **Buscar um jogo em Ofertas de qualquer lugar:** aperte **Esc** (ou `/`) (também em Destaques, e mesmo com o foco no topo do painel) e digite o nome. A busca procura na sua lista de desejos e em todas as promoções, sem os filtros, sem ligar para acentos e pontuação ("pokemon" acha "Pokémon"). Enter ou ↓ vai para o primeiro resultado; Esc de novo fecha e volta para onde você estava. No teclado sem a tecla `/`, AltGr+Q também abre (vale para a Biblioteca).
+- **Buscar um jogo de qualquer lugar:** aperte **Esc** (ou `/`) em Ofertas (também em Destaques, e mesmo com o foco no topo do painel) e digite o nome numa barra larga no centro da tela. No Carrinho, nas Configurações e nas Notificações, o Esc leva direto para essa busca; na Biblioteca, abre e fecha a busca dela. A busca procura na sua lista de desejos e em todas as promoções, sem os filtros, sem ligar para acentos e pontuação ("pokemon" acha "Pokémon"). Enter ou ↓ vai para o primeiro resultado; Esc de novo fecha e volta para onde você estava. No teclado sem a tecla `/`, AltGr+Q também abre (vale para a Biblioteca).
 
 ## 0.17.1 (publicada em 2026-10-09)
 - **Cores que mostram para onde olhar, só em preto e vermelho** (paleta da Flat UI Colors): cada vermelho tem um papel. Vermelho cheio só no que compra (Pôr no carrinho, Finalizar pedido); os outros botões (Página na Steam, Já tenho, Monitorar, Não avisar) ficaram cinza; o texto clicável ganhou um rosa-claro com mais contraste; a aba atual e o que está ligado, um vermelho vivo. Textos apagados ficaram um pouco mais claros.

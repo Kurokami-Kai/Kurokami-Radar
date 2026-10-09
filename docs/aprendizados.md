@@ -2,6 +2,10 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — Esc em todas as abas; barra de busca no centro
+- **`navigate` para `#carr` não troca de aba:** o painel abre na última aba salva; clicar no menu para testar outra aba.
+- **Função chamada no carregamento não pode ser `const` declarado mais abaixo** (TDZ): `buscaPend` virou `function`.
+
 ## 2026-10-09 — Esc abre e fecha a busca
 - **Pulei o teste ("mudança simples") e quebrou tudo:** `function buscar` no topo do script já é `window.buscar`; reatribuir `window.buscar=k=>...buscar()` virou recursão infinita e matou também o `/`. Nunca dar a um embrulho o nome da função global; testar mesmo quando parece simples.
 - **`navigate` para a mesma URL com outro `#` não recarrega:** os erros no console eram da página antiga; usar `location.reload()`.

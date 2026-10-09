@@ -551,6 +551,22 @@ body::after{content:"";position:fixed;z-index:-1;left:50%;top:50%;width:150vmax;
   animation:kh-gira 60s linear infinite}
 @keyframes kh-gira{to{transform:rotate(1turn)}}
 @media (prefers-reduced-motion:reduce){body::after{animation:none}}
+/* busca (Esc ou /): uma barra larga no centro, presa no alto, com a mira vermelha da loja */
+.bq-w{position:sticky;top:0;z-index:12;margin:0 -16px 22px;padding:26px 16px 16px;background:linear-gradient(var(--bg) 72%,#05050500)}
+.bq{display:flex;align-items:center;gap:14px;max-width:960px;margin:0 auto;height:60px;padding:0 12px 0 20px;cursor:text;
+  background:#0d0d0dd9;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:3px;
+  box-shadow:inset 0 0 0 1px #ff475759,0 10px 30px #00000080;transition:box-shadow .15s}
+.bq:focus-within{box-shadow:inset 0 0 0 1px var(--sinal),0 0 0 3px #ff475726,0 0 36px #ff475740}
+.bq svg{flex:none;color:var(--sinal)}
+.bq input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font:inherit;font-size:21px;letter-spacing:.01em}
+.bq input::placeholder{color:#6a6a6a}
+.bq input::-webkit-search-cancel-button{display:none}
+.bq-x{flex:none;display:flex;align-items:center;gap:6px;background:none;border:0;color:var(--fraco);cursor:pointer;font-size:12.5px;padding:6px 8px;border-radius:2px}
+.bq-x:hover{color:#fff;background:#ffffff0f}
+.bq kbd,.bq-i kbd{background:#ffffff1a;color:#fff;border-radius:2px;padding:0 6px;font:inherit;font-size:11.5px}
+.bq-i{max-width:960px;margin:10px auto 0;text-align:center;color:var(--fraco);font-size:12.5px}
+.bq-i b{color:#fff;font-weight:400}
+.bq-nada{text-align:center;color:var(--fraco);margin:48px 0}
 /* painéis meio transparentes para o fundo vivo aparecer atrás deles */
 :root{--pan:#0d0d0d99}
 .prat,.lane,.se{background:#0d0d0d8c!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
@@ -789,8 +805,9 @@ function pagBusca(){const t=norm(S.q).split(' ').filter(Boolean),todos=[...OB.va
   const l=t.length?todos.filter(o=>{const n=o.nb??=' '+norm(o.nome)+' ';return t.every(w=>n.includes(w));}):[];
   const ini=o=>o.nb.startsWith(' '+t[0])?1:0;
   l.sort((a,b)=>ini(b)-ini(a)||em(b)-em(a)||a.k.localeCompare(b.k,'pt-BR'));
-  return `<div class="tool"><div class="l1"><span class="cnt">${t.length?`<b>${fmtN(l.length)}</b> encontrado${l.length===1?'':'s'} · na lista de desejos e nas promoções, sem os filtros`:'Digite o nome do jogo · procura na lista de desejos e nas promoções, sem os filtros'}</span><span class="sp"></span>${qIn()}<button class="limpa" data-fimbusca title="Fechar a busca (Esc)">✕ Fechar busca</button></div></div>`
-   +(l.length?blocos([['','',l,'p']],rend):t.length?'<p class="vazio">Nenhum jogo com esse nome aqui. A busca cobre a lista de desejos e as promoções que o Kurokami acompanha.</p>':'');}
+  return `<div class="bq-w"><label class="bq"><svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input id="q" type="search" placeholder="Buscar um jogo" autocomplete="off" spellcheck="false" value="${esc(S.q)}"><button class="bq-x" data-fimbusca title="Fechar a busca"><kbd>Esc</kbd>fechar</button></label>
+   <div class="bq-i">${t.length?`<b>${fmtN(l.length)}</b> encontrado${l.length===1?'':'s'} · `:''}na sua lista de desejos e em todas as promoções, sem os filtros${t.length&&l.length?' · <kbd>Enter</kbd> vai ao primeiro':''}</div></div>`
+   +(l.length?blocos([['','',l,'p']],rend):t.length?'<p class="bq-nada">Nenhum jogo com esse nome aqui.</p>':'');}
 function abreBusca(){if(S.aberto!=null)fecha();if(!S.busca){S.busca=true;S.lim=120;desenha();scrollTo(0,0);}const q=$('#q');if(q){q.focus();q.select();}}
 window.buscar=k=>k==='Escape'&&S.busca?fimBusca():abreBusca();   // o painel repassa / e Esc
 function fimBusca(){S.busca=false;S.q='';S.lim=120;desenha();scrollTo(0,0);}
@@ -801,7 +818,7 @@ function desenha(){
   S.lista=[];document.body.classList.toggle('pg-dest',dest);document.body.classList.toggle('mod-C',S.mod==='C');
   $('#main').innerHTML=S.busca?pagBusca():dest?pagDestA():S.sub==='promo'?pagPromoM():pagListaM();avisaPai('vale');
   const tem=new Set($$('#main [data-L]').map(e=>e.dataset.L));
-  $('#az').innerHTML=dest?'':'#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(c=>`<button data-az="${c}"${tem.has(c)?'':' disabled'}>${c}</button>`).join('');
+  $('#az').innerHTML=dest||S.busca?'':'#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(c=>`<button data-az="${c}"${tem.has(c)?'':' disabled'}>${c}</button>`).join('');
   setas();kb();if(dest)ajustaMinis();
 }
 function setas(){$$('.trilho.arr').forEach(t=>{const at=()=>{t.style.setProperty('--fe',t.scrollLeft>4?'40px':'0px');t.style.setProperty('--fd',t.scrollLeft+t.clientWidth<t.scrollWidth-4?'64px':'0px');};at();t.onscroll=at;});}
