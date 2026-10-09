@@ -7,6 +7,8 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Ordem padrão antes de ordenar:** `tool()` fixava a ordem depois do `sort` e a 1ª pintura saiu sem ordem; testar cada tela num laço JS (opção × página × modo) achou isso mais rápido que prints.
 - **Prints do navegador do app falham depois de `resize_window`** (a pane muda de largura e limpa a emulação): confira pelo DOM (`getBoundingClientRect`, contagens) em vez de insistir.
 - **DLCs possuídas = 0 sem `userdata.json`:** antes de concluir "bug no Completar", `grep userdata radar.log`.
+- **Cinco rodadas de amostras com dados reais fecharam a Biblioteca (H2):** o dono decide melhor vendo; o que travou cada rodada foi detalhe visual medido (altura da ficha em 1280×900, capas centralizadas, barra que não lê 100%). Referência para outro chat vai para `docs/specs/` com dados reduzidos e tempos sintéticos; a completa fica em `dados/`.
+- **Regra de dado sintético com `appid % 5`** zerou uma franquia inteira (os appids do GTA são múltiplos de 10): use um hash, não um módulo pequeno.
 - **O navegador do app não abre arquivo local acima de ~512 KB** ("couldn't open file"): 510 KB abriu, 513 não. Tire dos dados o que a amostra não usa.
 - **`Set-Content -Encoding utf8` no PowerShell 5.1 grava BOM** (apareceu na mensagem do commit): escreva o texto com a ferramenta Write.
 - **Mensagem de commit com aspas no PowerShell 5.1 quebra** (vira pathspec): use `git commit -F arquivo.txt` do scratchpad.

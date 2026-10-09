@@ -1,11 +1,37 @@
 # Spec 09 — Biblioteca nova: Coleção por franquias, ficha estilo PlayStation
 
-Status: **Etapa 1 feita** (08/10; vai na 0.17.0); Etapa 2 em amostras: A/B/C avaliadas, D/E na mesa (09/10); Etapa 3 em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
+Status: **Etapa 1 feita** (08/10; vai na 0.17.0); **Etapa 2 decidida (09/10, opção H2): pronta para implementar**; Etapa 3 em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
 
 ## Etapas
 1. **Ficha nova (decidida: B+ com fundo de captura de tela).** **A referência visual é a amostra B+ de [09-amostras-ficha.html](09-amostras-ficha.html)** (dono: "ficou perfeito"): siga o layout, as medidas e os blocos dela. Inclui: a mesma ficha em Ofertas, Promoções e Biblioteca; arte da biblioteca (`logo.png`, capa vertical do `capa_v`) e captura de tela de fundo (`appdetails.screenshots`, cache); fileira de 5 números; fileira da franquia com setas (só com os jogos que o Radar já conhece: biblioteca e lista); duas colunas (veredito/pisos/histórico | preço por loja, HLTB, crítica, informações); HLTB, jogadores e notas pelo Augmented Steam (servidor, cache de 30 dias, sem chamar em lote); tempo jogado e última vez pelo `GetOwnedGames` (`include_appinfo`/`playtime_forever`, `rtime_last_played`); "trocar" franquia à mão. Conquistas (`GetPlayerAchievements`) podem ficar para o fim da etapa, se pesar.
-2. **Biblioteca: Coleção, Franquias e Completar** com os modos Capas e Texto; DLCs em promoção sai. Precisa de amostras antes (como as da ficha).
+2. **Biblioteca e Completar (decidida, opção H2).** Leia a seção "Etapa 2: veredito" logo abaixo e abra a referência [09-referencia-biblioteca.html](09-referencia-biblioteca.html).
 3. **Franquia inteira** (jogos que não estão na biblioteca nem na lista, em preto e branco): medir a fonte antes. · Skills: `editar-painel`, `coleta-e-apis`, `testar-sem-rede`
+
+## Etapa 2: veredito (09/10) — o que implementar
+**Referência visual: [09-referencia-biblioteca.html](09-referencia-biblioteca.html)** (abre no navegador; dados de exemplo: parte da biblioteca do dono, tempos e totais sintéticos). Siga o layout, as medidas e o comportamento dela. A mesma página com todos os dados reais fica só na máquina do dono, em `dados/amostras-biblioteca-escolhida.html` (pasta ignorada pelo Git). As rodadas A–H1 abaixo são histórico.
+
+**Menu e páginas**
+- Topo: **Biblioteca ▾** com **Biblioteca** (atalho 1), **Completar** (2) e o link "DLCs dos meus jogos em promoção ↗" (abre Promoções com Tipo DLC + Tenho o jogo base). A aba "DLCs em promoção" sai.
+- **Biblioteca** abre na **Coleção**; o botão onde ficava Capas/Texto alterna **▦ Coleção / ☰ Franquias** (tecla T). São a mesma coisa vista de dois jeitos.
+  - **Coleção:** vitrine de capas verticais um pouco maiores que a grade de jogos (`minmax(172px,1fr)`); **uma capa por franquia, em pilha** (duas folhas atrás), com "N de M" no canto, barra de progresso no pé, nome e "X h jogadas · faltam N" embaixo. A capa da franquia é a do jogo mais jogado dela. Jogos sem franquia (avulsos) entram na mesma vitrine, sem pilha. Ordem em botões de um clique: Mais jogadas · Recentes · A–Z · Mais completas · Maiores.
+  - **Franquias:** 2 prateleiras por linha: nome, "N de M · faltam R$ · X h", barra e a fileira de capas (tenho = colorida com ✓; falta = P&B com preço, + e ♥ se estiver na lista). Ordem: Mais completas · Mais faltando · Mais barato de fechar · Mais jogadas · A–Z.
+  - Clique (ou Enter) numa franquia abre a **ficha da franquia em tela cheia**; num avulso, a ficha do jogo (Etapa 1).
+- **Completar** alterna **≡ Texto / ▦ Capas**; **abre em Capas, na ordem "Em promoção"**.
+  - **Capas:** 3 por linha; capa vertical do jogo, nome, "tem X de Y · faltam R$ · N em promoção", barra e 6 DLCs (header em P&B, colorida ao passar o mouse, % de desconto, preço; a 6ª vira "+ N" se houver mais). Clique abre a **ficha de completar** em tela cheia: capa do jogo, 5 números (faltam, hoje, nos pisos, em promoção, mais barata), "Pôr todas" / "Pôr só as em promoção" / "Abrir a ficha do jogo" e as DLCs agrupadas por tipo (História, Conteúdo, Pacote, Extra...).
+  - **Texto:** blocos de franquia **de altura fixa** (sempre 6 linhas; as que sobram ficam em branco), 3 por linha, **só das franquias com algo faltando**, o que falta primeiro: nome do jogo **em lilás** quando falta (♥, % e preço), claro quando tem (✓ e tempo jogado); rodapé "+ N jogos · abrir a franquia ›". Ordem: Em promoção · Mais perto de fechar · Mais barato de fechar · Mais faltando · A–Z.
+  - **Não mostrar DLCs inúteis** (cosméticos, trilhas, vozes, cores, skins): o Completar já usa `ctx.relevantes` (tira o que o `dlc.py` classifica como cosmético/atalho, conforme o config), **mas o classificador deixa passar**. Medido em 09/10 no banco do dono: das 1.885 DLCs "conteúdo" do Completar, **72 têm cara de cosmético** — 22 "System Voice"/vozes e 8 "Character Color" (Guilty Gear), 13 trilhas ("Music for The Long Dark", "Promotion Music", BGM), 17 "Pacote Pro"/operadores de Call of Duty (skins), e os trajes/títulos do Devil May Cry 5 ("Alt Hero", "Alt Style", "Alt Title"). **Antes de implementar o Completar, corrigir a classificação em `dlc.py`** (palavras como voice, color/colour, music/soundtrack/OST/BGM, costume/outfit/skin, "Pacote Pro", operator, "Alt ..."), medir de novo e conferir que expansões de verdade (ex.: "Ghost Recon Wildlands - Narco Road", "Sniper Ghost Warrior 2: Siberian Strike") continuam.
+- **Texto em geral:** nunca em alvenaria (colunas de alturas diferentes): sempre grade de blocos iguais. Nomes: tenho = claro (`#e8f1f8`), falta = lilás (`#c9a0ff`).
+
+**Ficha da franquia (H2)**
+- Tela cheia por cima da página (`#000d` atrás), ✕ e setas ‹ › fixas nas laterais para a franquia anterior/próxima (← →); Esc fecha.
+- **Topo:** a **capa horizontal da loja** (`header.jpg`/`capa` do banco, 340 px) à esquerda; à direita etiquetas (Franquia · "✓ completa · tenho N de M" · "♥ N na lista de desejos"), o nome grande, "De AAAA a AAAA · N jogos que o Radar conhece · jogou por último X (há Y)" e as ações (Pôr os N que faltam no carrinho · Trocar a imagem · Juntar / separar). **Fundo:** o `library_hero` do jogo representante **na largura da ficha, na proporção dele** (`background-size:100% auto`), esmaecido. Sem capa vertical no topo (disputava com as capas dos jogos).
+- **Jogos da franquia:** título + "N de M · em ordem de lançamento" + **barra de progresso ocupando o resto da linha**. Uma **fileira só, sem setas: arrasta segurando o botão esquerdo** (o clique que termina um arrasto não abre nada; bordas esmaecidas indicam que há mais). As capas crescem de 116 até 156 px e ficam **centralizadas** (`justify-content: safe center`); legenda com nome em 2 linhas e "ano · tempo" (tenho) ou "ano · preço" (falta).
+- **Barra de baixo, de ponta a ponta e até o fim da ficha** (fundo `#0e141bf2`, 4 colunas): Números (Jogos N de M %, Tempo jogado, Para completar, DLCs que faltam, Valor cheio · hoje — cada um numa linha) · Onde foi o seu tempo (5 barras) · O que falta (5, com %, preço e +) · Nunca jogados (etiquetas).
+- Medido: de 751 a 776 px de altura em 1280×900 (FINAL FANTASY com 30 jogos, GTA, Spider-Man, Resident Evil): cabe sem rolar.
+
+**Teclado e mouse** (uma mão no teclado, outra no mouse): setas andam pelas capas, Enter abre, Esc fecha, letra pula para a primeira com aquela inicial, índice **A–Z** fixo à direita (sem rolar nem digitar), `/` busca, 1/2 trocam a página, T alterna a visualização; barra de atalhos no rodapé.
+
+**Dados:** franquias de `series.franquias` (com `franquia_manual`), tempo jogado de `tempo_jogo`; o que falta numa franquia ainda é só o que está na lista de desejos (a franquia inteira é a Etapa 3).
 
 ## Etapa 1: como ficou (08/10)
 - `/api/jogo` traz a fileira (`franquia`) e o tempo jogado; `/api/jogo_extra` traz descrição/captura, HLTB/notas e conquistas (cache em `ficha_cache`), e a ficha redesenha quando chega.
