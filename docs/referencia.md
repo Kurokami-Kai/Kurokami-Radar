@@ -89,6 +89,7 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
   - `meta(chave, valor)`
   - `salvar_jogo(j)`
   - `marcar_listas(wishlist, possuidos, prioridade)`
+  - `salvar_tempo_jogo(tempos)` — tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo.
   - `definir_itad(appid, gid)`
   - `salvar_dlc(appid, pai, classe)`
   - `salvar_opcao(o)`
@@ -168,6 +169,17 @@ Classificacao automatica de DLCs pelo nome (pt/en). O painel vai permitir
 
 - `classificar(nome)`
 - `ignorada(classe, preco, cfg_dlc)`
+
+## `radar/ficha.py`
+Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca em lote) e guardado em ficha_cache:
+
+- `_do_cache(b, a, fonte)`
+- `_num(v)`
+- `_url(v)` — Servico de terceiro sem contrato: so link https vai para a pagina.
+- `augmented(appid)` — HLTB em minutos (FF VII Remake: 1935 = 32 h, como no site), jogadores e notas de usuarios/criticos.
+- `extras(b, cfg, a, tenho, log_erro)` — {loja, aug, conq}: do cache ou buscados em paralelo (o que faltar ou venceu). Fonte que falhou vem None.
+- `jogado(b, a)`
+- `fileira(b, ctx, a, nome, marcadas)` — A franquia do jogo entre os que o Radar conhece (biblioteca e lista), em ordem de lancamento, com o preco de
 
 ## `radar/ggdeals.py`
 GG.deals: melhor preco oficial e de keyshop + menores historicos de cada um.
@@ -255,6 +267,9 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_rar_info(an)` — O 'por que essa raridade' da ficha.
 - `_estado_dlcs(b, a, j)` — Por que a ficha nao tem DLCs: falhou, a Steam nao informou ou ainda nao consultada (com a fila, se rodando).
 - `api_jogo(q)`
+- `_ficha_local(b, ctx, cfg, a, r)` — O que a ficha nova (spec 09) le junto, sem rede: a fileira da franquia e o tempo jogado.
+- `api_jogo_extra(q)` — O que a ficha busca na rede ao abrir (descricao e captura, HLTB e notas, conquistas), com cache: vem depois
+- `post_franquia(d)` — Troca a franquia do jogo a mao (juntar = escolher uma que existe; separar = nome novo); vazio volta ao automatico.
 - `_jogo_steam(b, cfg, ctx, a)` — Ficha de um item da Steam inteira (fora da lista): o historico das lojas marcadas pela ITAD, baixado na hora
 - `_ler_carrinho()`
 - `_gravar_carrinho(itens)`
@@ -338,6 +353,9 @@ Agrupa jogos da mesma serie pelo nome, em vez do campo "franquia" da Steam
 - `chave(nome)`
 - `rotulo(nomes)` — Prefixo comum dos nomes, recortado do primeiro nome original (mantem a grafia: "Half-Life", "Need for Speed").
 - `agrupar(itens)` — itens: [{"appid", "nome", ...}] -> {chave: [itens]}
+- `_editora(f)`
+- `_da_steam(it)`
+- `franquias(itens, manual)` — itens: [{"appid", "nome", "franquia"}] -> {appid: nome da franquia}.
 
 ## `radar/servico.py`
 O ciclo que roda sozinho: coleta -> avalia -> notifica, no intervalo do config.
@@ -358,6 +376,8 @@ Steam: lista de desejos, biblioteca, detalhes da loja, DLCs e opcoes de compra.
 - `perfil_publico(steamid)` — {"nome", "avatar"} do perfil (XML da comunidade, sem chave), para o icone no topo do painel. None se falhar.
 - `wishlist(chave, steamid)`
 - `biblioteca_api(chave, steamid)`
+- `conquistas(chave, steamid, appid)` — Conquistas do jogo na conta (ficha, 1 chamada). Jogo sem conquistas: total 0. Perfil privado: erro 403.
+- `detalhes_loja(appid, pais)` — O que a ficha mostra da pagina da loja (1 chamada, sem ritmo: e a pessoa abrindo a ficha, nunca em lote).
 - `ler_userdata(arquivo)`
 - `url_asset(item)`
 - `_nome_norm(s)`

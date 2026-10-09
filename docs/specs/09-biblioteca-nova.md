@@ -1,11 +1,17 @@
 # Spec 09 — Biblioteca nova: Coleção por franquias, ficha estilo PlayStation
 
-Status: **Etapa 1 pronta para implementar** (ficha decidida em 08/10); Etapas 2 e 3 ainda em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
+Status: **Etapa 1 feita** (08/10; vai na 0.17.0); Etapas 2 e 3 ainda em discussão. Absorve a [spec 03](03-franquias-com-capas.md).
 
 ## Etapas
 1. **Ficha nova (decidida: B+ com fundo de captura de tela).** **A referência visual é a amostra B+ de [09-amostras-ficha.html](09-amostras-ficha.html)** (dono: "ficou perfeito"): siga o layout, as medidas e os blocos dela. Inclui: a mesma ficha em Ofertas, Promoções e Biblioteca; arte da biblioteca (`logo.png`, capa vertical do `capa_v`) e captura de tela de fundo (`appdetails.screenshots`, cache); fileira de 5 números; fileira da franquia com setas (só com os jogos que o Radar já conhece: biblioteca e lista); duas colunas (veredito/pisos/histórico | preço por loja, HLTB, crítica, informações); HLTB, jogadores e notas pelo Augmented Steam (servidor, cache de 30 dias, sem chamar em lote); tempo jogado e última vez pelo `GetOwnedGames` (`include_appinfo`/`playtime_forever`, `rtime_last_played`); "trocar" franquia à mão. Conquistas (`GetPlayerAchievements`) podem ficar para o fim da etapa, se pesar.
 2. **Biblioteca: Coleção, Franquias e Completar** com os modos Capas e Texto; DLCs em promoção sai. Precisa de amostras antes (como as da ficha).
 3. **Franquia inteira** (jogos que não estão na biblioteca nem na lista, em preto e branco): medir a fonte antes. · Skills: `editar-painel`, `coleta-e-apis`, `testar-sem-rede`
+
+## Etapa 1: como ficou (08/10)
+- `/api/jogo` traz a fileira (`franquia`) e o tempo jogado; `/api/jogo_extra` traz descrição/captura, HLTB/notas e conquistas (cache em `ficha_cache`), e a ficha redesenha quando chega.
+- Franquia automática: a da Steam menos serviços e editoras (medido: EA Play, WB Games, Team17 Digital, Bandai Namco Entertainment), com herança pelo nome; "trocar" grava em `franquia_manual`. No banco do dono: 199 franquias com 2+ jogos, FINAL FANTASY com 30.
+- Conquistas: só "N de M" e o anel (as mais raras precisariam de mais uma chamada: ficou de fora).
+- **Ainda não:** o "Ver a franquia inteira ›" (depende da Etapa 2), e a Biblioteca (Coleção/Franquias) ainda agrupa só pelo nome; a Etapa 2 passa a usar `series.franquias`.
 
 ## Pedido (dono, 08/10)
 - A aba está mal disposta. Hoje: **Completar · Franquias · Coleção · DLCs em promoção** (botões no topo da aba).

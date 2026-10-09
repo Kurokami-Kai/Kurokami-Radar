@@ -17,6 +17,9 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `steam_promo` | spec 07: retrato das promoções da Steam inteira (`appid` PK, `tipo` jogo/dlc/outro, `nome`, `pacote`, `preco`, `cheio`, `corte`, `fim` epoch, `rpos`, `rcount`, `rotulo`, `lancamento` epoch, `capa`, `visto`, `flag` marca da ITAD na oferta da Steam N/H/S, `hl1` menor de 1 ano em todas as lojas da ITAD, `aval` JSON `{tipos, selo_motivo, piso_ref, volta_texto, volta_ordem, volta_dica, inicio}` ou `{tipos, provisorio}` só com a marca, `adulto` 1 se a Steam marca conteúdo sexual (descritores 3 ou 4)); substituído inteiro a cada coleta (~15 MB em grande promoção) |
 | `promo_estado` | Steam inteira, por appid: `gid` (`''` = a ITAD não conhece; tenta de novo em 30 dias), `mapeado`, `baixado`/`preco_baixado` (histórico), `visto` (última coleta em que estava; 60 dias fora = apagado), `flag`, `hl`, `hl1`, `menores_preco`, `menores_quando` (marca guardada: repedida quando o preço muda ou após 1 dia) |
 | `promo_hist` | histórico (lojas marcadas, pela ITAD) só de quem esteve perto do recorde na Steam inteira: `appid, loja, preco, cheio, corte, quando` (PK appid+loja+quando; ~150 linhas por jogo) |
+| `tempo_jogo` | spec 09: `appid, minutos, ultima` (epoch) do `GetOwnedGames`; substituída a cada leitura da biblioteca pela API (sem chave da Steam fica vazia) |
+| `ficha_cache` | spec 09: o que a ficha busca ao abrir (`appid, fonte` = `loja`/`aug`/`conq`, `dados` JSON, `quando`); validade 30 dias (loja, aug) e 6 h (conq); falha guardada como `{falhou}` por 1 h |
+| `franquia_manual` | spec 09: `appid, nome, quando` = franquia trocada à mão na ficha; vence a automática (`series.franquias`) |
 | `consulta_lenta` | cache das consultas lentas da loja (`pacote`, `dlcs`; `dlcs_falha` = última falha do plano B, não conta como consultado) com data |
 | `alerta` | notificações enviadas |
 | `notificado` | estado por jogo para não repetir aviso (preço avisado, ativo) |

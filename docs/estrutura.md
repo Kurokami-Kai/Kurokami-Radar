@@ -17,7 +17,8 @@ Kurokami Radar/
 │   ├── banco.py             # SQLite: esquema, migrações, preços, pisos, ofertas vigentes
 │   ├── coleta.py            # orquestra a coleta (catálogo, biblioteca, ITAD, GG, custo completo)
 │   ├── dlc.py               # classificação de DLCs por nome
-│   ├── series.py            # agrupa jogos da mesma série pelo nome (aba Biblioteca)
+│   ├── series.py            # agrupa jogos da mesma série pelo nome (aba Biblioteca) e decide a franquia de cada jogo (ficha)
+│   ├── ficha.py             # spec 09: o que só a ficha usa (appdetails, Augmented Steam, conquistas, com cache), fileira da franquia e tempo jogado
 │   ├── analise.py           # raridade v2 (episódios), piso, Selo, score, etiquetas, caminhos/combinação de compra, avaliar()
 │   ├── notificar.py         # toast do Windows via PowerShell; capa do jogo
 │   ├── notificador.py       # regras de envio (linha de base, tipo recém-ligado vira resumo, rearme, silêncio, fim de promoção)

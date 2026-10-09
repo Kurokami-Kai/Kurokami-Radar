@@ -51,6 +51,13 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
         except Exception as e:
             falhou = str(e)
             log("   biblioteca pela API falhou (%s)" % e)
+        else:
+            # tempo jogado e ultima vez, para a ficha; resposta vazia (perfil privado) nao apaga o que ja havia
+            if steam.ULTIMO_TEMPO:
+                try:
+                    banco.salvar_tempo_jogo(steam.ULTIMO_TEMPO)
+                except Exception as e:
+                    log("   tempo jogado nao gravado (%s)" % e)
     mantida = bool(falhou and not do_retrato)
     if mantida:
         # sem a API e sem o retrato a biblioteca viria vazia e tudo que voce tem voltaria as Promocoes: fica a anterior

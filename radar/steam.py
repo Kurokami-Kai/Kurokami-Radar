@@ -58,6 +58,7 @@ def perfil_publico(steamid):
 
 
 ULTIMA_PRIORIDADE = {}  # appid -> posicao na lista de desejos (0 = topo), da ultima leitura
+ULTIMO_TEMPO = {}       # appid -> (minutos jogados, ultima vez em unix), da ultima leitura da biblioteca
 
 
 def wishlist(chave, steamid):
@@ -74,7 +75,38 @@ def biblioteca_api(chave, steamid):
     url = API + "IPlayerService/GetOwnedGames/v1/?" + urllib.parse.urlencode(
         {"key": chave, "steamid": steamid, "include_played_free_games": 1, "skip_unvetted_apps": 0})
     r = http_json(url, ritmo=RITMO["steam"])
-    return [g["appid"] for g in ((r or {}).get("response") or {}).get("games", [])]
+    jogos = ((r or {}).get("response") or {}).get("games", [])
+    ULTIMO_TEMPO.clear()
+    ULTIMO_TEMPO.update({int(g["appid"]): (g.get("playtime_forever") or 0, g.get("rtime_last_played") or None) for g in jogos})
+    return [g["appid"] for g in jogos]
+
+
+def conquistas(chave, steamid, appid):
+    """Conquistas do jogo na conta (ficha, 1 chamada). Jogo sem conquistas: total 0. Perfil privado: erro 403."""
+    try:
+        r = http_json(API + "ISteamUserStats/GetPlayerAchievements/v1/?" + urllib.parse.urlencode(
+            {"key": chave, "steamid": steamid, "appid": appid, "l": "brazilian"}), tentativas=2, timeout=15)
+    except urllib.error.HTTPError as e:
+        if e.code == 400 and "no stats" in (getattr(e, "corpo", "") or "").lower():
+            return {"feitas": 0, "total": 0}
+        raise
+    cs = ((r or {}).get("playerstats") or {}).get("achievements") or []
+    return {"feitas": sum(1 for c in cs if c.get("achieved")), "total": len(cs)}
+
+
+def detalhes_loja(appid, pais):
+    """O que a ficha mostra da pagina da loja (1 chamada, sem ritmo: e a pessoa abrindo a ficha, nunca em lote)."""
+    r = http_json("https://store.steampowered.com/api/appdetails?" + urllib.parse.urlencode(
+        {"appids": appid, "cc": pais, "l": "brazilian"}), tentativas=2, timeout=15)
+    d = (r or {}).get(str(appid)) or {}
+    if not d.get("success"):
+        return {}
+    d = d.get("data") or {}
+    ss = d.get("screenshots") or []
+    return {"descricao": d.get("short_description") or "", "captura": ss[0].get("path_full") if ss else None,
+            "desenvolvedor": ", ".join(d.get("developers") or []), "editora": ", ".join(d.get("publishers") or []),
+            "generos": ", ".join(g.get("description") for g in d.get("genres") or [] if g.get("description")),
+            "conquistas": ((d.get("achievements") or {}).get("total")) or 0}
 
 
 def ler_userdata(arquivo):

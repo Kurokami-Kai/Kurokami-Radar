@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import re
 import urllib.parse as _up
 
-from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, steam
+from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, ficha, steam
 from .rede import http_json
 from .banco import Banco
 
@@ -532,7 +532,9 @@ def api_jogo(q):
     ctx = analise.Contexto(b, cfg)
     if a not in ctx.lista and b.um("SELECT 1 FROM steam_promo WHERE appid=?", a):
         try:
-            return _jogo_steam(b, cfg, ctx, a)
+            r = _jogo_steam(b, cfg, ctx, a)
+            _ficha_local(b, ctx, cfg, a, r)
+            return r
         finally:
             b.con.close()
     j = ctx.jogos.get(a) or {}
@@ -576,7 +578,7 @@ def api_jogo(q):
     regua = analise.regua_steam(lin_m, melhor["preco"] if melhor else None, corte_m,
                                 b.linhas_lote(["Steam", "Steam (direto)"], [a]).get(a, []),
                                 st["preco"] if st else None, st["corte"] if st else 0, cfg_alerta=cfg["alerta"])         if "steam" in marc else None
-    r = {"jogo":{k: j.get(k) for k in ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento",
+    r = {"jogo":{k: j.get(k) for k in ("appid", "nome", "tipo", "capa", "capa_v", "rpos", "rcount", "rotulo", "lancamento",
                                          "preco_steam", "cheio_steam", "desconto_steam", "pai")},
          "historico": hist, "lojas": lojas, "dlcs": dl, "dlcs_estado": None if dl else _estado_dlcs(b, a, j),
          "caminhos": cam, "combo": combo,
@@ -589,8 +591,44 @@ def api_jogo(q):
          "tenho": a in ctx.possuidos, "tenho_manual": bool(b.um("SELECT 1 FROM tenho_manual WHERE appid=?", a)),
          "mudo": bool(b.um("SELECT 1 FROM silenciado WHERE appid=?", a)),
          "na_lista": a in ctx.lista}
-    b.con.close()
+    try:
+        _ficha_local(b, ctx, cfg, a, r)
+    finally:
+        b.con.close()
     return r
+
+
+def _ficha_local(b, ctx, cfg, a, r):
+    """O que a ficha nova (spec 09) le junto, sem rede: a fileira da franquia e o tempo jogado."""
+    r["franquia"] = ficha.fileira(b, ctx, a, r["jogo"].get("nome"), _marcadas(cfg))
+    r["jogado"] = ficha.jogado(b, a)
+
+
+def api_jogo_extra(q):
+    """O que a ficha busca na rede ao abrir (descricao e captura, HLTB e notas, conquistas), com cache: vem depois
+    da ficha, para ela abrir na hora. Cada parte vem None se a fonte falhou."""
+    a = int(q["appid"][0])
+    b = Banco()
+    try:
+        tenho = bool(b.um("SELECT 1 FROM jogo WHERE appid=? AND possuido=1", a))
+        return ficha.extras(b, config.carregar(), a, tenho, _log_erro)
+    finally:
+        b.con.close()
+
+
+def post_franquia(d):
+    """Troca a franquia do jogo a mao (juntar = escolher uma que existe; separar = nome novo); vazio volta ao automatico."""
+    a, nome = int(d["appid"]), (d.get("nome") or "").strip()[:80]
+    b = Banco()
+    try:
+        if nome:
+            b.con.execute("INSERT OR REPLACE INTO franquia_manual VALUES(?,?,?)", (a, nome, datetime.now(timezone.utc).isoformat()))
+        else:
+            b.con.execute("DELETE FROM franquia_manual WHERE appid=?", (a,))
+        b.commit()
+    finally:
+        b.con.close()
+    return {"ok": True}
 
 
 def _jogo_steam(b, cfg, ctx, a):
@@ -1259,7 +1297,7 @@ def _limpar_sessao_qr():
     credenciais.gravar("steam_refresh", "")
 
 
-GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/alertas": api_alertas,
+GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/jogo_extra": api_jogo_extra, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
        "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine}
@@ -1269,7 +1307,7 @@ POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,
         "/api/atualizar_app": post_atualizar_app,
         "/api/steam/carrinho": post_steam_carrinho, "/api/steam/extensao": post_steam_extensao,
-        "/api/steam/conta": post_steam_conta}
+        "/api/steam/conta": post_steam_conta, "/api/franquia": post_franquia}
 
 
 def _log_erro(rota, e):

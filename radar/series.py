@@ -69,3 +69,48 @@ def agrupar(itens):
         if k:
             grupos.setdefault(k, []).append(it)
     return grupos
+
+
+# "franquias" da Steam que sao servicos de assinatura ou editoras, nao franquias (juntam Mass Effect com Need for
+# Speed, Batman com LEGO). Medido no banco do dono em 08/10: WB Games, Team17 Digital, Bandai Namco Entertainment...
+SERVICOS = {"ea play", "ubisoft+", "xbox game pass", "pc game pass", "game pass", "team ladybug"}
+EMPRESA = {"games", "digital", "entertainment", "interactive", "studio", "studios", "publishing", "software",
+           "inc", "inc.", "ltd", "ltd.", "llc", "corporation"}
+
+
+def _editora(f):
+    p = f.lower().split()
+    return f.lower() in SERVICOS or p[-1] in EMPRESA
+
+
+def _da_steam(it):
+    return [f.strip() for f in (it.get("franquia") or "").split("|") if f.strip() and not _editora(f.strip())]
+
+
+def franquias(itens, manual=None):
+    """itens: [{"appid", "nome", "franquia"}] -> {appid: nome da franquia}.
+    1) a franquia da Steam (sem servicos de assinatura); com varias, a que tem mais jogos conhecidos;
+    2) sem ela, o agrupamento pelo nome, e o grupo herda a franquia da Steam que outros do grupo tem
+       ("FINAL FANTASY X" sem o campo entra em FINAL FANTASY); 3) a troca feita a mao na ficha sempre vence."""
+    grafia, conta = {}, {}
+    for it in itens:
+        for f in _da_steam(it):
+            grafia.setdefault(f.lower(), f)
+            conta[f.lower()] = conta.get(f.lower(), 0) + 1
+    out = {}
+    for it in itens:
+        fs = [f.lower() for f in _da_steam(it)]
+        if fs:
+            out[it["appid"]] = grafia[max(fs, key=lambda f: (conta[f], -len(f)))]
+    for membros in agrupar(itens).values():
+        da_steam = {}
+        for m in membros:
+            if m["appid"] in out:
+                da_steam[out[m["appid"]]] = da_steam.get(out[m["appid"]], 0) + 1
+        nome = max(da_steam, key=da_steam.get) if da_steam else rotulo([m["nome"] for m in membros])
+        for m in membros:
+            out.setdefault(m["appid"], nome)
+    for it in itens:
+        out.setdefault(it["appid"], it.get("nome") or str(it["appid"]))
+    out.update({a: n for a, n in (manual or {}).items() if a in out})
+    return out

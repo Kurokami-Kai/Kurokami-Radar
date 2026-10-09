@@ -51,6 +51,11 @@ CREATE TABLE IF NOT EXISTS promo_estado(
   flag TEXT, hl INTEGER, hl1 INTEGER, menores_preco INTEGER, menores_quando TEXT);
 CREATE TABLE IF NOT EXISTS promo_hist(
   appid INTEGER, loja TEXT, preco INTEGER, cheio INTEGER, corte INTEGER, quando TEXT, PRIMARY KEY(appid, loja, quando));
+-- spec 09 (ficha nova): tempo jogado do GetOwnedGames (substituido a cada leitura da biblioteca), o que a ficha busca
+-- ao abrir (appdetails, Augmented Steam, conquistas; JSON com validade por fonte) e a franquia trocada a mao
+CREATE TABLE IF NOT EXISTS tempo_jogo(appid INTEGER PRIMARY KEY, minutos INTEGER, ultima INTEGER);
+CREATE TABLE IF NOT EXISTS ficha_cache(appid INTEGER, fonte TEXT, dados TEXT, quando TEXT, PRIMARY KEY(appid, fonte));
+CREATE TABLE IF NOT EXISTS franquia_manual(appid INTEGER PRIMARY KEY, nome TEXT, quando TEXT);
 """
 
 
@@ -162,6 +167,11 @@ class Banco:
                              [(a,) for a in possuidos])
         if prioridade:
             self.con.executemany("UPDATE jogo SET prioridade=? WHERE appid=?", [(p, a) for a, p in prioridade.items()])
+
+    def salvar_tempo_jogo(self, tempos):
+        """tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo."""
+        self.con.execute("DELETE FROM tempo_jogo")
+        self.con.executemany("INSERT INTO tempo_jogo VALUES(?,?,?)", [(a, m, u) for a, (m, u) in tempos.items()])
 
     def definir_itad(self, appid, gid):
         self.con.execute("UPDATE jogo SET itad_id=? WHERE appid=?", (gid, appid))
