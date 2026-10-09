@@ -525,12 +525,12 @@ function pular(L){const e=$(`#main [data-L="${L}"]`);if(!e){toast('Nada com '+L)
 document.addEventListener('keydown',e=>{
   const tg=e.target,digitando=tg.tagName==='INPUT';
   if(e.key==='Escape'){if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();}return;}
+  if(e.key==='/'&&!digitando){e.preventDefault();buscar();return;}   // antes dos modificadores: AltGr+Q (Ctrl+Alt) no teclado sem a tecla /
   if(digitando||e.ctrlKey||e.altKey||e.metaKey)return;
   if($('#ov .ov')){if(e.key==='ArrowLeft'||e.key==='ArrowRight'){passo(e.key==='ArrowRight'?1:-1);e.preventDefault();}return;}
   const m={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d'}[e.key];
   if(m){andar(m);e.preventDefault();return;}
   if(e.key==='Enter'&&tg.matches('[data-it],[data-ic]')){e.preventDefault();abre(+(tg.dataset.it??tg.dataset.ic));return;}
-  if(e.key==='/'){e.preventDefault();const q=$('#q');q&&q.focus();return;}
   if(['1','2'].includes(e.key)){S.sub=SUBS[+e.key-1][0];S.q='';desenha();scrollTo(0,0);return;}
   if(e.key==='t'||e.key==='T'){S.modo[S.sub]=S.sub==='bib'?(modo()==='colecao'?'franquias':'colecao'):(modo()==='capas'?'texto':'capas');desenha();return;}
   if(/^[a-z]$/i.test(e.key)){pular(e.key.toUpperCase());return;}
@@ -558,6 +558,8 @@ document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value.t
 /* ---------- dentro do painel: a ficha do jogo, o carrinho e a loja são os do painel (window.parent.KH) ---------- */
 const PAI=(()=>{try{return parent!==window&&parent.KH?parent.KH:null;}catch(e){return null;}})();
 function avisaPai(aba){try{history.replaceState(null,'','#'+S.sub);}catch(e){}if(PAI&&PAI.sub)PAI.sub(aba,S.sub);}
+function buscar(){const q=$('#q');if(q){q.focus();q.select();}}
+window.buscar=buscar;
 window.irSub=s=>{const [s0,m0]=String(s).split(':');if(m0&&SUBS.some(x=>x[0]===s0)){S.modo[s0]=m0;if(s0===S.sub&&S.aberto==null){desenha();return;}}s=s0;
   if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
 addEventListener('hashchange',()=>irSub(location.hash.slice(1)));

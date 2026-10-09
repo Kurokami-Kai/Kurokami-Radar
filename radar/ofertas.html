@@ -627,7 +627,7 @@ const FRL=Object.values(GR).map(g=>{const m=g.m.sort((a,b)=>(a.lanc||9e9)-(b.lan
 /* ---------- estado e filtros ---------- */
 const PADRAO={promo:{desc:50,an:500,tipo:'jogo',tenho:'esconder',lista:'',ate:0,nota:0,tp:[]},lista:{ver:'todos',desc:50,an:500,tipo:'jogo',tenho:'esconder',tp:[]}};
 const novoF=k=>({...PADRAO[k],tp:new Set()});
-const S={rec:{promo:'tudo',lista:'todos'},orc:10000,teto:2500,mod:'A',pop:false,selJ:null,selA:null,nota:false,sub:'dest',modo:{},q:'',ord:{},h:0,lim:120,aberto:null,lista:[],f:{promo:novoF('promo'),lista:novoF('lista')}};
+const S={busca:false,rec:{promo:'tudo',lista:'todos'},orc:10000,teto:2500,mod:'A',pop:false,selJ:null,selA:null,nota:false,sub:'dest',modo:{},q:'',ord:{},h:0,lim:120,aberto:null,lista:[],f:{promo:novoF('promo'),lista:novoF('lista')}};
 const SUBS=[['dest','Destaques','1'],['promo','Promoções','2'],['lista','Lista de desejos','3']];
 const modo=()=>S.modo[S.sub]||'jogos';
 const ORD={promo:[['melhor','Melhores'],['desc','Maior desconto'],['barato','Menor preço'],['aval','Mais bem avaliados'],['fim','Termina antes']],
@@ -637,7 +637,6 @@ const reg=x=>{S.lista.push(x);return S.lista.length-1;};
 const VAZIO={desc:0,an:0,tipo:'',tenho:'mostrar',lista:'',ate:0,nota:0};
 const NOMES={desc:v=>`Desconto -${v}% ou mais`,an:v=>`${fmtN(v)}+ análises`,tipo:v=>v==='jogo'?'Só jogos':v==='dlc'?'Só DLCs':'Só outros',tenho:()=>'Sem os que você tem',lista:v=>v==='so'?'Só da sua lista':'Fora da sua lista',ate:v=>'Até '+brl0(v),nota:v=>v+'%+ positivas'};
 function passa(o,f,pg){
-  if(S.q&&!o.nome.toLowerCase().includes(S.q))return false;
   if(f.tipo&&(f.tipo==='outros'?['jogo','dlc'].includes(o.tipo):o.tipo!==f.tipo))return false;
   if(f.tenho==='esconder'&&o.tenho)return false;
   if(f.an&&o.rcount<f.an)return false;
@@ -650,7 +649,6 @@ function passa(o,f,pg){
 function barraFiltros(pg){const f=S.f[pg],at=[];
   for(const k of ['desc','an','tipo','tenho','lista','ate','nota'])if(k in f&&f[k]!==VAZIO[k])at.push([k,NOMES[k](f[k])]);
   f.tp.forEach(t=>at.push(['tp:'+t,ET[t][0]]));
-  if(S.q)at.push(['q',`“${S.q}”`]);
   const g=(nome,k,ops)=>`<div class="chips"><span>${nome}</span>${ops.map(([v,t])=>`<button data-fk="${k}" data-fv="${v}" aria-pressed="${String(f[k])===String(v)}">${t}</button>`).join('')}</div>`;
   return `<div class="fpop"${S.pop?'':' hidden'}><div class="fbar"><span>Ligados</span>${at.length?at.map(([k,t])=>`<button class="pil" data-tira="${k}" title="Tirar este filtro">${esc(t)}<i>✕</i></button>`).join('')+`<button class="limpa" data-limpa>Limpar tudo</button>`:'<span class="nada">nenhum: mostrando tudo</span>'}
     ${JSON.stringify([...f.tp])!=='[]'||Object.keys(VAZIO).some(k=>k in f&&f[k]!==PADRAO[pg][k])?'<button class="limpa" data-padrao>Voltar ao padrão</button>':''}</div>
@@ -743,7 +741,7 @@ function fichaPrat(x){const l=x.l,A=l[0].appid;
 
 /* ---------- listas com blocos ---------- */
 const chipsOrd=()=>`<div class="chips"><span>Ordem</span>${ORD[S.sub].map(([v,l])=>`<button data-ord="${v}" aria-pressed="${v===ordem()}">${v==='melhor'?ROT_M[S.mod]:l}</button>`).join('')}</div>`;
-const qIn=()=>`<input id="q" type="search" placeholder="Buscar  ( / )" value="${esc(S.q)}">`;
+const qIn=()=>`<input id="q" type="search" placeholder="Buscar jogo  ( / )" autocomplete="off" value="${esc(S.q)}">`;
 function maisL(n,tot){return n<tot?`<div class="mais-l" id="maisL">carregando mais… (${fmtN(n)} de ${fmtN(tot)})</div>`:`<div class="mais-l">${fmtN(tot)} de ${fmtN(tot)}</div>`;}
 function blocos(bl,render){let resta=S.lim,tot=0,html='';
   for(const [t,s,l,tipo,id] of bl){tot+=l.length;if(!l.length)continue;const p=l.slice(0,Math.max(0,resta));resta-=p.length;if(!p.length)continue;
@@ -785,13 +783,26 @@ function fichaFR(x){const A=x.rep.appid,anos=x.m.map(o=>o.lanc).filter(Boolean).
    <div><h4>Dá para esperar</h4>${x.m.filter(o=>em(o)&&!o.vale).slice(0,5).map(o=>`<div class="fl"><span class="n" style="color:var(--fraco)">${esc(o.nome)}</span><span class="p">${o.espera?'volta em '+tempo(o.espera):''}</span></div>`).join('')||'<p class="vazio">Nenhum.</p>'}</div>
    <div><h4>Fora de promoção</h4>${x.m.filter(o=>!em(o)).slice(0,6).map(o=>`<div class="fl"><span class="n" style="color:var(--fraco)">${esc(o.nome)}</span><span class="p">${esc(o.pv.prox_curto||'sem previsão')}</span></div>`).join('')||'<p class="vazio">Tudo em promoção.</p>'}</div></div></div>`;}
 
+/* ---------- busca: o nome em toda a aba (lista de desejos + promoções), sem filtros; "/" abre de qualquer sub-aba ---------- */
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+function pagBusca(){const t=norm(S.q).split(' ').filter(Boolean),todos=[...OB.values()];
+  const l=t.length?todos.filter(o=>{const n=o.nb??=' '+norm(o.nome)+' ';return t.every(w=>n.includes(w));}):[];
+  const ini=o=>o.nb.startsWith(' '+t[0])?1:0;
+  l.sort((a,b)=>ini(b)-ini(a)||em(b)-em(a)||a.k.localeCompare(b.k,'pt-BR'));
+  return `<div class="tool"><div class="l1"><span class="cnt">${t.length?`<b>${fmtN(l.length)}</b> encontrado${l.length===1?'':'s'} · na lista de desejos e nas promoções, sem os filtros`:'Digite o nome do jogo · procura na lista de desejos e nas promoções, sem os filtros'}</span><span class="sp"></span>${qIn()}<button class="limpa" data-fimbusca title="Fechar a busca (Esc)">✕ Fechar busca</button></div></div>`
+   +(l.length?blocos([['','',l,'p']],rend):t.length?'<p class="vazio">Nenhum jogo com esse nome aqui. A busca cobre a lista de desejos e as promoções que o Kurokami acompanha.</p>':'');}
+function buscar(){if(S.aberto!=null)fecha();if(!S.busca){S.busca=true;S.lim=120;desenha();scrollTo(0,0);}const q=$('#q');if(q){q.focus();q.select();}}
+window.buscar=buscar;
+function fimBusca(){S.busca=false;S.q='';S.lim=120;desenha();scrollTo(0,0);}
+
 /* ---------- desenho ---------- */
 function desenha(){
-  S.lista=[];document.body.classList.toggle('pg-dest',S.sub==='dest');document.body.classList.toggle('mod-C',S.mod==='C');
-  $('#main').innerHTML=S.sub==='dest'?pagDestA():S.sub==='promo'?pagPromoM():pagListaM();avisaPai('vale');
+  const dest=S.sub==='dest'&&!S.busca;
+  S.lista=[];document.body.classList.toggle('pg-dest',dest);document.body.classList.toggle('mod-C',S.mod==='C');
+  $('#main').innerHTML=S.busca?pagBusca():dest?pagDestA():S.sub==='promo'?pagPromoM():pagListaM();avisaPai('vale');
   const tem=new Set($$('#main [data-L]').map(e=>e.dataset.L));
-  $('#az').innerHTML=S.sub==='dest'?'':'#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(c=>`<button data-az="${c}"${tem.has(c)?'':' disabled'}>${c}</button>`).join('');
-  setas();kb();if(S.sub==='dest')ajustaMinis();
+  $('#az').innerHTML=dest?'':'#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(c=>`<button data-az="${c}"${tem.has(c)?'':' disabled'}>${c}</button>`).join('');
+  setas();kb();if(dest)ajustaMinis();
 }
 function setas(){$$('.trilho.arr').forEach(t=>{const at=()=>{t.style.setProperty('--fe',t.scrollLeft>4?'40px':'0px');t.style.setProperty('--fd',t.scrollLeft+t.clientWidth<t.scrollWidth-4?'64px':'0px');};at();t.onscroll=at;});}
 let arr=null,semClique=false;
@@ -812,14 +823,14 @@ const kind=y=>y.k==='prat'?'prat':y.k==='fr'?'fr':'jogo';
 function passo(d){const n=OV.length,ab=OV[S.aberto],k0=kind(ab);let i=S.aberto;
   for(let c=0;c<n;c++){i=(i+d+n)%n;const y=OV[i];if(kind(y)===k0&&(k0!=='jogo'||y.o!==ab.o))break;}
   S.aberto=i;pinta();}
-function vai(go){if(S.aberto!=null)fecha();S.q='';S.lim=120;const [g,sec]=go.split(':');
+function vai(go){if(S.aberto!=null)fecha();S.q='';S.busca=false;S.lim=120;const [g,sec]=go.split(':');
   if(g==='lista'){S.sub='lista';S.rec.lista='promo';S.ord.lista='melhor';S.modo.lista='jogos';desenha();scrollTo(0,0);return;}
   else if(g==='fim'){S.sub='promo';S.ord.promo='fim';}
   else if(g==='baratos'){S.sub='promo';S.ord.promo='melhor';S.f.promo=novoF('promo');S.f.promo.lista='sem';S.teto=+sec;S.rec.promo='baratos';desenha();scrollTo(0,0);return;}
   else{S.sub='promo';S.ord.promo='melhor';S.f.promo.lista='sem';S.rec.promo=REC_P.some(x=>x[0]===sec)?sec:'tudo';desenha();scrollTo(0,0);return;}
   desenha();const a=sec&&$('#sec-'+sec);scrollTo(0,a?a.getBoundingClientRect().top+scrollY-110:0);}
 function tira(k){const pg=S.sub==='lista'?'lista':'promo',f=S.f[pg];
-  if(k==='q')S.q='';else if(k.startsWith('tp:'))f.tp.delete(k.slice(3));else f[k]=VAZIO[k];S.lim=120;desenha();}
+  if(k.startsWith('tp:'))f.tp.delete(k.slice(3));else f[k]=VAZIO[k];S.lim=120;desenha();}
 
 /* ---------- teclado ---------- */
 function navs(){return $$('#main [data-nav]').filter(e=>e.offsetParent);}
@@ -835,15 +846,16 @@ function pular(Lt){const e=$(`#main [data-L="${Lt}"]`);if(!e){toast('Nada com '+
   const alvo=e.matches('[data-nav]')?e:e.querySelector('[data-nav]')||e;window.scrollTo({top:e.getBoundingClientRect().top+scrollY-130});alvo.focus&&alvo.focus({preventScroll:true});}
 document.addEventListener('keydown',e=>{
   const tg=e.target,digitando=tg.tagName==='INPUT'&&tg.type!=='checkbox';
-  if(e.key==='Escape'){if(S.pop){fechaPop();return;}if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();}return;}
+  if(e.key==='Escape'){if(S.pop){fechaPop();return;}if(S.busca&&S.aberto==null&&(tg.id==='q'||!digitando)){fimBusca();return;}if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();}return;}
+  if(tg.id==='q'&&(e.key==='Enter'||e.key==='ArrowDown')){const a=navs()[0];if(a){e.preventDefault();a.focus({preventScroll:true});ver(a);}return;}
+  if(e.key==='/'&&!digitando){e.preventDefault();buscar();return;}   // antes dos modificadores: no teclado sem a tecla /, ela sai no AltGr+Q (Ctrl+Alt)
   if(digitando||e.ctrlKey||e.altKey||e.metaKey)return;
   if($('#ov .ov')){if(e.key==='ArrowLeft'||e.key==='ArrowRight'){passo(e.key==='ArrowRight'?1:-1);e.preventDefault();}return;}
   if(e.key==='Backspace'&&S.sub!=='dest'){const p=$$('.pil');if(p.length){tira(p[p.length-1].dataset.tira);e.preventDefault();}return;}
   const m={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d'}[e.key];
   if(m){andar(m);e.preventDefault();return;}
   if(e.key==='Enter'&&tg.matches('[data-j]')){e.preventDefault();abre(+tg.dataset.j);return;}
-  if(e.key==='/'){e.preventDefault();const q=$('#q');q&&q.focus();return;}
-  if(['1','2','3'].includes(e.key)){S.sub=SUBS[+e.key-1][0];S.q='';S.lim=120;desenha();scrollTo(0,0);return;}
+  if(['1','2','3'].includes(e.key)){S.sub=SUBS[+e.key-1][0];S.q='';S.busca=false;S.lim=120;desenha();scrollTo(0,0);return;}
   if((e.key==='t'||e.key==='T')&&S.sub==='lista'){S.modo.lista=modo()==='jogos'?'franquias':'jogos';desenha();return;}
   if(/^[a-z]$/i.test(e.key)&&S.sub!=='dest'){pular(e.key.toUpperCase());return;}
 });
@@ -855,7 +867,8 @@ document.addEventListener('click',e=>{const x=e.target;let b;const pg=S.sub==='l
   if(b=x.closest('[data-pop]')){S.pop=!S.pop;const p=$('.fpop');if(p)p.hidden=!S.pop;b.setAttribute('aria-expanded',S.pop);return;}
   if(S.pop&&!x.closest('.fpop'))fechaPop();
   if(b=x.closest('[data-sec]')){S.lim=5000;desenha();const a=$('#sec-'+b.dataset.sec);if(a)scrollTo(0,a.getBoundingClientRect().top+scrollY-110);return;}
-  if(b=x.closest('[data-sub]')){S.sub=b.dataset.sub;S.q='';S.lim=120;desenha();b.blur();scrollTo(0,0);return;}
+  if(x.closest('[data-fimbusca]')){fimBusca();return;}
+  if(b=x.closest('[data-sub]')){S.sub=b.dataset.sub;S.q='';S.busca=false;S.lim=120;desenha();b.blur();scrollTo(0,0);return;}
   if(b=x.closest('[data-mais]')){e.stopPropagation();maisCarr(b);return;}
   if(b=x.closest('[data-loja]')){e.stopPropagation();if(PAI)PAI.loja(+b.dataset.loja);else open('https://store.steampowered.com/app/'+b.dataset.loja+'/','_blank');return;}
   if(x.closest('[data-bib]')){if(PAI)PAI.aba('bib');return;}
@@ -863,7 +876,7 @@ document.addEventListener('click',e=>{const x=e.target;let b;const pg=S.sub==='l
   if(b=x.closest('[data-go]')){vai(b.dataset.go);return;}
   if(b=x.closest('[data-h]')){S.h=+b.dataset.h;const y=scrollY;desenha();scrollTo(0,y);return;}
   if(b=x.closest('[data-tira]')){tira(b.dataset.tira);return;}
-  if(x.closest('[data-limpa]')){const f=S.f[pg];Object.keys(VAZIO).forEach(k=>{if(k in f)f[k]=VAZIO[k];});f.tp.clear();S.q='';S.lim=120;desenha();return;}
+  if(x.closest('[data-limpa]')){const f=S.f[pg];Object.keys(VAZIO).forEach(k=>{if(k in f)f[k]=VAZIO[k];});f.tp.clear();S.lim=120;desenha();return;}
   if(x.closest('[data-padrao]')){const ver=S.f[pg].ver;S.f[pg]=novoF(pg);if(ver)S.f[pg].ver=ver;S.lim=120;desenha();return;}
   if(b=x.closest('[data-fk]')){const f=S.f[pg],k=b.dataset.fk,v=b.dataset.fv;f[k]=['desc','an','ate','nota'].includes(k)?+v:v;S.lim=120;desenha();return;}
   if(b=x.closest('[data-modo]')){S.modo[S.sub]=b.dataset.modo;S.lim=120;desenha();return;}
@@ -878,7 +891,7 @@ document.addEventListener('click',e=>{const x=e.target;let b;const pg=S.sub==='l
   if(x.closest('#ov')&&(b=x.closest('[data-j]'))){const y=OV[+b.dataset.j];if(y){if(PAI&&ehJogo(y))fichaPai(OV,+b.dataset.j);else{S.aberto=+b.dataset.j;pinta();}}return;}
   if(b=x.closest('#main [data-j]')){abre(+b.dataset.j);return;}
 });
-document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value.trim().toLowerCase();S.lim=120;const p=e.target.selectionStart;desenha();const n=$('#q');n.focus();n.setSelectionRange(p,p);}});
+document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;S.busca=true;S.lim=120;const p=e.target.selectionStart;desenha();const n=$('#q');n.focus();n.setSelectionRange(p,p);}});
 addEventListener('scroll',()=>{const m=$('#maisL');if(m&&m.getBoundingClientRect().top<innerHeight+400){S.lim+=120;const y=scrollY;desenha();scrollTo(0,y);}},{passive:true});
 /* =================== sexta rodada: Destaques A ajustado, Promoções e Lista no molde da Biblioteca =================== */
 const MODS={A:['A','Ficha e banner em 2 frases curtas (o resto em "por quê"); Promoções e Lista abrem com recortes em cartões, sem título; a Lista ganha o orçamento: com R$ X, quais jogos levar.']};
@@ -1062,7 +1075,7 @@ function pagDestC(){const ag=ELEG_L(),st=ELEG_S(),vm=(prateleiras().find(x=>x.no
    +sec('Da sua lista: vale esperar',`${vm.length} · fora de promoção; a próxima deve vir em até 3 semanas, no menor preço`,vm,'vem');}
 
 /* ---------- Promoções ---------- */
-function btnF(pg){const f=S.f[pg],n=['desc','an','tipo','tenho','lista','ate','nota'].filter(k=>k in f&&f[k]!==VAZIO[k]).length+f.tp.size+(S.q?1:0);
+function btnF(pg){const f=S.f[pg],n=['desc','an','tipo','tenho','lista','ate','nota'].filter(k=>k in f&&f[k]!==VAZIO[k]).length+f.tp.size;
   return `<button class="addf" data-pop aria-expanded="${!!S.pop}">Filtros${n?` <b>${n}</b>`:''} ▾</button>${n?'<button class="limpa lx" data-limpa title="Tirar todos os filtros">✕</button>':''}`;}
 const vazioF='<p class="vazio">Nenhum jogo com esses filtros. Abra “Filtros” e tire algum.</p>';
 /* recortes: cada um é um jeito de olhar as promoções (com os seus filtros); o cartão mostra a capa do melhor dele */
@@ -1131,7 +1144,7 @@ function pagListaM(){const m=modo(),f=S.f.lista,o=ordem(),base=L.filter(x=>passa
 /* ---------- dentro do painel: a ficha do jogo, o carrinho e a loja são os do painel (window.parent.KH) ---------- */
 const PAI=(()=>{try{return parent!==window&&parent.KH?parent.KH:null;}catch(e){return null;}})();
 function avisaPai(aba){try{history.replaceState(null,'','#'+S.sub);}catch(e){}if(PAI&&PAI.sub)PAI.sub(aba,S.sub);}
-window.irSub=s=>{if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
+window.irSub=s=>{if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';S.busca=false;if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
 addEventListener('hashchange',()=>irSub(location.hash.slice(1)));
 const pedeCarr=(ids,mon)=>{ids=[...new Set(ids.filter(Boolean).map(Number))];if(!ids.length){toast('Nada para pôr no carrinho');return;}
   if(PAI)PAI.carrinho(ids.map(a=>{const o=OB.get(a);return {appid:a,mon:mon?mon(a):false,loja:o&&o.preco!=null?o.loja||'Steam':undefined};}));else toast('No carrinho (abra pelo painel)');};

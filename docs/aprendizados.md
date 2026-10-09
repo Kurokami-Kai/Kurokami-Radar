@@ -2,6 +2,12 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — busca com / em toda a aba Ofertas
+- **"O / não funciona" era a sub-aba sem caixa:** o atalho só focava `#q`, que não existe em Destaques (a que abre primeiro). Ler o handler de teclado antes de testar achou na hora.
+- **Tecla com foco no painel não chega no iframe:** repassar pelo painel (`window.buscar` da página). E AltGr chega como Ctrl+Alt: testar a tecla `/` antes do filtro de modificadores.
+- **Print logo depois de `type` vem atrasado:** o texto já estava no campo; esperar 1 s antes do print.
+- **Portas 8801 e 8803 ocupadas por outras conversas:** usei 8807 no `launch.json` temporário (desfeito antes do commit).
+
 ## 2026-10-09 — sem barras de rolagem; teste de fundo
 - **"Fundo não aparece" em Ofertas era cobertura, não cor:** `.prat`/`.lane`/`.full` são `#0d0d0d` opacos na largura toda; achar pelo DOM (`elementFromPoint` + fundo não transparente) antes de mexer nos gradientes.
 - **Testar fundo sem editar arquivo:** `<style id=fundoTeste>` injetado no painel e nos dois iframes + barra de botões flutuante deixou o dono comparar ao vivo.

@@ -1370,6 +1370,9 @@ function mostraFrame(t){const f=FR[t],el=$('#'+f.id);scrollTo(0,0);ajustaTopo();
     el.onload=()=>{el.hidden=false;$('#'+f.id+'Msg').hidden=true;if(S.tab===t)focaFrame();};el.src=f.url+'?t='+Date.now()+'#'+f.sub;}
   else{try{el.contentWindow.irSub(f.sub);}catch(e){}focaFrame();}}
 function focaFrame(){const f=FR[S.tab];if(f)try{$('#'+f.id).contentWindow.focus();}catch(e){}}
+/* "/" com o foco no painel (topo, abas) ainda abre a busca de Ofertas/Biblioteca */
+addEventListener('keydown',e=>{if(e.key!=='/'||!FR[S.tab]||!$('#modal').hidden||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.target.isContentEditable)return;
+  try{const w=$('#'+FR[S.tab].id).contentWindow;if(w.buscar){e.preventDefault();w.focus();w.buscar();}}catch(x){}});
 let MOP={};   // como a ficha foi aberta: {vered, passo, pos} quando vem das páginas novas
 window.KH={
   ficha(appid,op){abrirJogo(appid,op);},
