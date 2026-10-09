@@ -2,6 +2,10 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — aba Notificações nova; extensão recusada pela loja do Edge
+- **A loja do Edge recusa `description` acima de 132 caracteres** no `manifest.json`: o `checar.py` confere agora (e pegou a 1ª versão encurtada, com 134).
+- **`ref_N` do `find` vence ao navegar:** um clique com ref velho caiu no Carrinho; depois de navegar, rode `find` de novo ou clique por `javascript_tool`.
+
 ## 2026-10-09 — azul e verde viram vermelho
 - **Mapa de hex com alfa preservado nos 3 arquivos (painel, ofertas, biblioteca) + varredura do DOM por matiz** (abas e iframe) achou as 2 sobras (ícone da lista, "igual ao recorde") que o mapa não cobria; troca de texto de comentário que contém hex tem de vir depois do mapa (o assert pegou).
 - **Verde com sentido fica** (exigir × excluir, feito, turquesa dos vereditos): trocar tudo por vermelho apagaria a diferença entre bom e ruim.

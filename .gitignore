@@ -10,3 +10,6 @@ assets/
 *.spec
 __pycache__/
 *.pyc
+
+# pacotes soltos na raiz (ex.: zip da extensão para a loja)
+/*.zip

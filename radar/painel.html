@@ -438,9 +438,29 @@ select.mini{padding:3px 6px;font-size:11.5px}
 @media (max-width:720px){.cfg-row{flex-wrap:wrap;gap:10px;padding:12px 14px}.cfg-c{width:100%;justify-content:flex-end}.cfg-save>span{display:none}}
 .btn-go2{background:linear-gradient(90deg,var(--go1) 5%,var(--go2) 95%);color:#fff;border:0;border-radius:2px;padding:10px 20px;font-size:14px;cursor:pointer}
 .btn-go2:hover{filter:brightness(1.15)}
-.nrow{display:grid;grid-template-columns:120px minmax(0,1fr) auto auto;gap:12px;align-items:center;background:rgba(0,0,0,.2);padding:4px 10px 4px 4px;margin-bottom:2px;cursor:pointer}
-.nrow:hover{background:#1c1c1c}
-.nrow .q{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.nf-cfg{color:var(--blue)!important;cursor:pointer}.nf-cfg:hover{text-decoration:underline}
+.nf-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.nf-seg{display:inline-flex;background:#0d0d0d;box-shadow:inset 0 0 0 1px #ffffff14;border-radius:2px;padding:2px}
+.nf-seg button{background:none;border:0;color:var(--muted);font:inherit;font-size:12.5px;padding:6px 12px;border-radius:2px;cursor:pointer}
+.nf-seg button span{margin-left:6px;color:var(--dim);font-size:11.5px}
+.nf-seg button:hover{color:#fff}
+.nf-seg button[aria-pressed="true"]{background:#1f1f1f;color:#fff;box-shadow:inset 0 -2px 0 var(--blue)}
+.nf-seg button[aria-pressed="true"] span{color:var(--blue)}
+.nf-info{color:var(--dim);font-size:12px}
+.nf-dia{display:flex;align-items:center;gap:12px;margin:24px 0 8px;font-size:12px;font-weight:400;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.nf-dia::after{content:"";flex:1;height:1px;background:#ffffff12}
+.nf-dia span{color:var(--dim);letter-spacing:0;text-transform:none}
+.nf-grupo{display:flex;flex-direction:column;gap:4px}
+.nf-row{display:grid;grid-template-columns:184px minmax(0,1fr) auto 26px;gap:16px;align-items:center;background:#0d0d0d;padding:8px 14px 8px 8px;border-left:3px solid transparent;cursor:pointer;transition:background .12s}
+.nf-row:hover{background:#161616;border-left-color:var(--blue)}
+.nf-row .art{width:184px}
+.nf-nome{color:#fff;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nf-mot{display:flex;align-items:baseline;gap:8px;margin-top:6px;color:var(--text);font-size:12.5px;line-height:1.35}
+.nf-tag{flex:0 0 auto;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:2px;color:var(--c);background:color-mix(in srgb,var(--c) 13%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 30%,transparent)}
+.nf-meta{margin-top:6px;color:var(--dim);font-size:11.5px}
+.nf-preco{display:flex;flex-direction:column;align-items:flex-end;gap:4px;white-space:nowrap}
+.nf-p{color:#fff;font-size:17px}
+.nf-ag{color:var(--muted);font-size:11.5px}.nf-ag.ok{color:var(--disc-fg)}.nf-ag.up{color:var(--dim)}
 .off{opacity:.5}
 #progTopo{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#8a1220,#ff4655);z-index:80;transition:width .4s}
 .status{cursor:pointer}
@@ -489,7 +509,7 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .cartbtn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:2px;background:rgba(255,70,85,.15);color:var(--blue);font-size:14px;cursor:pointer;flex:0 0 auto}
 .cartbtn:hover,.cartbtn.on{background:var(--disc-bg);color:var(--disc-fg)}
 @media (max-width:900px){.carr-grid{grid-template-columns:1fr}.crow{grid-template-columns:90px 1fr auto 28px}.crow .modosel{grid-column:2}}
-@media (max-width:720px){.nrow{grid-template-columns:90px 1fr auto}.nrow .q{display:none}}
+@media (max-width:720px){.nf-row{grid-template-columns:96px minmax(0,1fr) auto;gap:10px;padding-right:10px;align-items:start}.nf-row .art{width:96px}.nf-row .cartbtn{display:none}.nf-nome{font-size:13.5px}.nf-mot{flex-wrap:wrap;gap:4px 8px}.nf-p{font-size:15px}}
 /* ---------- 0.15: vitrine e Promoções (spec 04) ---------- */
 
 .pbrowse{grid-template-columns:minmax(0,1fr) 232px}
@@ -650,7 +670,8 @@ body.emframe{overflow:hidden}body.emframe .foot{display:none}
   </section>
 
   <section id="tab-notif" class="wrap tabsec" hidden>
-    <div class="shead"><h2>Notificações enviadas</h2><span class="aside">as 200 mais recentes</span></div>
+    <div class="shead"><h2>Notificações</h2><a class="aside nf-cfg" href="#" data-nfcfg>Escolher o que avisa ›</a></div>
+    <div id="notifTopo"></div>
     <div id="notifLista"></div>
   </section>
 
@@ -1272,13 +1293,43 @@ $('#buscaRes').addEventListener('click',async e=>{if(e.target.closest('[data-fec
   toast('No carrinho');renderCarr();});
 
 /* ================= notificações ================= */
-async function renderNotif(){
-  const d=await api('/api/notificacoes');
-  $('#notifLista').innerHTML=d.itens.length?d.itens.map(n=>`<div class="nrow" data-open="${n.appid}">${art(n.appid,n.nome||n.appid,n.capa,{small:true})}
-    <div><div style="color:#fff">${esc(n.nome||n.appid)}</div><div class="motivo">${esc(n.motivo||'')} · ${esc(n.loja||'')}</div></div>
-    <span class="q">${fmtISO(n.quando)}</span><span class="pb full"><span class="prs tnum"><span class="f">${brl(n.preco)}</span></span></span></div>`).join(''):
-    '<div class="empty">Nenhuma notificação ainda. A primeira checagem só registra o que já está em promoção; daí em diante, as novidades aparecem aqui.</div>';
+let NOTIF=[];
+// etiqueta pelo começo do motivo (analise.motivo_tipo); o 4º item diz se o texto fica inteiro
+const NF_TIPOS=[[/^Selo Kurokami:\s*/i,'Selo Kurokami','#f5c75b'],[/^menor preço já registrado/i,'Novo recorde','#ff4655',1],
+  [/^mesmo preço do menor/i,'Igual ao recorde','#ff8a94',1],[/^menor preço em 2 anos/i,'Menor em 2 anos','#c7b3ff',1],
+  [/^keyshop\s*/i,'Keyshop','#e2a635'],[/^versão completa/i,'Versão completa','#d2d2d2',1]];
+const nfKey=n=>/keyshop/i.test(n.loja||'');
+function nfTipo(n){const m=n.motivo||'',r=NF_TIPOS.find(x=>x[0].test(m));let t,c='#979797',txt=m;
+  if(r){t=r[1];c=r[2];if(!r[3])txt=m.replace(r[0],'');}
+  else{const p=m.match(/^([^:]{2,20}):\s*/);if(p){t=p[1];txt=m.slice(p[0].length);}else t=nfKey(n)?'Keyshop':'Promoção';}
+  return {t,c,txt:txt?txt[0].toUpperCase()+txt.slice(1):''};}
+function nfDia(iso){const d=new Date(iso),z=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime(),dd=Math.round((z(new Date())-z(d))/864e5);
+  return dd===0?'Hoje':dd===1?'Ontem':d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'}).replace(/^./,c=>c.toUpperCase());}
+const nfHora=iso=>new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+function nfAgora(n){const o=IDX.get(n.appid);if(!o)return '';const k=nfKey(n),p=k?o.keyshop:o.preco;
+  if(p==null)return '<span class="nf-ag up">sem preço agora</span>';
+  if(!k&&!(o.corte>0)&&p>n.preco)return `<span class="nf-ag up">a promoção acabou · ${brl(p)}</span>`;
+  return p<n.preco?`<span class="nf-ag ok">agora ${brl(p)}, mais barato</span>`:p===n.preco?'<span class="nf-ag ok">ainda nesse preço</span>':`<span class="nf-ag">agora ${brl(p)}</span>`;}
+async function renderNotif(){const d=await api('/api/notificacoes');NOTIF=d.itens||[];desenharNotif();}
+function desenharNotif(){
+  if(!NOTIF.length){$('#notifTopo').innerHTML='';$('#notifLista').innerHTML='<div class="empty">Nenhuma notificação ainda. A primeira checagem só registra o que já está em promoção; daí em diante, as novidades aparecem aqui.</div>';return;}
+  // o mesmo jogo pela mesma via (loja oficial ou keyshop) aparece uma vez, no aviso mais recente, com os anteriores contados
+  const por=new Map(),lista=[];
+  for(const n of NOTIF){const k=n.appid+(nfKey(n)?'k':'o'),a=por.get(k);if(a){a.antes.push(n);continue;}const x={...n,antes:[]};por.set(k,x);lista.push(x);}
+  const nk=lista.filter(nfKey).length,f=S.nf||'todas',vis=lista.filter(n=>f==='todas'||(f==='keyshop')===nfKey(n));
+  const desde=new Date(NOTIF[NOTIF.length-1].quando).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  $('#notifTopo').innerHTML=`<div class="nf-bar"><div class="nf-seg">${[['todas','Todas',lista.length],['oficial','Lojas oficiais',lista.length-nk],['keyshop','Keyshops',nk]].map(([k,t,c])=>`<button type="button" data-nf="${k}" aria-pressed="${f===k}">${t}<span>${c}</span></button>`).join('')}</div>
+    <span class="nf-info">${fmtN(NOTIF.length)} aviso${NOTIF.length>1?'s':''} desde ${desde}${NOTIF.length>=200?' (os 200 mais recentes)':''} · o mesmo jogo aparece uma vez</span></div>`;
+  const dias=[];for(const n of vis){const dl=nfDia(n.quando);if(!dias.length||dias[dias.length-1][0]!==dl)dias.push([dl,[]]);dias[dias.length-1][1].push(n);}
+  $('#notifLista').innerHTML=vis.length?dias.map(([dl,l])=>`<h3 class="nf-dia">${esc(dl)}<span>${l.length} jogo${l.length>1?'s':''}</span></h3><div class="nf-grupo">${l.map(n=>{const t=nfTipo(n),a=n.antes;
+    return `<div class="nf-row" data-open="${n.appid}">${art(n.appid,n.nome||n.appid,n.capa)}
+    <div style="min-width:0"><div class="nf-nome">${esc(n.nome||n.appid)}</div><div class="nf-mot"><span class="nf-tag" style="--c:${t.c}">${esc(t.t)}</span><span>${esc(t.txt)}</span></div>
+    <div class="nf-meta">${esc(n.loja||'')} · ${nfHora(n.quando)}${a.length?` · avisado ${a.length+1} vezes; antes ${a.slice(0,2).map(x=>brl(x.preco)+' em '+fmtISO(x.quando).replace(',',' às')).join(', ')}`:''}</div></div>
+    <div class="nf-preco"><span class="nf-p tnum">${brl(n.preco)}</span>${nfAgora(n)}</div>${cartBtn(n.appid)}</div>`;}).join('')}</div>`).join('')
+    :`<div class="empty">Nenhuma notificação de ${f==='keyshop'?'keyshop':'loja oficial'}.</div>`;
 }
+$('#tab-notif').addEventListener('click',e=>{const b=e.target.closest('[data-nf]');if(b){S.nf=b.dataset.nf;save();desenharNotif();return;}
+  if(e.target.closest('[data-nfcfg]')){e.preventDefault();ls.set('cfgSec','avisos');setTab('cfg');window.scrollTo(0,0);}});
 
 /* ================= configurações ================= */
 let CFG=null;
