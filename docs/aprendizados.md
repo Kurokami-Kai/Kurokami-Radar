@@ -7,6 +7,8 @@ Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que ga
 - **Ordem padrão antes de ordenar:** `tool()` fixava a ordem depois do `sort` e a 1ª pintura saiu sem ordem; testar cada tela num laço JS (opção × página × modo) achou isso mais rápido que prints.
 - **Prints do navegador do app falham depois de `resize_window`** (a pane muda de largura e limpa a emulação): confira pelo DOM (`getBoundingClientRect`, contagens) em vez de insistir.
 - **DLCs possuídas = 0 sem `userdata.json`:** antes de concluir "bug no Completar", `grep userdata radar.log`.
+- **O navegador do app não abre arquivo local acima de ~512 KB** ("couldn't open file"): 510 KB abriu, 513 não. Tire dos dados o que a amostra não usa.
+- **`Set-Content -Encoding utf8` no PowerShell 5.1 grava BOM** (apareceu na mensagem do commit): escreva o texto com a ferramenta Write.
 - **Mensagem de commit com aspas no PowerShell 5.1 quebra** (vira pathspec): use `git commit -F arquivo.txt` do scratchpad.
 - **Aba do navegador do app recusa JS em arquivo local às vezes** ("shows a local file"): `preview_start` com a mesma URL abre outra aba que aceita.
 - **Amostra com dados reais pegou um bug de produção** (franquia "45527500"): contar no banco os campos com parte numérica respondeu em 1 consulta. `zoom` na região do print funciona quando o `screenshot` cheio sai em escala estranha.

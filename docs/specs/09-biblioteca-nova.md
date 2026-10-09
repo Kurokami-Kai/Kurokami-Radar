@@ -37,6 +37,12 @@ Amostra em `dados/amostras-biblioteca-2.html` (mesmos dados). Nas duas: capa da 
 - **F · Ficha numa tela só:** cabeçalho com os 5 números, jogos numa fileira com setas (os 30 do FINAL FANTASY cabem) e logo abaixo três caixas (onde foi o seu tempo, nunca jogados, o que falta): 864 px de altura, cabe numa tela de 900. Completar em 3 por linha com 6 DLCs.
 - **G · Ficha com painel ao lado:** jogos em grade à esquerda (todos visíveis) e um painel fixo à direita com os números, o tempo e o que falta, que acompanha a rolagem. Completar em 2 por linha com 8 DLCs.
 
+## Quase veredito: quarta rodada, H e G (09/10)
+- Dono: ficha F "com ressalvas"; o painel lateral da G tem de ir **até o fim** da ficha; quer uma versão com esse painel **na horizontal, embaixo dos jogos**; os jogos numa fileira só, **sem setas: arrastar segurando o botão esquerdo**. "Basicamente o layout do F, mas com a barra vertical do G na horizontal."
+- **Coleção e Franquias são a mesma coisa:** o menu vira **Biblioteca** (abre na Coleção, a vitrine de capas em pilha) e o botão onde ficava Capas/Texto alterna **Coleção / Franquias** (2 prateleiras por linha, de arrastar). **Completar** fica com Texto (blocos de altura fixa) e Capas (3 por linha, 6 DLCs), da F, e abre a ficha de completar em tela cheia.
+- Amostra em `dados/amostras-biblioteca-4.html`. **H:** cabeçalho da G (capa, etiquetas, nome, ações), fileira de arrastar com bordas esmaecidas indicando que há mais, e a barra deitada de ponta a ponta até o fim (números | onde foi o seu tempo | o que falta | nunca jogados): 814–846 px de altura, cabe numa tela de 900. **G:** igual, mas com o painel ao lado indo até o fim (o conteúdo acompanha a rolagem).
+- A confirmar: o "texto" do Completar já usa o mesmo bloco da Coleção em texto da F; se a ideia era o Completar em texto mostrar as **franquias com os jogos que faltam** (e não as DLCs), é uma troca pequena.
+
 ## Pedido (dono, 08/10)
 - A aba está mal disposta. Hoje: **Completar · Franquias · Coleção · DLCs em promoção** (botões no topo da aba).
 - Deve ficar parecida com **Ofertas** (menu no topo com subpáginas, talvez).
