@@ -359,14 +359,16 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-seta.e{left:32px;background:linear-gradient(90deg,#000000 10%,#00000000)}.fx-seta.d{right:32px;background:linear-gradient(270deg,#000000 10%,#00000000)}
 .fx-seta:hover{color:var(--blue)}
 .fx-abas{position:relative;display:flex;justify-content:center;gap:8px;padding:0 32px 14px;flex:none}
-.fx-aba{flex:0 1 220px;min-width:0;text-align:left;background:#0d0d0de6;border:0;border-top:2px solid #ffffff18;padding:9px 12px 10px;cursor:pointer;color:inherit;font:inherit}
+.fx-aba{flex:1 1 0;min-width:0;text-align:left;background:#0d0d0de6;border:0;border-top:2px solid #ffffff18;padding:9px 12px 10px;cursor:pointer;color:inherit;font:inherit}
 .fx-aba .k{float:right;font-style:normal;font-size:11px;line-height:16px;color:var(--dim);box-shadow:inset 0 0 0 1px #ffffff26;border-radius:2px;padding:0 5px;margin-left:6px}
 .fx-aba b{display:block;color:#fff;font-weight:400;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fx-aba span{display:block;color:var(--muted);font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fx-aba:hover{background:#1a1a1a}
+.fx-aba[aria-selected="true"]:focus-visible{outline:none}
 .fx-aba[aria-selected="true"]{background:#1a0a0c;border-top-color:var(--sinal)}.fx-aba[aria-selected="true"] b{color:var(--sinal)}.fx-aba[aria-selected="true"] .k{color:#fff;box-shadow:inset 0 0 0 1px var(--sinal)}
 .fx-painel{position:relative;display:flex;flex-direction:column;gap:14px;padding:6px 32px 26px;max-width:1180px;width:100%;margin:0 auto}
 .fx-painel>*{flex-shrink:0}
+.fx-painel{scrollbar-width:thin;scrollbar-color:#ffffff30 transparent;scrollbar-gutter:stable}
 .fx-2c{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start}
 .fx-painel .fx-car{padding:0}.fx-painel .fx-seta.e{left:0}.fx-painel .fx-seta.d{right:0}.fx-painel .fx-capa{width:132px}
 @media (min-width:821px){
@@ -387,9 +389,13 @@ select.mini{padding:3px 6px;font-size:11.5px}
 .fx-linha .voce{position:absolute;top:14px;transform:translateX(-50%);font-size:11px;color:var(--sinal);white-space:nowrap}
 .fx-linha .voce::before{content:"▲";display:block;text-align:center;font-size:9px;line-height:1}
 .fx-barra{height:6px;background:#ffffff12;margin:6px 0 2px}.fx-barra i{display:block;height:100%;background:var(--sinal)}
-.fx-crit{display:flex;gap:8px;flex-wrap:wrap}
-.fx-crit>*{display:flex;flex-direction:column;align-items:center;background:var(--bg-row);padding:6px 10px;font-size:11px;color:var(--muted)}
-.fx-crit b{font-size:18px;color:#fff;font-weight:400}
+.fx-crit{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.fx-crit>*{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;background:var(--bg-row);padding:10px 6px;font-size:11px;line-height:1.3;color:var(--muted)}
+.fx-crit b{font-size:20px;line-height:1.2;color:#fff;font-weight:400;margin-bottom:2px}
+.fx-lj{font-size:13px}.fx-lj td{padding:7px 8px}.fx-lj td.ag{color:#fff}.fx-lj td.dif{color:var(--dim)}
+.fx-lj .pc{display:inline-block;background:var(--disc-bg);color:var(--disc-fg);padding:1px 6px;font-size:12px}
+.fx-lj tr.melhor td{background:#1a0a0c}.fx-lj tr.melhor td.ag,.fx-lj tr.melhor a{color:var(--disc-fg)}.fx-lj tr.melhor td.dif{color:var(--sinal)}
+.fx-lj tr.off td{color:var(--dim)}.fx-lj tr.off a{color:var(--muted)}
 .fx-kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px;margin:0}.fx-kv dt{color:var(--muted)}.fx-kv dd{margin:0;min-width:0}
 .fx-troca{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .fx-troca input{flex:1;min-width:120px;background:#000000;border:0;color:#fff;padding:5px 8px;box-shadow:inset 0 0 0 1px #333333;font-family:inherit}
@@ -1028,7 +1034,7 @@ function fecharModal(){$('#modal').hidden=true;document.body.style.overflow='';i
 $('#modal').addEventListener('click',e=>{const p=e.target.closest('[data-mpasso]');if(p){if(MOP.passo)MOP.passo(+p.dataset.mpasso);return;}
   if(e.target.id==='modal'||e.target.closest('.mclose'))fecharModal();});
 addEventListener('keydown',e=>{if($('#modal').hidden)return;if(e.key==='Escape')fecharModal();
-  else if(/^[1-5]$/.test(e.key)&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&$('#fxPainel')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){const a=fxListaAbas()[+e.key-1];if(a){e.preventDefault();fxAba(a[0]);}}
+  else if(/^[1-5]$/.test(e.key)&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&$('#fxPainel')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){const a=fxListaAbas()[+e.key-1];if(a){e.preventDefault();const foco=e.target.closest&&e.target.closest('.fx-aba');fxAba(a[0]);if(foco)$('#mbody .fx-aba[aria-selected="true"]').focus({preventScroll:true});}}
   else if(MOP.passo&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();MOP.passo(e.key==='ArrowRight'?1:-1);}});
 /* a caixa do veredito das páginas novas (amostra 8): o veredito numa linha, 2 frases e o "por quê" fechado */
 function fxVered(v){return `<div class="fx-cx fx-v8" style="--c:${v.cor}"><div class="l1">${v.etq?`<span class="fx-etq" style="background:${v.etq[1]};color:${v.etq[2]}">${esc(v.etq[0])}</span>`:''}<span><b style="color:${v.cor}">${esc(v.rot)}</b>${v.sub?' · '+esc(v.sub):''}</span></div>
@@ -1145,16 +1151,20 @@ function fxDlcs(){let s='';
 function fxTroca(F){return `<div class="fx-troca"><input id="frNome" list="frNomes" value="${esc(F.nome)}" aria-label="Franquia" placeholder="Nome da franquia"><datalist id="frNomes">${F.nomes.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
   <button class="btn-ghost" data-fr="salvar">Salvar</button>${F.manual?'<button class="btn-ghost" data-fr="auto">Automático</button>':''}<button class="btn-ghost" data-fr="cancelar">Cancelar</button></div>
   <div class="fx-vazio" style="margin-top:4px">Escolha uma franquia que já existe para juntar, ou digite um nome novo para separar.</div>`;}
-/* painel 3: preço em todas as lojas (e as formas de comprar) */
+/* painel 3: preço em todas as lojas (tabela na largura toda) e, embaixo, as formas de comprar */
 function fxLojas(){
   const g=MJ.gg;let s='';
-  const linha=(n,sub,v,cls,url)=>`<div class="fx-l${cls?' '+cls:''}"><span>${url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(n)}</a>`:esc(n)}${sub?` <span class="sub">· ${sub}</span>`:''}</span><span class="tnum">${v}</span></div>`;
-  const vende=MJ.lojas.filter(l=>l.vende).sort((x,y)=>x.atual-y.atual);
-  const rows=vende.map((l,i)=>linha(l.loja,[l.corte>0?'-'+l.corte+'%':'',l.menor!=null?'menor '+brl(l.menor):'',l.marcada?'alerta':''].filter(Boolean).join(' · '),brl(l.atual),i?'':'melhor',l.url))
-    .concat(g&&g.keyshop!=null?[linha('Keyshop (GG.deals)',g.hist_keyshop!=null?'menor '+brl(g.hist_keyshop):'',brl(g.keyshop),'',g.url)]:[])
-    .concat(MJ.lojas.filter(l=>!l.vende).map(l=>linha(l.loja,l.menor!=null?'menor '+brl(l.menor):'',l.sem_atual?'—':'não vende agora','',l.url)));
-  s+=rows.length?`<div class="fx-cx"><h3>Preço agora por loja</h3>${rows.join('')}</div>`:'<div class="fx-vazio">Nenhuma loja com preço para este jogo.</div>';
-  const cm=fxCaminhos();return cm?`<div class="fx-2c">${s}<div>${cm}</div></div>`:s;
+  const vende=MJ.lojas.filter(l=>l.vende).sort((x,y)=>x.atual-y.atual),b=vende[0];
+  // uma linha por loja: nome (e "alerta" se é uma das suas), desconto, preço de agora, quanto a mais que a mais barata, menor registrado
+  const linha=(cls,n,url,tag,pc,ag,dif,menor)=>`<tr${cls?` class="${cls}"`:''}><td class="t">${url?`<a href="${esc(url)}" target="_blank" rel="noopener">${esc(n)}</a>`:esc(n)}${tag?`<span class="tag">${tag}</span>`:''}</td>
+    <td class="n">${pc}</td><td class="n ag">${ag}</td><td class="n dif">${dif}</td><td class="n">${menor}</td></tr>`;
+  const dif=v=>!b||v==null?'':v===b.atual?'a mais barata':v<b.atual?brl(b.atual-v)+' a menos':'+'+brl(v-b.atual);
+  const rows=vende.map((l,i)=>linha(i?'':'melhor',l.loja,l.url,l.marcada?'alerta':'',l.corte>0?`<span class="pc">-${l.corte}%</span>`:'',brl(l.atual),dif(l.atual),l.menor!=null?brl(l.menor):'—'))
+    .concat(g&&g.keyshop!=null?[linha('','Keyshop (GG.deals)',g.url,'chave','',brl(g.keyshop),dif(g.keyshop),g.hist_keyshop!=null?brl(g.hist_keyshop):'—')]:[])
+    .concat(MJ.lojas.filter(l=>!l.vende).map(l=>linha('off',l.loja,l.url,'','',l.sem_atual?'—':'não vende','',l.menor!=null?brl(l.menor):'—')));
+  s+=rows.length?`<div class="fx-cx"><h3>Preço agora por loja</h3><div class="ctab-wrap"><table class="ctab fx-lj tnum"><thead><tr><th>Loja</th><th class="n">Desconto</th><th class="n">Agora</th><th class="n">Diferença</th><th class="n">Menor registrado</th></tr></thead><tbody>${rows.join('')}</tbody></table></div></div>`
+    :'<div class="fx-vazio">Nenhuma loja com preço para este jogo.</div>';
+  const cm=fxCaminhos();return cm?`${s}<div class="fx-cx">${cm}</div>`:s;
 }
 /* painel 5: sobre o jogo (HowLongToBeat, notas, detalhes, DLCs) */
 function fxSobre(){
@@ -1176,7 +1186,7 @@ function fxSobre(){
     ${F?`<dt>Franquia</dt><dd>${esc(F.nome)}${F.manual?' <span class="fx-vazio">(trocada por você)</span>':''} · <a href="#" data-trocar>trocar</a>${MTROCA?fxTroca(F):''}</dd>`:''}</dl></div>`;
   return `<div class="fx-2c">${s}</div>${fxDlcs()}`;
 }
-/* os painéis da ficha: caixas centradas, uma aberta por vez (clique ou teclas 1–5); o escolhido vale para a próxima ficha */
+/* os painéis da ficha: caixas na largura da ficha, uma aberta por vez (clique ou teclas 1–5); o escolhido vale para a próxima ficha */
 let MABA='vale';
 function fxListaAbas(){
   const j=MJ.jogo,o=MJ.item||IDX.get(j.appid)||{},F=MJ.franquia,a=MX&&MX.aug,h=a&&a.hltb,c=MX&&MX.conq,v=MOP.vered;

@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — abas da ficha, lojas em tabela, notas alinhadas
+- **"Fica fixado bugado" era o foco:** clicar na aba 1 e apertar 2 deixava o contorno de `:focus-visible` na 1 (o teclado liga o anel). Passar o foco para a aba escolhida e tirar o contorno dela resolveu.
+- **Tabela larga em duas colunas estoura** no painel de ~1100 px: lojas na largura toda e as formas de comprar embaixo.
+- **`fxAba` antes de `abrirJogo` terminar não vale:** para testar um painel, ponha `MABA` e depois abra a ficha.
+
 ## 2026-10-09 — ficha em painéis, colunas alinhadas, fundo vivo
 - **"Desalinhado" era coluna `auto`:** o -90% andava porque a largura do preço (e da etiqueta GMG) variava por linha; caixas de largura fixa (grid 50px + 80px, loja embaixo do preço) e o calor sem negrito resolveram.
 - **Flex column na `.mbox` não alcança os netos:** o painel não crescia porque o filho direto é `#mbody`; ele também precisa ser flex (medir `getBoundingClientRect` mostrou na hora).
