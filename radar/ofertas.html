@@ -741,7 +741,7 @@ function fichaPrat(x){const l=x.l,A=l[0].appid;
 
 /* ---------- listas com blocos ---------- */
 const chipsOrd=()=>`<div class="chips"><span>Ordem</span>${ORD[S.sub].map(([v,l])=>`<button data-ord="${v}" aria-pressed="${v===ordem()}">${v==='melhor'?ROT_M[S.mod]:l}</button>`).join('')}</div>`;
-const qIn=()=>`<input id="q" type="search" placeholder="Buscar jogo  ( / )" autocomplete="off" value="${esc(S.q)}">`;
+const qIn=()=>`<input id="q" type="search" placeholder="Buscar jogo  ( Esc )" autocomplete="off" value="${esc(S.q)}">`;
 function maisL(n,tot){return n<tot?`<div class="mais-l" id="maisL">carregando mais… (${fmtN(n)} de ${fmtN(tot)})</div>`:`<div class="mais-l">${fmtN(tot)} de ${fmtN(tot)}</div>`;}
 function blocos(bl,render){let resta=S.lim,tot=0,html='';
   for(const [t,s,l,tipo,id] of bl){tot+=l.length;if(!l.length)continue;const p=l.slice(0,Math.max(0,resta));resta-=p.length;if(!p.length)continue;
@@ -792,7 +792,7 @@ function pagBusca(){const t=norm(S.q).split(' ').filter(Boolean),todos=[...OB.va
   return `<div class="tool"><div class="l1"><span class="cnt">${t.length?`<b>${fmtN(l.length)}</b> encontrado${l.length===1?'':'s'} · na lista de desejos e nas promoções, sem os filtros`:'Digite o nome do jogo · procura na lista de desejos e nas promoções, sem os filtros'}</span><span class="sp"></span>${qIn()}<button class="limpa" data-fimbusca title="Fechar a busca (Esc)">✕ Fechar busca</button></div></div>`
    +(l.length?blocos([['','',l,'p']],rend):t.length?'<p class="vazio">Nenhum jogo com esse nome aqui. A busca cobre a lista de desejos e as promoções que o Kurokami acompanha.</p>':'');}
 function buscar(){if(S.aberto!=null)fecha();if(!S.busca){S.busca=true;S.lim=120;desenha();scrollTo(0,0);}const q=$('#q');if(q){q.focus();q.select();}}
-window.buscar=buscar;
+window.buscar=k=>k==='Escape'&&S.busca?fimBusca():buscar();   // o painel repassa / e Esc
 function fimBusca(){S.busca=false;S.q='';S.lim=120;desenha();scrollTo(0,0);}
 
 /* ---------- desenho ---------- */
@@ -812,7 +812,7 @@ document.addEventListener('pointerup',()=>{if(!arr)return;if(arr.mov){semClique=
 document.addEventListener('click',e=>{if(semClique){e.stopPropagation();e.preventDefault();semClique=false;}},true);
 document.addEventListener('dragstart',e=>{if(e.target.closest('.trilho'))e.preventDefault();});
 function kb(){$('#kb').innerHTML=$('#ov .ov')?'<span><kbd>← →</kbd>anterior / próximo</span><span><kbd>Esc</kbd>fechar</span><span><kbd>Tab</kbd>andar pelos botões</span>'
-  :'<span><kbd>← → ↑ ↓</kbd>andar</span><span><kbd>Enter</kbd>abrir em tela cheia</span><span><kbd>A–Z</kbd>pular para a letra</span><span><kbd>/</kbd>buscar</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>Destaques / Promoções / Lista</span><span><kbd>T</kbd>Jogos / Franquias</span><span><kbd>Backspace</kbd>tira o último filtro</span>';}
+  :'<span><kbd>← → ↑ ↓</kbd>andar</span><span><kbd>Enter</kbd>abrir em tela cheia</span><span><kbd>A–Z</kbd>pular para a letra</span><span><kbd>Esc</kbd>buscar</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>Destaques / Promoções / Lista</span><span><kbd>T</kbd>Jogos / Franquias</span><span><kbd>Backspace</kbd>tira o último filtro</span>';}
 let OV=[];
 function abre(j){const x=S.lista[j];if(!x)return;if(PAI&&ehJogo(x)){fichaPai(S.lista,j);return;}OV=S.lista.slice();S.aberto=j;pinta();}
 function pinta(){const x=OV[S.aberto],keep=S.lista;S.lista=OV;const h=x.k==='prat'?fichaPrat(x.x):x.k==='fr'?fichaFR(x):fichaJ(x.k==='jogo'&&x.m?x.m[0]:x.o);
@@ -846,7 +846,7 @@ function pular(Lt){const e=$(`#main [data-L="${Lt}"]`);if(!e){toast('Nada com '+
   const alvo=e.matches('[data-nav]')?e:e.querySelector('[data-nav]')||e;window.scrollTo({top:e.getBoundingClientRect().top+scrollY-130});alvo.focus&&alvo.focus({preventScroll:true});}
 document.addEventListener('keydown',e=>{
   const tg=e.target,digitando=tg.tagName==='INPUT'&&tg.type!=='checkbox';
-  if(e.key==='Escape'){if(S.pop){fechaPop();return;}if(S.busca&&S.aberto==null&&(tg.id==='q'||!digitando)){fimBusca();return;}if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();}return;}
+  if(e.key==='Escape'){if(S.pop){fechaPop();return;}if(S.busca&&S.aberto==null&&(tg.id==='q'||!digitando)){fimBusca();return;}if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();return;}if(!S.pop&&!digitando)buscar();return;}   // Esc abre e fecha a busca
   if(tg.id==='q'&&(e.key==='Enter'||e.key==='ArrowDown')){const a=navs()[0];if(a){e.preventDefault();a.focus({preventScroll:true});ver(a);}return;}
   if(e.key==='/'&&!digitando){e.preventDefault();buscar();return;}   // antes dos modificadores: no teclado sem a tecla /, ela sai no AltGr+Q (Ctrl+Alt)
   if(digitando||e.ctrlKey||e.altKey||e.metaKey)return;
