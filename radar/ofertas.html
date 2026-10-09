@@ -1009,7 +1009,7 @@ function pagDestA(){const st=PS.filter(o=>em(o)&&o.hist&&fl(o)),vk=k=>st.filter(
   const bb=BB(),tt=S.teto,bt=bb.filter(o=>o.preco<=tt);
   const tetos=`<div class="tetos">${TETOS.map(([v,t])=>`<button data-teto="${v}" aria-pressed="${v===tt}">${t} <small>${fmtN(bb.filter(o=>o.preco<=v).length)}</small></button>`).join('')}</div>`;
   return faixaEv()+banner()+`<div class="pcab" style="margin-top:24px"><h2>Hoje</h2><span class="res">o piso é o menor preço dos últimos 2 anos: abaixo dele por R$ 5 e 15% ou mais é <b style="color:#ff8a94">imperdível</b>; nele, <b style="color:#ff4655">não fica mais barato</b></span></div>
-   <div class="tri">${lane('#ff4655','Melhores ofertas','fora da lista · abaixo do menor preço em 2 anos · pelo ganho',mo,'promo:imperdivel')}${lane('#ff4655','Menores históricos','fora da lista · no menor preço em 2 anos · pela economia',mh,'promo:menor')}${lane('#d2d2d2','Bons e baratos','fora da lista · baratos e bem avaliados · pelas análises',bt,'baratos:'+tt,false,rowB,tetos)}${lane('#ff4655','Lista de desejos','em promoção · as melhores primeiro',li,'lista:imperdivel',true)}</div>`
+   <div class="tri">${lane('#ff4655','Melhores ofertas','fora da lista · abaixo do menor preço em 2 anos · pelo ganho',mo,'promo:imperdivel')}${lane('#ff4655','Menores históricos','fora da lista · no menor preço em 2 anos · pela economia',mh,'promo:menor')}${lane('#ff4655','Bons e baratos','fora da lista · baratos e bem avaliados · pelas análises',bt,'baratos:'+tt,false,rowB,tetos)}${lane('#ff4655','Lista de desejos','em promoção · as melhores primeiro',li,'lista:imperdivel',true)}</div>`
    +pratsLinha([{nome:'Acabam em até 3 dias',c:'#ff4655',desc:'Imperdíveis e no menor preço que terminam logo (♥ = da sua lista)',l:fim}]);}
 function pagDestB(){const pm=L.filter(em),fo=L.filter(o=>!em(o)&&!o.breve&&o.pv.prox_t),sp=L.filter(o=>!em(o)&&!o.breve&&!o.pv.prox_t).length;
   const A=agrupa(pm,bucketsFim(),o=>o).map(x=>(x.l.sort(SORT.melhor),x)),F=agrupa(fo,bucketsMes(),o=>o.pv.prox_t).map(x=>(x.l.sort(SORT.prox),x));
@@ -1030,11 +1030,11 @@ function btnF(pg){const f=S.f[pg],n=['desc','an','tipo','tenho','lista','ate','n
 const vazioF='<p class="vazio">Nenhum jogo com esses filtros. Abra “Filtros” e tire algum.</p>';
 /* recortes: cada um é um jeito de olhar as promoções (com os seus filtros); o cartão mostra a capa do melhor dele */
 const tetoTxt=()=>'até '+brl0(S.teto);
-const REC_P=[['tudo','Todas','pelo veredito','#ffffff',o=>true,null],
+const REC_P=[['tudo','Todas','pelo veredito','#ff4655',o=>true,null],
   ['imperdivel','Imperdíveis','abaixo do menor preço em 2 anos','#ff4655',o=>verd(o)[0]==='imperdivel',(a,b)=>ganho(b)-ganho(a)],
   ['menor','Menores históricos','no menor preço em 2 anos','#ff4655',o=>verd(o)[0]==='menor',(a,b)=>b.eco-a.eco],
-  ['baratos','Bons e baratos',()=>tetoTxt()+' · 85%+ positivas','#d2d2d2',o=>o.preco<=S.teto&&(o.rpos||0)>=85&&(o.cheio||0)>=3000,(a,b)=>(AF[b.appid]?1:0)-(AF[a.appid]?1:0)||notaB(b)-notaB(a)],
-  ['grandes','Grandes por pouco','eram R$ 150+, hoje até R$ 50','#a8a8a8',o=>(o.cheio||0)>=15000&&o.preco<=5000,(a,b)=>b.eco-a.eco],
+  ['baratos','Bons e baratos',()=>tetoTxt()+' · 85%+ positivas','#ff4655',o=>o.preco<=S.teto&&(o.rpos||0)>=85&&(o.cheio||0)>=3000,(a,b)=>(AF[b.appid]?1:0)-(AF[a.appid]?1:0)||notaB(b)-notaB(a)],
+  ['grandes','Grandes por pouco','eram R$ 150+, hoje até R$ 50','#ff4655',o=>(o.cheio||0)>=15000&&o.preco<=5000,(a,b)=>b.eco-a.eco],
   ['fim','Acabam em 3 dias','as melhores primeiro','#ff4655',o=>o.fim>AGORA&&o.fim-AGORA<=3*DIA,ordV],
   ['serie','Das suas séries','de séries que você tem','#ff4655',o=>!!AF[o.appid],ordV]];
 function cardsRec(base,defs,pg){const cur=S.rec[pg];
@@ -1059,9 +1059,9 @@ const SECS=[['imperdivel','Imperdíveis','abaixo do menor preço em 2 anos por R
 const secVerd=l=>SECS.map(([k,t,s,so])=>{const g=l.filter(o=>verd(o)[0]===k).sort(so);return [t,`${fmtN(g.length)} · ${s}`,g,'p',k];}).filter(b=>b[2].length);
 const REC_L=[['agora','Compre agora','imperdíveis e no menor preço','#ff4655',o=>em(o)&&['imperdivel','menor'].includes(verd(o)[0]),ordV],
   ['fim','Acabam em 3 dias','as melhores primeiro','#ff4655',o=>em(o)&&o.fim>AGORA&&o.fim-AGORA<=3*DIA,ordV],
-  ['espera','Pode esperar','o menor preço volta logo','#c8c8c8',o=>em(o)&&verd(o)[0]==='espera',ordV],
+  ['espera','Pode esperar','o menor preço volta logo','#ff4655',o=>em(o)&&verd(o)[0]==='espera',ordV],
   ['vem','Vem aí','fora de promoção; deve entrar em 30 dias','#ff4655',o=>verd(o)[0]==='vem',SORT.prox],
-  ['baratos','Até R$ 25','em promoção, os melhores primeiro','#d2d2d2',o=>em(o)&&!gratis(o)&&o.preco<=2500,ordV]];
+  ['baratos','Até R$ 25','em promoção, os melhores primeiro','#ff4655',o=>em(o)&&!gratis(o)&&o.preco<=2500,ordV]];
 const VER_L=[['todos','Todos',o=>true],['promo','Em promoção',em],['fora','Fora de promoção',o=>!em(o)&&!o.breve],['breve','Em breve',o=>!!o.breve]];
 /* orçamento: entre os melhores negócios da lista (imperdíveis e no menor preço), a combinação que cabe no valor e
    rende a maior economia (mochila em reais inteiros; imperdível vale 1,3× a economia) */
