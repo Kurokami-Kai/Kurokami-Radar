@@ -3,6 +3,9 @@
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
 ## 0.17.2
+- **Buscas mais bonitas:** na Biblioteca, Esc (ou o botão **Buscar**) abre a mesma barra larga de Ofertas no alto da página; em Promoções e na Lista de desejos a caixinha virou um botão que abre a busca grande; na tabela com todos os filtros, a busca por nome ganhou lupa e brilho vermelho, e o Esc vai direto para ela.
+- **As DLCs que você tem:** a API da Steam só passa os jogos; as DLCs da sua conta vêm pela **extensão do Hunter** (ela lê o que você tem na própria loja). Sem ela, o Completar mostra um aviso com o botão para instalar, e o convite da extensão no topo agora diz isso. Com a extensão, as DLCs passam a contar na hora, sem esperar a próxima verificação.
+- **Dois Hunters abertos não se misturam mais:** o Windows deixava um Hunter antigo e um novo ocuparem a mesma porta, e quem respondia era o antigo (o aviso "o Hunter que está rodando é a versão X, mas os arquivos são da Y"). Agora o segundo não consegue pegar a porta do primeiro.
 - **Buscar um jogo de qualquer lugar:** aperte **Esc** (ou `/`) em Ofertas (também em Destaques, e mesmo com o foco no topo do painel) e digite o nome numa barra larga no centro da tela. No Carrinho, nas Configurações e nas Notificações, o Esc leva direto para essa busca; na Biblioteca, abre e fecha a busca dela. A busca procura na sua lista de desejos e em todas as promoções, sem os filtros, sem ligar para acentos e pontuação ("pokemon" acha "Pokémon"). Enter ou ↓ vai para o primeiro resultado; Esc de novo fecha e volta para onde você estava. No teclado sem a tecla `/`, AltGr+Q também abre (vale para a Biblioteca).
 
 ## 0.17.1 (publicada em 2026-10-09)

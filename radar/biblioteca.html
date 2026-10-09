@@ -47,6 +47,21 @@ h2{font-size:22px;font-weight:400;color:#fff;margin:0}
 .chips button:hover{background:#ffffff1a;color:#fff}
 .chips button[aria-pressed=true]{background:#3d3d3d;color:#fff}
 .tool .sp{flex:1}
+.aviso-dlc{margin:14px 0 4px;padding:12px 16px;border-radius:3px;background:#4a10168c;box-shadow:inset 3px 0 0 var(--sinal);color:var(--txt);font-size:13px;line-height:1.7}
+.aviso-dlc b{color:#fff;font-weight:400}.aviso-dlc .bq-btn{margin:0 4px}
+/* busca (Esc ou /): barra larga no centro, no alto da barra de ferramentas, como a de Ofertas */
+.tool .bq{flex:0 0 100%;display:flex;align-items:center;gap:14px;max-width:960px;margin:6px auto 6px;height:54px;padding:0 12px 0 18px;cursor:text;
+  background:#0d0d0dd9;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:3px;box-shadow:inset 0 0 0 1px #ff475759,0 10px 30px #00000080;transition:box-shadow .15s}
+.tool .bq:focus-within{box-shadow:inset 0 0 0 1px var(--sinal),0 0 0 3px #ff475726,0 0 36px #ff475740}
+.bq svg{flex:none;color:var(--sinal)}
+.tool .bq input{flex:1;min-width:0;width:auto;background:none;border:0;box-shadow:none;outline:0;color:#fff;font:inherit;font-size:19px;padding:0}
+.bq input::placeholder{color:#6a6a6a}.bq input::-webkit-search-cancel-button{display:none}
+.bq-x{flex:none;display:flex;align-items:center;gap:6px;background:none;border:0;color:var(--fraco);cursor:pointer;font-size:12.5px;padding:6px 8px;border-radius:2px}
+.bq-x:hover{color:#fff;background:#ffffff0f}
+.bq kbd{background:#ffffff1a;color:#fff;border-radius:2px;padding:0 6px;font:inherit;font-size:11.5px}
+.bq-btn{display:inline-flex;align-items:center;gap:8px;background:#ffffff0d;border:0;color:var(--txt);padding:6px 12px;border-radius:2px;cursor:pointer;font-size:13px}
+.bq-btn:hover{background:#ffffff1a;color:#fff}.bq-btn svg{color:var(--sinal)}
+.bq-btn kbd{background:#ffffff1a;color:#fff;border-radius:2px;padding:0 5px;font:inherit;font-size:11px}
 .tool input{background:#0d0d0d;border:0;box-shadow:inset 0 0 0 1px #333333;color:#fff;padding:6px 10px;border-radius:2px;font:inherit;font-size:13px;width:190px}
 .views{display:inline-flex;gap:2px}
 .views button{background:#0d0d0d;border:0;color:var(--fraco);padding:6px 10px;cursor:pointer;border-radius:2px;font-size:12.5px}
@@ -349,8 +364,9 @@ function vitItem(x,i){
     <div class="nm">${esc(x.nome)}</div><div class="sub">${x.min?horas(x.min)+' jogadas':'nada jogado'}${x.falta.length?' · faltam '+x.falta.length:''}</div></div>`;
 }
 function tool(){const o=ordem(),V=S.sub==='bib'?[['colecao','▦ Coleção'],['franquias','☰ Franquias']]:[['texto','≡ Texto'],['capas','▦ Capas']];
-  return `<div class="tool"><div class="chips"><span>Ordem</span>${ORD[ordKey()].map(([v,l])=>`<button data-ord="${v}" aria-pressed="${v===o}">${l}</button>`).join('')}</div>
-   <span class="sp"></span><input id="q" type="search" placeholder="Buscar  ( Esc )" value="${esc(S.q)}">
+  const bq=S.busca?`<label class="bq"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input id="q" type="search" placeholder="${S.sub==='bib'?'Buscar na sua biblioteca':'Buscar um jogo ou DLC'}" autocomplete="off" spellcheck="false" value="${esc(S.q)}"><button class="bq-x" data-fimbusca title="Fechar a busca"><kbd>Esc</kbd>fechar</button></label>`:'';
+  return `<div class="tool">${bq}<div class="chips"><span>Ordem</span>${ORD[ordKey()].map(([v,l])=>`<button data-ord="${v}" aria-pressed="${v===o}">${l}</button>`).join('')}</div>
+   <span class="sp"></span>${S.busca?'':`<button class="bq-btn" data-busca title="Buscar (Esc ou /)"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg>Buscar <kbd>Esc</kbd></button>`}
    <span class="views">${V.map(([v,t])=>`<button data-modo="${v}" aria-pressed="${modo()===v}">${t}</button>`).join('')}</span></div>`;}
 const legenda=`<div class="leg2"><span><i style="background:var(--tenho)"></i>tenho</span><span><i style="background:var(--lista)"></i>falta (♥ = na lista de desejos)</span></div>`;
 /* bloco de texto com altura fixa: sempre N linhas (as que sobram ficam em branco) */
@@ -468,11 +484,13 @@ function pagFranquias(){const o=ordem(),l=FR.filter(busca).sort(SORT[o]);S.lista
   return cab+`<div class="grid2">${l.map((x,i)=>`<div class="prat" data-L="${x.L}" data-it="${i}"><div class="cab"><h3><button data-it="${i}" data-nav title="${esc(x.nome)}">${esc(x.nome)}</button></h3><small>${x.tenho} de ${x.total}${x.falta.length?' · faltam '+brl0(x.custo):' · ✓ completa'}${x.min?' · '+horas(x.min):''}</small></div>
     ${bar(100*x.tenho/x.total)}${fileira(x.m,104,false)}</div>`).join('')}</div>`;}
 /* Completar em texto: as franquias com algo faltando, no bloco da Coleção em texto da F (o que falta primeiro, em lilás) */
+/* a API da Steam só passa jogos: as DLCs que você tem vêm da extensão (sessão da loja) */
+const avisoDlc=()=>D.dlcs===false?`<div class="aviso-dlc"><b>As DLCs que você já tem ainda não entraram</b>, então aparecem aqui como faltando. A Steam só mostra as DLCs da sua conta na própria loja, e quem lê isso é a <b>extensão do Hunter</b>${PAI&&PAI.instalarExt?' <button class="bq-btn" data-instext>Instalar a extensão</button>':''}. Depois de instalar, abra a loja da Steam logado uma vez.</div>`:'';
 function pagCompletarTexto(){const f=FR.filter(x=>x.falta.length&&busca(x)).sort(SORT[ordem()]);S.lista=f;
-  return `<div class="pcab"><h2>Completar</h2><span class="res"><b>${f.length}</b> franquias com jogo faltando · <b>${fmtN(f.reduce((s,x)=>s+x.falta.length,0))}</b> jogos · <b>${brl0(f.reduce((s,x)=>s+x.custo,0))}</b> hoje · clique abre a franquia</span></div>${tool()}${legenda}<div class="tgrid">${f.map((x,i)=>tcFr(x,i,6,true)).join('')}</div>`;}
+  return `${avisoDlc()}<div class="pcab"><h2>Completar</h2><span class="res"><b>${f.length}</b> franquias com jogo faltando · <b>${fmtN(f.reduce((s,x)=>s+x.falta.length,0))}</b> jogos · <b>${brl0(f.reduce((s,x)=>s+x.custo,0))}</b> hoje · clique abre a franquia</span></div>${tool()}${legenda}<div class="tgrid">${f.map((x,i)=>tcFr(x,i,6,true)).join('')}</div>`;}
 function pagCompletar(){if(modo()==='texto')return pagCompletarTexto();const o=ordem(),l=C.filter(c=>!S.q||c.nome.toLowerCase().includes(S.q)||c.falta.some(d=>d.nome.toLowerCase().includes(S.q))).sort(SORTC[o]);S.lista=l;
   const tdl=l.reduce((s,c)=>s+c.falta.length,0),F3=true;
-  const cab=`<div class="pcab"><h2>Completar</h2><span class="res"><b>${l.length}</b> jogos com DLC faltando · <b>${fmtN(tdl)}</b> DLCs · <b>${brl0(T.falta_hoje)}</b> hoje · <b class="g">${brl0(T.falta_menor)}</b> nos pisos · clique abre em tela cheia</span></div>${tool()}`;
+  const cab=`${avisoDlc()}<div class="pcab"><h2>Completar</h2><span class="res"><b>${l.length}</b> jogos com DLC faltando · <b>${fmtN(tdl)}</b> DLCs · <b>${brl0(T.falta_hoje)}</b> hoje · <b class="g">${brl0(T.falta_menor)}</b> nos pisos · clique abre em tela cheia</span></div>${tool()}`;
   if(modo()==='texto')return cab+`<div class="tgrid">${l.slice(0,90).map((c,i)=>tcCp(c,i,6)).join('')}</div><div class="nota">Mostrando os 90 primeiros.</div>`;
   const nD=F3?6:8,dc=F3?3:4;
   return cab+`<div class="grid2" style="--n:${F3?3:2}">${l.slice(0,90).map((c,i)=>{const promo=c.falta.filter(d=>d.corte).length;const ds=[...c.falta].sort((a,b)=>(b.corte>0)-(a.corte>0)||a.preco-b.preco);const mostra=c.falta.length>nD?nD-1:nD;
@@ -524,23 +542,26 @@ function pular(L){const e=$(`#main [data-L="${L}"]`);if(!e){toast('Nada com '+L)
   const alvo=e.matches('[data-nav]')?e:e.querySelector('[data-nav]')||e;window.scrollTo({top:e.getBoundingClientRect().top+scrollY-110});alvo.focus&&alvo.focus({preventScroll:true});}
 document.addEventListener('keydown',e=>{
   const tg=e.target,digitando=tg.tagName==='INPUT';
-  if(e.key==='Escape'){if(tg.id==='q'){fimBusca();return;}if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();return;}if(S.q)fimBusca();else abreBusca();return;}   // Esc abre e fecha a busca
+  if(e.key==='Escape'){if(tg.id==='q'){fimBusca();return;}if(digitando){tg.blur();return;}if(S.aberto!=null){fecha();e.preventDefault();return;}if(S.busca)fimBusca();else abreBusca();return;}   // Esc abre e fecha a busca
   if(e.key==='/'&&!digitando){e.preventDefault();abreBusca();return;}   // antes dos modificadores: AltGr+Q (Ctrl+Alt) no teclado sem a tecla /
   if(digitando||e.ctrlKey||e.altKey||e.metaKey)return;
   if($('#ov .ov')){if(e.key==='ArrowLeft'||e.key==='ArrowRight'){passo(e.key==='ArrowRight'?1:-1);e.preventDefault();}return;}
   const m={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d'}[e.key];
   if(m){andar(m);e.preventDefault();return;}
   if(e.key==='Enter'&&tg.matches('[data-it],[data-ic]')){e.preventDefault();abre(+(tg.dataset.it??tg.dataset.ic));return;}
-  if(['1','2'].includes(e.key)){S.sub=SUBS[+e.key-1][0];S.q='';desenha();scrollTo(0,0);return;}
+  if(['1','2'].includes(e.key)){S.sub=SUBS[+e.key-1][0];S.q='';S.busca=false;desenha();scrollTo(0,0);return;}
   if(e.key==='t'||e.key==='T'){S.modo[S.sub]=S.sub==='bib'?(modo()==='colecao'?'franquias':'colecao'):(modo()==='capas'?'texto':'capas');desenha();return;}
   if(/^[a-z]$/i.test(e.key)){pular(e.key.toUpperCase());return;}
 });
 
 /* ---------- cliques ---------- */
 document.addEventListener('click',e=>{const x=e.target;let b;
+  if(x.closest('[data-fimbusca]')){fimBusca();return;}
+  if(x.closest('[data-busca]')){abreBusca();return;}
+  if(x.closest('[data-instext]')){PAI.instalarExt();return;}
   if(x.matches('[data-ov]')){fecha();return;}
-  if(b=x.closest('#opc [data-o]')){S.o=b.dataset.o;S.q='';if(S.aberto!=null)fecha();desenha();scrollTo(0,0);return;}
-  if(b=x.closest('[data-sub]')){S.sub=b.dataset.sub;S.q='';desenha();b.blur();scrollTo(0,0);return;}
+  if(b=x.closest('#opc [data-o]')){S.o=b.dataset.o;S.q='';S.busca=false;if(S.aberto!=null)fecha();desenha();scrollTo(0,0);return;}
+  if(b=x.closest('[data-sub]')){S.sub=b.dataset.sub;S.q='';S.busca=false;desenha();b.blur();scrollTo(0,0);return;}
   if(x.closest('[data-ext]')){if(PAI)PAI.dlcsPromo();return;}
   if(b=x.closest('[data-modo]')){S.modo[S.sub]=b.dataset.modo;desenha();return;}
   if(b=x.closest('[data-ord]')){S.ord[ordKey()]=b.dataset.ord;desenha();return;}
@@ -558,11 +579,11 @@ document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value.t
 /* ---------- dentro do painel: a ficha do jogo, o carrinho e a loja são os do painel (window.parent.KH) ---------- */
 const PAI=(()=>{try{return parent!==window&&parent.KH?parent.KH:null;}catch(e){return null;}})();
 function avisaPai(aba){try{history.replaceState(null,'','#'+S.sub);}catch(e){}if(PAI&&PAI.sub)PAI.sub(aba,S.sub);}
-function abreBusca(){const q=$('#q');if(q){q.focus();q.select();}}
-function fimBusca(){S.q='';desenha();}
-window.buscar=k=>k==='Escape'&&S.q?fimBusca():abreBusca();   // o painel repassa / e Esc (nome diferente da função: senão chama a si mesmo)
+function abreBusca(){if(S.aberto!=null)fecha();if(!S.busca){S.busca=true;desenha();}const q=$('#q');if(q){q.focus();q.select();}}
+function fimBusca(){S.q='';S.busca=false;desenha();}
+window.buscar=k=>k==='Escape'&&S.busca?fimBusca():abreBusca();   // o painel repassa / e Esc (nome diferente da função: senão chama a si mesmo)
 window.irSub=s=>{const [s0,m0]=String(s).split(':');if(m0&&SUBS.some(x=>x[0]===s0)){S.modo[s0]=m0;if(s0===S.sub&&S.aberto==null){desenha();return;}}s=s0;
-  if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
+  if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';S.busca=false;if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
 addEventListener('hashchange',()=>irSub(location.hash.slice(1)));
 const pedeCarr=(ids,mon)=>{ids=[...new Set(ids.filter(Boolean).map(Number))];if(!ids.length){toast('Nada para pôr no carrinho');return;}
   if(PAI)PAI.carrinho(ids.map(a=>({appid:a,mon:mon?mon(a):false,loja:ID[a]?ID[a].loja:'Steam'})));else toast('No carrinho (abra pelo painel)');};

@@ -584,6 +584,11 @@ details.blk>summary::-webkit-details-marker{display:none}
 details.blk>summary h4::after{content:"▾";float:right;opacity:.7}
 details.blk[open]>summary h4::after{content:"▴"}
 .pon{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--sinal);margin-left:6px;vertical-align:middle}
+.pbq{display:flex;align-items:center;gap:9px;height:38px;padding:0 10px;background:#0d0d0d;border-radius:2px;box-shadow:inset 0 0 0 1px #ff475740;cursor:text;transition:box-shadow .15s}
+.pbq:focus-within{box-shadow:inset 0 0 0 1px var(--sinal),0 0 0 3px #ff475726,0 0 18px #ff475733}
+.pbq svg{flex:none;color:var(--sinal)}
+.pbq input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font:inherit;font-size:14px;padding:0}
+.pbq input::placeholder{color:#6a6a6a}.pbq input::-webkit-search-cancel-button{display:none}
 .pin{background:#000000;border:0;color:#fff;padding:5px 6px;border-radius:2px;box-shadow:inset 0 0 0 1px #333333;font:inherit;font-size:12px;width:76px}
 .pfx .f{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:8px}
 .pfx input[type=date]{width:128px}
@@ -948,7 +953,7 @@ function renderSide(){const r=PR||{contagens:{mostrar_so:{},tipo:{}},conta:{tem_
   const marca=g=>(P[g]||[]).length?' <i class="pon"></i>':'';
   const ae=document.activeElement;let foco=null,pos=null;
   if(ae&&$('#pSide').contains(ae)){foco=ae.id?'#'+ae.id:ae.dataset.num?`[data-num="${ae.dataset.num}"]`:ae.dataset.data?`[data-data="${ae.dataset.data}"]`:null;try{pos=ae.selectionStart;}catch(e){}}
-  $('#pSide').innerHTML=`<div class="blk"><h4>Buscar por nome</h4><div class="in"><input type="search" class="pin" id="pBusca" placeholder="nome do jogo" value="${esc(P.busca||'')}" style="width:100%"></div></div>
+  $('#pSide').innerHTML=`<div class="blk"><h4>Buscar por nome</h4><div class="in"><label class="pbq"><svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input type="search" id="pBusca" placeholder="Nome do jogo  ( Esc )" autocomplete="off" spellcheck="false" value="${esc(P.busca||'')}"></label></div></div>
     <div class="blk"><h4>Sua relação com o jogo</h4><div class="in">${REL.map(([k,l])=>tri(k,l)).join('')}
       <label class="tick"><input type="checkbox" id="pQq" ${P.qualquer_um?'checked':''}>Qualquer um (os ✓ valem com OU)</label>
       ${sem?`<div class="hint">Seguido e Ignorado vêm da sua conta Steam: ${temExt()&&parseFloat(document.documentElement.dataset.kurokamiExt)>=1.1?'abra qualquer página da loja da Steam (logado) e volte aqui':'precisa da extensão do Hunter 1.1 ou mais nova (instale, ou recarregue-a em chrome://extensions) e de uma visita à loja da Steam logado'}.</div>`:''}</div></div>
@@ -1372,8 +1377,11 @@ function mostraFrame(t){const f=FR[t],el=$('#'+f.id);scrollTo(0,0);ajustaTopo();
 function focaFrame(){const f=FR[S.tab];if(f)try{$('#'+f.id).contentWindow.focus();}catch(e){}}
 /* Esc e "/" com o foco no painel (topo, abas): abrem (o Esc também fecha) a busca de Ofertas/Biblioteca; nas outras abas, o Esc leva à busca de Ofertas */
 function buscaPend(f,el){if(!f.busca)return;f.busca=false;try{el.contentWindow.buscar();}catch(e){}}
-addEventListener('keydown',e=>{if(!(e.key==='/'||e.key==='Escape')||!$('#modal').hidden||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.target.isContentEditable)return;
-  if(!FR[S.tab]){if(e.key==='Escape'&&$('#buscaRes').hidden){e.preventDefault();FR.vale.busca=true;setTab('vale');}return;}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&e.target.id==='pBusca'){e.target.blur();return;}
+  if(!(e.key==='/'||e.key==='Escape')||!$('#modal').hidden||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.target.isContentEditable)return;
+  if(!FR[S.tab]){if(e.key!=='Escape'||!$('#buscaRes').hidden)return;e.preventDefault();
+    if(S.tab==='lista'&&$('#pBusca')){$('#pBusca').focus();$('#pBusca').select();return;}   // na tabela com filtros, a busca é a dela
+    FR.vale.busca=true;setTab('vale');return;}
   try{const w=$('#'+FR[S.tab].id).contentWindow;if(w.buscar){e.preventDefault();w.focus();w.buscar(e.key);}}catch(x){}});
 let MOP={};   // como a ficha foi aberta: {vered, passo, pos} quando vem das páginas novas
 window.KH={
@@ -1387,6 +1395,7 @@ window.KH={
     toast(n?(n===1?'No carrinho':n+' no carrinho')+(lj.length===1?' · '+lj[0]:lj.length?' · '+lj.length+' lojas':'')+(ja?` · ${ja} já estava${ja>1?'m':''}`:''):'Já está no carrinho');},
   loja(a){open(storeUrl(a),'_blank','noopener');},
   aba(t){setTab(t);},
+  instalarExt(){instalarExt();},
   sub(aba,s){if(FR[aba])FR[aba].sub=s;},
   dlcsPromo(){FR.bib.sub='completar:capas';setTab('bib');}   // o Completar em Capas abre na ordem "Em promoção": as DLCs com desconto de cada jogo
 };
@@ -1646,7 +1655,7 @@ function faixaExt(forcar){
   if(!forcar&&(ls.get('ext_nao',0)||depois))return;
   const d=document.createElement('div');d.id='aviso-ext';
   d.style.cssText='background:#1f1f1f;color:#fff;padding:10px 16px;text-align:center;font-size:12.5px;line-height:1.7';
-  d.innerHTML=`O <b>Finalizar pedido</b> põe os jogos no carrinho da Steam sozinho com a <b>extensão do Hunter</b>. Instalar agora? É uma vez só e leva menos de um minuto.
+  d.innerHTML=`A <b>extensão do Hunter</b> põe os jogos no carrinho da Steam no <b>Finalizar pedido</b> e traz o que você tem na conta, <b>inclusive as DLCs</b> (a API da Steam só passa os jogos). Instalar agora? É uma vez só e leva menos de um minuto.
     <button class="btn-imp" id="extSim" type="button" style="margin-left:8px">Instalar</button> <button class="btn-ghost" id="extDepois" type="button">Agora não</button> <button class="btn-ghost" id="extNunca" type="button">Não perguntar mais</button>`;
   document.body.prepend(d);
   $('#extSim').onclick=instalarExt;

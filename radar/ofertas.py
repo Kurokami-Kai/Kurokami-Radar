@@ -8,7 +8,7 @@ import time
 from collections import defaultdict
 from datetime import datetime, timezone
 
-from . import analise, config, series
+from . import analise, caminhos, config, series
 from .banco import Banco
 from .previsao import Previsor, eventos
 
@@ -188,7 +188,8 @@ def _montar_biblioteca():
         C = [[g['appid'], g['dlc_tenho'], g['dlc_total'], g['valor_cheio'], g['falta_hoje'], g['falta_menor'],
               [[d['appid'], d['nome'], d['preco'], d['cheio'], d['corte'], d['menor'], d['classe']] for d in g['falta']]]
              for g in bd['jogos'] if g['falta'] or g['dlc_total']]
-        return {'total': bd['total'], 'n': bd['n_jogos'], 'G': G, 'C': C}
+        # sem o retrato da conta (userdata.json, que a extensao grava), a biblioteca so tem jogos: as DLCs que voce tem ficam de fora
+        return {'total': bd['total'], 'n': bd['n_jogos'], 'G': G, 'C': C, 'dlcs': bool(caminhos.achar_userdata(config.carregar()))}
     finally:
         b.con.close()
 

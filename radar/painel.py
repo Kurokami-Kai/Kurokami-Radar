@@ -1335,10 +1335,10 @@ def post_steam_conta(d):
         with open(arq + ".tmp", "w", encoding="utf-8") as f:
             json.dump(u, f)
         os.replace(arq + ".tmp", arq)
-        # a coleta refaz a biblioteca inteira; ate la, o que voce tem ja sai das Promocoes
-        for i in range(0, len(u["rgOwnedApps"]), 500):
-            lote = u["rgOwnedApps"][i:i + 500]
-            b.con.execute("UPDATE jogo SET possuido=1 WHERE appid IN (%s)" % ",".join("?" * len(lote)), lote)
+        # a coleta refaz a biblioteca inteira; ate la, o que voce tem ja sai das Promocoes e as DLCs (que nem
+        # sempre tem linha em jogo) ja contam no Completar, como no marcar_listas
+        b.con.executemany("INSERT INTO jogo(appid, possuido) VALUES(?,1) ON CONFLICT(appid) DO UPDATE SET possuido=1",
+                          [(a,) for a in u["rgOwnedApps"]])
         b.commit()
         return {"ok": True, "possuidos": len(u["rgOwnedApps"]), "seguidos": len(u["rgFollowedApps"]),
                 "ignorados": len(u["rgIgnoredApps"])}
@@ -1615,13 +1615,19 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"erro": str(e)}, 500)
 
 
+class _Servidor(ThreadingHTTPServer):
+    # sem SO_REUSEADDR: no Windows ele deixa dois processos na mesma porta e quem responde e o mais antigo
+    # (um Hunter velho aberto, ou copias de teste empilhadas, servem o codigo antigo com o painel novo)
+    allow_reuse_address = False
+
+
 def iniciar(abrir=False):
     global PORTA
     host = "0.0.0.0" if rede_local() else "127.0.0.1"
     srv, erro = None, None
     for p in PORTAS:
         try:
-            srv = ThreadingHTTPServer((host, p), Handler)
+            srv = _Servidor((host, p), Handler)
             PORTA = p
             break
         except OSError as e:

@@ -2,6 +2,11 @@
 
 Leia no início de toda tarefa; atualize no fim (até 5 linhas datadas: o que gastou tokens à toa, erros que se repetiram, o que fazer diferente). Máximo de 60 linhas: quando passar, resuma as entradas antigas num bloco só.
 
+## 2026-10-09 — aviso de versão, buscas, DLCs da conta
+- **"Rodando 0.16.0, arquivos 0.17.1" eram 6 cópias de teste na 8801 ao mesmo tempo:** o `HTTPServer` liga `SO_REUSEADDR`, que no Windows deixa vários processos na mesma porta, e responde o mais antigo. `_Servidor(allow_reuse_address=False)` no `painel.py`. Olhar `netstat -ano | findstr LISTENING` antes de suspeitar do código.
+- **"Não puxa minhas DLCs" não era o SteamID:** `GetOwnedGames` não traz DLCs; só o `rgOwnedApps` da extensão. O explorador achou em uma rodada (646 jogos, 0 DLCs, sem `userdata.json`).
+- **Matar processos seguidos esbarrou no classificador:** depois de um `Stop-Process`, um simples `sed` foi negado; ler com Grep/Read resolveu.
+
 ## 2026-10-09 — Esc em todas as abas; barra de busca no centro
 - **`navigate` para `#carr` não troca de aba:** o painel abre na última aba salva; clicar no menu para testar outra aba.
 - **Função chamada no carregamento não pode ser `const` declarado mais abaixo** (TDZ): `buscaPend` virou `function`.
