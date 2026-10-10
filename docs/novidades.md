@@ -3,7 +3,7 @@
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
 ## 0.18.0
-- **Avisos no Telegram:** em Configurações → Notificações, conecte um bot gratuito do Telegram (abra o @BotFather, envie /newbot e cole o token; depois toque em Iniciar no seu bot e clique em Vincular). Os avisos de oferta, "termina em breve" e os resumos chegam também no celular, com a capa do jogo e o botão **Abrir oferta**, respeitando a pausa, o horário de silêncio e o máximo por checagem. O token fica no Gerenciador de Credenciais do Windows, nunca no `config.json`. Dá para usar só o Telegram: desligue "Notificar no Windows".
+- **Avisos no Telegram:** em **Configurações → Telegram** (item próprio no menu do lado), conecte um bot gratuito do Telegram (abra o @BotFather, envie /newbot e cole o token; depois toque em Iniciar no seu bot e clique em Vincular). Os avisos de oferta, "termina em breve" e os resumos chegam também no celular, com a capa do jogo e o botão **Abrir oferta**, respeitando a pausa, o horário de silêncio e o máximo por checagem. O token fica no Gerenciador de Credenciais do Windows, nunca no `config.json`. Dá para usar só o Telegram: desligue "Notificar no Windows".
 
 ## 0.17.2
 - **Abertura animada:** ao abrir o painel, a logo se desenha na tela (o disco, a mira que gira, o anel que corre ao contrário, o ponto que pulsa e o traço vermelho sob o nome), no mesmo estilo da logo do topo. Dura uns 2 segundos, aparece uma vez por sessão do navegador e um clique ou tecla pula (não aparece com "mostrar animações" desligado no Windows).

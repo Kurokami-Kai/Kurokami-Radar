@@ -1,6 +1,6 @@
 /* ================= configurações ================= */
 let CFG=null,TGTOK=false;
-const CFG_SECOES=[['avisos','Avisos','o que dispara um aviso'],['lojas','Lojas','de onde pode vir'],['notif','Notificações','Windows, Telegram, silêncio'],
+const CFG_SECOES=[['avisos','Avisos','o que dispara um aviso'],['lojas','Lojas','de onde pode vir'],['notif','Notificações','no Windows, silêncio'],['telegram','Telegram','avisos no celular'],
   ['freq','Frequência','de quanto em quanto tempo'],['steam','Steam inteira','todas as promoções'],['keyshops','Keyshops','GG.deals'],
   ['dlc','DLCs','no custo completo'],['acesso','Celular e outros PCs','abrir pela rede']];
 async function renderCfg(){
@@ -14,11 +14,11 @@ async function renderCfg(){
   const swRow=(p,v,t,h)=>row(t,h,sw(p,v,t));
   // Telegram: bot gratuito; o token vai para o Gerenciador de Credenciais (nunca para o config.json) e a página só mostra o estado
   const tgHtml=()=>{const t=(CFG.notificacoes||{}).telegram||{};
-    if(!TGTOK)return `<h4>Telegram</h4><div class="hint">O mesmo aviso no celular, de graça. No Telegram, abra o <b>@BotFather</b>, envie <b>/newbot</b>, siga os passos e cole aqui o token que ele mandar.</div>
+    if(!TGTOK)return `<div class="hint">O mesmo aviso no celular, de graça. No Telegram, abra o <b>@BotFather</b>, envie <b>/newbot</b>, siga os passos e cole aqui o token que ele mandar.</div>
       ${row('Token do bot','Fica só neste PC, no Gerenciador de Credenciais do Windows.',`<input class="cfg-txt" id="tgTok" type="password" autocomplete="off" placeholder="123456:ABC…"><button class="btn-go2" data-tg="token" type="button">Conectar</button>`)}`;
-    if(!t.chat_id)return `<h4>Telegram</h4><div class="hint">Bot conectado. Agora abra o bot no Telegram, toque em <b>Iniciar</b> (ou mande qualquer mensagem) e clique em Vincular.</div>
+    if(!t.chat_id)return `<div class="hint">Bot conectado. Agora abra o bot no Telegram, toque em <b>Iniciar</b> (ou mande qualquer mensagem) e clique em Vincular.</div>
       ${row('Sua conversa','',`<button class="btn-go2" data-tg="vincular" type="button">Vincular conversa</button><button class="btn-ghost" data-tg="remover" type="button">Trocar o bot</button>`)}`;
-    return `<h4>Telegram</h4>${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
+    return `${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
       ${row('Conexão','Bot conectado e conversa vinculada.',`<button class="btn-ghost" data-tg="testar" type="button">Enviar teste</button><button class="btn-ghost" data-tg="remover" type="button">Desconectar</button>`)}`;};
   const sec=(id,t,p,corpo)=>`<section class="cfg-sec" data-sec="${id}" hidden><header><h3>${t}</h3>${p?`<p>${p}</p>`:''}</header>${corpo}</section>`;
   const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
@@ -47,7 +47,8 @@ async function renderCfg(){
       ${row('Avisar de novo se cair','Um jogo já avisado só avisa de novo se baixar pelo menos isto.',num('notificacoes.melhora_minima_reais',n.melhora_minima_reais??0.5,0.5,0,null,'R$',1))}
       ${row('Avisar quando a promoção estiver acabando','Vale para o que está no carrinho ou que avisa. 0 desliga.',num('notificacoes.termina_em_breve_horas',n.termina_em_breve_horas??24,1,0,168,'horas antes'))}
       ${row('Horário de silêncio','Sem notificações nesse intervalo (vale para o Windows e para o Telegram).',`${sw('notificacoes.silencio.ativo',si.ativo,'Horário de silêncio')}<span>de</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.de" value="${esc(si.de||'23:00')}"><span>até</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.ate" value="${esc(si.ate||'08:00')}">`)}</div>
-     <div class="cfg-card" id="tgBox">${tgHtml()}</div>`)}
+`)}
+   ${sec('telegram','Telegram','Os mesmos avisos no celular, de graça, por um bot seu do Telegram.',`<div class="cfg-card" id="tgBox">${tgHtml()}</div>`)}
    ${sec('freq','Frequência','De quanto em quanto tempo o Hunter busca preços. A primeira verificação é sempre completa.',
      `<div class="cfg-card"><h4>Verificação rápida</h4>
       ${row('Preços nas lojas (ITAD)',`A cada ${iv.itad} min e no "Verificar agora": preços em todas as lojas.`,num('intervalos_minutos.itad',iv.itad,5,10,null,'min'))}
