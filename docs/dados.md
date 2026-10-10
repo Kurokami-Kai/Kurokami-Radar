@@ -41,7 +41,7 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 - `migracoes[]`: mudanças de padrão já aplicadas a este arquivo (`config.MIGRACOES`, cada uma roda uma vez em `carregar()`; depois vale a escolha do usuário). Hoje: `keyshop_alerta_off`
 - `dlc`: `ignorar_cosmeticos|extras|atalhos|pacotes|gratis`
 - `completo`: `padrao`, `jogos{appid:"completo"}`
-- `bundles`, `notificacoes` (`ativas, max_por_rodada, melhora_minima_reais, silencio{}, termina_em_breve_horas`)
+- `bundles`, `notificacoes` (`ativas, max_por_rodada, melhora_minima_reais, silencio{}, termina_em_breve_horas, telegram{ativo, chat_id}`; o `chat_id` não é segredo, o token do bot fica no keyring)
 - `steam_inteira` (bool, padrão true: coleta da Steam inteira), `steam_inteira_hist_por_rodada` (60: históricos da Steam inteira por rodada; a ITAD aceita ~100 chamadas em 5 min), `intervalos_minutos{itad, ggdeals, steam, steam_inteira}` (Steam inteira: 60 min), `chamadas_lentas_por_rodada`, `verificacao_completa_dias`, `historico.importar_dias`
 - `extras[]`, `painel{rede_local}`, `atualizacao{repo, verificar}`
 
@@ -53,4 +53,4 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 
 ## Segredos
 
-Chaves (`steam`, `itad`, `ggdeals`) ficam no **Gerenciador de Credenciais** (keyring, serviço `Kurokami Hunter`); variáveis `KUROKAMI_<NOME>_KEY` têm prioridade (útil em testes). Nunca gravar chave em arquivo nem em log.
+Chaves (`steam`, `itad`, `ggdeals`, e o token do bot em `telegram`) ficam no **Gerenciador de Credenciais** (keyring, serviço `Kurokami Hunter`); variáveis `KUROKAMI_<NOME>_KEY` têm prioridade (útil em testes). Nunca gravar chave em arquivo nem em log.

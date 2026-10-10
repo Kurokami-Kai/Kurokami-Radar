@@ -1,10 +1,10 @@
 /* ================= configurações ================= */
-let CFG=null;
-const CFG_SECOES=[['avisos','Avisos','o que dispara um aviso'],['lojas','Lojas','de onde pode vir'],['notif','Notificações','no Windows, silêncio'],
+let CFG=null,TGTOK=false;
+const CFG_SECOES=[['avisos','Avisos','o que dispara um aviso'],['lojas','Lojas','de onde pode vir'],['notif','Notificações','Windows, Telegram, silêncio'],
   ['freq','Frequência','de quanto em quanto tempo'],['steam','Steam inteira','todas as promoções'],['keyshops','Keyshops','GG.deals'],
   ['dlc','DLCs','no custo completo'],['acesso','Celular e outros PCs','abrir pela rede']];
 async function renderCfg(){
-  const d=await api('/api/config');CFG=d.config;const c=CFG;
+  const d=await api('/api/config');CFG=d.config;TGTOK=!!d.telegram_token;const c=CFG;
   const lojas=[...new Set([...(d.lojas_itad||[]),...c.lojas])].sort((a,b)=>a.localeCompare(b));
   const marc=new Set(c.lojas.map(x=>x.toLowerCase()));
   // peças: linha (título, explicação, controle), interruptor e número com unidade
@@ -12,6 +12,14 @@ async function renderCfg(){
   const sw=(p,v,t)=>`<label class="cfg-sw"><input type="checkbox" data-k="${p}" ${v?'checked':''} aria-label="${esc(t)}"><i></i></label>`;
   const num=(p,v,step,min,max,un,pre)=>`<span class="cfg-num${pre?' pre':''}"><input type="number" data-k="${p}" value="${v}" step="${step||1}" min="${min??0}"${max!=null?` max="${max}"`:''}>${un?`<em>${un}</em>`:''}</span>`;
   const swRow=(p,v,t,h)=>row(t,h,sw(p,v,t));
+  // Telegram: bot gratuito; o token vai para o Gerenciador de Credenciais (nunca para o config.json) e a página só mostra o estado
+  const tgHtml=()=>{const t=(CFG.notificacoes||{}).telegram||{};
+    if(!TGTOK)return `<h4>Telegram</h4><div class="hint">O mesmo aviso no celular, de graça. No Telegram, abra o <b>@BotFather</b>, envie <b>/newbot</b>, siga os passos e cole aqui o token que ele mandar.</div>
+      ${row('Token do bot','Fica só neste PC, no Gerenciador de Credenciais do Windows.',`<input class="cfg-txt" id="tgTok" type="password" autocomplete="off" placeholder="123456:ABC…"><button class="btn-go2" data-tg="token" type="button">Conectar</button>`)}`;
+    if(!t.chat_id)return `<h4>Telegram</h4><div class="hint">Bot conectado. Agora abra o bot no Telegram, toque em <b>Iniciar</b> (ou mande qualquer mensagem) e clique em Vincular.</div>
+      ${row('Sua conversa','',`<button class="btn-go2" data-tg="vincular" type="button">Vincular conversa</button><button class="btn-ghost" data-tg="remover" type="button">Trocar o bot</button>`)}`;
+    return `<h4>Telegram</h4>${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
+      ${row('Conexão','Bot conectado e conversa vinculada.',`<button class="btn-ghost" data-tg="testar" type="button">Enviar teste</button><button class="btn-ghost" data-tg="remover" type="button">Desconectar</button>`)}`;};
   const sec=(id,t,p,corpo)=>`<section class="cfg-sec" data-sec="${id}" hidden><header><h3>${t}</h3>${p?`<p>${p}</p>`:''}</header>${corpo}</section>`;
   const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
   const FREQ={selo:'~0,2 avisos por semana (0,7 em grandes promoções)',novo:'~2 avisos por semana (6 em grandes promoções)',
@@ -38,7 +46,8 @@ async function renderCfg(){
       ${row('Máximo por checagem','',num('notificacoes.max_por_rodada',n.max_por_rodada??5,1,1,20))}
       ${row('Avisar de novo se cair','Um jogo já avisado só avisa de novo se baixar pelo menos isto.',num('notificacoes.melhora_minima_reais',n.melhora_minima_reais??0.5,0.5,0,null,'R$',1))}
       ${row('Avisar quando a promoção estiver acabando','Vale para o que está no carrinho ou que avisa. 0 desliga.',num('notificacoes.termina_em_breve_horas',n.termina_em_breve_horas??24,1,0,168,'horas antes'))}
-      ${row('Horário de silêncio','Sem notificações nesse intervalo.',`${sw('notificacoes.silencio.ativo',si.ativo,'Horário de silêncio')}<span>de</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.de" value="${esc(si.de||'23:00')}"><span>até</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.ate" value="${esc(si.ate||'08:00')}">`)}</div>`)}
+      ${row('Horário de silêncio','Sem notificações nesse intervalo (vale para o Windows e para o Telegram).',`${sw('notificacoes.silencio.ativo',si.ativo,'Horário de silêncio')}<span>de</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.de" value="${esc(si.de||'23:00')}"><span>até</span><input class="cfg-time" type="time" data-k="notificacoes.silencio.ate" value="${esc(si.ate||'08:00')}">`)}</div>
+     <div class="cfg-card" id="tgBox">${tgHtml()}</div>`)}
    ${sec('freq','Frequência','De quanto em quanto tempo o Hunter busca preços. A primeira verificação é sempre completa.',
      `<div class="cfg-card"><h4>Verificação rápida</h4>
       ${row('Preços nas lojas (ITAD)',`A cada ${iv.itad} min e no "Verificar agora": preços em todas as lojas.`,num('intervalos_minutos.itad',iv.itad,5,10,null,'min'))}
@@ -69,6 +78,15 @@ async function renderCfg(){
     q('.cfg-nav [data-sec]').forEach(b=>b.setAttribute('aria-selected',b.dataset.sec===id));q('.cfg-sec').forEach(x=>x.hidden=x.dataset.sec!==id);};
   mostrar(atual);
   f.querySelector('.cfg-nav').addEventListener('click',e=>{const b=e.target.closest('[data-sec]');if(b)mostrar(b.dataset.sec);});
+  f.addEventListener('click',async e=>{const b=e.target.closest('[data-tg]');if(!b)return;
+    const acao=b.dataset.tg,tg=(CFG.notificacoes=CFG.notificacoes||{}).telegram=CFG.notificacoes.telegram||{ativo:false,chat_id:''};
+    b.disabled=true;const r=await post('/api/telegram',{acao,token:acao==='token'?$('#tgTok').value:undefined});b.disabled=false;
+    if(!r.ok){toast(r.erro||'Erro');return;}
+    if(acao==='token'){TGTOK=true;tg.chat_id='';tg.ativo=false;toast('Bot '+r.bot+' conectado');}
+    else if(acao==='vincular'){tg.chat_id=r.chat_id;tg.ativo=true;toast('Vinculado a '+r.nome+'. Mandei uma mensagem para confirmar.');}
+    else if(acao==='testar')toast('Mensagem enviada. Veja no Telegram.');
+    else{TGTOK=false;tg.chat_id='';tg.ativo=false;toast('Telegram desconectado');}
+    $('#tgBox').innerHTML=tgHtml();});
   const contaLojas=()=>{const t=q('[data-loja]');$('#ljN').textContent=`${t.filter(x=>x.checked).length} de ${t.length} marcadas`;};contaLojas();
   const sujo=()=>{$('#cfgSaveBar').hidden=false;};
   if(!f.dataset.ouvindo){f.dataset.ouvindo=1;  // #cfgForm fica; os ouvintes entram uma vez só (re-render e Descartar não somam)

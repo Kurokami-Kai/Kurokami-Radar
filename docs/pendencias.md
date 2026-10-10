@@ -21,7 +21,7 @@
 Em ordem aproximada de valor. Nada aqui foi iniciado.
 
 - **Vídeo de abertura do painel** (pedido do dono, 09/10, "coisa para depois"): uma animação curta ao abrir o Hunter.
-- **Telegram**: mesmo alerta no celular fora de casa (bot gratuito; token no keyring).
+- **Telegram, o que falta** (base e avisos de oferta feitos na 0.18.0): avisos de **eventos da Steam** (festivais; fonte: feed `store.steampowered.com/feeds/news/app/593110/`), **Humble Bundle** (JSON `landingPage-json-data` de `humblebundle.com/bundles`, ou ITAD `games/bundles/v2`), **campanhas novas da Nuuvem** (links `/promo/<nome>` da home) e **cupons da Nuuvem** (texto de banners/campanhas; sem página pública de cupons). Cada fonte vira um tipo ligável em Notificações → Telegram.
 - **Bundles de outras lojas** (Humble, Fanatical) via ITAD `games/bundles/v2`.
 - **Hype Games e 2Game**: fora da ITAD; só lendo o site (frágil).
 - **Backup automático** semanal do `radar.sqlite3`.

@@ -7,7 +7,7 @@
 import json
 from datetime import datetime
 
-from . import caminhos, notificar
+from . import caminhos, notificar, telegram
 from .banco import agora
 
 ESQUEMA = """CREATE TABLE IF NOT EXISTS notificado(
@@ -31,6 +31,13 @@ class Notificador:
     def __init__(self, banco, cfg, log=print):
         self.b, self.cfg, self.log = banco, cfg, log
         self.b.con.execute(ESQUEMA)
+
+    def _avisar(self, titulo, texto, clique=None, botoes=(), imagem=None, rodape=None, foto=None):
+        """Um aviso, nos dois canais: toast do Windows (se ativo) e Telegram (se ligado)."""
+        if (self.cfg.get("notificacoes") or {}).get("ativas", True):
+            notificar.mostrar(titulo, texto, clique=clique, botoes=botoes, imagem=imagem, rodape=rodape)
+        if telegram.ligado(self.cfg):
+            telegram.enviar(self.cfg, titulo, texto + ("\n" + rodape if rodape else ""), botoes=botoes, foto=foto)
 
     def _lista_url(self):
         from . import painel
@@ -111,13 +118,12 @@ class Notificador:
             novos += [p for p in pend if p["appid"] in atuais and p["appid"] not in vistos]
             self.b.meta("pendentes", [])
 
-        if ncfg.get("ativas", True):
-            for t, n in resumos:
-                notificar.mostrar("%s ligado" % NOME_TIPO[t],
-                                  "%d jogo%s já %s assim agora. Você vai receber só os próximos." % (
-                                      n, "s" if n > 1 else "", "estão" if n > 1 else "está"),
-                                  clique=self._vitrine_url(), botoes=[("Ver", self._vitrine_url())])
-        if not ncfg.get("ativas", True) or not novos:
+        for t, n in resumos:
+            self._avisar("%s ligado" % NOME_TIPO[t],
+                         "%d jogo%s já %s assim agora. Você vai receber só os próximos." % (
+                             n, "s" if n > 1 else "", "estão" if n > 1 else "está"),
+                         clique=self._vitrine_url(), botoes=[("Ver", self._vitrine_url())])
+        if not (ncfg.get("ativas", True) or telegram.ligado(self.cfg)) or not novos:
             self.b.commit()
             return []
 
@@ -127,9 +133,9 @@ class Notificador:
             self._enviar(a)
         if len(novos) > limite:
             resto = len(novos) - limite
-            notificar.mostrar("+%d oferta%s que vale%s a pena" % (resto, "s" if resto > 1 else "", "m" if resto > 1 else ""),
-                              ", ".join(a["nome"] for a in novos[limite:limite + 4]) + ("…" if resto > 4 else ""),
-                              clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
+            self._avisar("+%d oferta%s que vale%s a pena" % (resto, "s" if resto > 1 else "", "m" if resto > 1 else ""),
+                         ", ".join(a["nome"] for a in novos[limite:limite + 4]) + ("…" if resto > 4 else ""),
+                         clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
         self.b.con.executemany("INSERT INTO alerta(appid, loja, preco, motivo, quando, enviado) VALUES(?,?,?,?,?,1)",
                                [(a["appid"], a["loja"], a["preco"], a["motivo"], agora()) for a in novos])
         self.b.commit()
@@ -158,7 +164,8 @@ class Notificador:
             titulo = "%s · %s" % (NOME_TIPO[t], a["nome"])
         else:
             titulo = a["nome"]
-        notificar.mostrar(titulo, linha1 + "\n" + linha2, clique=oferta, botoes=botoes, imagem=img, rodape=rodape)
+        self._avisar(titulo, linha1 + "\n" + linha2, clique=oferta, botoes=botoes, imagem=img, rodape=rodape,
+                     foto=j["capa"] if j else None)
 
     def _acao(self, acao, appid):
         from . import painel
@@ -191,15 +198,16 @@ class Notificador:
             j = self.b.um("SELECT capa FROM jogo WHERE appid=?", c["appid"])
             img = notificar.capa(c["appid"], j["capa"] if j else None)
             steam = "https://store.steampowered.com/app/%d/" % c["appid"]
-            notificar.mostrar("Termina em %dh: %s" % (h, c["nome"]),
-                              "%s%s na %s\n%s" % (brl(c["preco"]), (" · -%d%%" % c["corte"]) if c.get("corte") else "", c["loja"],
-                                                   "está no seu carrinho" if c.get("carrinho") else "vale a pena pelos seus filtros"),
-                              clique=c.get("url") or steam, botoes=[("Abrir oferta", c.get("url") or steam)], imagem=img)
+            self._avisar("Termina em %dh: %s" % (h, c["nome"]),
+                         "%s%s na %s\n%s" % (brl(c["preco"]), (" · -%d%%" % c["corte"]) if c.get("corte") else "", c["loja"],
+                                              "está no seu carrinho" if c.get("carrinho") else "vale a pena pelos seus filtros"),
+                         clique=c.get("url") or steam, botoes=[("Abrir oferta", c.get("url") or steam)], imagem=img,
+                         foto=j["capa"] if j else None)
         if len(enviados) > limite:
             resto = enviados[limite:]
-            notificar.mostrar("+%d terminando em breve" % len(resto),
-                              ", ".join(c["nome"] for c in resto[:4]) + ("…" if len(resto) > 4 else ""),
-                              clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
+            self._avisar("+%d terminando em breve" % len(resto),
+                         ", ".join(c["nome"] for c in resto[:4]) + ("…" if len(resto) > 4 else ""),
+                         clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
         # limpa o que ja passou
         self.b.meta("avisos_fim", {k: v for k, v in avisados.items() if v > agora_ - 86400})
         self.b.commit()

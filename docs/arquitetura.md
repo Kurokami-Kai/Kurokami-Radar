@@ -22,7 +22,7 @@ Kurokami Hunter é um app **local** de Windows (Python 3.12) que monitora a list
 
 - **Processo único.** A bandeja é o processo principal. O serviço de coleta e o servidor do painel são threads dele. Uma porta-trava (`127.0.0.1:47811`) impede duas cópias.
 - **Janelas Tk** (chaves, atualização) rodam em **processo separado** (`KurokamiRadar.exe chaves` / `atualizar-app`), porque o pystray ocupa a thread principal.
-- **Notificações**: `notificar.py` monta XML de toast e chama PowerShell (`-EncodedCommand`, janela oculta). O app se registra em `HKCU\Software\Classes\AppUserModelId\Kurokami.Hunter` para aparecer com nome e ícone.
+- **Notificações**: `notificar.py` monta XML de toast e chama PowerShell (`-EncodedCommand`, janela oculta). O app se registra em `HKCU\Software\Classes\AppUserModelId\Kurokami.Hunter` para aparecer com nome e ícone. `telegram.py` espelha os mesmos avisos num bot do Telegram (Bot API por HTTPS, sem dependência; só links `https://` viram botão); `Notificador._avisar` manda para os dois canais, cada um com seu liga/desliga.
 
 ## Fontes de dados e o papel de cada uma
 

@@ -47,7 +47,9 @@ PADRAO = {
         "max_por_rodada": 5,            # acima disso, os demais viram uma notificacao-resumo
         "melhora_minima_reais": 0.5,    # jogo ja avisado so avisa de novo se cair pelo menos isso
         "silencio": {"ativo": False, "de": "23:00", "ate": "08:00"},
-        "termina_em_breve_horas": 24    # avisa quando algo do carrinho/"vale a pena" esta acabando (0 desliga)
+        "termina_em_breve_horas": 24,   # avisa quando algo do carrinho/"vale a pena" esta acabando (0 desliga)
+        # Telegram: o mesmo aviso no celular (bot gratuito; o token fica no keyring, o chat_id aqui)
+        "telegram": {"ativo": False, "chat_id": ""}
     },
 
     "keyshops": {

@@ -1159,19 +1159,69 @@ def api_config(_q):
     b = Banco()
     lojas = b.meta("lojas_itad") or []
     b.con.close()
-    return {"config": config.carregar(), "lojas_itad": lojas, "classes": dlcmod.CLASSES}
+    from . import credenciais
+    return {"config": config.carregar(), "lojas_itad": lojas, "classes": dlcmod.CLASSES,
+            "telegram_token": bool(credenciais.ler("telegram"))}
 
 
 # ------------------------------------------------------------------ escrita
 def post_config(dados):
     cfg = config.carregar()
     novo = dados.get("config") or {}
+    tg = (cfg.get("notificacoes") or {}).get("telegram")
     for k in ("lojas", "somente_drm_steam", "alerta", "keyshops", "dlc", "notificacoes", "intervalos_minutos", "completo", "extras",
               "verificacao_completa_dias"):
         if k in novo:
             cfg[k] = novo[k]
+    if tg is not None and isinstance(cfg.get("notificacoes"), dict):
+        # so /api/telegram mexe na conversa vinculada (aba velha ou celular nao redirecionam os avisos);
+        # o liga/desliga ("ativo") continua vindo do formulario
+        novo_tg = (novo.get("notificacoes") or {}).get("telegram") or {}
+        cfg["notificacoes"]["telegram"] = dict(tg, ativo=bool(novo_tg.get("ativo", tg.get("ativo")) and tg.get("chat_id")))
     config.salvar(cfg)
     return {"ok": True}
+
+
+def post_telegram(d):
+    """Conecta o bot do Telegram (so pelo proprio PC). acao: token (guarda e testa), vincular (acha a conversa),
+    testar (manda uma mensagem), remover (apaga token e conversa)."""
+    from . import credenciais, telegram
+    acao = d.get("acao")
+    cfg = config.carregar()
+    t = cfg["notificacoes"].setdefault("telegram", {"ativo": False, "chat_id": ""})
+    if acao == "token":
+        token = credenciais.limpar(d.get("token"))
+        ok, r = telegram.conectar(token) if token else (False, "cole o token que o @BotFather mandou")
+        if not ok:
+            return {"ok": False, "erro": r}
+        credenciais.gravar("telegram", token)
+        t["chat_id"] = ""
+        config.salvar(cfg)
+        return {"ok": True, "bot": r}
+    token = credenciais.ler("telegram")
+    if acao == "remover":
+        credenciais.gravar("telegram", None)
+        t.update(ativo=False, chat_id="")
+        config.salvar(cfg)
+        return {"ok": True}
+    if not token:
+        return {"ok": False, "erro": "conecte o bot primeiro"}
+    if acao == "vincular":
+        chat, nome = telegram.achar_conversa(token)
+        if not chat:
+            return {"ok": False, "erro": "Ainda não vi mensagem sua ao bot (%s). Abra o bot no Telegram, toque em Iniciar e tente de novo." % nome}
+        t["chat_id"] = chat
+        t["ativo"] = True
+        config.salvar(cfg)
+        telegram.enviar(cfg, "Kurokami Hunter conectado", "Daqui pra frente os avisos também chegam aqui.")
+        return {"ok": True, "nome": nome, "chat_id": chat}
+    if acao == "testar":
+        if not t.get("chat_id"):
+            return {"ok": False, "erro": "vincule a conversa primeiro"}
+        ok = telegram.enviar(dict(cfg, notificacoes=dict(cfg["notificacoes"], telegram=dict(t, ativo=True))),
+                             "Teste do Kurokami Hunter", "Se você leu isto, o Telegram está funcionando.")
+        return {"ok": ok, "erro": "" if ok else "o Telegram não aceitou a mensagem (veja o radar.log)"}
+    return {"ok": False, "erro": "acao invalida"}
 
 
 def post_dlc(d):
@@ -1353,7 +1403,8 @@ POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,
         "/api/atualizar_app": post_atualizar_app,
         "/api/steam/carrinho": post_steam_carrinho, "/api/steam/extensao": post_steam_extensao,
-        "/api/steam/conta": post_steam_conta, "/api/franquia": post_franquia}
+        "/api/steam/conta": post_steam_conta, "/api/franquia": post_franquia,
+        "/api/telegram": post_telegram}
 
 
 def _log_erro(rota, e):
@@ -1569,9 +1620,10 @@ class Handler(BaseHTTPRequestHandler):
             t = token()
             if ("kr=%s" % t) not in (self.headers.get("Cookie") or ""):
                 return self._json({"erro": "nao autorizado"}, 401)
-            if urlparse(self.path).path in ("/api/acesso", "/api/sair") or urlparse(self.path).path.startswith("/api/steam/"):
+            if urlparse(self.path).path in ("/api/acesso", "/api/sair", "/api/telegram") or urlparse(self.path).path.startswith("/api/steam/"):
                 return self._json({"erro": "so pelo proprio PC"}, 403)
-        if urlparse(self.path).path.startswith("/api/steam/") and not (self._local() and self._host_local() and origem):
+        if (urlparse(self.path).path.startswith("/api/steam/") or urlparse(self.path).path == "/api/telegram") \
+                and not (self._local() and self._host_local() and origem):
             return self._json({"erro": "so pelo proprio painel, neste PC"}, 403)
         f = POST.get(urlparse(self.path).path)
         if not f:
