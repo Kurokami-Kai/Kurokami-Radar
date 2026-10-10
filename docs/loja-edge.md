@@ -41,6 +41,6 @@ O `description` do `manifest.json` tem no máximo **132 caracteres** (a loja rec
 - **Notas para a certificação:** "Para testar: em store.steampowered.com, logado, abra https://store.steampowered.com/cart/#kurokami=BR:p<subid> (o subid de um jogo pago, que aparece no botão "Adicionar ao carrinho" da página do jogo). A extensão adiciona o item ao carrinho e mostra uma faixa no topo. Sem o fragmento #kurokami, ela não faz nada."
 
 ## Depois de aprovada
-Mande ao Claude o link da extensão na loja (`https://microsoftedge.microsoft.com/addons/detail/<id>`): o assistente do Hunter passa a abrir a loja no Edge (um clique em "Obter") e mantém o "Carregar sem compactação" para os outros navegadores.
+Publicada em 10/10/2026: `LOJA_EDGE` em `radar/painel.py` guarda o link (`https://microsoftedge.microsoft.com/addons/detail/kurokami-hunter-carrinh/hkoneojejphjfakoapjjnjbgabcnljpl`). Com o Edge como navegador padrão, a faixa de instalação do painel abre a loja (um clique em "Obter"); "Instalar pela pasta" e os outros navegadores seguem com "Carregar sem compactação".
 
 Atualizar: suba `version` em `extensao/manifest.json`, gere o ZIP de novo e envie como nova versão no Partner Center.

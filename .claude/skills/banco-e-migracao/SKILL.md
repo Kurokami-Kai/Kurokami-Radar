@@ -1,6 +1,6 @@
 ---
 name: banco-e-migracao
-description: Como mudar o banco SQLite e o config.json do Kurokami Hunter sem quebrar instalações existentes (colunas, tabelas, chaves de meta, migração de dados, configurações novas). Use sempre que a tarefa precisar guardar um dado novo, mudar formato de dado ou adicionar opção de configuração.
+description: Mudar o banco SQLite ou o config.json sem quebrar instalações existentes (coluna, tabela, chave de meta, migração, opção nova). Use ao guardar dado novo, mudar formato de dado ou adicionar configuração.
 ---
 
 # Banco e migração

@@ -31,14 +31,23 @@ function faixaExt(forcar){
   d.innerHTML=`A <b>extensão do Hunter</b> põe os jogos no carrinho da Steam no <b>Finalizar pedido</b> e traz o que você tem na conta, <b>inclusive as DLCs</b> (a API da Steam só passa os jogos). Instalar agora? É uma vez só e leva menos de um minuto.
     <button class="btn-imp" id="extSim" type="button" style="margin-left:8px">Instalar</button> <button class="btn-ghost" id="extDepois" type="button">Agora não</button> <button class="btn-ghost" id="extNunca" type="button">Não perguntar mais</button>`;
   document.body.prepend(d);
-  $('#extSim').onclick=instalarExt;
+  $('#extSim').onclick=()=>instalarExt();
   $('#extDepois').onclick=()=>{try{sessionStorage.setItem('kr:ext_depois','1');}catch(e){}d.remove();};
   $('#extNunca').onclick=()=>{ls.set('ext_nao',1);d.remove();toast('Certo. Se mudar de ideia, clique em Finalizar pedido no Carrinho.');};
 }
-async function instalarExt(){
+async function instalarExt(pasta){
   const d=$('#aviso-ext');if(!d)return;
-  const r=await post('/api/steam/extensao',{navegador:true});
+  const r=await post('/api/steam/extensao',{navegador:true,pasta:pasta===true});
   if(!r.ok){toast(r.erro||'Não consegui abrir a pasta da extensão.');return;}
+  if(r.loja){   // Edge: a extensão está na loja deles, um clique em Obter
+    d.innerHTML=`<div style="text-align:left;max-width:780px;margin:0 auto">Abri a página da extensão na <b>loja do Edge</b>.
+      <ol style="margin:4px 0 6px 18px;padding:0"><li>Clique em <b>Obter</b> e confirme em <b>Adicionar extensão</b>.</li><li>Volte aqui e clique em <b>Pronto</b>.</li></ol>
+      <button class="btn-imp" id="extPronto" type="button">Pronto</button> <button class="btn-ghost" id="extPasta" type="button">Instalar pela pasta</button> <button class="btn-ghost" id="extFechar" type="button">Fechar</button>
+      <span style="font-size:11px;color:#d2d2d2;margin-left:8px">Ela só age na página do carrinho da Steam; o Hunter nunca vê senha, token ou cookie.</span></div>`;
+    $('#extPronto').onclick=()=>{try{sessionStorage.setItem('kr:ext_conferir','1');}catch(e){}location.reload();};
+    $('#extPasta').onclick=()=>instalarExt(true);
+    $('#extFechar').onclick=()=>d.remove();
+    return;}
   let copiado=false;try{await navigator.clipboard.writeText(r.pasta);copiado=true;}catch(e){}
   d.innerHTML=`<div style="text-align:left;max-width:780px;margin:0 auto">${r.aviso?`<b style="color:#ff8a94">${esc(r.aviso)}</b>`:`Abri as extensões do <b>${esc(r.navegador)}</b> (${esc(r.pagina)}) e a pasta da extensão no Explorador.`}
     <ol style="margin:4px 0 6px 18px;padding:0"><li>Na página de extensões, ligue o <b>Modo do desenvolvedor</b>.</li>

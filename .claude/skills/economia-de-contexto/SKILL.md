@@ -1,6 +1,6 @@
 ---
 name: economia-de-contexto
-description: Regras de economia de tokens do Kurokami Hunter - painel só por função (tools/mapa.py radar/painel-web), leitura/testes no subagente explorador, revisão no revisor, /clear e /compact, docs por seção, relatório enxuto e esforço por tipo de tarefa. Use sempre que for ler arquivos grandes, buscar, testar, revisar diff ou a conversa estiver longa.
+description: Economia de tokens: painel só por função (tools/mapa.py), leitura e testes no subagente explorador, revisão no revisor, /clear e /compact, docs por seção. Use ao ler arquivo grande, buscar, testar, revisar diff ou com a conversa longa.
 ---
 
 # Economia de contexto (Kurokami Hunter)

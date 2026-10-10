@@ -1,6 +1,6 @@
 ---
 name: editar-painel
-description: Como editar o painel web do Kurokami Hunter (radar/painel.html + CSS e JS em radar/painel-web/) sem quebrar nada nem estourar o contexto. Use sempre que a tarefa mexer em abas, visual, filtros, carrinho, biblioteca, ficha do jogo, configurações ou qualquer coisa que o usuário veja no navegador.
+description: Editar o painel web (radar/painel.html e radar/painel-web/) sem quebrar nada nem estourar o contexto. Use ao mexer em abas, visual, filtros, carrinho, biblioteca, ficha do jogo, configurações ou qualquer coisa vista no navegador.
 ---
 
 # Editar o painel

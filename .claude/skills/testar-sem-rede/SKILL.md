@@ -1,6 +1,6 @@
 ---
 name: testar-sem-rede
-description: Testa mudanças do Kurokami Hunter (API do painel, avaliação, raridade, carrinho, biblioteca, visual) usando uma cópia de um banco real, sem chamar Steam/ITAD/GG.deals. Use depois de alterar painel.py, painel.html, analise.py ou banco.py, e ao reproduzir bugs.
+description: Testa API do painel, avaliação, raridade, carrinho, biblioteca e visual com cópia de banco real, sem chamar Steam/ITAD/GG.deals. Use depois de alterar painel.py, painel.html, analise.py ou banco.py, e ao reproduzir bugs.
 ---
 
 # Testar sem rede

@@ -1240,6 +1240,9 @@ NAVEGADORES = {"MSEdge": ("Edge", "edge://extensions"), "Chrome": ("Chrome", "ch
                "Vivaldi": ("Vivaldi", "vivaldi://extensions")}
 
 
+LOJA_EDGE = "https://microsoftedge.microsoft.com/addons/detail/kurokami-hunter-carrinh/hkoneojejphjfakoapjjnjbgabcnljpl"
+
+
 def _navegador_padrao():
     """(nome, exe, pagina de extensoes) do navegador padrao do Windows, ou None se nao for um que a extensao aceita."""
     import shlex
@@ -1258,14 +1261,19 @@ def _navegador_padrao():
 
 
 def post_steam_extensao(d):
-    """Abre a pasta da extensao no Explorador e, com {navegador: true}, a pagina de extensoes do navegador padrao
-    (o assistente do painel: o usuario liga o Modo do desenvolvedor e arrasta a pasta para a pagina)."""
+    """Assistente da extensao do painel. No Edge padrao, abre a pagina dela na loja do Edge (um clique em Obter;
+    {loja: true} na resposta). Nos outros navegadores, ou com {pasta: true}, abre a pagina de extensoes e a pasta da
+    extensao no Explorador (o usuario liga o Modo do desenvolvedor e arrasta a pasta)."""
     import subprocess
     if not os.path.isfile(os.path.join(caminhos.PASTA_EXTENSAO, "manifest.json")):
         return {"ok": False, "erro": "Pasta da extensão não encontrada: reinstale o Hunter."}
     r = {"ok": True, "pasta": caminhos.PASTA_EXTENSAO}
     if d.get("navegador"):
         nav = _navegador_padrao()
+        if nav and nav[0] == "Edge" and not d.get("pasta"):
+            subprocess.Popen([nav[1], LOJA_EDGE])
+            r.update(navegador="Edge", loja=True, pagina=LOJA_EDGE)
+            return r
         if nav:
             subprocess.Popen([nav[1], nav[2]])
             r.update(navegador=nav[0], pagina=nav[2])

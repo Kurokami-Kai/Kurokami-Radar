@@ -1,6 +1,6 @@
 ---
 name: coleta-e-apis
-description: Regras para mexer na coleta de preços e nas integrações Steam, IsThereAnyDeal e GG.deals do Kurokami Hunter (limites de ritmo, lotes, cache, progresso, falhas). Use sempre que a tarefa tocar em steam.py, itad.py, ggdeals.py, coleta.py, rede.py ou adicionar uma fonte de dados nova.
+description: Regras da coleta de preços e das integrações Steam, ITAD e GG.deals (ritmo, lotes, cache, progresso, falhas). Use ao mexer em steam.py, itad.py, ggdeals.py, coleta.py, rede.py ou ao adicionar fonte de dados.
 ---
 
 # Coleta e APIs

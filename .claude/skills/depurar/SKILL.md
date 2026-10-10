@@ -1,6 +1,6 @@
 ---
 name: depurar
-description: Roteiro para investigar bugs e comportamentos estranhos do Kurokami Hunter com o mínimo de tentativa e erro (coletar evidência, hipótese, teste, correção pequena). Use sempre que o usuário relatar erro, print de tela estranha, notificação errada, preço errado, algo que "não puxou" ou travou.
+description: Roteiro para investigar bugs (evidência, hipótese, teste, correção pequena). Use quando o usuário relatar erro, print estranho, notificação ou preço errado, algo que "não puxou" ou travou.
 ---
 
 # Depurar
