@@ -6,7 +6,7 @@ function porqueVolta(m){const o=IDX.get(m.jogo.appid)||{};
   const ref=m.piso_ref&&m.corte>0?`${volta?'<br>':''}Menor preço antes desta promoção: <b>${esc(pisoRefTxt(m.piso_ref))}</b>`:'';
   const regua=m.regua_steam?`<div class="regua">${esc(m.regua_steam.texto)}</div>`:'';
   return selo||volta||ref?`<div class="porque">${selo}${volta}${ref}</div>${regua}`:regua;}
-let MJ=null, MRANGE=365, MTODAS=false;
+let MJ=null, MRANGE=365, MVISTA='steam';   // MVISTA: o gráfico da ficha, 'steam' (como o SteamDB) ou 'todas' (tecla T)
 let MSEQ=0;
 async function abrirJogo(appid,op){
   const meu=++MSEQ;MOP=op||{};
@@ -24,7 +24,8 @@ function fecharModal(){$('#modal').hidden=true;document.body.style.overflow='';i
 $('#modal').addEventListener('click',e=>{const p=e.target.closest('[data-mpasso]');if(p){if(MOP.passo)MOP.passo(+p.dataset.mpasso);return;}
   if(e.target.id==='modal'||e.target.closest('.mclose'))fecharModal();});
 addEventListener('keydown',e=>{if($('#modal').hidden)return;if(e.key==='Escape')fecharModal();
-  else if(/^[1-5]$/.test(e.key)&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&$('#fxPainel')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){const a=fxListaAbas()[+e.key-1];if(a){e.preventDefault();const foco=e.target.closest&&e.target.closest('.fx-aba');fxAba(a[0]);if(foco)$('#mbody .fx-aba[aria-selected="true"]').focus({preventScroll:true});}}
+  else if(e.shiftKey&&/^Digit[1-5]$/.test(e.code)&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&$('#fxPainel')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){const a=fxListaAbas()[+e.code.slice(5)-1];if(a){e.preventDefault();const foco=e.target.closest&&e.target.closest('.fx-aba');fxAba(a[0]);if(foco)$('#mbody .fx-aba[aria-selected="true"]').focus({preventScroll:true});}}
+  else if((e.key==='t'||e.key==='T')&&!e.ctrlKey&&!e.altKey&&!e.metaKey&&$('#chart')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();fxVista(MVISTA==='steam'?'todas':'steam');}
   else if(MOP.passo&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();MOP.passo(e.key==='ArrowRight'?1:-1);}});
 /* a caixa do veredito das páginas novas (amostra 8): o veredito numa linha, 2 frases e o "por quê" fechado */
 function fxVered(v){return `<div class="fx-cx fx-v8" style="--c:${v.cor}"><div class="l1">${v.etq?`<span class="fx-etq" style="background:${v.etq[1]};color:${v.etq[2]}">${esc(v.etq[0])}</span>`:''}<span><b style="color:${v.cor}">${esc(v.rot)}</b>${v.sub?' · '+esc(v.sub):''}</span></div>
@@ -81,10 +82,14 @@ function fxAcoes(){
   const j=MJ.jogo,o=MJ.item||IDX.get(j.appid)||{},noC=CARR.find(c=>c.appid===j.appid);
   // a loja do preço mais barato de agora nas suas lojas (no empate, a Steam): o botão diz onde vai comprar
   const ml=(MJ.lojas||[]).filter(l=>l.marcada&&l.atual!=null).sort((a,b)=>a.atual-b.atual||(a.loja!=='Steam')-(b.loja!=='Steam'))[0];
+  const fora=ml&&ml.loja!=='Steam';   // o melhor preço é de outra loja: o botão principal abre a página dela (o carrinho é só da Steam)
+  const vendeSteam=(MJ.lojas||[]).some(l=>l.loja==='Steam'&&l.atual!=null);
   const bt=(at,t,cls)=>`<button class="${cls||'btn-ghost'}" ${at}>${t}</button>`;
   const loja=`<a class="btn-ghost" href="${storeUrl(j.appid)}" target="_blank" rel="noopener">Página na Steam</a>`;
   if(MJ.tenho)return `<div class="fx-acoes"><a class="btn-go" href="steam://run/${j.appid}">▶ Jogar na Steam</a>${loja}${MJ.tenho_manual?bt('data-tenho="1"','Desfazer "já tenho"'):''}</div>`;
-  return `<div class="fx-acoes">${bt(`data-mcart="${j.appid}"${ml?` data-mloja="${esc(ml.loja)}"`:''}`,noC?'✓ No carrinho'+(noC.loja?' · '+esc(noC.loja):''):'Pôr no carrinho'+(ml?' · '+esc(ml.loja):''),'btn-go green')}${loja}${bt('data-tenho="1"','Já tenho')}
+  const carro=fora&&!noC?(/^https:\/\//.test(ml.url||'')?`<a class="btn-go green" href="${esc(ml.url)}" target="_blank" rel="noopener">Abrir na ${esc(ml.loja)} ↗</a>`:bt(`data-mloja="${esc(ml.loja)}"`,'Abrir na '+esc(ml.loja)+' ↗','btn-go green'))
+    +(vendeSteam?bt(`data-mcart="${j.appid}"`,'Pôr no carrinho da Steam','btn-ghost'):''):bt(`data-mcart="${j.appid}"`,noC?'✓ No carrinho da Steam':'Pôr no carrinho da Steam','btn-go green');
+  return `<div class="fx-acoes">${carro}${loja}${bt('data-tenho="1"','Já tenho')}
     ${o.extra?bt(`data-desmonitorar="${j.appid}"`,'Parar de monitorar'):''}${MJ.steam_inteira?bt(`data-monitorar="${j.appid}" title="Entra na sua lista do Hunter: alertas, todas as lojas, DLCs e keyshop"`,'Monitorar'):''}
     ${bt(`data-mudo="${MJ.mudo?0:1}"`,MJ.mudo?'Voltar a avisar':'Não avisar deste jogo')}
     ${MJ.dlcs.length?`<span class="seg" role="group" aria-label="Alertar por"><button data-modo="base" aria-pressed="${MJ.modo!=='completo'}">Alertar pelo base</button><button data-modo="completo" aria-pressed="${MJ.modo==='completo'}">Pelo completo</button></span>`:''}</div>`;
@@ -192,7 +197,7 @@ function fxSobre(){
     ${F?`<dt>Franquia</dt><dd>${esc(F.nome)}${F.manual?' <span class="fx-vazio">(trocada por você)</span>':''} · <a href="#" data-trocar>trocar</a>${MTROCA?fxTroca(F):''}</dd>`:''}</dl></div>`;
   return `<div class="fx-2c">${s}</div>${fxDlcs()}`;
 }
-/* os painéis da ficha: caixas na largura da ficha, uma aberta por vez (clique ou teclas 1–5); o escolhido vale para a próxima ficha */
+/* os painéis da ficha: caixas na largura da ficha, uma aberta por vez (clique ou teclas ⇧1–⇧5); o escolhido vale para a próxima ficha */
 let MABA='vale';
 function fxListaAbas(){
   const j=MJ.jogo,o=MJ.item||IDX.get(j.appid)||{},F=MJ.franquia,a=MX&&MX.aug,h=a&&a.hltb,c=MX&&MX.conq,v=MOP.vered;
@@ -255,12 +260,13 @@ $('#mbody').addEventListener('click',async e=>{
     if((await post('/api/franquia',{appid:MJ.jogo.appid,nome})).ok===false)return;
     MTROCA=false;toast(nome?'Franquia: '+nome:'Franquia automática de volta');try{MJ=await api('/api/jogo?appid='+MJ.jogo.appid);}catch(_){}renderModal();return;}
   const r=e.target.closest('[data-range]');if(r){MRANGE=+r.dataset.range;renderModal();return;}
-  const l=e.target.closest('[data-todas]');if(l){MTODAS=!MTODAS;desenharGrafico();return;}
+  const l=e.target.closest('[data-vista]');if(l){fxVista(l.dataset.vista);return;}
   const th=e.target.closest('[data-tenho]');if(th){if(MJ.tenho&&!MJ.tenho_manual){toast('Já está na sua biblioteca da Steam');return;}const novo=!MJ.tenho_manual;await post('/api/tenho',{appid:MJ.jogo.appid,tenho:novo});
     toast(novo?'Marcado como seu: sai dos alertas e do carrinho':'Desmarcado');MJ=await api('/api/jogo?appid='+MJ.jogo.appid);renderModal();FR.bib.velho=FR.vale.velho=true;return;}
   const mu=e.target.closest('[data-mudo]');if(mu){await post('/api/silenciar',{appid:MJ.jogo.appid,mudo:mu.dataset.mudo==='1'});toast(mu.dataset.mudo==='1'?'Sem alertas para este jogo':'Alertas de volta');
     MJ.mudo=mu.dataset.mudo==='1';const it=IDX.get(MJ.jogo.appid);if(it)it.mudo=MJ.mudo;renderModal();return;}
-  const mc=e.target.closest('[data-mcart]');if(mc){await alternarCarr(+mc.dataset.mcart,false,false,mc.dataset.mloja||undefined);renderModal();return;}
+  const ml=e.target.closest('[data-mloja]');if(ml&&!ml.dataset.mcart){abrirNaLoja(MJ.jogo.appid,ml.dataset.mloja);return;}
+  const mc=e.target.closest('[data-mcart]');if(mc){await alternarCarr(+mc.dataset.mcart);renderModal();return;}
   const mo=e.target.closest('[data-monitorar]');if(mo){if(mo.disabled)return;mo.disabled=true;await post('/api/extra',{appid:+mo.dataset.monitorar});mo.textContent='Monitorado';toast('Monitorado: entra na sua lista na próxima checagem');return;}
   const dm=e.target.closest('[data-desmonitorar]');if(dm){await post('/api/extra',{appid:+dm.dataset.desmonitorar,remover:true});toast('Não é mais monitorado (sai da lista na próxima checagem)');return;}
   const m=e.target.closest('[data-modo]');if(m){await post('/api/modo',{appid:MJ.jogo.appid,modo:m.dataset.modo});toast('Modo salvo: vale a partir da próxima checagem');MJ.modo=m.dataset.modo;
@@ -283,21 +289,23 @@ function fxEnvelope(series){   // degraus [início, preço, loja]: o menor preç
     const u=out[out.length-1];if(!u||u[1]!==v||u[2]!==lj)out.push([t,v,lj]);}
   return out;}
 function fxEnvMarc(){const m=fxMarcadas(),s=fxSeries(n=>m.has(n));return s.length?{env:fxEnvelope(s),marc:true}:{env:fxEnvelope(fxSeries(()=>true)),marc:false};}
+const ehSteam=n=>n==='Steam'||n==='Steam (direto)';
+function fxVista(v){if(!MJ||!$('#chart'))return;if(v==='steam'&&!fxSeries(ehSteam).length)return;MVISTA=v;desenharGrafico();}
 const noTempo=(env,t)=>{let r=null;for(const x of env){if(x[0]>t)break;r=x;}return r;};
 function recorta(env,t0){const a=noTempo(env,t0);return (a?[[t0,a[1],a[2]]]:[]).concat(env.filter(x=>x[0]>t0));}
 function desenharGrafico(){
   const box=$('#chart'),leg=$('#legend');if(!box)return;
-  const agora=Date.now(),{env:em,marc}=fxEnvMarc(),et=fxEnvelope(fxSeries(()=>true));
+  const agora=Date.now(),temSteam=fxSeries(ehSteam).length>0;if(!temSteam)MVISTA='todas';
+  const steam=MVISTA==='steam',em=fxEnvelope(fxSeries(steam?ehSteam:()=>true));
   if(!em.length){box.innerHTML='<div class="empty" style="padding:30px">Sem histórico de preços.</div>';leg.innerHTML='';$('#faixa').innerHTML='';return;}
   const t0=MRANGE>=99999?em[0][0]:agora-MRANGE*DIA_MS;
-  const A=recorta(em,t0),B=recorta(et,t0),difere=B.some(x=>{const y=noTempo(A,x[0]);return !y||x[1]<y[1]-tolP(y[1]);});
-  const o=MJ.item||IDX.get(MJ.jogo.appid)||{},cheio=(MJ.lojas.find(l=>l.loja===o.loja)||{}).cheio||MJ.jogo.cheio_steam;
-  const todas=MTODAS&&difere,mm=fxMarcadas(),nOut=marc?fxSeries(n=>!mm.has(n)&&!/^GG\.deals/.test(n)).length:0;
-  leg.innerHTML=`<span><i style="background:#ff4757"></i>Melhor preço ${marc?'nas lojas que alertam':'em todas as lojas'}</span>
-    ${difere||nOut?`<button data-todas aria-pressed="${MTODAS}" title="Mostra as lojas que não alertam: a linha cinza no gráfico e as linhas delas na faixa de baixo"><i style="background:#8c8c8c"></i>Outras lojas e keyshop</button>`:''}${cheio?'<span><i class="tr"></i>Preço cheio</span>':''}`;
+  const A=recorta(em,t0);
+  const o=MJ.item||IDX.get(MJ.jogo.appid)||{},cheio=(MJ.lojas.find(l=>l.loja===(steam?'Steam':o.loja))||MJ.lojas.find(l=>l.loja===o.loja)||{}).cheio||MJ.jogo.cheio_steam;
+  leg.innerHTML=`<span class="seg" role="group" aria-label="Lojas do gráfico">${temSteam?`<button data-vista="steam" aria-pressed="${steam}">Steam</button>`:''}<button data-vista="todas" aria-pressed="${!steam}" title="O menor preço entre todas as lojas e a keyshop, dia a dia">Todas as lojas</button></span>
+    <span style="color:var(--dim)">${temSteam?'<kbd>T</kbd> ou arraste para o lado: ':''}${steam?'só o preço da Steam':'o menor preço entre as lojas, com a loja no hover'}</span>${cheio?'<span><i class="tr"></i>Preço cheio</span>':''}`;
   if(!A.length){box.innerHTML='<div class="empty" style="padding:30px">Sem dados no período.</div>';fxFaixa(t0,agora);return;}
   const W=Math.max(320,box.clientWidth-16),H=Math.round(innerWidth>820?Math.min(300,Math.max(180,innerHeight-700)):200),PL=58,PR=14,PT=14,PB=24;
-  const vis=A.concat(todas?B:[]),maxY=Math.max(cheio||0,...vis.map(x=>x[1]))*1.1||100;
+  const vis=A,maxY=Math.max(cheio||0,...vis.map(x=>x[1]))*1.1||100;
   const X=t=>PL+(t-t0)/(agora-t0)*(W-PL-PR),Y=v=>PT+(1-v/maxY)*(H-PT-PB);
   const degraus=E=>E.map((x,i)=>(i?`H${X(x[0]).toFixed(1)}V`:`M${X(x[0]).toFixed(1)},`)+Y(x[1]).toFixed(1)).join('')+`H${X(agora).toFixed(1)}`;
   let g='';for(let i=0;i<=4;i++){const v=maxY*i/4;g+=`<line x1="${PL}" x2="${W-PR}" y1="${Y(v)}" y2="${Y(v)}" stroke="#ffffff12"/><text x="${PL-8}" y="${Y(v)+4}" fill="#979797" font-size="11" text-anchor="end">${brl0(v)}</text>`;}
@@ -309,23 +317,23 @@ function desenharGrafico(){
   const marcas=`<circle cx="${X(agora)}" cy="${Y(hoje)}" r="4.5" fill="#ff4757"/>${lbl(X(agora)-8,Y(hoje)-9,'hoje '+brl(hoje)+(ehHoje?' · o menor do período':''),'end')}`
     +(ehHoje?'':`<circle cx="${X(Math.max(mn[0],t0))}" cy="${Y(mn[1])}" r="3.5" fill="#fff"/>${lbl(Math.min(X(Math.max(mn[0],t0))+8,W-PR-150),Y(mn[1])+16,'menor do período '+brl(mn[1]),'start')}`);
   box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${g}<path d="${dA}V${Y(0)}H${X(A[0][0])}Z" fill="#ff475714"/>
-    ${todas?`<path d="${degraus(B)}" fill="none" stroke="#8c8c8c" stroke-width="1.5" stroke-dasharray="2 3"/>`:''}<path d="${dA}" fill="none" stroke="#ff4757" stroke-width="2.2"/>${marcas}
+<path d="${dA}" fill="none" stroke="#ff4757" stroke-width="2.2"/>${marcas}
     <line id="cur" y1="${PT}" y2="${H-PB}" stroke="#ffffff66" visibility="hidden"/><rect x="${PL}" y="0" width="${W-PL-PR}" height="${H}" fill="transparent"/></svg><div class="tip" id="tip"></div>`;
   const svg=box.querySelector('svg'),tip=$('#tip'),cur=box.querySelector('#cur');
   svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*W;if(x<PL){tip.style.display='none';return;}
-    const t=t0+(x-PL)/(W-PL-PR)*(agora-t0),a=noTempo(A,t),b=todas&&noTempo(B,t);cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.setAttribute('visibility','visible');
+    const t=t0+(x-PL)/(W-PL-PR)*(agora-t0),a=noTempo(A,t);cur.setAttribute('x1',x);cur.setAttribute('x2',x);cur.setAttribute('visibility','visible');
     const pc=v=>cheio&&v<cheio?` <span class="pc">-${Math.round((1-v/cheio)*100)}%</span>`:'';
-    tip.innerHTML=`<div style="margin-bottom:3px"><b>${new Date(t).toLocaleDateString('pt-BR')}</b></div>${a?`<div><span style="color:#d63031">■</span> <b>${brl(a[1])}</b>${pc(a[1])} na ${esc(a[2])}</div>`:''}
-      ${b&&(!a||b[1]<a[1])?`<div><span style="color:#8c8c8c">■</span> ${brl(b[1])} na ${esc(b[2])}</div>`:''}`;
+    tip.innerHTML=`<div style="margin-bottom:3px"><b>${new Date(t).toLocaleDateString('pt-BR')}</b></div>${a?`<div><span style="color:#d63031">■</span> <b>${brl(a[1])}</b>${pc(a[1])} ${steam?'':'na '+esc(a[2])}</div>`:''}`;
     tip.style.display='block';const px=e.clientX-box.getBoundingClientRect().left;tip.style.left=Math.min(px+12,box.clientWidth-tip.offsetWidth-4)+'px';tip.style.top='12px';});
   svg.addEventListener('mouseleave',()=>{tip.style.display='none';cur.setAttribute('visibility','hidden');});
+  if(temSteam)svg.addEventListener('pointerdown',ev=>{const x0=ev.clientX;   // arrastar o gráfico para o lado (dedo ou mouse) troca entre Steam e todas as lojas
+    addEventListener('pointerup',up=>{if(Math.abs(up.clientX-x0)>70)fxVista(MVISTA==='steam'?'todas':'steam');},{once:true});});
   fxFaixa(t0,agora);
 }
 /* faixa de promoções: uma linha por loja, um quadrado por mês (por semana em 3 meses), na cor do maior desconto */
 function fxFaixa(t0,agora){
   const el=$('#faixa');if(!el)return;const m=fxMarcadas();
-  const so=!MTODAS&&[...m].some(n=>MJ.historico[n]);   // por padrão só as lojas que alertam; as outras no botão da legenda
-  const S=fxSeries(n=>!/^GG\.deals/.test(n)&&!(n==='Steam (direto)'&&MJ.historico.Steam)&&(!so||m.has(n)))
+  const S=fxSeries(n=>!/^GG\.deals/.test(n)&&!(n==='Steam (direto)'&&MJ.historico.Steam)&&(MVISTA!=='steam'||ehSteam(n)))
     .sort((a,b)=>(m.has(b[0])-m.has(a[0]))||a[0].localeCompare(b[0]));
   const C=[];   // colunas [início, fim, rótulo]
   if(agora-t0<=100*DIA_MS)for(let a=t0;a<agora;a+=7*DIA_MS)C.push([a,Math.min(a+7*DIA_MS,agora),new Date(a).toLocaleDateString('pt-BR',{day:'numeric',month:'short'}).replace('.','')]);

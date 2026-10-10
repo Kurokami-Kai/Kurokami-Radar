@@ -61,7 +61,18 @@ function flags(o){
   return f.join('');
 }
 function revText(o){return o.rcount?`<span class="${revClass(o.rpos,o.rcount)}">${esc(o.rotulo||o.rpos+'%')}</span> <span style="color:var(--dim)">(${fmtK(o.rcount)})</span>`:'<span class="rv-non">Sem análises</span>';}
-function cartBtn(id,mon){const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}"${mon?' data-mon="1"':''} title="${on?'Tirar do carrinho':mon?'Pôr no carrinho (e monitorar)':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
+/* o carrinho é só da Steam: jogo cujo melhor preço está em outra loja ganha um botão que abre a página dela, no lugar do + */
+function lojaExt(id){const o=IDX.get(id);return o&&o.loja&&o.loja!=='Steam'&&o.preco!=null?o:null;}
+async function abrirNaLoja(id,loja){
+  const x=IDX.get(id),u0=x&&x.loja===loja&&/^https:\/\//.test(x.url||'')?x.url:null;
+  if(u0){open(u0,'_blank','noopener');return;}
+  const w=open('about:blank','_blank');if(w)try{w.opener=null;}catch(e){}   // abre já, no clique; o endereço vem em seguida
+  let u=null;try{const m=await api('/api/jogo?appid='+id);const l=(m.lojas||[]).find(l=>l.loja===loja&&/^https:\/\//.test(l.url||''));u=l&&l.url;}catch(e){}
+  if(u&&w){w.location=u;return;}
+  if(w)w.close();toast('Sem link direto da '+loja+': a ficha mostra as lojas.');abrirJogo(id);}
+function cartBtn(id,mon){const x=lojaExt(id);
+  if(x)return `<span class="cartbtn ext" role="button" tabindex="0" data-lojaext="${id}" data-loja="${esc(x.loja)}" title="Abrir na ${esc(x.loja)} (o carrinho é só da Steam)">↗</span>`;
+  const on=CARR.some(c=>c.appid===id);return `<span class="cartbtn${on?' on':''}" role="button" tabindex="0" data-cart="${id}"${mon?' data-mon="1"':''} title="${on?'Tirar do carrinho':mon?'Pôr no carrinho (e monitorar)':'Pôr no carrinho'}">${on?'✓':'+'}</span>`;}
 const abre=o=>o.steam_inteira?`data-open="${o.appid}"`:`data-open="${o.appid}" data-hv="${o.appid}"`;   // Steam inteira: ficha sem o cartão de passar o mouse
 function capCard(o){return `<a class="cap" href="#" ${abre(o)}>${art(o.appid,o.nome,o.capa)}
   <div class="meta"><div class="nm">${esc(o.nome)}</div><div class="row"><span class="rvs">${revText(o)}</span><span style="display:flex;gap:5px;align-items:center">${cartBtn(o.appid,o.steam_inteira)}${precoComPiso(o)}</span></div></div></a>`;}
@@ -88,13 +99,14 @@ document.addEventListener('mouseover',e=>{const el=e.target.closest('[data-hv]')
 addEventListener('scroll',()=>{clearTimeout(hvT);HV.classList.remove('on');hvEl=null;},{passive:true});
 let CARR=[];
 async function salvarCarr(){const r=await post('/api/carrinho',{itens:CARR});$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';
-  CARR.forEach(c=>{if(c.appid&&r&&r.lojas&&r.lojas[c.appid])c.loja=r.lojas[c.appid];});return r;}
-const naLoja=id=>{const c=CARR.find(x=>x.appid===id);return c&&c.loja?' · '+c.loja:'';};
-async function alternarCarr(id,forcar,mon,loja){const i=CARR.findIndex(c=>c.appid===id);
+  return r;}
+async function alternarCarr(id,forcar,mon){const i=CARR.findIndex(c=>c.appid===id);
   if(i>=0&&forcar!==true){CARR.splice(i,1);toast('Saiu do carrinho');}
-  else if(i<0){if(mon){const r=await post('/api/extra',{appid:id});if(!r||r.ok===false||r.erro){toast('Não consegui monitorar: '+((r&&r.erro)||'?'));return;}}CARR.push({appid:id,modo:'conta',loja});}
-  await salvarCarr();if(i<0)toast((mon?'No carrinho e monitorado (entra na lista na próxima checagem)':'No carrinho')+naLoja(id));$$(`[data-cart="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.appid===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
+  else if(i<0){if(mon){const r=await post('/api/extra',{appid:id});if(!r||r.ok===false||r.erro){toast('Não consegui monitorar: '+((r&&r.erro)||'?'));return;}}CARR.push({appid:id,modo:'conta',loja:'Steam'});}
+  await salvarCarr();if(i<0)toast((mon?'No carrinho e monitorado (entra na lista na próxima checagem)':'No carrinho da Steam'));$$(`[data-cart="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.appid===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});
   if(S.tab==='carr')renderCarr();if(S.tab==='lista')renderLista();}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-lojaext]');if(!c)return;e.preventDefault();e.stopPropagation();abrirNaLoja(+c.dataset.lojaext,c.dataset.loja);},true);
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('span[role="button"][tabindex]')){e.preventDefault();e.target.click();}});   // os botões em <span> também respondem ao teclado
 document.addEventListener('click',e=>{const c=e.target.closest('[data-cart]');if(!c)return;e.preventDefault();e.stopPropagation();alternarCarr(+c.dataset.cart,false,c.dataset.mon==='1');},true);
 async function alternarBundle(id){const i=CARR.findIndex(c=>c.bundle===id);if(i>=0){CARR.splice(i,1);toast('Bundle saiu do carrinho');}else{CARR.push({bundle:id,modo:'conta'});toast('Bundle no carrinho');}
   await salvarCarr();$$(`[data-cartb="${id}"]`).forEach(el=>{const on=CARR.some(c=>c.bundle===id);el.classList.toggle('on',on);el.textContent=on?'✓':'+';});

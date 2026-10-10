@@ -58,23 +58,15 @@ function conferirExt(){   // depois do "Pronto": a página recarregou; a extens�
 async function finalizar(){
   if(!CD)return;
   const nota=$('#finalNota');nota.innerHTML='';
-  const vivos=CD.itens.filter(c=>!c.possuido),outras=vivos.filter(c=>c.loja!=='Steam'),fora=outras.filter(c=>c.url),semLink=outras.filter(c=>!c.url);
-  const nSteam=vivos.filter(c=>c.loja==='Steam').length+CD.bundles.length;
-  if(!(nSteam+outras.length)){toast('O carrinho está vazio.');return;}
-  if(semLink.length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#ff8a94;font-size:11.5px;margin-top:6px">Sem link da loja (abra pela ficha do jogo): ${semLink.map(c=>esc(c.nome)+' · '+esc(c.loja)).join(', ')}</div>`);
-  if(!nSteam&&!fora.length)return;
-  if(nSteam&&!temExt()){faixaExt(true);window.scrollTo(0,0);toast('Instale a extensão do Hunter (faixa no topo) e clique em Finalizar pedido de novo.');return;}
-  const w=nSteam?window.open('about:blank','_blank'):null;if(w)w.opener=null;   // abre já, no clique (o navegador não bloqueia); a Steam não alcança o painel
-  // as outras lojas: uma aba por jogo; o navegador costuma liberar só a primeira aba de um clique
-  const bloq=fora.filter(c=>{const x=window.open(c.url,'_blank');if(!x)return true;try{x.opener=null;}catch(e){}return false;});
-  if(fora.length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="font-size:11.5px;margin-top:6px;color:${bloq.length?'#ff8a94':'var(--dim)'}">${bloq.length?`O navegador bloqueou ${bloq.length} aba${bloq.length>1?'s':''}: permita pop-ups deste endereço (ícone na barra de endereço) ou abra aqui:`:'Abri a página de cada jogo nas outras lojas:'}</div>
-    ${fora.map(c=>`<a href="${esc(c.url)}" target="_blank" rel="noopener" style="display:block;font-size:12px;color:var(--blue);margin:3px 0">${esc(c.nome)} <span class="lojatag">${esc(c.loja)}</span></a>`).join('')}`);
-  if(!nSteam){toast(`${fora.length} página${fora.length>1?'s':''} de outras lojas: conclua a compra em cada uma.`);return;}
+  const nSteam=CD.itens.filter(c=>!c.possuido).length+CD.bundles.length;
+  if(!nSteam){toast('O carrinho está vazio.');return;}
+  if(!temExt()){faixaExt(true);window.scrollTo(0,0);toast('Instale a extensão do Hunter (faixa no topo) e clique em Finalizar pedido de novo.');return;}
+  const w=window.open('about:blank','_blank');if(w)w.opener=null;   // abre já, no clique (o navegador não bloqueia); a Steam não alcança o painel
   const b=$('#btnFinalizar');b.disabled=true;let r;try{r=await post('/api/steam/carrinho');}finally{b.disabled=false;}
   if(!r.ok){if(w)w.close();toast('Erro: '+(r.erro||'?'));}
   else{
     if(w)w.location=r.url;else nota.insertAdjacentHTML('afterbegin',`<a class="btn-ghost" href="${esc(r.url)}" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir o carrinho da Steam</a>`);
-    toast(`${r.n} item(ns) a caminho do carrinho da Steam: a extensão do Hunter adiciona na aba que abriu.${fora.length?` E ${fora.length} de outras lojas, cada um na página da loja.`:''} Conclua o pagamento lá.`);
+    toast(`${r.n} item(ns) a caminho do carrinho da Steam: a extensão do Hunter adiciona na aba que abriu. Conclua o pagamento lá.`);
   }
   if((r.sem_pacote||[]).length)nota.insertAdjacentHTML('beforeend',`<div class="hint" style="color:#ff8a94;font-size:11.5px">Sem pacote conhecido (abra a página): ${r.sem_pacote.map(esc).join(', ')}</div>`);
 }

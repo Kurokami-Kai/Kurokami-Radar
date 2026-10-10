@@ -7,10 +7,10 @@ async function renderCarr(){
   const it=CD.itens;
   $('#carrNote').textContent=(it.length||CD.bundles.length)?`${it.length} item(ns)${CD.bundles.length?` + ${CD.bundles.length} bundle(s)`:''}`:'';
   const ofC=c=>c.lojas.find(l=>l.loja===c.loja)||{};
-  const linha=c=>{const sel=ofC(c),troca=c.lojas.length>1||c.sumiu;
+  const linha=c=>{const sel=ofC(c);
     return `<div class="crow">${art(c.appid,c.nome,c.capa,{small:true})}
-      <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.sumiu?`<span class="flag">${esc(c.pedida)} não vende mais: valendo ${esc(c.loja)}</span>`:''}${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag">⏳ ${fimTxt(c.fim)}</span>`:''}${c.tipo_oferta==='selo'?seloBadge(c):recPill(c)}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
-      <div class="cesc">${troca?`<select class="mini lojasel" data-cloja="${c.appid}" title="Em que loja comprar">${c.lojas.map(l=>`<option value="${esc(l.loja)}"${l.loja===c.loja?' selected':''}>${esc(l.loja)} · ${brl(l.preco)}</option>`).join('')}</select>`:`<span class="lojatag" title="Loja">${esc(c.loja)}</span>`}${c.loja==='Steam'?modoSel('a',c.appid,c.modo):''}</div>
+      <div><div class="nm" data-open="${c.appid}">${esc(c.nome)}</div><div class="flags" style="margin-top:4px">${c.sumiu?'<span class="flag">Não está à venda na Steam agora</span>':''}${c.possuido?'<span class="flag own">Você já tem</span>':''}${c.em_bundle.length?`<span class="flag">também no bundle ${esc(c.em_bundle[0])}</span>`:''}${fimTxt(c.fim)?`<span class="flag">⏳ ${fimTxt(c.fim)}</span>`:''}${c.tipo_oferta==='selo'?seloBadge(c):recPill(c)}${c.piso!=null?`<span class="motivo" style="margin:0">menor de sempre ${brl(c.piso)}</span>`:''}</div></div>
+      <div class="cesc"><span class="lojatag" title="Loja">Steam</span>${modoSel('a',c.appid,c.modo)}</div>
       ${priceBlock({preco:sel.preco,cheio:sel.cheio,corte:sel.corte||0})}
       <button class="xbtn" data-cart="${c.appid}" title="Tirar do carrinho">×</button></div>`;};
   const linhaB=b=>`<div class="crow">${art(b.bundle,b.nome,b.capa,{small:true})}
@@ -23,9 +23,9 @@ async function renderCarr(){
   const lojas=Object.keys(grupos).sort((a,b)=>(b==='Steam')-(a==='Steam')||a.localeCompare(b,'pt-BR'));
   const subt=l=>grupos[l].reduce((s,c)=>s+(c.possuido?0:ofC(c).preco||0),0)+(l==='Steam'?CD.bundles.reduce((s,b)=>s+(b.preco||0),0):0);
   $('#carrLista').innerHTML=lojas.length?lojas.map(l=>{const n=grupos[l].length+(l==='Steam'?CD.bundles.length:0);
-    return `<div class="cgrp"><h3>${esc(l)}</h3><span class="sub">${n} ${n>1?'itens':'item'} · ${brl(subt(l))}</span><span class="aside">${l==='Steam'?'vai para o carrinho da Steam pela extensão':'o Finalizar pedido abre a página de cada jogo nesta loja'}</span></div>`
+    return `<div class="cgrp"><h3>${esc(l)}</h3><span class="sub">${n} ${n>1?'itens':'item'} · ${brl(subt(l))}</span><span class="aside">vai para o carrinho da Steam pela extensão</span></div>`
       +grupos[l].map(linha).join('')+(l==='Steam'?CD.bundles.map(linhaB).join(''):'');}).join(''):
-    '<div class="empty">Carrinho vazio. Use o + nas listas, o botão na ficha do jogo, a busca ao lado ou "Trazer o carrinho da Steam".</div>';
+    '<div class="empty">Carrinho vazio (só da Steam: jogo de outra loja abre a página dela). Use o + nas listas, o botão na ficha do jogo, a busca ao lado ou "Trazer o carrinho da Steam".</div>';
   let total=0,cheio=0,pisoTot=0,semPreco=0;
   CD.bundles.forEach(b=>{if(b.preco==null){semPreco++;return;}total+=b.preco;cheio+=b.cheio||b.preco;pisoTot+=b.preco;});
   it.forEach(c=>{const sel=ofC(c);if(sel.preco==null){semPreco++;return;}
@@ -53,8 +53,7 @@ async function renderCarr(){
 }
 $('#carrBundles').addEventListener('click',async e=>{const t=e.target.closest('[data-trocar]');if(!t)return;const [bid,ids]=t.dataset.trocar.split('|');const rem=new Set(ids.split(',').map(Number));
   CARR=CARR.filter(c=>!(c.appid&&rem.has(c.appid)));if(!CARR.some(c=>c.bundle===+bid))CARR.push({bundle:+bid,modo:'conta'});await salvarCarr();toast('Trocado pelo bundle');renderCarr();});
-$('#carrLista').addEventListener('change',async e=>{const lj=e.target.closest('[data-cloja]');
-  if(lj){const c=CARR.find(x=>x.appid===+lj.dataset.cloja);if(c)c.loja=lj.value;await salvarCarr();toast('Agora na '+lj.value);renderCarr();return;}
+$('#carrLista').addEventListener('change',async e=>{
   const s=e.target.closest('[data-cmodo]');if(!s)return;const t=s.dataset.cmodo[0],id=+s.dataset.cmodo.slice(1);
   const c=CARR.find(x=>t==='b'?x.bundle===id:x.appid===id);if(c)c.modo=s.value;await salvarCarr();renderCarr();});
 $('#orc').addEventListener('change',e=>{ls.set('orc',+e.target.value||0);renderCarr();});
@@ -81,4 +80,4 @@ $('#buscaRes').addEventListener('click',async e=>{if(e.target.closest('[data-fec
   a.disabled=true;a.classList.add('feito');a.querySelector('.rok').textContent='✓';
   const id=+a.dataset.addcarr;if(a.dataset.mon==='1'){await post('/api/extra',{appid:id});await carregarLista();}
   if(!CARR.some(c=>c.appid===id)){CARR.push({appid:id,modo:'conta'});await salvarCarr();}
-  toast('No carrinho'+naLoja(id));renderCarr();});
+  toast('No carrinho da Steam');renderCarr();});

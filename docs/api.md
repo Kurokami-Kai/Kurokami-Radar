@@ -32,7 +32,7 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | `/api/alertas` | último resultado de `avaliar` (`quando, itens[], novos[]`) |
 | `/api/notificacoes` | `itens[]` da tabela `alerta` (200 mais recentes) |
 | `/api/config` | `config, lojas_itad[], classes` |
-| `/api/carrinho` | `itens[]` (`loja` = a loja que vale agora, `pedida` = a gravada, `sumiu` = a pedida parou de vender e vale a Steam ou a mais barata, `url` = página da Steam ou link da ITAD da loja, `lojas[]` = ofertas de agora nas lojas marcadas + Steam + a pedida, por preço, para trocar; `modo`; `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `sem_pacote[]` |
+| `/api/carrinho` | `itens[]` (sempre `loja`/`pedida` = `Steam`: o carrinho é só da Steam, `sumiu` = a Steam não vende o jogo agora, `url` = página da Steam, `lojas[]` = só a oferta da Steam; `modo`; `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `sem_pacote[]` |
 | `/api/buscar?q=` | busca na loja (nome, appid ou link) → `itens[{appid,nome,capa,preco,corte,tipo,na_lista,possuido}]` |
 | `/api/biblioteca` | `jogos[]` (valor, DLCs que contam, faltantes com preço/menor, bundles), `total{hoje,cheio,menor,falta_*}`, `franquias[]` (séries), `sem_lista_dlc, sem_dados, atualizado, falta_ids`, `dlcs_promo[]` (DLCs que contam, que você não tem, de jogos que você tem, com desconto agora: `appid, nome, capa, pai, pai_nome, preco, cheio, corte, loja, so_steam` (preço só do catálogo da Steam), `fim, tipo_oferta, piso_ref`) |
 | `/api/acesso` | `rede_local, porta, ips[], pin, links[]` (só local) |
@@ -49,7 +49,7 @@ Todo POST bem-sucedido invalida o cache das linhas de Promoções (refeito na pr
 | `/api/verificar` | — | verificação rápida agora (precisa da bandeja) |
 | `/api/atualizar_tudo` | — | verificação completa agora |
 | `/api/pausar` | — | alterna pausa das notificações |
-| `/api/carrinho` | `{itens:[{appid,modo,loja}|{bundle,modo}]}` (`modo`: `conta` (padrão)\|`presente`\|`privado`, só vale na Steam; `loja` = nome da loja como na ITAD, ex. `Steam`, `Nuuvem`, `GreenManGaming`; sem ela, a oferta mais barata de agora nas lojas marcadas, empate = Steam) | grava `dados/carrinho.json` (sem repetidos); devolve `{ok, n, lojas{appid: loja}}` |
+| `/api/carrinho` | `{itens:[{appid,modo}|{bundle,modo}]}` (`modo`: `conta` (padrão)\|`presente`\|`privado`; `loja` é ignorada e gravada como `Steam`) | grava `dados/carrinho.json` (sem repetidos); devolve `{ok, n, lojas{appid: loja}}` |
 | `/api/extra` | `{appid, remover?}` | monitora/para de monitorar jogo fora da wishlist (`config.extras`) |
 | `/api/tenho` | `{appid, tenho}` | "já tenho" manual (tabela `tenho_manual`), tira do carrinho |
 | `/api/silenciar` | `{appid, mudo}` | sem notificações para o jogo |

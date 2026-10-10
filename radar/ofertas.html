@@ -686,7 +686,8 @@ const LJC={'GreenManGaming':'GMG','Epic Game Store':'Epic','Humble Store':'Humbl
 const lojaCurta=l=>LJC[l]||String(l).replace(/^GamesPlanet .*/,'GamesPlanet').replace(/ Store$/,'');
 const foraSteam=o=>o.loja&&o.loja!=='Steam'&&o.preco!=null;
 const lojaTag=o=>foraSteam(o)?`<i class="lj" title="Este preço é na ${esc(o.loja)}, não na Steam">${esc(lojaCurta(o.loja))}</i>`:'';
-const maisT=o=>foraSteam(o)?`Pôr no carrinho da ${esc(o.loja)}`:'Pôr no carrinho da Steam';
+const maisT=o=>foraSteam(o)?`Abrir na ${esc(o.loja)} (o carrinho é só da Steam)`:'Pôr no carrinho da Steam';
+const mg=o=>foraSteam(o)?'↗':'+';   // o carrinho é só da Steam: melhor preço em outra loja abre a página dela
 const precoTxt=o=>o.preco==null?(o.breve?'em breve':'sem preço'):brl(o.preco)+lojaTag(o);
 function ctxLin(o){const c=etqC(o);if(c)return pill(c);
   if(!em(o))return o.pv.prox_curto?`<span>próxima: ${esc(o.pv.prox_curto)}</span>`:`<span class="dim">${o.breve?'em breve':'sem previsão'}</span>`;
@@ -694,20 +695,20 @@ function ctxLin(o){const c=etqC(o);if(c)return pill(c);
 const subLin=o=>em(o)?[o.eco>0?'economia '+brl0(o.eco):'',(etqC(o)||[])[1]!=='fim'?fimTxt(o.fim):''].filter(Boolean).join(' · '):o.pv.menor?'menor que já teve: '+brl(o.pv.menor[0]):'';
 function capaV(o,j,op={}){const p=etqP(o);
   return `<button class="capa ofc${S.nota&&o.risco!=null?' nbon':''}" data-nav data-j="${j}" title="${esc(o.nome)}">${imgV(o)}${p?pill(p,'tp'):''}${o.lista&&!op.semLista?'<span class="cor">♥</span>':''}${nbx(o)}
-    <span class="pr"><span>${em(o)&&!gratis(o)?`<span class="c">-${o.corte}%</span>`:''}${em(o)?precoTxt(o):o.pv.menor?'<span style="color:var(--fraco)">menor </span>'+brl(o.pv.menor[0]):precoTxt(o)}</span>${o.preco!=null&&!gratis(o)?`<span class="mais" data-mais title="${maisT(o)}">+</span>`:''}</span></button>`;}
+    <span class="pr"><span>${em(o)&&!gratis(o)?`<span class="c">-${o.corte}%</span>`:''}${em(o)?precoTxt(o):o.pv.menor?'<span style="color:var(--fraco)">menor </span>'+brl(o.pv.menor[0]):precoTxt(o)}</span>${o.preco!=null&&!gratis(o)?`<span class="mais" data-mais title="${maisT(o)}">${mg(o)}</span>`:''}</span></button>`;}
 function itV(o,op={}){const j=reg({k:'jogo',o}),s2=subLin(o),c=ctxLin(o);
   return `<div class="it" data-L="${o.L}">${capaV(o,j,op)}<div class="nm">${esc(o.nome)}</div><div class="sub">${c||'&nbsp;'}</div>${s2?`<div class="sub2">${esc(s2)}</div>`:''}</div>`;}
 function filV(l,cw=170){return `<div class="fil" style="--cw:${cw}px"><div class="trilho arr">${l.map(o=>{const j=reg({k:'jogo',o});
   return `<div>${capaV(o,j)}<div class="lgo"><div class="n" title="${esc(o.nome)}">${esc(o.nome)}</div><div class="a">${ctxLin(o)||esc(subLin(o))}</div></div></div>`;}).join('')}</div></div>`;}
 function caixaP(o){if(gratis(o))return `<div class="cx2"><span class="pc">-100%</span><span class="pv"><s>${brl(o.cheio)}</s><b>Grátis</b></span></div>`;
-  return `<div class="cx2"><span class="pc">-${o.corte}%</span><span class="pv"><s>${brl(o.cheio)}</s><b>${brl(o.preco)}${lojaTag(o)}</b></span><span class="mais" data-mais title="${maisT(o)}">+</span></div>`;}
+  return `<div class="cx2"><span class="pc">-${o.corte}%</span><span class="pv"><s>${brl(o.cheio)}</s><b>${brl(o.preco)}${lojaTag(o)}</b></span><span class="mais" data-mais title="${maisT(o)}">${mg(o)}</span></div>`;}
 function cardH(o){const j=reg({k:'jogo',o}),p=etqP(o),s2=subLin(o);
   return `<div class="hc" data-L="${o.L}"><button class="hci${S.nota&&o.risco!=null?' nbon':''}" data-nav data-j="${j}" title="${esc(o.nome)}">${imgH(o)}${p?pill(p,'tp'):''}${o.lista?'<span class="cor">♥</span>':''}${nbx(o)}</button>
     <div class="hcb"><div class="hcn" title="${esc(o.nome)}">${esc(o.nome)}</div><div class="hcr"><div class="hcl"><div class="s">${ctxLin(o)||'&nbsp;'}</div>${s2?`<div class="s dim">${esc(s2)}</div>`:''}</div>${caixaP(o)}</div></div></div>`;}
 function rowT(o){const j=reg({k:'jogo',o}),p=etqP(o),c=etqC(o);
   return `<button class="tr" data-nav data-j="${j}" data-L="${o.L}">${imgH(o)}<span class="n">${o.lista?'<span style="color:var(--lista)">♥ </span>':''}${esc(o.nome)}<small>${esc(subLin(o))}</small></span>
     <span class="etc">${S.mod==='A'?vdPill(o):(p?pill(p)+' ':'')+(c?pill(c):o.hist?'':'<span class="dim" style="font-size:12px">sem histórico ainda</span>')}</span>
-    <span class="pc">-${o.corte}%</span><span class="p"><s>${brl(o.cheio)}</s>${precoTxt(o)}</span>${gratis(o)?'<span></span>':`<span class="mais" data-mais title="${maisT(o)}">+</span>`}</button>`;}
+    <span class="pc">-${o.corte}%</span><span class="p"><s>${brl(o.cheio)}</s>${precoTxt(o)}</span>${gratis(o)?'<span></span>':`<span class="mais" data-mais title="${maisT(o)}">${mg(o)}</span>`}</button>`;}
 
 /* ---------- ficha ---------- */
 const navOv=`<button class="x" data-fecha title="Fechar (Esc)">✕</button><button class="nav2 e" data-passo="-1" title="Anterior (←)">‹</button><button class="nav2 d" data-passo="1" title="Próximo (→)">›</button>`;
@@ -798,7 +799,7 @@ function fichaFR(x){const A=x.rep.appid,anos=x.m.map(o=>o.lanc).filter(Boolean).
    <div class="in" style="padding-bottom:0;padding-top:6px"><h4>Jogos da franquia na lista <span>${x.pm.length} de ${x.m.length} em promoção · em ordem de lançamento</span><div class="bar"><i style="width:${100*x.pm.length/x.m.length}%"></i></div></h4>
    <div class="fil" style="--cw:120px"><div class="trilho arr">${x.m.map(o=>{const j=reg({k:'jogo',o});return `<div>${capaV(o,j,{semLista:true})}<div class="lgo"><div class="n">${esc(o.nome)}</div><div class="a">${ctxLin(o)||esc(subLin(o))}</div></div></div>`;}).join('')}</div></div></div>
    <div class="faixa"><div><dl class="kv"><dt>Na lista</dt><dd>${x.m.length}</dd><dt>Em promoção</dt><dd class="g">${x.pm.length}</dd><dt>Valem a pena</dt><dd>${vl.length}</dd><dt>Hoje</dt><dd>${brl0(x.hoje)}</dd></dl></div>
-   <div><h4>Valem a pena</h4>${vl.slice(0,5).map(o=>`<div class="fl"><span class="n" style="color:#fff">${esc(o.nome)}</span><span class="p"><span class="pct">-${o.corte}%</span>${brl(o.preco)}${lojaTag(o)}<span class="mais" data-mais="${o.appid}" title="${maisT(o)}">+</span></span></div>`).join('')||'<p class="vazio">Nenhum agora.</p>'}</div>
+   <div><h4>Valem a pena</h4>${vl.slice(0,5).map(o=>`<div class="fl"><span class="n" style="color:#fff">${esc(o.nome)}</span><span class="p"><span class="pct">-${o.corte}%</span>${brl(o.preco)}${lojaTag(o)}<span class="mais" data-mais="${o.appid}" title="${maisT(o)}">${mg(o)}</span></span></div>`).join('')||'<p class="vazio">Nenhum agora.</p>'}</div>
    <div><h4>Dá para esperar</h4>${x.m.filter(o=>em(o)&&!o.vale).slice(0,5).map(o=>`<div class="fl"><span class="n" style="color:var(--fraco)">${esc(o.nome)}</span><span class="p">${o.espera?'volta em '+tempo(o.espera):''}</span></div>`).join('')||'<p class="vazio">Nenhum.</p>'}</div>
    <div><h4>Fora de promoção</h4>${x.m.filter(o=>!em(o)).slice(0,6).map(o=>`<div class="fl"><span class="n" style="color:var(--fraco)">${esc(o.nome)}</span><span class="p">${esc(o.pv.prox_curto||'sem previsão')}</span></div>`).join('')||'<p class="vazio">Tudo em promoção.</p>'}</div></div></div>`;}
 
@@ -811,8 +812,9 @@ function pagBusca(){const t=norm(S.q).split(' ').filter(Boolean),todos=[...OB.va
   return `<div class="bq-w"><label class="bq"><svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg><input id="q" type="search" placeholder="Buscar um jogo" autocomplete="off" spellcheck="false" value="${esc(S.q)}"><button class="bq-x" data-fimbusca title="Fechar a busca"><kbd>Esc</kbd>fechar</button></label>
    <div class="bq-i">${t.length?`<b>${fmtN(l.length)}</b> encontrado${l.length===1?'':'s'} · `:''}na sua lista de desejos e em todas as promoções, sem os filtros${t.length&&l.length?' · <kbd>Enter</kbd> vai ao primeiro':''}</div></div>`
    +(l.length?blocos([['','',l,'p']],rend):t.length?'<p class="bq-nada">Nenhum jogo com esse nome aqui.</p>':'');}
-function abreBusca(){if(S.aberto!=null)fecha();if(!S.busca){S.busca=true;S.lim=120;desenha();scrollTo(0,0);}const q=$('#q');if(q){q.focus();q.select();}}
-window.buscar=k=>k==='Escape'&&S.busca?fimBusca():abreBusca();   // o painel repassa / e Esc
+function abreBusca(c){if(S.aberto!=null)fecha();if(c){S.q=(S.busca?S.q:'')+c;S.busca=true;S.lim=120;desenha();scrollTo(0,0);}else if(!S.busca){S.busca=true;S.lim=120;desenha();scrollTo(0,0);}
+  const q=$('#q');if(q){q.focus();if(c)q.setSelectionRange(q.value.length,q.value.length);else q.select();}}
+window.buscar=k=>k==='Escape'&&S.busca?fimBusca():abreBusca(k&&k.length===1&&k!=='/'?k:'');   // o painel repassa / , Esc e a letra solta
 function fimBusca(){S.busca=false;S.q='';S.lim=120;desenha();scrollTo(0,0);}
 
 /* ---------- desenho ---------- */
@@ -832,7 +834,7 @@ document.addEventListener('pointerup',()=>{if(!arr)return;if(arr.mov){semClique=
 document.addEventListener('click',e=>{if(semClique){e.stopPropagation();e.preventDefault();semClique=false;}},true);
 document.addEventListener('dragstart',e=>{if(e.target.closest('.trilho'))e.preventDefault();});
 function kb(){$('#kb').innerHTML=$('#ov .ov')?'<span><kbd>← →</kbd>anterior / próximo</span><span><kbd>Esc</kbd>fechar</span><span><kbd>Tab</kbd>andar pelos botões</span>'
-  :'<span><kbd>← → ↑ ↓</kbd>andar</span><span><kbd>Enter</kbd>abrir em tela cheia</span><span><kbd>A–Z</kbd>pular para a letra</span><span><kbd>Esc</kbd>buscar</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd>Destaques / Promoções / Lista</span><span><kbd>T</kbd>Jogos / Franquias</span><span><kbd>Backspace</kbd>tira o último filtro</span>';}
+  :'<span><kbd>← → ↑ ↓</kbd>andar</span><span><kbd>Enter</kbd>abrir em tela cheia</span><span><kbd>letra</kbd>ou <kbd>/</kbd> buscar</span><span><kbd>1</kbd>–<kbd>4</kbd>Ofertas / Biblioteca / Configurações / Carrinho</span><span><kbd>⇧1</kbd><kbd>⇧2</kbd><kbd>⇧3</kbd>Destaques / Promoções / Lista</span><span><kbd>⇧T</kbd>Jogos / Franquias</span><span><kbd>Backspace</kbd>tira o último filtro</span>';}
 let OV=[];
 function abre(j){const x=S.lista[j];if(!x)return;if(PAI&&ehJogo(x)){fichaPai(S.lista,j);return;}OV=S.lista.slice();S.aberto=j;pinta();}
 function pinta(){const x=OV[S.aberto],keep=S.lista;S.lista=OV;const h=x.k==='prat'?fichaPrat(x.x):x.k==='fr'?fichaFR(x):fichaJ(x.k==='jogo'&&x.m?x.m[0]:x.o);
@@ -875,9 +877,10 @@ document.addEventListener('keydown',e=>{
   const m={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d'}[e.key];
   if(m){andar(m);e.preventDefault();return;}
   if(e.key==='Enter'&&tg.matches('[data-j]')){e.preventDefault();abre(+tg.dataset.j);return;}
-  if(['1','2','3'].includes(e.key)){S.sub=SUBS[+e.key-1][0];S.q='';S.busca=false;S.lim=120;desenha();scrollTo(0,0);return;}
-  if((e.key==='t'||e.key==='T')&&S.sub==='lista'){S.modo.lista=modo()==='jogos'?'franquias':'jogos';desenha();return;}
-  if(/^[a-z]$/i.test(e.key)&&S.sub!=='dest'){pular(e.key.toUpperCase());return;}
+  const dg=/^(?:Digit|Numpad)([1-9])$/.exec(/^Numpad/.test(e.code||'')&&!/^\d$/.test(e.key)?'':e.code||'');   // 1–4: seções do painel; ⇧1–⇧3: páginas daqui
+  if(dg){e.preventDefault();if(!e.shiftKey){if(PAI&&PAI.irSecao)PAI.irSecao(+dg[1]);}else if(SUBS[+dg[1]-1]){S.sub=SUBS[+dg[1]-1][0];S.q='';S.busca=false;S.lim=120;desenha();scrollTo(0,0);}return;}
+  if(e.shiftKey&&e.code==='KeyT'){if(S.sub==='lista'){S.modo.lista=modo()==='jogos'?'franquias':'jogos';desenha();}return;}
+  if(e.key.length===1&&/\p{L}/u.test(e.key)){e.preventDefault();abreBusca(e.key);return;}   // uma letra solta abre a busca já com ela
 });
 
 /* ---------- cliques ---------- */
@@ -1003,7 +1006,7 @@ function banner(){const [a,b]=BAN(),H=[...a,...b];if(!H.length)return '';S.h=(S.
      <div style="min-width:0"><div><span class="chip" style="background:#0009">${pop?'Popular nas lojas':'♥ Da sua lista'} · ${S.h%10+1} de ${pop?b.length:a.length}</span>${etqFicha(o)}</div><h1>${esc(o.nome)}</h1>
      ${k==='sem'?`<div class="se" style="--c:#ff4757"><b>Popular: ${fmtN(o.rcount)} análises na Steam</b><span>-${o.corte}% · economia de ${brl0(o.eco)}${fimTxt(o.fim)?' · '+fimTxt(o.fim):''}. O Hunter ainda não tem as promoções antigas deste jogo para comparar.</span></div>`
       :`<div class="se" style="--c:${c[2]}"><b>${c[0]}${sv?': '+esc(sv):''}</b><span>${fatos(o).map(([a,b])=>esc(a+': '+b)).join(' · ')}</span></div>`}
-     <div class="acoes"><button class="btn verde" data-mais="${o.appid}">Pôr no carrinho · ${brl(o.preco)}${foraSteam(o)?' na '+esc(lojaCurta(o.loja)):''}</button><button class="btn" data-j="${j}">Abrir a ficha</button><button class="btn" data-loja="${o.appid}">Abrir na Steam</button></div></div></div>
+     <div class="acoes"><button class="btn verde" data-mais="${o.appid}">${foraSteam(o)?'Abrir na '+esc(lojaCurta(o.loja))+' ↗ · '+brl(o.preco):'Pôr no carrinho · '+brl(o.preco)}</button><button class="btn" data-j="${j}">Abrir a ficha</button><button class="btn" data-loja="${o.appid}">Abrir na Steam</button></div></div></div>
     ${tilesJ(o)}
     <div class="minis2"><div class="fil"><div class="trilho arr">${a.map(mini).join('')}${b.length?`<div class="mlab">Populares<br>nas lojas ›</div>`:''}${b.map((x,i)=>mini(x,i+a.length)).join('')}</div></div></div></div></div>`;}
 function ajustaMinis(){const t=$('.minis2 .trilho'),e=t&&t.querySelector('[aria-current=true]');if(e)t.scrollLeft=e.parentNode.offsetLeft-t.clientWidth/2+e.offsetWidth/2;}
@@ -1049,7 +1052,7 @@ function lane(cor,tit,exp,l,go,nome,row,extra){row=row||(o=>rowV(o,nome));
 /* capa no molde da Biblioteca: % no canto (cor do veredito), barra embaixo = do preço cheio ao menor em 2 anos */
 function itP(o){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k],z=o.pv.piso,
     pos=em(o)&&z&&o.cheio>z[0]?Math.max(0,Math.min(1,(o.cheio-o.preco)/(o.cheio-z[0]))):em(o)&&z?1:0;
-  return `<div class="it" data-L="${o.L}"><button class="capa ofp" data-nav data-j="${j}" title="${esc(o.nome)}">${imgV(o)}${em(o)?`<span class="ok" style="background:${c[1]};color:${c[3]}">${gratis(o)?'Grátis':'-'+o.corte+'%'}</span>`:''}${o.lista&&S.sub!=='lista'?'<span class="cor">♥</span>':''}${o.preco!=null&&!gratis(o)?`<span class="mais mp" data-mais title="${maisT(o)}">+</span>`:''}${em(o)&&z?`<span class="pb3" title="Do preço cheio (esquerda) ao menor em 2 anos (direita)"><i style="width:${Math.round(pos*100)}%;background:${c[2]}"></i></span>`:''}</button>
+  return `<div class="it" data-L="${o.L}"><button class="capa ofp" data-nav data-j="${j}" title="${esc(o.nome)}">${imgV(o)}${em(o)?`<span class="ok" style="background:${c[1]};color:${c[3]}">${gratis(o)?'Grátis':'-'+o.corte+'%'}</span>`:''}${o.lista&&S.sub!=='lista'?'<span class="cor">♥</span>':''}${o.preco!=null&&!gratis(o)?`<span class="mais mp" data-mais title="${maisT(o)}">${mg(o)}</span>`:''}${em(o)&&z?`<span class="pb3" title="Do preço cheio (esquerda) ao menor em 2 anos (direita)"><i style="width:${Math.round(pos*100)}%;background:${c[2]}"></i></span>`:''}</button>
    <div class="nm">${esc(o.nome)}</div><div class="sub">${em(o)?`<b class="pg">${precoTxt(o)}</b> <s>${brl(o.cheio)}</s>`:o.pv.menor?'menor que já teve: '+brl(o.pv.menor[0]):precoTxt(o)}</div>
    <div class="sub vs" style="color:${c[2]}" title="${esc(c[0]+(s?' · '+s:''))}">${c[0]}${s?' · '+esc(s):''}</div></div>`;}
 const itA=o=>{const j=reg({k:'jogo',o});return `<div class="it" data-L="${o.L}">${capaV(o,j,{semLista:true})}<div class="nm">${esc(o.nome)}</div>${vdPill(o)}</div>`;};
@@ -1058,7 +1061,7 @@ function itB(o){const j=reg({k:'jogo',o}),v=o.pv,prev=!em(o)&&!o.breve&&v.prox_t
   return `<div class="it" data-L="${o.L}">${capaV(o,j,{semLista:true})}<div class="nm">${esc(o.nome)}</div>${band}${prev?`<div class="sub2">${v.prox_c>=4?`o preço de ${v.prox_c} das 6 últimas promoções`:'faixa das 3 últimas promoções'}</div>`:''}</div>`;}
 const itC=o=>{const j=reg({k:'jogo',o});return `<div class="it" data-L="${o.L}">${capaV(o,j,{semLista:S.sub==='lista'})}<div class="nm">${esc(o.nome)}</div>${faixa(o,200,12)}<div class="sub fxt">${esc(faixaTxt(o))}</div></div>`;};
 function rowC(o){const j=reg({k:'jogo',o}),p=etqP(o);
-  return `<button class="tr trc" data-nav data-j="${j}" data-L="${o.L}">${imgH(o)}<span class="n">${o.lista?'<span style="color:var(--lista)">♥ </span>':''}${esc(o.nome)}<small>${p?pill(p):''}${esc(faixaTxt(o))}</small></span><span class="fxc">${faixa(o,240,14)}</span><span class="pc">-${o.corte}%</span><span class="p"><s>${brl(o.cheio)}</s>${precoTxt(o)}</span>${gratis(o)?'<span></span>':`<span class="mais" data-mais title="${maisT(o)}">+</span>`}</button>`;}
+  return `<button class="tr trc" data-nav data-j="${j}" data-L="${o.L}">${imgH(o)}<span class="n">${o.lista?'<span style="color:var(--lista)">♥ </span>':''}${esc(o.nome)}<small>${p?pill(p):''}${esc(faixaTxt(o))}</small></span><span class="fxc">${faixa(o,240,14)}</span><span class="pc">-${o.corte}%</span><span class="p"><s>${brl(o.cheio)}</s>${precoTxt(o)}</span>${gratis(o)?'<span></span>':`<span class="mais" data-mais title="${maisT(o)}">${mg(o)}</span>`}</button>`;}
 
 /* ---------- Destaques ---------- */
 /* filtro escondido do Destaques (não aparece na tela): o padrão de Promoções. Corta o lançamento caro com -30/-40%
@@ -1168,7 +1171,11 @@ function avisaPai(aba){try{history.replaceState(null,'','#'+S.sub);}catch(e){}if
 window.irSub=s=>{if(!SUBS.some(x=>x[0]===s)||(s===S.sub&&S.aberto==null))return;if(S.aberto!=null)fecha();S.sub=s;S.q='';S.busca=false;if('lim' in S)S.lim=120;desenha();scrollTo(0,0);};
 addEventListener('hashchange',()=>irSub(location.hash.slice(1)));
 const pedeCarr=(ids,mon)=>{ids=[...new Set(ids.filter(Boolean).map(Number))];if(!ids.length){toast('Nada para pôr no carrinho');return;}
-  if(PAI)PAI.carrinho(ids.map(a=>{const o=OB.get(a);return {appid:a,mon:mon?mon(a):false,loja:o&&o.preco!=null?o.loja||'Steam':undefined};}));else toast('No carrinho (abra pelo painel)');};
+  const fora=ids.filter(a=>{const o=OB.get(a);return o&&foraSteam(o);});   // o carrinho é só da Steam: um jogo de outra loja abre a página dela
+  if(ids.length===1&&fora.length){const o=OB.get(ids[0]);if(PAI)PAI.lojaDe(o.appid,o.loja);else toast('Abra pelo painel para ir à '+o.loja);return;}
+  ids=ids.filter(a=>!fora.includes(a));
+  if(!ids.length){toast('O melhor preço desses jogos é em outras lojas: abra a ficha de cada um');return;}
+  if(PAI)PAI.carrinho(ids.map(a=>({appid:a,mon:mon?mon(a):false})),fora.length);else toast('No carrinho (abra pelo painel)');};
 const ehJogo=x=>x.k==='jogo'||(x.k==='fr'&&x.m&&x.m.length===1);
 const jogoDe=x=>x.o||x.m[0];
 /* o que a ficha do painel mostra no lugar da caixa antiga: o veredito, as 2 frases e o "por quê" */

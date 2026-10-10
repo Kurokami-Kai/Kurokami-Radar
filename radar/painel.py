@@ -727,15 +727,6 @@ def _jogo_steam(b, cfg, ctx, a):
                      if ps else None}}
 
 
-def _oferta_do_item(pedida, todas, marc):
-    """A oferta que vale para um item do carrinho: a da loja escolhida; se ela parou de vender, a da Steam
-    (ou a mais barata das lojas marcadas). Devolve (oferta ou None, sumiu)."""
-    o = next((x for x in todas if x["loja"] == pedida), None)
-    if o is not None:
-        return o, False
-    return (next((x for x in todas if x["loja"] == "Steam"), None) or _melhor_oferta([x for x in todas if x["loja"].lower() in marc])), bool(todas)
-
-
 def _ler_carrinho():
     try:
         with open(caminhos.ARQ_CARRINHO, encoding="utf-8") as f:
@@ -750,26 +741,6 @@ def _ler_carrinho():
     return v
 
 
-def _lojas_padrao(appids):
-    """Loja de cada jogo que entra no carrinho sem loja escolhida: a oferta mais barata de agora nas lojas
-    marcadas (a mesma que as listas mostram; no empate, a Steam)."""
-    try:
-        marc = _marcadas(config.carregar())
-        b = Banco()
-        try:
-            atuais = b.ofertas_atuais(appids)
-        finally:
-            b.con.close()
-    except Exception as e:
-        _log_erro("carrinho (lojas)", e)
-        return {}
-    out = {}
-    for a in appids:
-        m = _melhor_oferta([o for o in atuais.get(a, []) if o["loja"].lower() in marc])
-        out[a] = m["loja"] if m else "Steam"
-    return out
-
-
 def _gravar_carrinho(itens):
     caminhos.garantir()
     tmp = caminhos.ARQ_CARRINHO + ".tmp"
@@ -779,7 +750,7 @@ def _gravar_carrinho(itens):
 
 
 def api_carrinho(_q):
-    """Carrinho simulado: jogos/DLCs (com a loja escolhida) e bundles da Steam (com o preco para voce)."""
+    """Carrinho simulado da Steam: jogos/DLCs e bundles (com o preco para voce). Jogo de outra loja nao entra: o painel abre a pagina da loja."""
     cfg = config.carregar()
     b = Banco()
     itens = _ler_carrinho()
@@ -817,10 +788,9 @@ def api_carrinho(_q):
         a = int(it["appid"])
         j = ctx.jogos.get(a) or {}
         todas = [o for o in atuais.get(a, []) if o.get("preco") is not None]
-        pedida = it.get("loja") or "Steam"
-        escolhida, sumiu = _oferta_do_item(pedida, todas, marc)
-        ofs = sorted([o for o in todas if o["loja"].lower() in marc or o["loja"] in ("Steam", pedida)],
-                     key=lambda o: (o["preco"], o["loja"] != "Steam"))   # as lojas para trocar no carrinho
+        escolhida = next((o for o in todas if o["loja"] == "Steam"), None)   # o carrinho e so da Steam: as outras lojas abrem a pagina delas
+        sumiu = escolhida is None
+        ofs = [escolhida] if escolhida else []
         ps = b.pisos(a, lojas_m) if lojas_m else {}
         tag, texto, acima = analise.etiqueta(escolhida["preco"], escolhida.get("cheio"), ps, cfg["alerta"]) \
             if escolhida and escolhida.get("corte") else (None, None, None)
@@ -828,8 +798,8 @@ def api_carrinho(_q):
                               cfg_alerta=cfg["alerta"]) if escolhida and escolhida.get("corte") and lojas_m else {}
         out.append({"appid": a, "modo": modos[("a", a)], "nome": j.get("nome") or str(a), "capa": j.get("capa"), "tipo": j.get("tipo"),
                     "possuido": a in ctx.possuidos, "lojas": [{k: o.get(k) for k in ("loja", "preco", "cheio", "corte", "url")} for o in ofs],
-                    "loja": escolhida["loja"] if escolhida else pedida, "pedida": pedida, "sumiu": sumiu,
-                    "url": ficha._url((escolhida or {}).get("url")) if escolhida and escolhida["loja"] != "Steam" else "https://store.steampowered.com/app/%d/" % a,
+                    "loja": "Steam", "pedida": "Steam", "sumiu": sumiu,
+                    "url": "https://store.steampowered.com/app/%d/" % a,
                     "piso": ps.get(0), "fim": _fim(escolhida, j),
                     "tag": tag, "tag_texto": texto, "acima": acima, "em_bundle": cobertos.get(a, []),
                     "raridade": an.get("nivel"), "raridade_texto": an.get("texto"), "selo": an.get("selo", False), "selo_motivo": an.get("selo_motivo"),
@@ -874,19 +844,12 @@ def post_carrinho(d):
         if i.get("bundle"):
             k, item = ("b", int(i["bundle"])), {"bundle": int(i["bundle"]), "modo": _modo(i.get("modo"))}
         elif i.get("appid"):
-            loja = i.get("loja") if isinstance(i.get("loja"), str) and 0 < len(i["loja"].strip()) <= 60 else None
-            k, item = ("a", int(i["appid"])), {"appid": int(i["appid"]), "modo": _modo(i.get("modo")), "loja": loja and loja.strip()}
+            k, item = ("a", int(i["appid"])), {"appid": int(i["appid"]), "modo": _modo(i.get("modo")), "loja": "Steam"}
         else:
             continue
         if k not in vistos:
             vistos.add(k)
             limpo.append(item)
-    sem = [x["appid"] for x in limpo if x.get("appid") and not x["loja"]]
-    if sem:   # entrou sem loja (o + das listas do painel, a busca): a mais barata de agora
-        padrao = _lojas_padrao(sem)
-        for x in limpo:
-            if x.get("appid") and not x["loja"]:
-                x["loja"] = padrao.get(x["appid"]) or "Steam"
     _gravar_carrinho(limpo)
     return {"ok": True, "n": len(limpo), "lojas": {str(x["appid"]): x["loja"] for x in limpo if x.get("appid")}}
 
@@ -1134,14 +1097,6 @@ def _itens_para_steam():
     b = Banco()
     # quem ainda nao tem o pacote (subid) conhecido: pergunta a Steam agora, numa consulta so
     carr = _ler_carrinho()
-    outras = [int(i["appid"]) for i in carr if i.get("appid") and i.get("loja") != "Steam"]
-    if outras:   # os de outras lojas abrem na pagina delas; se a loja parou de vender e vale a Steam, vao para a Steam
-        marc = _marcadas(cfg)
-        atuais = b.ofertas_atuais(outras)
-        def vale(i):
-            o, _ = _oferta_do_item(i["loja"], [x for x in atuais.get(int(i["appid"]), []) if x.get("preco") is not None], marc)
-            return (o or {}).get("loja", i["loja"])
-        carr = [i for i in carr if not i.get("appid") or i.get("loja") == "Steam" or vale(i) == "Steam"]
     faltam = [int(i["appid"]) for i in carr if i.get("appid")
               and not (b.um("SELECT pacote FROM jogo WHERE appid=?", int(i["appid"])) or {"pacote": None})["pacote"]]
     if faltam:

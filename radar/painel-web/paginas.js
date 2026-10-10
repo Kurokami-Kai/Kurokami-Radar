@@ -10,25 +10,39 @@ function mostraFrame(t){const f=FR[t],el=$('#'+f.id);scrollTo(0,0);ajustaTopo();
     el.onload=()=>{el.hidden=false;$('#'+f.id+'Msg').hidden=true;if(S.tab===t){focaFrame();buscaPend(f,el);}};el.src=f.url+'?t='+Date.now()+'#'+f.sub;}
   else{try{el.contentWindow.irSub(f.sub);}catch(e){}focaFrame();buscaPend(f,el);}}
 function focaFrame(){const f=FR[S.tab];if(f)try{$('#'+f.id).contentWindow.focus();}catch(e){}}
-/* Esc e "/" com o foco no painel (topo, abas): abrem (o Esc também fecha) a busca de Ofertas/Biblioteca; nas outras abas, o Esc leva à busca de Ofertas */
+/* Teclado do painel. 1–4 trocam de seção (Ofertas, Biblioteca, Configurações, Carrinho); ⇧1–⇧3, de página dentro dela;
+   "/" e Esc abrem a busca; uma letra solta abre a busca já com ela. Com o foco num iframe, a página repassa 1–4 por KH.irSecao. */
+const SECOES=['vale','bib','cfg','carr'];
+const SUBS_SECAO={vale:['dest','promo','lista'],bib:['bib','completar'],cfg:['cfg','notif']};
+const secaoDe=t=>t==='lista'?'vale':t==='notif'?'cfg':t;
+function irSecao(n){const t=SECOES[n-1];if(!t||S.tab===t)return;setTab(t);}
+function irPagina(n){const sec=secaoDe(S.tab),s=(SUBS_SECAO[sec]||[])[n-1];if(!s)return;if(FR[sec]){FR[sec].sub=s;setTab(sec);}else setTab(s);}
 function buscaPend(f,el){if(!f.busca)return;f.busca=false;try{el.contentWindow.buscar();}catch(e){}}
-addEventListener('keydown',e=>{if(e.key==='Escape'&&e.target.id==='pBusca'){e.target.blur();return;}
-  if(!(e.key==='/'||e.key==='Escape')||!$('#modal').hidden||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.target.isContentEditable)return;
-  if(!FR[S.tab]){if(e.key!=='Escape'||!$('#buscaRes').hidden)return;e.preventDefault();
-    if(S.tab==='lista'&&$('#pBusca')){$('#pBusca').focus();$('#pBusca').select();return;}   // na tabela com filtros, a busca é a dela
-    FR.vale.busca=true;setTab('vale');return;}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&(e.target.id==='pBusca'||e.target.id==='busca')){e.target.blur();return;}
+  if(!$('#modal').hidden||e.ctrlKey||e.altKey||e.metaKey||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||e.target.isContentEditable)return;
+  const d=/^(?:Digit|Numpad)([1-9])$/.exec(/^Numpad/.test(e.code||'')&&!/^\d$/.test(e.key)?'':e.code||'');
+  if(d){e.preventDefault();e.shiftKey?irPagina(+d[1]):irSecao(+d[1]);return;}
+  const letra=e.key.length===1&&/\p{L}/u.test(e.key);
+  if(!(e.key==='/'||e.key==='Escape'||letra))return;
+  const digita=letra?e.key:'';
+  if(!FR[S.tab]){
+    if(S.tab==='carr'&&$('#busca')&&e.key!=='Escape'){e.preventDefault();const b=$('#busca');b.focus();if(digita){b.value=digita;b.dispatchEvent(new Event('input'));}return;}
+    if(S.tab==='lista'&&$('#pBusca')){e.preventDefault();const b=$('#pBusca');b.focus();if(digita){b.value=digita;b.dispatchEvent(new Event('input',{bubbles:true}));}else b.select();return;}   // na tabela com filtros, a busca é a dela
+    if(e.key!=='Escape'||!$('#buscaRes').hidden)return;   // Configurações e Notificações: letra solta não abre nada; o Esc leva à busca de Ofertas
+    e.preventDefault();FR.vale.busca=true;setTab('vale');return;}
   try{const w=$('#'+FR[S.tab].id).contentWindow;if(w.buscar){e.preventDefault();w.focus();w.buscar(e.key);}}catch(x){}});
 let MOP={};   // como a ficha foi aberta: {vered, passo, pos} quando vem das páginas novas
 window.KH={
   ficha(appid,op){abrirJogo(appid,op);},
-  async carrinho(itens){let n=0,ja=0;
+  async carrinho(itens,fora){let n=0,ja=0;
     for(const it of itens){if(CARR.some(c=>c.appid===it.appid)){ja++;continue;}
       if(it.mon){const r=await post('/api/extra',{appid:it.appid});if(!r||r.ok===false||r.erro){toast('Não consegui monitorar: '+((r&&r.erro)||'?'));continue;}}
-      CARR.push({appid:it.appid,modo:'conta',loja:it.loja});n++;}
+      CARR.push({appid:it.appid,modo:'conta',loja:'Steam'});n++;}
     if(n)await salvarCarr();
-    const lj=[...new Set(itens.map(it=>(CARR.find(c=>c.appid===it.appid)||{}).loja).filter(Boolean))];
-    toast(n?(n===1?'No carrinho':n+' no carrinho')+(lj.length===1?' · '+lj[0]:lj.length?' · '+lj.length+' lojas':'')+(ja?` · ${ja} já estava${ja>1?'m':''}`:''):'Já está no carrinho');},
+    toast(n?(n===1?'No carrinho da Steam':n+' no carrinho da Steam')+(ja?` · ${ja} já estava${ja>1?'m':''}`:'')+(fora?` · ${fora} com melhor preço em outra loja ficou de fora`:''):'Já está no carrinho');},
   loja(a){open(storeUrl(a),'_blank','noopener');},
+  lojaDe(a,loja){abrirNaLoja(a,loja);},   // a página do jogo na loja (o carrinho é só da Steam)
+  irSecao(n){irSecao(n);},
   aba(t){setTab(t);},
   instalarExt(){instalarExt();},
   extVersao(){return document.documentElement.dataset.kurokamiExt||'';},
