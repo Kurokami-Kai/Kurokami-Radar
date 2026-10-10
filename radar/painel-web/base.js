@@ -1,3 +1,11 @@
+/* ================= abertura ================= */
+/* a logo se desenha ao abrir: uma vez por sessão do navegador; clique ou tecla pula */
+(function(){const el=document.getElementById('abertura');if(!el)return;let fim=false;
+const sai=()=>{if(fim)return;fim=true;el.classList.add('sai');setTimeout(()=>el.remove(),600);};
+try{if(sessionStorage.getItem('kr:abertura')||matchMedia('(prefers-reduced-motion:reduce)').matches){el.remove();return;}sessionStorage.setItem('kr:abertura','1');}catch(e){}
+el.addEventListener('click',sai);
+addEventListener('keydown',e=>{if(fim)return;e.stopImmediatePropagation();e.preventDefault();sai();},true);
+setTimeout(sai,2400);})();
 /* ================= helpers ================= */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
