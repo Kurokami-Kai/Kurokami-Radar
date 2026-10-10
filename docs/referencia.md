@@ -83,6 +83,7 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
 - `utc(ts)` — Tudo em UTC no mesmo formato, para a ordenacao por texto funcionar.
 - **class `Banco`** — 
   - `_migrar()`
+  - `_migrar_2()`
   - `commit()`
   - `q(sql)`
   - `um(sql)`
@@ -119,6 +120,16 @@ Icone na bandeja do Windows. Roda o servico em segundo plano.
 - `abrir_log()` — Abre o log; se ainda nao existe (nada foi registrado), cria vazio antes.
 - `_comando_atual()`
 - `main(esperar, abrir_painel)`
+
+## `radar/cambio.py`
+Câmbio para o histórico da ITAD.
+
+- `moeda_do_pais(pais)`
+- `_arquivo()`
+- `_ler()`
+- `_baixar()` — Reais por unidade de cada moeda (a API dá moedas por real; inverte). None se a rede falhar.
+- `taxas()` — {moeda: reais por unidade}. Cache em memória e em disco por 24 h; nunca levanta erro.
+- `em_reais(valor, moeda, alvo)` — Valor decimal na `moeda` para a moeda do país (alvo). Igual ao alvo ou sem moeda: devolve como veio.
 
 ## `radar/caminhos.py`
 Pastas do app.
