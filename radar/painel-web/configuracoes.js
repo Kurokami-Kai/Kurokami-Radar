@@ -13,12 +13,19 @@ async function renderCfg(){
   const num=(p,v,step,min,max,un,pre)=>`<span class="cfg-num${pre?' pre':''}"><input type="number" data-k="${p}" value="${v}" step="${step||1}" min="${min??0}"${max!=null?` max="${max}"`:''}>${un?`<em>${un}</em>`:''}</span>`;
   const swRow=(p,v,t,h)=>row(t,h,sw(p,v,t));
   // Telegram: bot gratuito; o token vai para o Gerenciador de Credenciais (nunca para o config.json) e a página só mostra o estado
+  const tgGuia=aberto=>`<details class="tg-guia"${aberto?' open':''}><summary>Como configurar (cada pessoa cria o seu bot, leva 2 minutos)</summary><ol>
+      <li>No Telegram, procure <b>@BotFather</b> (o oficial, com o selo azul) e envie <b>/newbot</b>.</li>
+      <li>Ele pede um <b>nome</b> (aparece na conversa, pode ser "Kurokami Hunter") e um <b>usuário</b> que termine em <b>bot</b>, como <b>meu_kurokami_bot</b>. Se o usuário já existir, tente outro.</li>
+      <li>O BotFather responde com um <b>token</b>, parecido com <b>123456:ABC…</b>. Copie e cole em "Token do bot" abaixo; clique em <b>Conectar</b>.</li>
+      <li>Abra o seu bot no Telegram (o link <b>t.me/…</b> que o BotFather mandou), toque em <b>Iniciar</b> e volte aqui; clique em <b>Vincular conversa</b>.</li>
+      <li>Ligue "Avisar também no Telegram" e clique em <b>Enviar teste</b>. Pronto: os avisos chegam no celular.</li></ol>
+      <p>O token é como uma senha: fica só neste PC e não deve ser mandado a ninguém. Se vazar, envie <b>/revoke</b> ao BotFather e conecte de novo. Só quem mandar mensagem ao bot antes do passo 4 é vinculado, então não compartilhe o link do bot até terminar.</p></details>`;
   const tgHtml=()=>{const t=(CFG.notificacoes||{}).telegram||{};
-    if(!TGTOK)return `<div class="hint">O mesmo aviso no celular, de graça. No Telegram, abra o <b>@BotFather</b>, envie <b>/newbot</b>, siga os passos e cole aqui o token que ele mandar.</div>
+    if(!TGTOK)return `${tgGuia(true)}
       ${row('Token do bot','Fica só neste PC, no Gerenciador de Credenciais do Windows.',`<input class="cfg-txt" id="tgTok" type="password" autocomplete="off" placeholder="123456:ABC…"><button class="btn-go2" data-tg="token" type="button">Conectar</button>`)}`;
-    if(!t.chat_id)return `<div class="hint">Bot conectado. Agora abra o bot no Telegram, toque em <b>Iniciar</b> (ou mande qualquer mensagem) e clique em Vincular.</div>
+    if(!t.chat_id)return `${tgGuia(true)}<div class="hint">Bot conectado. Agora abra o bot no Telegram, toque em <b>Iniciar</b> (ou mande qualquer mensagem) e clique em Vincular.</div>
       ${row('Sua conversa','',`<button class="btn-go2" data-tg="vincular" type="button">Vincular conversa</button><button class="btn-ghost" data-tg="remover" type="button">Trocar o bot</button>`)}`;
-    return `${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
+    return `${tgGuia(false)}${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
       ${row('Conexão','Bot conectado e conversa vinculada.',`<button class="btn-ghost" data-tg="testar" type="button">Enviar teste</button><button class="btn-ghost" data-tg="remover" type="button">Desconectar</button>`)}`;};
   const sec=(id,t,p,corpo)=>`<section class="cfg-sec" data-sec="${id}" hidden><header><h3>${t}</h3>${p?`<p>${p}</p>`:''}</header>${corpo}</section>`;
   const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
