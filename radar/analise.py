@@ -176,9 +176,12 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
 
     # ---- pilula de piso (reais): compara com o que havia ANTES do episodio de preco atual
     if preco is not None and corte > 0:
+        # o episodio do preco atual so anda para tras sobre trechos NO MESMO preco (folga de centavos para os dois
+        # lados): um trecho mais barato e um recorde anterior de verdade, nao parte deste episodio (bug ate a 0.18.0:
+        # `_igual` e de um lado so e engolia os precos menores, e o Selo saia para quem nem estava no piso)
         ini_preco = agora_
         for s in reversed(segs):
-            if s[2] is not None and _igual(s[2], preco):
+            if s[2] is not None and abs(s[2] - preco) <= max(10, preco * 0.01):
                 ini_preco = s[0]
             else:
                 break

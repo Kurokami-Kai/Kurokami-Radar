@@ -4,6 +4,7 @@ import urllib.error
 import urllib.parse
 from datetime import datetime, timedelta, timezone
 
+from . import cambio
 from .rede import RITMO, de_reais, explicar, http_json, lotes
 
 API = "https://api.isthereanydeal.com/"
@@ -146,9 +147,16 @@ def historico(chave, pais, gid, shop_ids, dias, desde=None, tentativas=8):
     desde = desde or (datetime.now(timezone.utc) - timedelta(days=dias)).replace(microsecond=0).isoformat()
     r = _get("games/history/v2", chave, tentativas=tentativas, id=gid, country=pais,
              shops=",".join(map(str, shop_ids)), since=desde) or []
+    alvo = cambio.moeda_do_pais(pais)
+
+    def valor(p):
+        """O historico vem no dinheiro da loja (US$, EUR, GBP), nao em reais como os precos de agora: converte."""
+        p = p or {}
+        return de_reais(cambio.em_reais(p.get("amount"), p.get("currency"), alvo))
+
     out = []
     for e in r:
         deal = e.get("deal") or {}
-        out.append(((e.get("shop") or {}).get("name"), de_reais((deal.get("price") or {}).get("amount")),
-                    de_reais((deal.get("regular") or {}).get("amount")), int(deal.get("cut") or 0), e.get("timestamp")))
+        out.append(((e.get("shop") or {}).get("name"), valor(deal.get("price")), valor(deal.get("regular")),
+                    int(deal.get("cut") or 0), e.get("timestamp")))
     return out

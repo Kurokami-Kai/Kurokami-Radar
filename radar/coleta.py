@@ -102,7 +102,18 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
             banco.meta("ult_steam", agora())
         banco.commit()
     else:
-        log("Catalogo Steam recente, pulando (use --tudo para forcar)")
+        # jogo que entrou na lista agora (ou nunca teve os detalhes lidos) nao espera o intervalo do catalogo: sem isso
+        # o aviso saia com o appid no lugar do nome e sem capa (Planet of Lana, 10/10). Sem resposta da Steam, tenta de novo em 1 dia.
+        conhecidos = {r["appid"] for r in banco.q("SELECT appid FROM jogo WHERE nome IS NOT NULL")}
+        novos = [a for a in wl if a not in conhecidos and not banco.consultado("nome", a, 1)]
+        if novos:
+            log("Steam: %d jogo(s) sem detalhes na lista, lendo agora..." % len(novos))
+            catalogo_steam(cfg, banco, novos, possuidos, sid, k_steam, log, None if sem_limite else cfg.get("chamadas_lentas_por_rodada", 120))
+            for a in novos:
+                banco.marcar_consulta("nome", a)
+            banco.commit()
+        else:
+            log("Catalogo Steam recente, pulando (use --tudo para forcar)")
 
     # ---------------------------------------------------------- 2b. biblioteca (1x por dia)
     if forcar or _min_desde(banco, "ult_biblioteca") >= 24 * 60:

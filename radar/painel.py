@@ -666,9 +666,13 @@ def _jogo_steam(b, cfg, ctx, a):
     """Ficha de um item da Steam inteira (fora da lista): o historico das lojas marcadas pela ITAD, baixado na hora
     se faltar (steam_inteira.historico_um), e a mesma avaliacao da lista. Das outras lojas so o menor (sem o preco
     de agora); sem DLCs, bundles e keyshop (isso vem ao monitorar o jogo)."""
-    from . import credenciais, steam_inteira
+    from . import credenciais, ofertas, steam_inteira
+    antes = b.um("SELECT baixado FROM promo_estado WHERE appid=?", a)
     try:
         aviso = steam_inteira.historico_um(b, cfg, credenciais.ler("itad"), a, log=lambda *_: None)
+        depois = b.um("SELECT baixado FROM promo_estado WHERE appid=?", a)
+        if depois and depois["baixado"] != (antes["baixado"] if antes else None):
+            ofertas.invalidar()   # a pagina Ofertas ainda diria "sem historico" ate o cache vencer (10 min)
     except Exception as e:   # ex.: banco ocupado pela coleta; a ficha abre com o historico que ja tem
         b.con.rollback()
         _log_erro("ficha da Steam inteira", e)

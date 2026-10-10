@@ -26,7 +26,7 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `tenho_manual`, `silenciado` | ações do usuário no painel |
 | `meta` | chave→JSON (abaixo) |
 
-Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__`; mudanças de dados usam `meta.esquema` (`_migrar`).
+Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__`; mudanças de dados usam `meta.esquema` (`_migrar`). `esquema` 3 (0.18.1): histórico da ITAD em moeda estrangeira; apaga `historico_importado` (a lista importa de novo, convertido) e põe `promo_estado.baixado = BAIXADO_ANTIGO` (`2000-01-01…`, a Steam inteira refaz o jogo inteiro). `dados/cambio.json` = `{quando, taxas: {moeda: reais}}`, câmbio guardado 24 h (`cambio.py`).
 
 ## Chaves de `meta`
 

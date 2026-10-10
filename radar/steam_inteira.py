@@ -13,7 +13,7 @@ import urllib.parse
 from datetime import datetime, timedelta, timezone
 
 from . import analise, itad, progresso
-from .banco import agora, utc
+from .banco import BAIXADO_ANTIGO, agora, utc
 from .rede import RITMO, explicar, http_json
 
 QUERY = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -276,7 +276,8 @@ def historicos(banco, cfg, chave, log=print, por_rodada=60):
     for i, f in enumerate(lote, 1):
         r = f[-1]
         progresso.passo(i, len(lote))
-        desde = (datetime.fromisoformat(r["baixado"]) - timedelta(days=2)).isoformat() if r["baixado"] else None
+        refazer = bool(r["baixado"]) and r["baixado"] <= BAIXADO_ANTIGO
+        desde = (datetime.fromisoformat(r["baixado"]) - timedelta(days=2)).isoformat() if r["baixado"] and not refazer else None
         try:
             regs = itad.historico(chave, pais, r["gid"], ids, cfg["historico"]["importar_dias"], desde=desde, tentativas=1)
         except itad.ChaveRecusada:
@@ -284,6 +285,8 @@ def historicos(banco, cfg, chave, log=print, por_rodada=60):
         except Exception as e:
             log("   a ITAD limitou o ritmo (%s); continuo na proxima rodada" % explicar(e))
             break
+        if refazer:   # historico antigo (moeda errada, 0.18.1): troca tudo do jogo de uma vez
+            banco.con.execute("DELETE FROM promo_hist WHERE appid=?", (r["appid"],))
         banco.con.executemany("INSERT OR IGNORE INTO promo_hist VALUES(?,?,?,?,?,?)",
                               [(r["appid"], g[0], g[1], g[2], g[3], utc(g[4])) for g in regs if g[1] is not None])
         banco.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=? WHERE appid=?", (agora(), r["preco"], r["appid"]))
@@ -325,12 +328,15 @@ def historico_um(banco, cfg, chave, appid, log=print):
             if not ids:
                 return "nenhuma das suas lojas marcadas existe na IsThereAnyDeal"
             banco.meta("promo_lojas", {"ids": ids, "nomes": nomes})
-        desde = (datetime.fromisoformat(e["baixado"]) - timedelta(days=2)).isoformat() if e and e["baixado"] else None
+        refazer = bool(e and e["baixado"]) and e["baixado"] <= BAIXADO_ANTIGO
+        desde = (datetime.fromisoformat(e["baixado"]) - timedelta(days=2)).isoformat() if e and e["baixado"] and not refazer else None
         regs = itad.historico(chave, pais, gid, ids, cfg["historico"]["importar_dias"], desde=desde, tentativas=1)
     except itad.ChaveRecusada:
         return "a IsThereAnyDeal recusou a chave"
     except Exception as ex:
         return "a IsThereAnyDeal não respondeu agora (%s); tente de novo em alguns minutos" % explicar(ex)
+    if refazer:
+        banco.con.execute("DELETE FROM promo_hist WHERE appid=?", (appid,))
     banco.con.executemany("INSERT OR IGNORE INTO promo_hist VALUES(?,?,?,?,?,?)",
                           [(appid, g[0], g[1], g[2], g[3], utc(g[4])) for g in regs if g[1] is not None])
     banco.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=? WHERE appid=?", (agora(), r["preco"], appid))

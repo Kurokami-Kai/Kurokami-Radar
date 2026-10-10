@@ -6,6 +6,7 @@ Só lições que continuam valendo (o diário de cada tarefa fica no `git log`).
 - **Medir antes de propor:** contar no banco ou na API (quantos mudam, quantos o filtro pega) antes de criar regra, métrica ou coluna; conferir 3 itens na loja antes de perseguir contagem de terceiros.
 - **Ler o log e o estado antes do código:** `grep "biblioteca:" radar.log`, `netstat -ano | findstr LISTENING` (várias cópias na mesma porta: o `HTTPServer` do Windows liga `SO_REUSEADDR`; o `painel.py` usa `allow_reuse_address=False`), pasta da extensão em qual navegador.
 - **"Contraditório" costuma ser duas definições do mesmo termo** (ex.: "esta promoção" em `analise` × `previsao`): imprimir os dados do jogo do print num script do scratchpad acha em 1 rodada.
+- **Moeda da API:** a ITAD manda `history/v2` na moeda da loja e `prices/v3` convertido; confira `currency` antes de comparar preço de duas rotas. Muitos Selos de uma vez = dado errado, não critério errado (reproduza um jogo com a cópia do banco instalado em `%LOCALAPPDATA%\Kurokami Radar`, não o `dados/` do repositório, que pode ser velho).
 - **Empate escolhe a primeira linha do banco:** ao mostrar "a loja do melhor preço", desempate pela Steam.
 - `GetOwnedGames` não traz DLCs (só o `rgOwnedApps` da extensão); a ITAD tem cota (~100 chamadas em 5 min: espaçar e parar no primeiro 429).
 

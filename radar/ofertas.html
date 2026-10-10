@@ -944,7 +944,8 @@ const GANHO_MIN=500,GANHO_PCT=.15;   /* imperdível: abaixo do piso por R$ 5 e 1
 function verd(o){if(o._v)return o._v;const v=o.pv;let r;
   if(em(o)){const z=v.piso;
     if(o.t==='selo')r=['imperdivel','Selo Kurokami'];
-    else if(!o.hist||!z)r=['sem','compare pelo desconto'];
+    else if(!o.hist)r=['sem','histórico ainda não baixado · compare pelo desconto'];
+    else if(!z)r=['sem','nenhuma promoção anterior em 2 anos · compare pelo desconto'];
     else{const [pz,n]=z,g=pz-o.preco,abaixo=o.preco<pz-tolP(pz);
       if(abaixo&&g>=GANHO_MIN&&g>=GANHO_PCT*pz)r=['imperdivel',`${brl(g)} abaixo do menor em 2 anos`];
       else if(abaixo)r=['menor',`${brl(g)} abaixo do menor em 2 anos`];

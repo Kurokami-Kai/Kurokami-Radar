@@ -12,7 +12,8 @@ Kurokami Hunter/
 │   ├── janela_chaves.py     # janela Tk "Perfil e chaves" (primeira abertura)
 │   ├── rede.py              # http_json, servico_steam (GET input_json), Ritmo (rate limit adaptativo)
 │   ├── steam.py             # wishlist, GetItems, edições/pacote base, DLCs pela loja, bundles
-│   ├── itad.py              # lojas, lookup, preços v3 (1 oferta por loja), histórico
+│   ├── itad.py              # lojas, lookup, preços v3 (1 oferta por loja), histórico (convertido para reais por `cambio.py`)
+│   ├── cambio.py            # câmbio do dia (Frankfurter) para o histórico da ITAD, que vem em US$/€/£; cache em dados/cambio.json
 │   ├── ggdeals.py           # preços oficial/keyshop
 │   ├── banco.py             # SQLite: esquema, migrações, preços, pisos, ofertas vigentes
 │   ├── coleta.py            # orquestra a coleta (catálogo, biblioteca, ITAD, GG, custo completo)

@@ -39,6 +39,14 @@ def mes_ano(meses_atras):
 mensal50 = lambda ate: [x for m in range(ate - 1, 1, -2) for x in promo(m, 5000, 50)]
 CASOS = [
     # pilula de piso: os 18 meses contam desde a ULTIMA vez no nivel do recorde anterior
+    # 10/10/2026 (Planet of Lana): o preco mais barato de uma loja acabou e outra loja comecou no mesmo dia (trechos
+    # colados); o recorde recente (R$ 10) nao e "parte do episodio de agora" e o preco de agora (R$ 20) nao e recorde
+    ("recorde recente colado ao episodio de agora: nao e piso nem Selo",
+     promo(30, 5000, 50) + [dict(loja="Nuuvem", preco=1000, corte=90, quando=iso(1)), dict(loja="Nuuvem", preco=CHEIO, corte=0, quando=iso(0, 0.5))],
+     2000, 80, "piso_tipo", None, 40),
+    ("recorde recente colado ao episodio de agora: sem Selo",
+     promo(30, 5000, 50) + [dict(loja="Nuuvem", preco=1000, corte=90, quando=iso(1)), dict(loja="Nuuvem", preco=CHEIO, corte=0, quando=iso(0, 0.5))],
+     2000, 80, "selo", False, 40),
     ("recorde visto pela ultima vez ha 19 meses", promo(19, 5000, 50), 4500, 55, "piso_tipo", "raro", 40),
     ("recorde visto pela ultima vez ha 17 meses", promo(17, 5000, 50), 4500, 55, "piso_tipo", "novo", 40),
     ("preco atual = 50% do recorde", promo(2, 5000, 50), 2500, 75, "piso_tipo", "raro", 40),

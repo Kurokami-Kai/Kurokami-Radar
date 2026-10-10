@@ -6,6 +6,8 @@ from datetime import datetime, timedelta, timezone
 
 from . import caminhos
 
+BAIXADO_ANTIGO = "2000-01-01T00:00:00+00:00"   # promo_estado.baixado de um historico em moeda errada: refazer inteiro
+
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS jogo(
   appid INTEGER PRIMARY KEY, nome TEXT, tipo TEXT, pai INTEGER, capa TEXT,
@@ -107,8 +109,20 @@ class Banco:
         self._migrar()
 
     def _migrar(self):
-        if (self.meta("esquema") or 1) >= 2:
-            return
+        esquema = self.meta("esquema") or 1
+        if esquema < 2:
+            self._migrar_2()
+        if esquema < 3:
+            # 0.18.1: o historico da ITAD vinha em US$/EUR/GBP e era lido como reais (cambio.py). A lista de desejos
+            # importa o historico de novo, ja convertido (~1 chamada por jogo, aos poucos); a Steam inteira marca o
+            # historico como antigo (BAIXADO_ANTIGO) e refaz a cada rodada e a cada ficha. O que esta no banco continua
+            # valendo ate cada jogo ser refeito: a troca das linhas de um jogo e de uma vez so.
+            self.con.execute("DELETE FROM historico_importado WHERE escopo='todas'")
+            self.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=NULL WHERE baixado IS NOT NULL", (BAIXADO_ANTIGO,))
+            self.meta("esquema", 3)
+            self.con.commit()
+
+    def _migrar_2(self):
         # 1) preco lido direto da Steam vira uma "loja" propria: nao briga mais com o "Steam" da ITAD
         self.con.execute("UPDATE preco SET loja='Steam (direto)' WHERE fonte='steam'")
         # 2) horarios em UTC
