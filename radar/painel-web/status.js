@@ -1,5 +1,5 @@
 /* ================= status / ações ================= */
-const VERSAO_PAGINA='0.17.2';
+const VERSAO_PAGINA='0.18.0';
 function nVitrine(){return VIT?['selo','novo','igual','24m'].reduce((s,t)=>s+((VIT[t]||{}).total||0),0):null;}
 function atualizarStatus(){const el=$('#stTopo');if(el&&VIT)el.innerHTML=`<b>${nVitrine()}</b> na vitrine · ${fmtN(RES.na_lista)} na lista`;}
 async function carregarResumo(){

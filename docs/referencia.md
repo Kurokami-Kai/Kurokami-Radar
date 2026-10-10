@@ -222,6 +222,7 @@ Decide QUAIS alertas viram notificacao:
 - `brl(c)`
 - `em_silencio(cfg, agora_local)`
 - **class `Notificador`** — 
+  - `_avisar(titulo, texto, clique, botoes, imagem, rodape, foto)` — Um aviso, nos dois canais: toast do Windows (se ativo) e Telegram (se ligado).
   - `_lista_url()`
   - `_vitrine_url()`
   - `processar(alertas)`
@@ -290,11 +291,9 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `api_hltb(q)` — Tempo para zerar (HowLongToBeat, em minutos) dos jogos de uma franquia: ?appids=1,2,3 (até 60).
 - `post_franquia(d)` — Troca a franquia do jogo a mao (juntar = escolher uma que existe; separar = nome novo); vazio volta ao automatico.
 - `_jogo_steam(b, cfg, ctx, a)` — Ficha de um item da Steam inteira (fora da lista): o historico das lojas marcadas pela ITAD, baixado na hora
-- `_oferta_do_item(pedida, todas, marc)` — A oferta que vale para um item do carrinho: a da loja escolhida; se ela parou de vender, a da Steam
 - `_ler_carrinho()`
-- `_lojas_padrao(appids)` — Loja de cada jogo que entra no carrinho sem loja escolhida: a oferta mais barata de agora nas lojas
 - `_gravar_carrinho(itens)`
-- `api_carrinho(_q)` — Carrinho simulado: jogos/DLCs (com a loja escolhida) e bundles da Steam (com o preco para voce).
+- `api_carrinho(_q)` — Carrinho simulado da Steam: jogos/DLCs e bundles (com o preco para voce). Jogo de outra loja nao entra: o painel abre a pagina da loja.
 - `_modo(m)` — Como o item entra no carrinho da Steam: para a conta, de presente ou compra privada.
 - `post_carrinho(d)` — O carrinho fica num arquivo proprio: gravar nele nunca espera a coleta liberar o banco.
 - `api_buscar(q)` — Nome, appid ou link da Steam -> resultados da loja.
@@ -313,13 +312,14 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `api_alertas(_q)`
 - `api_config(_q)`
 - `post_config(dados)`
+- `post_telegram(d)` — Conecta o bot do Telegram (so pelo proprio PC). acao: token (guarda e testa), vincular (acha a conversa),
 - `post_dlc(d)`
 - `post_modo(d)`
 - `post_verificar(_d)`
 - `post_pausar(_d)`
 - `post_steam_carrinho(_d)` — Monta o endereco do carrinho da Steam com o pedido (#kurokami=PAIS:p<subid>[-modo],b<bundleid>[-modo]).
 - `_navegador_padrao()` — (nome, exe, pagina de extensoes) do navegador padrao do Windows, ou None se nao for um que a extensao aceita.
-- `post_steam_extensao(d)` — Abre a pasta da extensao no Explorador e, com {navegador: true}, a pagina de extensoes do navegador padrao
+- `post_steam_extensao(d)` — Assistente da extensao do painel. No Edge padrao, abre a pagina dela na loja do Edge (um clique em Obter;
 - `post_steam_conta(d)` — Dados da sua conta Steam que a extensao leu na loja, com a sessao da pagina (senha, token e cookie nunca chegam
 - `_limpar_sessao_qr()` — O login por QR saiu na 0.16 (a Steam o tratava como celular novo). Quem tinha a sessao no cofre:
 - `_log_erro(rota, e)`
@@ -459,6 +459,16 @@ Entrar pela Steam (OpenID 2.0), como no ITAD, na GG.deals e na SteamDB.
 - `url_de_entrada(base)` — URL da pagina de login da Steam. `base` = http://localhost[:porta], montada pelo servidor (nunca pelo cabecalho Host).
 - `_confirmar_na_steam(params)`
 - `concluir(query, base, confirmar, agora)` — Valida a volta da Steam e devolve o SteamID (17 digitos). `query` = dict de listas (parse_qs).
+
+## `radar/telegram.py`
+Telegram (bot gratuito): espelha os avisos no celular, fora de casa.
+
+- `_chamar(token, metodo, dados, timeout)` — Devolve (ok, resposta_json_ou_erro). Nunca levanta: aviso que falha nao pode derrubar a coleta.
+- `_cfg(cfg)`
+- `ligado(cfg)` — Ligado + token + conversa vinculada.
+- `enviar(cfg, titulo, texto, botoes, foto)` — botoes: [(rotulo, url)]: so links https publicos (localhost e file:/// nao abrem no celular).
+- `conectar(token)` — Testa o token (getMe). Devolve (ok, @usuario_do_bot ou mensagem de erro).
+- `achar_conversa(token)` — Chat de quem mandou mensagem ao bot. Devolve (chat_id, nome) ou (None, motivo).
 
 ## `radar/validar.py`
 Testa cada chave com uma chamada real e explica o resultado.
