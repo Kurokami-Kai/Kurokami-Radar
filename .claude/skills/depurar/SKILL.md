@@ -16,7 +16,7 @@ Peça/colete só o necessário:
 - Versão rodando × versão dos arquivos (faixa vermelha no painel indica processo antigo).
 
 ## 2. Hipótese explícita
-Escreva 1 a 3 causas prováveis e o que confirmaria cada uma. Confira `docs/decisoes.md`: muitos sintomas já têm causa conhecida (preço "grátis", fuso, pacote parcial, Hunter antigo servindo página nova…).
+Escreva 1 a 3 causas prováveis e o que confirmaria cada uma. Confira o `docs/decisoes-*.md` do assunto (índice em `docs/decisoes.md`): muitos sintomas já têm causa conhecida (preço "grátis", fuso, pacote parcial, Hunter antigo servindo página nova…).
 
 ## 3. Reproduzir sem rede
 Com uma cópia do banco do usuário (skill `testar-sem-rede`), chame a função suspeita direto e mostre o valor errado. Só então corrija.
@@ -26,4 +26,4 @@ Com uma cópia do banco do usuário (skill `testar-sem-rede`), chame a função 
 - Se o usuário não pode te dar mais dados, acrescente **diagnóstico** (motivo no log/painel) junto da correção, para a próxima ocorrência explicar a si mesma.
 
 ## 5. Registrar
-Bug com causa não óbvia → uma linha em `docs/decisoes.md` ("sintoma → causa → regra").
+Bug com causa não óbvia → uma linha no `docs/decisoes-*.md` do assunto ("sintoma → causa → regra").

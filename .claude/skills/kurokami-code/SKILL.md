@@ -10,7 +10,7 @@ Esta skill **não carrega as outras**: ela indica qual abrir. Abra só a que a t
 ## 1. Entender antes de tocar (barato)
 - Leia o `CLAUDE.md` (já está no contexto) e **só** o doc de `docs/` que a tarefa pede.
 - Para achar código: `py tools/mapa.py <arquivo> [termo]` e leia apenas o intervalo de linhas indicado. Nunca abra `ficha.js`, `ofertas.html` ou `docs/referencia.md` inteiros (`py tools/mapa.py radar/painel-web [termo]`).
-- Mexe em coleta, preços, avaliação ou instalador? Leia a seção de `docs/decisoes.md` da tarefa (`grep -n '^## '` e só o intervalo).
+- Mexe em coleta, preços, avaliação ou instalador? Abra só o `docs/decisoes-<assunto>.md` da tarefa (índice em `docs/decisoes.md`).
 
 ## 2. Plano curto
 Antes de editar, escreva em 3 a 8 linhas: o que muda, em quais arquivos, como testar. Se a tarefa for grande ou ambígua, mostre o plano ao usuário e espere o ok.

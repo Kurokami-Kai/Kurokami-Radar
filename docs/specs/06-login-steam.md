@@ -1,6 +1,6 @@
 # Spec 06 — Login Steam por QR (opcional)
 
-Status: **Nível 1 (OpenID) feito em v0.16.0. Nível 2 (QR + carrinho direto) implementado e depois descartado em 08/10/2026:** a Steam tratou o login por QR como celular novo e alertou o dono de conta invadida; o carrinho passou para a extensão própria do Radar (ver `docs/decisoes.md`, "Login Steam") · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `coleta-e-apis`
+Status: **Nível 1 (OpenID) feito em v0.16.0. Nível 2 (QR + carrinho direto) implementado e depois descartado em 08/10/2026:** a Steam tratou o login por QR como celular novo e alertou o dono de conta invadida; o carrinho passou para a extensão própria do Radar (ver `docs/decisoes-login-steam.md`) · Pedido do dono em 04/10/2026 · Skills: `kurokami-code`, `coleta-e-apis`
 
 **Duas etapas. Faça a Etapa 1 (teste), entregue o relatório e PARE. A Etapa 2 é escrita depois, com base no teste.**
 

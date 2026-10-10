@@ -5,7 +5,7 @@ description: Regras da coleta de preços e das integrações Steam, ITAD e GG.de
 
 # Coleta e APIs
 
-Antes: leia `docs/decisoes.md` (seções Steam e ITAD) e a parte "Fontes de dados" de `docs/arquitetura.md`.
+Antes: leia `docs/decisoes-coleta.md` e a parte "Fontes de dados" de `docs/arquitetura.md`.
 
 ## Regras
 - **Lote sempre que existir**: GetItems 50/chamada, ITAD preços 200, GG.deals 100. Nunca um item por chamada se houver lote.
@@ -22,7 +22,7 @@ Antes: leia `docs/decisoes.md` (seções Steam e ITAD) e a parte "Fontes de dado
 1. Cliente em módulo próprio (`radar/<fonte>.py`) com função de lote e exceção `ChaveRecusada`.
 2. Chave (se houver) em `credenciais.CHAVES` + validação em `validar.py` + campo na `janela_chaves.py`.
 3. Etapa em `coleta.atualizar` com intervalo próprio em `config.intervalos_minutos`.
-4. Documentar em `docs/arquitetura.md` (tabela de fontes) e `docs/decisoes.md` se houver pegadinha.
+4. Documentar em `docs/arquitetura.md` (tabela de fontes) e `docs/decisoes-coleta.md` se houver pegadinha.
 
 ## Testar
 `py radar.py sondar <appid>` salva respostas cruas em `dados/sonda/sonda.json`: confira o formato real antes de escrever o parser.

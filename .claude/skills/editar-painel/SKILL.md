@@ -24,7 +24,7 @@ description: Editar o painel web (radar/painel.html e radar/painel-web/) sem que
 
 ## Regras
 - Todo texto vindo de dado passa por `esc()`.
-- Só preto e vermelho, cada vermelho com um papel: `--acao` (comprar), `--sinal` (ativo/importante), `--blue` (clicável); botão secundário cinza; desconto pela escala `data-calor` (ver `docs/decisoes.md`, "Paleta por papel"). Use as variáveis do `:root`.
+- Só preto e vermelho, cada vermelho com um papel: `--acao` (comprar), `--sinal` (ativo/importante), `--blue` (clicável); botão secundário cinza; desconto pela escala `data-calor` (ver `docs/decisoes-visual.md`, "Paleta por papel"). Use as variáveis do `:root`.
 - Pensar no celular: o painel também abre no telefone (media queries `max-width:720px/900px`).
 - Campo novo de API → documentar em `docs/api.md` e criar no `painel.py`.
 - Mudou o painel junto com o servidor → mesma versão em `VERSAO_PAGINA` e `radar/__init__.py`.

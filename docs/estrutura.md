@@ -63,7 +63,7 @@ Kurokami Hunter/
 │   ├── rodar_instalado.py   # roda um comando do radar.py pelo código com os dados da instalação (%LOCALAPPDATA%)
 │   ├── painel_copia.py      # sobe o painel numa cópia do banco (porta 8799), sem coleta: para ver o visual e tirar prints
 │   └── checar.py            # checagens antes de entregar (sintaxe, JS, versão, add-data, dados pessoais, .gitignore, testar_piso)
-├── docs/                    # esta documentação
+├── docs/                    # esta documentação (decisoes.md = índice; decisoes-coleta/raridade/selo/app/login-steam/produto/visual.md = o conteúdo)
 ├── .github/workflows/gerar-instalador.yml   # build do Setup.exe em Releases
 ├── installer.iss            # Inno Setup (instalação por usuário, sem admin)
 ├── gerar_setup.bat          # build local do Setup.exe (precisa do Inno Setup)

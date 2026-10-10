@@ -35,5 +35,5 @@ Só lições que continuam valendo (o diário de cada tarefa fica no `git log`).
 
 ## Economia de tokens
 - Modelo padrão Sonnet (`.claude/settings.json`); Opus só para planejar algo grande. Conversa nova perto de 100–150k tokens ou ao trocar de assunto; `/compact` no meio de uma tarefa.
-- `decisoes.md` e `novidades.md` por seção, nunca inteiros; `referencia.md` só se regenera ao publicar.
+- `decisoes-<assunto>.md` (índice em `decisoes.md`) e `novidades.md` por seção, nunca inteiros; `referencia.md` só se regenera ao publicar.
 - Subagentes: `explorador` (Haiku) para leitura ampla, `revisor` (Sonnet) para diff de lógica.
