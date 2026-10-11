@@ -917,7 +917,10 @@ def api_biblioteca(_q):
     consultados = {r["id"] for r in b.q("SELECT id FROM consulta_lenta WHERE tipo='dlcs'")}
     jogos, sem_lista = [], 0
     tot = {"hoje": 0, "cheio": 0, "menor": 0, "falta_hoje": 0, "falta_cheio": 0, "falta_menor": 0, "dlcs_tenho": 0, "dlcs_faltam": 0}
-    dlc_tenho_total = sum(1 for a in tem if (J.get(a) or {}).get("tipo") == "dlc")
+    # DLC que voce tem tambem passa pelas regras de "DLC inutil" (Configuracoes -> DLCs): nao entra na contagem nem no valor
+    classe_dlc = {d["appid"]: d["classe"] for lst in ctx.dlcs.values() for d in lst}
+    conta_dlc = lambda a: not dlcmod.ignorada(classe_dlc.get(a) or dlcmod.classificar((J.get(a) or {}).get("nome")), preco(a), cfg["dlc"], tenho=True)
+    dlc_tenho_total = sum(1 for a in tem if (J.get(a) or {}).get("tipo") == "dlc" and conta_dlc(a))
     for a in tem:
         j = J.get(a) or {}
         if j.get("tipo") != "jogo" or not j.get("nome"):
@@ -926,7 +929,7 @@ def api_biblioteca(_q):
         rel = set(ctx.relevantes(a))
         tenho = [d["appid"] for d in dl if d["appid"] in tem]
         falta = [d for d in dl if d["appid"] in rel and d["appid"] not in tem and preco(d["appid"])]
-        vl = [x for x in [a] + tenho if preco(x) is not None]
+        vl = [x for x in [a] + [t for t in tenho if conta_dlc(t)] if preco(x) is not None]
         v_hoje = sum(preco(x) for x in vl)
         v_cheio = sum(cheio(x) or 0 for x in vl)
         v_menor = sum((menor(x) if menor(x) is not None else preco(x)) for x in vl)

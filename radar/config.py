@@ -67,7 +67,10 @@ PADRAO = {
         "ignorar_extras": True,       # trilha sonora, artbook, wallpaper...
         "ignorar_atalhos": True,      # boosters, moedas, time savers
         "ignorar_pacotes": False,     # DLCs que juntam outras (ex.: HITMAN "Deluxe Pack") - contam por padrao
-        "ignorar_gratis": True
+        "ignorar_gratis": True,
+        "ignorar_itens": True,        # armas, armaduras, pingentes, conjuntos de itens (classe "item")
+        "preco_minimo": 0,            # reais: DLC mais barata que isso nao conta (0 = desligado)
+        "so_expansoes": False         # so expansoes e passes de temporada contam (as outras classes saem)
     },
 
     # "base": avalia o jogo sozinho; "completo": avalia o custo de ter tudo que importa.

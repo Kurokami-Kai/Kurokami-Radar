@@ -275,7 +275,7 @@ def catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento=None)
             for b in d["_bundles"]:  # bundles de DLC (ex.: "Deluxe Pack DLC"), uteis para completar a biblioteca
                 bundles_de.setdefault(b, set()).add(d["appid"])
             banco.salvar_jogo(d)
-            banco.salvar_dlc(d["appid"], d["pai"], dlcmod.classificar(d["nome"]))
+            banco.salvar_dlc(d["appid"], d["pai"], dlcmod.classificar(d["nome"], banco.nome_jogo(d["pai"])))
         banco.commit()
 
     # ---- bundles que contem jogos da lista
@@ -301,7 +301,7 @@ def catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento=None)
     novas = banco.q("SELECT j.appid, j.pai, j.nome FROM jogo j LEFT JOIN dlc d ON d.appid=j.appid "
                     "WHERE j.tipo='dlc' AND j.pai IS NOT NULL AND d.appid IS NULL")
     for r in novas:
-        banco.salvar_dlc(r["appid"], r["pai"], dlcmod.classificar(r["nome"]))
+        banco.salvar_dlc(r["appid"], r["pai"], dlcmod.classificar(r["nome"], banco.nome_jogo(r["pai"])))
     if novas:
         log("   %d DLCs reconhecidas pelos bundles e edicoes" % len(novas))
     # preco da propria Steam tambem vira historico (caso a ITAD nao tenha o item)
@@ -318,7 +318,7 @@ def coletar_biblioteca(cfg, banco, possuidos, k_itad, log):
     for d in (steam.normalizar_app(i) for i in steam.get_items([{"appid": a} for a in possuidos], pais, log=log)):
         banco.salvar_jogo(d)
         if d["tipo"] == "dlc" and d["pai"]:
-            banco.salvar_dlc(d["appid"], d["pai"], dlcmod.classificar(d["nome"]))
+            banco.salvar_dlc(d["appid"], d["pai"], dlcmod.classificar(d["nome"], banco.nome_jogo(d["pai"])))
         n += 1
     banco.commit()
     log("   %d itens lidos" % n)

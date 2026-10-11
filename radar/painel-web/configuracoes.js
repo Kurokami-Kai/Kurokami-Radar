@@ -71,12 +71,15 @@ async function renderCfg(){
      `<div class="cfg-card">${swRow('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata','Desligado por padrão: a GG.deals dava muito alarme falso.')}
       ${row('Abaixo de','',num('keyshops.preco_maximo',k.preco_maximo,1,0,null,'R$',1))}
       ${row('ou abaixo de','Porcentagem do menor preço oficial.',num('keyshops.pct_do_menor_oficial',k.pct_do_menor_oficial,5,0,100,'%'))}</div>`)}
-   ${sec('dlc','DLCs','O que entra no custo completo de um jogo (jogo + DLCs). Cada DLC pode ser reclassificada na ficha do jogo.',
+   ${sec('dlc','DLCs','O que conta como DLC que vale a pena: custo completo, "faltam" e totais da Biblioteca (o que você já tem também). Cada DLC pode ser reclassificada na ficha do jogo.',
      `<div class="cfg-card">${swRow('dlc.ignorar_cosmeticos',dl.ignorar_cosmeticos,'Ignorar cosméticos','Skins, roupas, visuais.')}
       ${swRow('dlc.ignorar_extras',dl.ignorar_extras,'Ignorar extras','Trilha sonora, artbook.')}
       ${swRow('dlc.ignorar_atalhos',dl.ignorar_atalhos,'Ignorar atalhos e moedas','')}
+      ${swRow('dlc.ignorar_itens',dl.ignorar_itens!==false,'Ignorar itens, armas e armaduras','Conjuntos de itens, pingentes, armas e armaduras avulsas.')}
       ${swRow('dlc.ignorar_pacotes',dl.ignorar_pacotes,'Ignorar pacotes que juntam outras DLCs','')}
-      ${swRow('dlc.ignorar_gratis',dl.ignorar_gratis,'Ignorar DLCs gratuitas','')}</div>`)}
+      ${swRow('dlc.ignorar_gratis',dl.ignorar_gratis,'Ignorar DLCs gratuitas','')}
+      ${row('Preço mínimo da DLC','DLC mais barata que isso não conta (vale para as que você tem também). 0 desliga.',num('dlc.preco_minimo',dl.preco_minimo??0,1,0,null,'R$',1))}
+      ${swRow('dlc.so_expansoes',!!dl.so_expansoes,'Só expansões e passes de temporada','Para quem só quer o que amplia a história: conta apenas expansões, campanhas e passes (e pacotes, se não estiverem ignorados).')}</div>`)}
    ${sec('acesso','Celular e outros PCs','Abrir o painel pelo celular ou por outro computador da mesma rede Wi-Fi. Esta parte salva na hora.',
      `<div class="cfg-card"><div class="cfg-in" id="acesso">carregando…</div></div>`)}
    </div></div>

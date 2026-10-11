@@ -127,6 +127,17 @@ class Banco:
             self.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=NULL WHERE baixado IS NOT NULL", (BAIXADO_ANTIGO,))
             self.meta("esquema", 3)
             self.con.commit()
+        if esquema < 4:
+            # 0.18.2: classificador de DLC novo (classe "item", trilhas, gestos, adesivos, moedas...): reclassifica o que veio
+            # do nome; correcao do usuario (origem='usuario') nunca muda.
+            from . import dlc as dlcmod
+            for r in self.con.execute("SELECT d.appid, d.classe, j.nome, p.nome FROM dlc d JOIN jogo j ON j.appid=d.appid "
+                                      "LEFT JOIN jogo p ON p.appid=d.pai WHERE d.origem<>'usuario' AND j.nome IS NOT NULL").fetchall():
+                nova = dlcmod.classificar(r[2], r[3])
+                if nova != r[1]:
+                    self.con.execute("UPDATE dlc SET classe=? WHERE appid=?", (nova, r[0]))
+            self.meta("esquema", 4)
+            self.con.commit()
 
     def _migrar_2(self):
         # 1) preco lido direto da Steam vira uma "loja" propria: nao briga mais com o "Steam" da ITAD
@@ -197,6 +208,10 @@ class Banco:
         self.con.execute("UPDATE jogo SET itad_id=? WHERE appid=?", (gid, appid))
 
     # ---------------- dlcs
+    def nome_jogo(self, appid):
+        r = self.um("SELECT nome FROM jogo WHERE appid=?", appid) if appid else None
+        return r["nome"] if r else None
+
     def salvar_dlc(self, appid, pai, classe):
         # nunca sobrescreve uma classificacao feita pelo usuario
         self.con.execute(

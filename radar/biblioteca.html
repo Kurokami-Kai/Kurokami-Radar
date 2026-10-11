@@ -319,8 +319,8 @@ const FR=Object.values(grupos).filter(f=>f.m.length>1&&f.m.some(g=>g.tenho)).map
 const EMFR=new Set(FR.flatMap(f=>f.m.map(g=>g.appid)));
 const AV=G.filter(g=>g.tenho&&!EMFR.has(g.appid)).map(g=>item(g.nome,[g],'jogo'));
 const T=D.total;
-const CLASSE={historia:'História',conteudo:'Conteúdo',cosmetico:'Cosmético',atalho:'Atalho',extra:'Extra',pacote:'Pacote'};
-const ORDEM_CL=['historia','conteudo','pacote','extra','cosmetico','atalho'];
+const CLASSE={historia:'História',conteudo:'Conteúdo',cosmetico:'Cosmético',atalho:'Atalho',extra:'Extra',pacote:'Pacote',item:'Item'};
+const ORDEM_CL=['historia','conteudo','pacote','item','extra','cosmetico','atalho'];
 
 /* ---------- estado ---------- */
 const S={o:'H2',sub:'bib',modo:{},q:'',ord:{},aberto:null,lista:[]};
