@@ -53,7 +53,7 @@ Verificação **rápida** = o ciclo normal (respeita intervalos e orçamento). *
 
 ## Avaliação (`analise.avaliar`)
 
-Por jogo da lista (exceto os que o usuário já tem): para cada oferta das **lojas marcadas** (e DRM Steam, se exigido) roda `analise.analisar(linhas, preco, corte)`:
+Por jogo da lista (exceto os que o usuário já tem): para cada oferta das **lojas marcadas** (e DRM Steam, se exigido) roda `analise.analisar(linhas, preco, corte)` (com `somente_drm_steam`, a oferta sem DRM Steam e o histórico dela ficam fora **em todo o painel**, não só aqui: `ofertas_atuais/linhas_lote/pisos/menor(so_drm=)` e `banco.SO_DRM_SQL`):
 - `linha_do_tempo` junta o histórico das lojas marcadas em trechos (menor preço, corte do menor, maior corte); `episodios` vira promoções (intervalo sem desconto < 1 dia não separa).
 - **Raridade** (eixo 1): episódios anteriores com corte ≥ atual − 5, por ano, nos últimos 24 meses. Comum ≥ 3/ano · Incomum 1,5–3 · Raro 0,75–1,5 · Ultrarraro < 0,75 · Lendário = nunca (histórico inteiro), com ≥ 24 meses de histórico e ≥ 1 promoção anterior; 12–24 meses: no máximo Ultrarraro. Sem promoção anterior nas lojas marcadas ou histórico < 6 meses: no máximo Incomum.
 - A raridade não aparece mais nas telas (0.15): vira a coluna informativa **"Costuma voltar"** (`costuma_voltar`: histórico curto · primeira promoção · nunca teve esse desconto (histórico inteiro) · não teve nos últimos 2 anos · todo mês · a cada ~N meses · 1 vez por ano · 1 vez em 2 anos; `dica_volta` dá a linha "Nos últimos 2 anos: N vezes com -Y% ou mais…").

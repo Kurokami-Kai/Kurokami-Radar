@@ -46,7 +46,8 @@ def candidatos_fim(b, alertas, cfg):
         j = b.um("SELECT nome, preco_steam, desconto_steam, fim_desconto FROM jogo WHERE appid=?", a)
         if not j:
             continue
-        ofs = [dict(r) for r in b.q("SELECT * FROM oferta_atual WHERE appid=? AND corte>0", a) if r["loja"].lower() in marc]
+        ofs = [dict(r) for r in b.q("SELECT * FROM oferta_atual WHERE appid=? AND corte>0", a)
+               if r["loja"].lower() in marc and (r["drm_steam"] or not cfg.get("somente_drm_steam"))]
         melhor = min(ofs, key=lambda o: o["preco"]) if ofs else None
         fim = _fim_iso(melhor["expira"]) if melhor and melhor.get("expira") else None
         if fim is None and j["desconto_steam"]:

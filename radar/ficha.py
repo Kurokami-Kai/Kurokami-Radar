@@ -121,7 +121,7 @@ def jogado(b, a):
     return {"minutos": r["minutos"], "ultima": r["ultima"]} if r else None
 
 
-def fileira(b, ctx, a, nome, marcadas):
+def fileira(b, ctx, a, nome, marcadas, so_drm=False):
     """A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
     agora (lojas marcadas) dos que voce nao tem. "nomes": as franquias com 2+ jogos, para o "trocar" da ficha."""
     J = ctx.jogos
@@ -133,7 +133,7 @@ def fileira(b, ctx, a, nome, marcadas):
     fr = series.franquias(itens, manual)
     alvo = fr[a]
     ids = [x["appid"] for x in itens if fr[x["appid"]].lower() == alvo.lower()]
-    ofs = b.ofertas_atuais([x for x in ids if x not in ctx.possuidos])
+    ofs = b.ofertas_atuais([x for x in ids if x not in ctx.possuidos], so_drm=so_drm)
     membros = []
     for x in ids:
         j = J.get(x) or {}

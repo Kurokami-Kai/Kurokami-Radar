@@ -622,7 +622,7 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
                 continue
             if pisos is None:
                 lojas_p = list(lojas_marcadas) + (["Steam (direto)"] if "Steam" in lojas_marcadas else [])
-                linhas = ctx.b.linhas_lote(lojas_p, [appid]).get(appid, [])
+                linhas = ctx.b.linhas_lote(lojas_p, [appid], so_drm=cfg.get("somente_drm_steam")).get(appid, [])
                 pisos = ctx.b._pisos_de(linhas, (90, 180, 270, 365)) if linhas else {}
             tag, texto, acima = etiqueta(o["preco"], o.get("cheio"), pisos, al, o.get("flag"))
             an = analisar(linhas, o["preco"], o["corte"], cfg_alerta=al)
@@ -645,7 +645,7 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
         g = gg.get(appid)
         if ks.get("ativo") and g and g.get("keyshop") is not None and not parciais and not g.get("parcial"):
             kp = g["keyshop"]
-            pisos_of = [x for x in (ctx.b.menor(appid, list(lojas_marcadas)), g.get("hist_oficial")) if x]
+            pisos_of = [x for x in (ctx.b.menor(appid, list(lojas_marcadas), so_drm=cfg.get("somente_drm_steam")), g.get("hist_oficial")) if x]
             menor_of = min(pisos_of) if pisos_of else None
             barato = kp <= (ks.get("preco_maximo") or 0) * 100 or \
                 (menor_of and kp <= menor_of * (ks.get("pct_do_menor_oficial") or 0) / 100)

@@ -12,7 +12,7 @@ import urllib.parse as _up
 
 from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, ficha, steam
 from .rede import http_json
-from .banco import Banco
+from .banco import SO_DRM_SQL, Banco
 
 PORTAS = (80, 8787)       # tenta a 80 (link sem numero); se estiver ocupada, usa a 8787
 PORTA = 8787              # a que ficou valendo
@@ -101,17 +101,11 @@ def _melhor_oferta(ofs):
     return min(ofs, key=lambda o: (o["preco"], o["loja"] != "Steam")) if ofs else None
 
 
-def _ultimos_por_loja(b, appids=None):
+def _minimos(b, appids=None, so_drm=False):
     filtro = "WHERE appid IN (SELECT appid FROM jogo WHERE na_lista=1)" if appids is None else \
         "WHERE appid IN (%s)" % ",".join(str(int(a)) for a in appids)
-    return b.q("""SELECT p.appid, p.loja, p.preco, p.cheio, p.corte, p.url, p.quando FROM preco p
-                  JOIN (SELECT appid, loja, MAX(quando) mq FROM preco %s GROUP BY appid, loja) u
-                  ON p.appid=u.appid AND p.loja=u.loja AND p.quando=u.mq""" % filtro)
-
-
-def _minimos(b, appids=None):
-    filtro = "WHERE appid IN (SELECT appid FROM jogo WHERE na_lista=1)" if appids is None else \
-        "WHERE appid IN (%s)" % ",".join(str(int(a)) for a in appids)
+    if so_drm:
+        filtro += SO_DRM_SQL
     return b.q("SELECT appid, loja, COALESCE(MIN(CASE WHEN preco>0 THEN preco END), MIN(preco)) m FROM preco %s GROUP BY appid, loja" % filtro)
 
 
@@ -202,13 +196,13 @@ def _montar_linhas(cfg, conta):
     ctx = analise.Contexto(b, cfg)
     marc = _marcadas(cfg)
     mins = {}
-    atuais = b.ofertas_atuais()
-    for r in _minimos(b):
+    atuais = b.ofertas_atuais(so_drm=cfg.get("somente_drm_steam"))
+    for r in _minimos(b, so_drm=cfg.get("somente_drm_steam")):
         mins.setdefault(r["appid"], {})[r["loja"]] = r["m"]
     lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")} if l.lower() in marc]
     if "steam" in marc:
         lojas_m.append("Steam (direto)")
-    linhas = b.linhas_lote(lojas_m)
+    linhas = b.linhas_lote(lojas_m, so_drm=cfg.get("somente_drm_steam"))
     pisos = {a_: b._pisos_de(rs, (90, 180, 270, 365)) for a_, rs in linhas.items()}
     extras = {int(x) for x in (cfg.get("extras") or [])}
     mudos = {r["appid"] for r in b.q("SELECT appid FROM silenciado")}
@@ -560,10 +554,10 @@ def api_jogo(q):
             b.con.close()
     j = ctx.jogos.get(a) or {}
     hist = {}
-    for r in b.q("SELECT loja, preco, quando FROM preco WHERE appid=? ORDER BY quando", a):
+    for r in b.q("SELECT loja, preco, quando FROM preco WHERE appid=?%s ORDER BY quando" % (SO_DRM_SQL if cfg.get("somente_drm_steam") else ""), a):
         hist.setdefault(r["loja"], []).append([r["quando"], r["preco"]])
-    atuais = {o["loja"]: o for o in b.ofertas_atuais([a]).get(a, [])}
-    mins = {r["loja"]: r["m"] for r in _minimos(b, [a])}
+    atuais = {o["loja"]: o for o in b.ofertas_atuais([a], so_drm=cfg.get("somente_drm_steam")).get(a, [])}
+    mins = {r["loja"]: r["m"] for r in _minimos(b, [a], so_drm=cfg.get("somente_drm_steam"))}
     nomes = [l for l in set(atuais) | set(mins) if l not in NAO_LOJA]
     lojas = [{"loja": l, "atual": (atuais.get(l) or {}).get("preco"), "cheio": (atuais.get(l) or {}).get("cheio"),
               "corte": (atuais.get(l) or {}).get("corte"), "url": (atuais.get(l) or {}).get("url"),
@@ -589,7 +583,7 @@ def api_jogo(q):
     lojas_m = [l for l in hist if l.lower() in marc] + (["Steam (direto)"] if "steam" in marc else [])
     ofs_m = [o for o in atuais.values() if o["loja"].lower() in marc]
     melhor = min(ofs_m, key=lambda o: o["preco"]) if ofs_m else None
-    lin_m = b.linhas_lote(lojas_m, [a]).get(a, []) if lojas_m else []
+    lin_m = b.linhas_lote(lojas_m, [a], so_drm=cfg.get("somente_drm_steam")).get(a, []) if lojas_m else []
     an = analise.analisar(lin_m, melhor["preco"] if melhor else None, melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"])
     corte_m = melhor["corte"] if melhor else 0
     tipos = analise.tipos_de(an)
@@ -621,7 +615,7 @@ def api_jogo(q):
 
 def _ficha_local(b, ctx, cfg, a, r):
     """O que a ficha nova (spec 09) le junto, sem rede: a fileira da franquia e o tempo jogado."""
-    r["franquia"] = ficha.fileira(b, ctx, a, r["jogo"].get("nome"), _marcadas(cfg))
+    r["franquia"] = ficha.fileira(b, ctx, a, r["jogo"].get("nome"), _marcadas(cfg), cfg.get("somente_drm_steam"))
     r["jogado"] = ficha.jogado(b, a)
 
 
@@ -770,7 +764,7 @@ def api_carrinho(_q):
     lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")} if l.lower() in marc]
     if "steam" in marc:
         lojas_m.append("Steam (direto)")
-    atuais = b.ofertas_atuais(apps) if apps else {}
+    atuais = b.ofertas_atuais(apps, so_drm=cfg.get("somente_drm_steam")) if apps else {}
     nome = lambda a: (ctx.jogos.get(a) or {}).get("nome") or str(a)
     cobertos = {}
     bl = []
@@ -795,10 +789,10 @@ def api_carrinho(_q):
         escolhida = next((o for o in todas if o["loja"] == "Steam"), None)   # o carrinho e so da Steam: as outras lojas abrem a pagina delas
         sumiu = escolhida is None
         ofs = [escolhida] if escolhida else []
-        ps = b.pisos(a, lojas_m) if lojas_m else {}
+        ps = b.pisos(a, lojas_m, so_drm=cfg.get("somente_drm_steam")) if lojas_m else {}
         tag, texto, acima = analise.etiqueta(escolhida["preco"], escolhida.get("cheio"), ps, cfg["alerta"]) \
             if escolhida and escolhida.get("corte") else (None, None, None)
-        an = analise.analisar(b.linhas_lote(lojas_m, [a]).get(a, []), escolhida["preco"], escolhida.get("corte"),
+        an = analise.analisar(b.linhas_lote(lojas_m, [a], so_drm=cfg.get("somente_drm_steam")).get(a, []), escolhida["preco"], escolhida.get("corte"),
                               cfg_alerta=cfg["alerta"]) if escolhida and escolhida.get("corte") and lojas_m else {}
         out.append({"appid": a, "modo": modos[("a", a)], "nome": j.get("nome") or str(a), "capa": j.get("capa"), "tipo": j.get("tipo"),
                     "possuido": a in ctx.possuidos, "lojas": [{k: o.get(k) for k in ("loja", "preco", "cheio", "corte", "url")} for o in ofs],
@@ -1014,11 +1008,11 @@ def _dlcs_em_promocao(b, cfg, ctx, jogos):
     faltam = {d["appid"]: g for g in jogos for d in g["falta"]}
     if not faltam:
         return []
-    atuais = b.ofertas_atuais(list(faltam))
+    atuais = b.ofertas_atuais(list(faltam), so_drm=cfg.get("somente_drm_steam"))
     lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")} if l.lower() in marc]
     if "steam" in marc:
         lojas_m.append("Steam (direto)")
-    linhas = b.linhas_lote(lojas_m, list(faltam)) if lojas_m else {}
+    linhas = b.linhas_lote(lojas_m, list(faltam), so_drm=cfg.get("somente_drm_steam")) if lojas_m else {}
     out = []
     for a, g in faltam.items():
         j = ctx.jogos.get(a) or {}

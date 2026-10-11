@@ -44,8 +44,8 @@ async function renderCfg(){
       ${row('Tolerância acima do menor histórico','',num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50,'%'))}
       ${row('Modo completo: dias de observação','',num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365,'dias'))}
       <div class="cfg-nota">Análises da Steam não decidem avisos.</div></div>`)}
-   ${sec('lojas','Lojas','O Hunter coleta todas as lojas; aqui você decide de quais pode vir um alerta.',
-     `<div class="cfg-card">${swRow('somente_drm_steam',c.somente_drm_steam,'Só chave ativável na Steam','Só alerta quando a chave ativa na Steam (DRM Steam).')}
+   ${sec('lojas','Lojas','O Hunter coleta todas as lojas; aqui você decide quais entram nos preços do painel, na ficha e nos alertas.',
+     `<div class="cfg-card">${swRow('somente_drm_steam',c.somente_drm_steam,'Só chave ativável na Steam','Esconde ofertas de GOG, Microsoft Store, Epic e outras que não ativam na Steam (painel, ficha, preço mínimo e alertas).')}
       ${row('Lojas que podem alertar',`<span id="ljN"></span>`,'<button class="btn-ghost" type="button" data-lj="1">Todas</button><button class="btn-ghost" type="button" data-lj="0">Nenhuma</button>')}
       <div class="cfg-lojas">${lojas.map(l=>`<label class="cfg-lj"><input type="checkbox" data-loja="${esc(l)}" ${marc.has(l.toLowerCase())?'checked':''}>${esc(l)}</label>`).join('')}</div></div>`)}
    ${sec('notif','Notificações','Os avisos aparecem no canto da tela do Windows. O histórico fica em Configurações → Notificações.',

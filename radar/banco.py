@@ -8,6 +8,12 @@ from . import caminhos
 
 BAIXADO_ANTIGO = "2000-01-01T00:00:00+00:00"   # promo_estado.baixado de um historico em moeda errada: refazer inteiro
 
+# somente_drm_steam: o historico (tabela preco) nao guarda o DRM, entao fica de fora o que a ITAD diz hoje que nao ativa na Steam
+# (oferta_atual.drm_steam = 0) e as lojas que nunca vendem chave Steam. Vale para `preco` sem apelido, no WHERE.
+LOJAS_SEM_STEAM = ("GOG", "Epic Game Store", "Microsoft Store", "Ubisoft Store", "EA Store", "Blizzard")
+SO_DRM_SQL = (" AND loja NOT IN (%s) AND NOT EXISTS (SELECT 1 FROM oferta_atual od WHERE od.appid=preco.appid"
+              " AND od.loja=preco.loja AND od.drm_steam=0)" % ",".join("'%s'" % l for l in LOJAS_SEM_STEAM))
+
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS jogo(
   appid INTEGER PRIMARY KEY, nome TEXT, tipo TEXT, pai INTEGER, capa TEXT,
@@ -250,10 +256,10 @@ class Banco:
         self.con.execute("INSERT OR REPLACE INTO historico_importado(appid, quando, escopo) VALUES(?,?,'todas')",
                          (appid, agora()))
 
-    def menor(self, appid, lojas=None, dias=None):
+    def menor(self, appid, lojas=None, dias=None, so_drm=False):
         """Menor preco registrado. dias: so olha essa janela (0/None = desde sempre).
         Precos que estavam valendo no inicio da janela tambem contam."""
-        filtro, args = "", [appid]
+        filtro, args = (SO_DRM_SQL if so_drm else ""), [appid]
         if lojas:
             filtro += " AND loja IN (%s)" % ",".join("?" * len(lojas))
             args += list(lojas)
@@ -268,14 +274,15 @@ class Banco:
         r = self.um("SELECT MIN(preco) m FROM preco WHERE appid=?%s" % filtro, *args)
         return r["m"] if r else None
 
-    def linhas_lote(self, lojas, appids=None):
-        """{appid: [registros de preco em ordem]} das lojas dadas, para a lista inteira (ou os appids dados)."""
+    def linhas_lote(self, lojas, appids=None, so_drm=False):
+        """{appid: [registros de preco em ordem]} das lojas dadas, para a lista inteira (ou os appids dados).
+        so_drm: sem o historico de loja que nao ativa na Steam (ver SO_DRM_SQL)."""
         if not lojas:
             return {}
         filtro = ("(SELECT appid FROM jogo WHERE na_lista=1)" if appids is None
                   else "(%s)" % ",".join(str(int(a)) for a in appids))
-        rows = self.q("SELECT appid, loja, preco, corte, quando FROM preco WHERE loja IN (%s) AND appid IN %s ORDER BY appid, quando"
-                      % (",".join("?" * len(lojas)), filtro), *lojas)
+        rows = self.q("SELECT appid, loja, preco, corte, quando FROM preco WHERE loja IN (%s) AND appid IN %s%s ORDER BY appid, quando"
+                      % (",".join("?" * len(lojas)), filtro, SO_DRM_SQL if so_drm else ""), *lojas)
         por = {}
         for r in rows:
             por.setdefault(r["appid"], []).append(r)
@@ -307,13 +314,13 @@ class Banco:
             out[d] = min(vals) if vals else None
         return out
 
-    def pisos(self, appid, lojas, janelas=(90, 180, 270, 365)):
+    def pisos(self, appid, lojas, janelas=(90, 180, 270, 365), so_drm=False):
         """{dias: menor preco na janela, 0: menor de todos os tempos} considerando so as lojas dadas.
         O preco que estava valendo quando a janela comecou tambem conta."""
         if not lojas:
             return {}
-        rows = self.q("SELECT loja, preco, quando FROM preco WHERE appid=? AND loja IN (%s) ORDER BY quando"
-                      % ",".join("?" * len(lojas)), appid, *lojas)
+        rows = self.q("SELECT loja, preco, quando FROM preco WHERE appid=? AND loja IN (%s)%s ORDER BY quando"
+                      % (",".join("?" * len(lojas)), SO_DRM_SQL if so_drm else ""), appid, *lojas)
         return self._pisos_de(rows, janelas) if rows else {}
 
     def atuais(self, appid):
@@ -332,11 +339,14 @@ class Banco:
                                1 if o.get("drm_steam") else 0, o.get("flag"), q, o.get("expira"))
                               for a, lst in ofertas.items() for o in lst if o.get("preco") is not None])
 
-    def ofertas_atuais(self, appids=None):
-        """{appid: [oferta]} vigentes, com a Steam lida direto do catalogo quando a ITAD nao traz a Steam."""
+    def ofertas_atuais(self, appids=None, so_drm=False):
+        """{appid: [oferta]} vigentes, com a Steam lida direto do catalogo quando a ITAD nao traz a Steam.
+        so_drm (config somente_drm_steam): deixa de fora a oferta que nao ativa na Steam (GOG, Microsoft Store...)."""
         filtro = "" if appids is None else " WHERE appid IN (%s)" % ",".join(str(int(a)) for a in appids)
         out = {}
         for r in self.q("SELECT * FROM oferta_atual" + filtro):
+            if so_drm and not r["drm_steam"]:
+                continue
             out.setdefault(r["appid"], []).append(dict(r))
         jf = "WHERE na_lista=1" if appids is None else "WHERE appid IN (%s)" % ",".join(str(int(a)) for a in appids)
         for j in self.q("SELECT appid, preco_steam, cheio_steam, desconto_steam FROM jogo " + jf):

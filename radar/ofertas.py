@@ -9,7 +9,7 @@ from collections import defaultdict
 from datetime import datetime, timezone
 
 from . import analise, caminhos, config, series
-from .banco import Banco
+from .banco import LOJAS_SEM_STEAM, SO_DRM_SQL, Banco
 from .previsao import Previsor, eventos
 
 CDN = 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/'
@@ -42,13 +42,16 @@ def curta(u):
     return '~' + u[len(CDN):] if u.startswith(CDN) else u
 
 
-def _linhas_de(b, tabela, lojas, appids):
+def _linhas_de(b, tabela, lojas, appids, so_drm=False):
+    """so_drm (somente_drm_steam): em `preco` sem o histórico que não ativa na Steam; `promo_hist` não guarda DRM,
+    então só perde as lojas que nunca vendem chave Steam."""
     por = defaultdict(list)
     ids = sorted(set(appids))
+    ext = SO_DRM_SQL if so_drm and tabela == 'preco' else ''
     for k in range(0, len(ids), 500):
-        for r in b.q("SELECT appid, loja, preco, corte, quando FROM %s WHERE appid IN (%s) ORDER BY appid, quando"
-                     % (tabela, ','.join(str(int(a)) for a in ids[k:k + 500]))):
-            if r['loja'] in lojas:
+        for r in b.q("SELECT appid, loja, preco, corte, quando FROM %s WHERE appid IN (%s)%s ORDER BY appid, quando"
+                     % (tabela, ','.join(str(int(a)) for a in ids[k:k + 500]), ext)):
+            if r['loja'] in lojas and not (so_drm and r['loja'] in LOJAS_SEM_STEAM):
                 por[r['appid']].append({'loja': r['loja'], 'preco': r['preco'], 'corte': r['corte'], 'quando': r['quando']})
     return por
 
@@ -88,7 +91,9 @@ def _montar_ofertas():
         cv = {r[0]: r[1] for r in b.q("SELECT appid, capa_v FROM jogo WHERE capa_v IS NOT NULL AND capa_v<>''")}
         lista_db = [{'appid': r[0], 'nome': r[1], 'franquia': r[2]} for r in b.q("SELECT appid, nome, franquia FROM jogo WHERE na_lista=1")]
         fr = series.franquias(lista_db, {r[0]: r[1] for r in b.q('SELECT appid, nome FROM franquia_manual')})
-        lojas = set((b.meta('promo_lojas') or {}).get('nomes') or []) or set(config.carregar().get('lojas') or [])
+        cfg = config.carregar()
+        so_drm = cfg.get('somente_drm_steam')
+        lojas = set((b.meta('promo_lojas') or {}).get('nomes') or []) or set(cfg.get('lojas') or [])
         lojas_l = lojas | ({'Steam (direto)'} if 'Steam' in lojas else set())
         com_hist = {r[0] for r in b.q('SELECT appid FROM promo_estado WHERE baixado IS NOT NULL')}
 
@@ -98,7 +103,7 @@ def _montar_ofertas():
         lista, _ = _todas({'fonte': 'steam', 'relacao': {'na_lista': 'exigir'}, 'ordem': [['corte', 'desc'], ['nome', 'asc']]})
 
         H = {}
-        lh = _linhas_de(b, 'preco', lojas_l, [o['appid'] for o in lista])
+        lh = _linhas_de(b, 'preco', lojas_l, [o['appid'] for o in lista], so_drm)
         L = []
         for o in lista:
             em = (o.get('corte') or 0) > 0 and o.get('preco') is not None
@@ -113,7 +118,7 @@ def _montar_ofertas():
 
         lid = {o['appid'] for o in lista}
         fora = [o for o in promo if o['appid'] not in lid]
-        ph = _linhas_de(b, 'promo_hist', lojas, [o['appid'] for o in fora if o['appid'] in com_hist])
+        ph = _linhas_de(b, 'promo_hist', lojas, [o['appid'] for o in fora if o['appid'] in com_hist], so_drm)
         P = []
         for o in promo:
             if o['appid'] in lid:
@@ -171,8 +176,9 @@ def _montar_biblioteca():
         itens = [{'appid': x, 'nome': J[x]['nome'], 'franquia': J[x].get('franquia')} for x in conhecidos]
         fr = series.franquias(itens, {r['appid']: r['nome'] for r in b.q('SELECT appid, nome FROM franquia_manual')})
         # o que falta: o preço de agora mais barato nas lojas marcadas, com a loja (o + põe no carrinho dessa loja)
-        marc = painel._marcadas(config.carregar())
-        atuais = b.ofertas_atuais([x for x in conhecidos if x not in ctx.possuidos])
+        cfg = config.carregar()
+        marc = painel._marcadas(cfg)
+        atuais = b.ofertas_atuais([x for x in conhecidos if x not in ctx.possuidos], so_drm=cfg.get('somente_drm_steam'))
         G = []
         for x in conhecidos:
             j = J[x]

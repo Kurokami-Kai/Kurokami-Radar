@@ -35,7 +35,7 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 ## `config.json` (padrões em `config.PADRAO`)
 
 - `perfil_steam`, `pais`, `userdata_json`, `pasta_kurokami_precos`
-- `lojas` (alertam), `somente_drm_steam`
+- `lojas` (alertam e entram nos preços do painel), `somente_drm_steam` (esconde de todo o painel a oferta que não ativa na Steam e o histórico dela; o histórico `preco` não guarda DRM: usa `oferta_atual.drm_steam=0` + `banco.LOJAS_SEM_STEAM`)
 - `alerta`: `tipos{selo,novo,igual,24m}` (o que avisa; padrão só `selo`), `desconto_minimo` (vale para novo, igual e 24m), `selo_corte_minimo` (Selo só a partir desse corte; padrão 0), `dias_minimos_completo`, `tolerancia_pct`, `janela_dias`/`perto` (informativos). Ignorados, ficam por compatibilidade: `raridade_minima` e `favoritos_top` (desde a 0.15), `score_minimo`, `avaliacao_minima` e `ignorar_sem_avaliacoes` (desde a 0.14)
 - `keyshops`: `ativo` (padrão `false` desde a 0.16), `preco_maximo`, `pct_do_menor_oficial`
 - `migracoes[]`: mudanças de padrão já aplicadas a este arquivo (`config.MIGRACOES`, cada uma roda uma vez em `carregar()`; depois vale a escolha do usuário). Hoje: `keyshop_alerta_off`
