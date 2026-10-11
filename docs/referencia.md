@@ -92,6 +92,7 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
   - `marcar_listas(wishlist, possuidos, prioridade)`
   - `salvar_tempo_jogo(tempos)` — tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo.
   - `definir_itad(appid, gid)`
+  - `nome_jogo(appid)`
   - `salvar_dlc(appid, pai, classe)`
   - `salvar_opcao(o)`
   - `itens_opcao(oid)`
@@ -102,14 +103,14 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
   - `ligar_opcao(appid, oid)`
   - `registrar_preco(appid, loja, preco, cheio, corte, fonte, url, quando)` — Grava so se mudou desde o ultimo registro dessa loja.
   - `importar_historico(appid, registros)` — registros: [(loja, preco, cheio, corte, quando)] vindos da ITAD.
-  - `menor(appid, lojas, dias)` — Menor preco registrado. dias: so olha essa janela (0/None = desde sempre).
-  - `linhas_lote(lojas, appids)` — {appid: [registros de preco em ordem]} das lojas dadas, para a lista inteira (ou os appids dados).
+  - `menor(appid, lojas, dias, so_drm)` — Menor preco registrado. dias: so olha essa janela (0/None = desde sempre).
+  - `linhas_lote(lojas, appids, so_drm)` — {appid: [registros de preco em ordem]} das lojas dadas, para a lista inteira (ou os appids dados).
   - `pisos_lote(lojas, janelas)` — Igual a pisos(), para todos os jogos da lista de uma vez.
   - `_pisos_de(rows, janelas)`
-  - `pisos(appid, lojas, janelas)` — {dias: menor preco na janela, 0: menor de todos os tempos} considerando so as lojas dadas.
+  - `pisos(appid, lojas, janelas, so_drm)` — {dias: menor preco na janela, 0: menor de todos os tempos} considerando so as lojas dadas.
   - `atuais(appid)` — Ultimo preco de cada loja.
   - `salvar_ofertas_atuais(ofertas)` — O que as lojas vendem AGORA (ultima resposta da ITAD). O historico nao serve para isso:
-  - `ofertas_atuais(appids)` — {appid: [oferta]} vigentes, com a Steam lida direto do catalogo quando a ITAD nao traz a Steam.
+  - `ofertas_atuais(appids, so_drm)` — {appid: [oferta]} vigentes, com a Steam lida direto do catalogo quando a ITAD nao traz a Steam.
   - `salvar_gg(appid, g)`
 
 ## `radar/bandeja.py`
@@ -142,10 +143,12 @@ Pastas do app.
 Orquestra a coleta: Steam (catalogo) -> ITAD (precos por loja + historico) -> GG.deals.
 
 - `_min_desde(banco, chave)`
-- `atualizar(cfg, banco, forcar, importar_hist, sem_limite, log, steam_agora)`
+- `atualizar(cfg, banco, forcar, importar_hist, sem_limite, log, steam_agora, faixa)` — faixa "tudo" (linha de comando): tudo em sequencia, como sempre. faixa "rapida" (o servico, de 15 em 15 min): listas,
 - `catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento)`
+- `atualizar_lenta(cfg, banco, forcar, sem_limite, log)` — Pista lenta (thread propria, 0.18.2): catalogo da Steam (detalhes, edicoes, DLCs, bundles), biblioteca (1x por dia),
 - `coletar_biblioteca(cfg, banco, possuidos, k_itad, log)` — Precos, franquias e menor historico de tudo que voce tem (jogos e DLCs).
 - `_cache_itad(cfg, banco)`
+- `importar_historicos(cfg, banco, chave, mapa, shop_ids, log)` — Historico (todas as lojas) dos jogos que ainda nao o tem, uma vez por jogo. Grava e confirma a cada jogo (a pista
 - `coletar_itad(cfg, banco, wl, chave, importar_hist, log)`
 
 ## `radar/config.py`
@@ -154,6 +157,7 @@ config.json: tudo que nao e segredo. O painel web (etapa 3) vai editar este arqu
 - `_mesclar(base, novo)`
 - `carregar()`
 - `_migrar(cfg)`
+- `marcar_todas_as_lojas(titulos)` — Migracao `todas_as_lojas` (0.18.2): le o config.json de agora (o `cfg` do ciclo pode estar velho, o painel pode ter
 - `salvar(cfg)`
 - `modo_do_jogo(cfg, appid)`
 
@@ -178,8 +182,9 @@ Chaves de API no Gerenciador de Credenciais do Windows (via keyring).
 ## `radar/dlc.py`
 Classificacao automatica de DLCs pelo nome (pt/en). O painel vai permitir
 
-- `classificar(nome)`
-- `ignorada(classe, preco, cfg_dlc)`
+- `_sem_titulo(nome, pai)` — Tira o nome do jogo do comeco do da DLC ("Trails in the Sky 1st Chapter - Zeram Powder" -> "Zeram Powder"):
+- `classificar(nome, pai)`
+- `ignorada(classe, preco, cfg_dlc, tenho)` — True se a DLC nao conta (custo completo, "falta", totais). tenho=True: DLC que voce ja tem, de preco as vezes
 
 ## `radar/ficha.py`
 Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca na coleta) e guardado em ficha_cache:
@@ -191,7 +196,7 @@ Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca na coleta
 - `extras(b, cfg, a, tenho, log_erro)` — {loja, aug, conq}: do cache ou buscados em paralelo (o que faltar ou venceu). Fonte que falhou vem None.
 - `hltb_lote(b, appids, log_erro, maximo)` — {appid: {story, extras, complete} em minutos, ou None}: o HLTB de varios jogos (ficha da franquia), do mesmo
 - `jogado(b, a)`
-- `fileira(b, ctx, a, nome, marcadas)` — A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
+- `fileira(b, ctx, a, nome, marcadas, so_drm)` — A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
 
 ## `radar/ggdeals.py`
 GG.deals: melhor preco oficial e de keyshop + menores historicos de cada um.
@@ -238,6 +243,7 @@ Decide QUAIS alertas viram notificacao:
   - `_vitrine_url()`
   - `processar(alertas)`
   - `_enviar(a)`
+  - `steam_inteira(ctx)` — Avisa jogos da Steam inteira FORA da sua lista (a lista tem o caminho de `processar`): so os tipos ligados em
   - `_acao(acao, appid)`
   - `terminando(candidatos)` — candidatos: [{"appid","nome","preco","corte","loja","fim"(epoch)}]. Avisa 1x por promocao.
 
@@ -255,7 +261,7 @@ Dados das páginas novas de Ofertas e Biblioteca (spec 09, amostra 8 de Ofertas 
 - `invalidar()`
 - `_cache(nome, fazer)` — Um cálculo por vez para cada página; quem chega no meio espera o mesmo resultado.
 - `curta(u)`
-- `_linhas_de(b, tabela, lojas, appids)`
+- `_linhas_de(b, tabela, lojas, appids, so_drm)` — so_drm (somente_drm_steam): em `preco` sem o histórico que não ativa na Steam; `promo_hist` não guarda DRM,
 - `_todas(q)` — Todas as páginas de /api/promocoes com o pedido q (no próprio processo).
 - `_linha(o, cv, fr, hist, prev, an)` — Uma linha no formato da amostra (os índices são lidos pela função M() da página).
 - `_montar_ofertas()`
@@ -275,8 +281,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_fim(oferta, jogo)` — Quando a promocao acaba (epoch), pela ITAD ou pela Steam.
 - `_marcadas(cfg)`
 - `_melhor_oferta(ofs)` — A oferta mais barata; no empate, a da Steam (o carrinho dela vai sozinho pela extensao).
-- `_ultimos_por_loja(b, appids)`
-- `_minimos(b, appids)`
+- `_minimos(b, appids, so_drm)`
 - `_idade_userdata()`
 - `_perfil_info(b)` — Nome e avatar do perfil Steam em uso (meta perfil_info). Se faltar ou for de outro SteamID, busca numa thread
 - `api_resumo(_q)`
@@ -371,11 +376,14 @@ Previsão de Ofertas (spec 09): "se eu não comprar agora, esse preço volta?", 
 ## `radar/progresso.py`
 Em que parte da checagem o Hunter esta (para o painel e o icone da bandeja).
 
+- `_novo()`
+- `_alvo()`
 - `iniciar(modo)`
 - `etapa(nome, total)`
 - `passo(atual, total)`
 - `linha(msg)` — Cada linha do log tambem vira progresso: linha sem recuo = etapa nova.
-- `fim(ok, resumo)`
+- `fim(ok, resumo, registrar)` — registrar=False: a rodada nao fez nada (pista lenta sem trabalho): nao troca o "ultima".
+- `_foto(e)`
 - `foto()`
 
 ## `radar/rede.py`
@@ -385,6 +393,11 @@ HTTP com JSON, backoff em 429/5xx e ritmo adaptativo (mesma logica do KurokamiPr
   - `aguardar()`
   - `freio(pausa)`
   - `ok()`
+- `marcar_lenta()` — Chamado uma vez pela thread da pista lenta.
+- `usar_banco(banco)` — A thread que chama promete nao segurar transacao do `banco` enquanto espera a rede: `http_json` confirma antes de cada
+- `_soltar()`
+- `e_lenta()`
+- **class `urgente`** — `with rede.urgente():` na pista rapida, em volta do que usa a ITAD: a lenta espera ate acabar.
 - `http_json(url, corpo, metodo, ritmo, tentativas, timeout, form)`
 - `servico_steam(url, entrada, chave, ritmo)` — Endpoints 'Service' da Steam: GET com input_json; POST so se o GET der 405.
 - `explicar(e)` — Mensagem curta de um erro HTTP, com o motivo que o servidor mandou.
@@ -415,7 +428,12 @@ O ciclo que roda sozinho: coleta -> avalia -> notifica, no intervalo do config.
 - `criar_log(eco)`
 - `_fim_iso(v)`
 - `candidatos_fim(b, alertas, cfg)` — O que esta no carrinho ou "vale a pena" e tem data de fim conhecida (ITAD ou Steam).
-- `ciclo(log, forcar, sem_limite, steam_agora)` — Uma rodada. forcar+sem_limite = verificacao completa. Devolve (alertas, novos).
+- `ciclo(log, forcar, sem_limite, steam_agora, faixa)` — Uma rodada. forcar+sem_limite = verificacao completa. Devolve (alertas, novos).
+- `_espera_historico(b, horas)` — Ainda vale esperar o historico da 1a instalacao? Teto de `horas` desde a 1a espera (nao fica sem aviso para sempre).
+- `ciclo_lento(log, forcar)` — Uma rodada da pista lenta (thread propria). forcar = a parte lenta da verificacao completa (sem orcamento de chamadas;
+- **class `Lenta`** — A pista lenta: repete `ciclo_lento` ate acabar o trabalho (de 3 em 3 min) e, sem trabalho, confere de 10 em 10 min
+  - `pedir_completa()`
+  - `run()`
 - **class `Servico`** — 
   - `_precisa_completa()` — 1a checagem e sempre completa; depois, a cada N dias (config verificacao_completa_dias).
   - `agora(completo)`
@@ -479,6 +497,7 @@ Telegram (bot gratuito): espelha os avisos no celular, fora de casa.
 - `ligado(cfg)` — Ligado + token + conversa vinculada.
 - `enviar(cfg, titulo, texto, botoes, foto)` — botoes: [(rotulo, url)]: so links https publicos (localhost e file:/// nao abrem no celular).
 - `conectar(token)` — Testa o token (getMe). Devolve (ok, @usuario_do_bot ou mensagem de erro).
+- `conversa_valida(token, chat_id)` — O bot ainda alcanca essa conversa? (trocar so o token do mesmo bot mantem a conversa vinculada)
 - `achar_conversa(token)` — Chat de quem mandou mensagem ao bot. Devolve (chat_id, nome) ou (None, motivo).
 
 ## `radar/validar.py`

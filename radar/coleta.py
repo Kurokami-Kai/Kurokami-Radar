@@ -16,7 +16,11 @@ def _min_desde(banco, chave):
     return (datetime.now(timezone.utc) - datetime.fromisoformat(t)).total_seconds() / 60
 
 
-def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, log=print, steam_agora=False):
+def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, log=print, steam_agora=False, faixa="tudo"):
+    """faixa "tudo" (linha de comando): tudo em sequencia, como sempre. faixa "rapida" (o servico, de 15 em 15 min): listas,
+    Steam inteira, jogos novos sem detalhes, precos da ITAD, GG.deals e o custo completo; o que e lento (catalogo da Steam,
+    biblioteca, historicos da ITAD) fica para `atualizar_lenta`, em outra thread."""
+    lenta = faixa == "tudo"
     pais = cfg["pais"]
     k_steam, k_itad, k_gg = credenciais.ler("steam"), credenciais.ler("itad"), credenciais.ler("ggdeals")
     t0 = time.time()
@@ -90,12 +94,13 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
     if steam_ligada and (steam_agora or forcar or _min_desde(
             banco, "ult_steam_inteira") >= cfg["intervalos_minutos"].get("steam_inteira", 15)):
         try:
-            steam_inteira.coletar(banco, cfg, log, k_itad)
+            with rede.urgente():
+                steam_inteira.coletar(banco, cfg, log, k_itad)
         except Exception as e:   # nao derruba a coleta da lista; tenta de novo na proxima rodada
             log("   Steam inteira falhou (%s), tento na proxima" % rede.explicar(e))
 
     # ---------------------------------------------------------- 2. catalogo Steam (mais pesado, intervalo maior)
-    if forcar or _min_desde(banco, "ult_steam") >= cfg["intervalos_minutos"]["steam"]:
+    if lenta and (forcar or _min_desde(banco, "ult_steam") >= cfg["intervalos_minutos"]["steam"]):
         orc = None if sem_limite else cfg.get("chamadas_lentas_por_rodada", 120)
         pendente = catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orc)
         if not pendente:  # se ficou consulta lenta para tras, a proxima rodada continua de onde parou
@@ -112,11 +117,11 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
             for a in novos:
                 banco.marcar_consulta("nome", a)
             banco.commit()
-        else:
+        elif lenta:
             log("Catalogo Steam recente, pulando (use --tudo para forcar)")
 
     # ---------------------------------------------------------- 2b. biblioteca (1x por dia)
-    if forcar or _min_desde(banco, "ult_biblioteca") >= 24 * 60:
+    if lenta and (forcar or _min_desde(banco, "ult_biblioteca") >= 24 * 60):
         try:
             coletar_biblioteca(cfg, banco, possuidos, k_itad, log)
             banco.meta("ult_biblioteca", agora())
@@ -129,7 +134,8 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
     lojas_marcadas = set()
     if k_itad:
         try:
-            ofertas, lojas_marcadas = coletar_itad(cfg, banco, wl, k_itad, importar_hist, log)
+            with rede.urgente():   # a pista lenta espera: o preco de agora tem a vez na cota da ITAD
+                ofertas, lojas_marcadas = coletar_itad(cfg, banco, wl, k_itad, importar_hist and lenta, log)
         except itad.ChaveRecusada as e:
             log("!! %s. Sigo so com Steam e GG.deals. Teste com: py radar.py testar" % e)
     else:
@@ -172,7 +178,7 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
     banco.commit()
 
     # ---------------------------------------------------------- 6. historico da Steam inteira (so quem esta perto do recorde, aos poucos)
-    if steam_ligada and k_itad and banco.meta("ult_steam_inteira"):
+    if lenta and steam_ligada and k_itad and banco.meta("ult_steam_inteira"):
         try:
             steam_inteira.historicos(banco, cfg, k_itad, log, cfg.get("steam_inteira_hist_por_rodada", 60))
         except Exception as e:
@@ -310,6 +316,59 @@ def catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento=None)
     return sobrou > 0
 
 
+def atualizar_lenta(cfg, banco, forcar=False, sem_limite=False, log=print):
+    """Pista lenta (thread propria, 0.18.2): catalogo da Steam (detalhes, edicoes, DLCs, bundles), biblioteca (1x por dia),
+    historico da ITAD dos jogos da lista e historico da Steam inteira. Parte das listas que a pista rapida ja gravou no
+    banco. So escreve log quando ha trabalho. Devolve True se ainda ha o que fazer logo (fila de DLCs, historico)."""
+    pais = cfg["pais"]
+    k_steam, k_itad = credenciais.ler("steam"), credenciais.ler("itad")
+    sid = banco.meta("steamid")
+    wl = [r["appid"] for r in banco.q("SELECT appid FROM jogo WHERE na_lista=1")]
+    if not sid or not wl:
+        return False   # a pista rapida ainda nao leu as listas
+    manuais = {r["appid"] for r in banco.q("SELECT appid FROM tenho_manual")}
+    possuidos = sorted(r["appid"] for r in banco.q("SELECT appid FROM jogo WHERE possuido=1") if r["appid"] not in manuais)
+    restante = False
+    if forcar or _min_desde(banco, "ult_steam") >= cfg["intervalos_minutos"]["steam"]:
+        orc = None if sem_limite else cfg.get("chamadas_lentas_por_rodada", 120)
+        if catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orc):
+            restante = True   # ficou consulta lenta para tras: a proxima rodada continua de onde parou
+        else:
+            banco.meta("ult_steam", agora())
+        banco.commit()
+    if forcar or _min_desde(banco, "ult_biblioteca") >= 24 * 60:
+        try:
+            coletar_biblioteca(cfg, banco, possuidos, k_itad, log)
+            banco.meta("ult_biblioteca", agora())
+            banco.commit()
+        except Exception as e:
+            log("   biblioteca falhou (%s), tento na proxima" % e)
+    if k_itad:
+        hist_ok = True   # False so se a ITAD estiver limitando (a importacao parou no meio)
+        try:
+            da_lista = set(wl)
+            mapa = {int(a): g for a, g in (banco.meta("itad_ids") or {}).items() if g and int(a) in da_lista}
+            ja = {r["appid"] for r in banco.q("SELECT appid FROM historico_importado WHERE escopo='todas'")}
+            if any(a not in ja for a in mapa):
+                shop_ids = sorted(int(x["id"]) for x in itad.lojas(k_itad, pais))
+                _ficaram, parou = importar_historicos(cfg, banco, k_itad, mapa, shop_ids, log)
+                if parou:
+                    restante, hist_ok = True, False
+        except itad.ChaveRecusada as e:
+            log("!! %s. Sigo sem o historico da ITAD." % e)
+        if hist_ok and not banco.meta("hist_inicial"):
+            banco.meta("hist_inicial", agora())   # a 1a importacao acabou: a pista rapida ja pode avisar sem avalanche
+            banco.commit()
+        if cfg.get("steam_inteira", True) and banco.meta("ult_steam_inteira"):
+            por = cfg.get("steam_inteira_hist_por_rodada", 60)
+            try:
+                if steam_inteira.historicos(banco, cfg, k_itad, log, por) >= por:
+                    restante = True
+            except Exception as e:
+                log("   historico da Steam inteira falhou (%s), tento na proxima" % rede.explicar(e))
+    return restante
+
+
 def coletar_biblioteca(cfg, banco, possuidos, k_itad, log):
     """Precos, franquias e menor historico de tudo que voce tem (jogos e DLCs)."""
     pais = cfg["pais"]
@@ -330,7 +389,7 @@ def coletar_biblioteca(cfg, banco, possuidos, k_itad, log):
                                           "WHERE j.possuido=1 AND d.appid NOT IN (SELECT appid FROM jogo WHERE possuido=1)")]
     alvo = list(dict.fromkeys(list(possuidos) + faltam))
     mapa = itad.mapear(k_itad, alvo, cache, log)
-    banco.meta("itad_ids", cache)
+    banco.meta("itad_ids", {**(banco.meta("itad_ids") or {}), **cache})   # a outra pista tambem grava: mescla, nao sobrescreve
     todas = [int(x["id"]) for x in itad.lojas(k_itad, pais)]
     lows = itad.precos(k_itad, pais, list(mapa.values()), todas, log)
     gid_app = {g: a for a, g in mapa.items()}
@@ -353,6 +412,40 @@ def _cache_itad(cfg, banco):
     return cache
 
 
+def importar_historicos(cfg, banco, chave, mapa, shop_ids, log):
+    """Historico (todas as lojas) dos jogos que ainda nao o tem, uma vez por jogo. Grava e confirma a cada jogo (a pista
+    rapida escreve no mesmo banco). Devolve (quantos ficaram para a proxima rodada, se parou no limite da ITAD)."""
+    pais = cfg["pais"]
+    ja = {r["appid"] for r in banco.q("SELECT appid FROM historico_importado WHERE escopo='todas'")}
+    novos = [a for a in mapa if a not in ja]
+    if not novos:
+        return 0, False
+    log("ITAD: importando historico de %d jogos (so na primeira vez)..." % len(novos))
+    seguidas = ficaram = 0
+    parou = False
+    for i, a in enumerate(novos, 1):
+        progresso.passo(i, len(novos))
+        try:
+            regs = itad.historico(chave, pais, mapa[a], shop_ids, cfg["historico"]["importar_dias"])
+            banco.importar_historico(a, regs)
+            seguidas = 0
+        except itad.ChaveRecusada:
+            raise
+        except Exception:
+            seguidas += 1
+            ficaram += 1
+            log("   historico do appid %s ficou para a proxima rodada (a ITAD limitou o ritmo)" % a)
+            if seguidas >= 5:
+                log("   a ITAD segue limitando; paro a importacao aqui e continuo na proxima rodada")
+                ficaram += len(novos) - i
+                parou = True
+                break
+        banco.commit()
+        if i % 50 == 0:
+            log("   %d/%d" % (i, len(novos)))
+    return ficaram, parou
+
+
 def coletar_itad(cfg, banco, wl, chave, importar_hist, log):
     pais = cfg["pais"]
     achadas, faltando, todas = itad.resolver_lojas(chave, pais, cfg["lojas"])
@@ -373,7 +466,7 @@ def coletar_itad(cfg, banco, wl, chave, importar_hist, log):
     marcadas = set(achadas.values())
     cache = _cache_itad(cfg, banco)
     mapa = itad.mapear(chave, wl, cache, log)
-    banco.meta("itad_ids", cache)
+    banco.meta("itad_ids", {**(banco.meta("itad_ids") or {}), **cache})   # a outra pista tambem grava: mescla, nao sobrescreve
     for a, g in mapa.items():
         banco.definir_itad(a, g)
     log("ITAD: %d jogos mapeados | coletando %d lojas, alertando em: %s" % (len(mapa), len(shop_ids), ", ".join(sorted(marcadas))))
@@ -381,29 +474,7 @@ def coletar_itad(cfg, banco, wl, chave, importar_hist, log):
 
     # historico (uma vez por jogo)
     if importar_hist:
-        ja = {r["appid"] for r in banco.q("SELECT appid FROM historico_importado WHERE escopo='todas'")}
-        novos = [a for a in mapa if a not in ja]
-        if novos:
-            log("ITAD: importando historico de %d jogos (so na primeira vez)..." % len(novos))
-            seguidas = 0
-            for i, a in enumerate(novos, 1):
-                progresso.passo(i, len(novos))
-                try:
-                    regs = itad.historico(chave, pais, mapa[a], shop_ids, cfg["historico"]["importar_dias"])
-                    banco.importar_historico(a, regs)
-                    seguidas = 0
-                except itad.ChaveRecusada:
-                    raise
-                except Exception:
-                    seguidas += 1
-                    log("   historico do appid %s ficou para a proxima rodada (a ITAD limitou o ritmo)" % a)
-                    if seguidas >= 5:
-                        log("   a ITAD segue limitando; paro a importacao aqui e continuo na proxima rodada")
-                        break
-                if i % 50 == 0:
-                    banco.commit()
-                    log("   %d/%d" % (i, len(novos)))
-            banco.commit()
+        importar_historicos(cfg, banco, chave, mapa, shop_ids, log)
 
     por_gid = itad.precos(chave, pais, list(mapa.values()), shop_ids, log)
     gid_app = {g: a for a, g in mapa.items()}

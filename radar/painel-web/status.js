@@ -1,5 +1,5 @@
 /* ================= status / ações ================= */
-const VERSAO_PAGINA='0.18.1';
+const VERSAO_PAGINA='0.18.2';
 function nVitrine(){return VIT?['selo','novo','igual','24m'].reduce((s,t)=>s+((VIT[t]||{}).total||0),0):null;}
 function atualizarStatus(){const el=$('#stTopo');if(el&&VIT)el.innerHTML=`<b>${nVitrine()}</b> na vitrine · ${fmtN(RES.na_lista)} na lista`;}
 async function carregarResumo(){
@@ -23,10 +23,12 @@ async function carregarResumo(){
     d.innerHTML=`O Hunter que está rodando é a versão <b>${esc(RES.versao)}</b>, mas os arquivos são da <b>${VERSAO_PAGINA}</b>. Clique com o direito no ícone da bandeja → <b>Sair</b> e abra de novo (ou "Reiniciar", nas versões novas).`;
     document.body.prepend(d);}
   const P=RES.progresso||{};const pct=P.total?Math.round(100*P.atual/P.total):null;
+  const Lz=P.lenta||{};const pctL=Lz.total?Math.round(100*Lz.atual/Lz.total):null;
   let t=`<span id="stTopo"><b>${nVitrine()??'…'}</b> na vitrine · ${fmtN(RES.na_lista)} na lista</span>`;
   if(P.ativo)t+=`<br><span style="color:var(--sinal)">verificação ${P.modo==='completa'?'completa':'rápida'}: ${esc((P.etapa||'').slice(0,42))}${pct!=null?' '+pct+'%':''}</span> ▾`;
   else if(RES.na_bandeja)t+=`<br>${RES.estado==='erro'?'<span class="err">erro na última checagem</span> · ':''}próxima: ${fmtISO(RES.proxima)} ▾`;
   else t+='<br>checado '+fmtISO(RES.atualizado);
+  if(Lz.ativo)t+=`<br><span style="color:#979797">segundo plano: ${esc((Lz.etapa||'').slice(0,34))}${pctL!=null?' '+pctL+'%':''}</span>`;
   $('#status').innerHTML=t;
   $('#progTopo').style.width=P.ativo?(pct!=null?Math.max(3,pct):35)+'%':'0';
   if(!$('#progBox').hidden)renderProg();$('#btnPausa').textContent=RES.pausado?'Retomar alertas':'Pausar alertas';
@@ -34,14 +36,18 @@ async function carregarResumo(){
   const av=(RES.perfil||{}).avatar;if(av&&av!==carregarResumo.av){carregarResumo.av=av;carregarConta();}  // o avatar chega depois da 1ª consulta
 }
 function renderProg(){const P=RES.progresso||{};const u=P.ultima;const min=s=>s>=90?Math.round(s/60)+' min':s+' s';
-  $('#progBox').innerHTML=P.ativo?`<h5>Verificação ${P.modo==='completa'?'completa':'rápida'} em andamento · ${min(P.decorrido||0)}</h5>
+  const Lz=P.lenta||{};   // pista lenta (catálogo, biblioteca, histórico): roda ao lado da rápida
+  const bg=Lz.ativo?`<h5 style="margin-top:12px">Segundo plano${Lz.modo==='completa'?' (parte lenta da verificação completa)':' (histórico, catálogo e biblioteca)'} · ${min(Lz.decorrido||0)}</h5>
+      <div>${esc(Lz.etapa||'')}${Lz.total?` — ${fmtN(Lz.atual)} de ${fmtN(Lz.total)}`:''}</div>
+      ${Lz.total?`<div class="bar"><i style="width:${100*Lz.atual/Lz.total}%"></i></div>`:''}<pre>${esc((Lz.log||[]).join('\n'))}</pre>`:'';
+  $('#progBox').innerHTML=(P.ativo?`<h5>Verificação ${P.modo==='completa'?'completa':'rápida'} em andamento · ${min(P.decorrido||0)}</h5>
       <div>${esc(P.etapa||'')}${P.total?` — ${fmtN(P.atual)} de ${fmtN(P.total)}`:''}</div>
       ${P.total?`<div class="bar"><i style="width:${100*P.atual/P.total}%"></i></div>`:''}<pre>${esc((P.log||[]).join('\n'))}</pre>`:
-    `<h5>Nenhuma verificação rodando agora</h5>
+    `<h5>Nenhuma verificação rápida rodando agora</h5>
      ${u?`<div>Última: ${u.modo==='completa'?'completa':'rápida'}, ${u.ok?'ok':'<span style="color:#ef6f6a">com erro</span>'} em ${min(u.duracao)} · ${esc(u.resumo||'')}</div>`:''}
      <div style="margin-top:6px;color:#979797">Próxima rápida: ${fmtISO(RES.proxima)||'—'} · Última completa: ${fmtISO(RES.ult_completa)||'nunca'}${RES.completa_dias?` · completa a cada ${RES.completa_dias} dias`:''}</div>
-     <div style="margin-top:6px;color:#979797">Rápida: preços nas lojas (a cada 30 min). Completa: também catálogo, biblioteca, DLCs, edições e histórico, sem limite de ritmo.</div>
-     ${(P.log||[]).length?`<pre>${esc(P.log.join('\n'))}</pre>`:''}`;}
+     <div style="margin-top:6px;color:#979797">Rápida: Steam inteira e preços nas lojas (a cada 15 min, por padrão). Segundo plano: catálogo, biblioteca, DLCs, edições e histórico, ao lado da rápida, no ritmo das APIs. Completa: o segundo plano sem limite de chamadas.</div>
+     ${(P.log||[]).length?`<pre>${esc(P.log.join('\n'))}</pre>`:''}`)+bg;}
 $('#status').addEventListener('click',()=>{$('#progBox').hidden=!$('#progBox').hidden;if(!$('#progBox').hidden)renderProg();});
 document.addEventListener('click',e=>{if(!e.target.closest('#progBox')&&!e.target.closest('#status'))$('#progBox').hidden=true;});
 $('#btnPausa').addEventListener('click',async()=>{const r=await post('/api/pausar');toast(r.pausado?'Notificações pausadas':'Notificações retomadas');carregarResumo();});
@@ -52,7 +58,7 @@ function render(){if(FR[S.tab])mostraFrame(S.tab);else if(S.tab==='lista')render
 
 async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&RES.progresso)||{};
   if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;Object.keys(FR).forEach(k=>{FR[k].velho=true;});await carregarLista();try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}toast('Verificação concluída');}
-  if(P.ativo)pollResumo.ativo=true;setTimeout(pollResumo,P.ativo?3000:30000);}
+  if(P.ativo)pollResumo.ativo=true;setTimeout(pollResumo,P.ativo||(P.lenta&&P.lenta.ativo)?3000:30000);}
 (async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,modo:i.modo,loja:i.pedida})).concat(c.bundles.map(b=>({bundle:b.bundle,modo:b.modo})));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
   const h=location.hash.slice(1);  // #vale, #lista... (o resumo "Tipo ligado" abre a vitrine com #vale)
   setTab(['vale','lista','bib','carr','notif','cfg'].includes(h)?h:['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();

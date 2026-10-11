@@ -296,7 +296,7 @@ def historicos(banco, cfg, chave, log=print, por_rodada=60):
                               [(r["appid"], g[0], g[1], g[2], g[3], utc(g[4])) for g in regs if g[1] is not None])
         banco.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=? WHERE appid=?", (agora(), r["preco"], r["appid"]))
         feitos += 1
-        if feitos % 10 == 0:
+        if feitos % 5 == 0:
             banco.commit()
     itens = {r["appid"]: dict(r) for r in banco.q("SELECT appid, preco, corte, flag FROM steam_promo")}
     avaliar(banco, cfg, itens)
