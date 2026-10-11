@@ -1,6 +1,7 @@
 """Chaves de API no Gerenciador de Credenciais do Windows (via keyring).
 Nada de chave em arquivo: o config.json pode ser compartilhado sem risco."""
 import getpass
+import logging
 import os
 
 SERVICO = "Kurokami Radar"
@@ -31,7 +32,8 @@ def ler(nome):
     try:
         v = keyring.get_password(SERVICO, nome)
         return v.strip() if v else None
-    except KeyringError:
+    except KeyringError as e:
+        logging.getLogger("radar").warning("Gerenciador de Credenciais: nao li '%s' (%s)", nome, e)
         return None
 
 

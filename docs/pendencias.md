@@ -4,6 +4,7 @@
 - [09 — Biblioteca nova](specs/09-biblioteca-nova.md): **feita** (Etapas 1 e 2 e Ofertas, em v0.17.0); **falta só a Etapa 3** (ver a franquia inteira, em discussão); absorve a 03
 - **Previsão pelo histórico de cada usuário** (a previsão já funciona, em `radar/previsao.py`): falta só recalcular. `previsao.TABELA` é o backtest do dono (699 jogos); rodar o backtest no Hunter de tempos em tempos (ex.: uma vez por semana, depois da coleta) e usar a tabela de cada um. Medir antes quanto tempo leva numa lista de 700 jogos.
 - **Ofertas e Biblioteca no celular:** o topo do painel ocupa ~320 px numa tela de 375 px; recolher o topo (ou só o ícone e o menu) quando a página nova está aberta.
+- [10 — App para o celular (APK)](specs/10-app-celular.md): **em discussão** (opções A–E; o PC do dono não fica ligado o dia todo; recomendação provisória: Telegram + PWA/APK "casca" com Tailscale)
 - [03 — Franquias com capas, cinza e recolher/expandir](specs/03-franquias-com-capas.md) (entra na 09)
 - 05 — Veredito na ficha, keyshop decente e limpeza das Configurações (a escrever)
 - [07 — Promoções da Steam inteira](specs/07-steam-inteira.md): feito em v0.17.0 (revisada em 08/10 com recordes e histórico também fora da lista, menus no topo, sem botão de fonte). Ideia original: Sem login nem perfil público, Promoções mostra a Steam inteira (como a SteamDB) e os filtros pessoais (lista de desejos, seguidos, família, carrinho) aparecem bloqueados com "Entre com a Steam para usar".

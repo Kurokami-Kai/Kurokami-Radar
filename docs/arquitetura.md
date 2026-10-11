@@ -12,7 +12,7 @@ Kurokami Hunter é um app **local** de Windows (Python 3.12) que monitora a list
              servico.Servico (thread)            painel.py (ThreadingHTTPServer, thread)
              a cada N min: ciclo()               GET/POST /api/*  ·  /kurokami (painel.html)
                            │                               │
-   ciclo(): coleta.atualizar → analise.avaliar → notificador.processar → relatorio
+   ciclo(): coleta.atualizar → analise.avaliar → notificador.processar → notificador.steam_inteira → relatorio
                            │
     ┌──────────────┬───────┴────────┬───────────────┐
   steam.py        itad.py        ggdeals.py      (rede.py: HTTP, ritmo, backoff)
@@ -41,7 +41,7 @@ Kurokami Hunter é um app **local** de Windows (Python 3.12) que monitora a list
 ## Ciclo de coleta (`coleta.atualizar`)
 
 1. Perfil → SteamID (XML público do perfil; API como reserva). Lista de desejos (+ `extras` do config). Biblioteca = `userdata.json` ∪ `GetOwnedGames` ∪ `tenho_manual`.
-1b. **Steam inteira** (`steam_inteira.coletar`, a cada `intervalos_minutos.steam_inteira` (60 min), no "Verificar agora" e na completa; `config.steam_inteira`): Query da Steam (~10 s) + marca e menores da ITAD (guardados em `promo_estado`; repedidos quando o preço muda ou após 1 dia; até 20 lotes por rodada, populares primeiro) + avaliação com o histórico que já tem; só então substitui o retrato `steam_promo`. Resposta vazia ou cortada levanta erro e não troca o retrato; falha só vai para o log. Não gera avisos.
+1b. **Steam inteira** (`steam_inteira.coletar`, a cada `intervalos_minutos.steam_inteira` (15 min), no "Verificar agora" e na completa; `config.steam_inteira`): Query da Steam (~10 s) + marca e menores da ITAD (guardados em `promo_estado`; repedidos quando o preço muda ou após 1 dia; até 20 lotes por rodada, populares primeiro) + avaliação com o histórico que já tem; só então substitui o retrato `steam_promo`. Resposta vazia ou cortada levanta erro e não troca o retrato; falha só vai para o log. Os avisos saem depois, por `notificador.steam_inteira` (ver "Notificação").
 2. **Catálogo Steam** (a cada `intervalos_minutos.steam`, ou forçado): detalhes da lista, conteúdo das edições, listas de DLC (plano B pela loja, com orçamento `chamadas_lentas_por_rodada`), bundles e itens de bundles. Se sobrar fila lenta, o catálogo roda de novo no próximo ciclo.
 3. **Biblioteca** (1x/dia): detalhes de tudo que o usuário tem + menor histórico na ITAD das DLCs que faltam.
 4. **ITAD**: mapeia appid→id ITAD; importa histórico uma vez por jogo (todas as lojas); preços atuais de todas as lojas → `preco` (só quando muda) e `oferta_atual` (snapshot vigente).
@@ -71,6 +71,8 @@ Por jogo da lista (exceto os que o usuário já tem): para cada oferta das **loj
 ## Notificação (`notificador.Notificador`)
 
 Linha de base na primeira vez (não dispara nada em massa) → ao **ligar um tipo** (`meta.tipos_ligados` muda), quem já estava assim e só avisaria por ele entra em `notificado` sem toast e sai um resumo "<Tipo> ligado: N jogos já estão assim agora…" com "Ver" (abre `#vale`) → avisa novidades, quedas ≥ `melhora_minima_reais` e jogos que "rearmaram" (saíram e voltaram). Respeita pausa, horário de silêncio (guarda pendentes), máximo por rodada (resto vira resumo) e silenciados. Avisos de "termina em breve" para carrinho/o que avisa. Título por tipo ("SELO KUROKAMI · …", "Novo recorde · …", "Igual ao recorde · …", "Menor em 2 anos · …"), nunca por raridade.
+
+**Avisos da Steam inteira** (`Notificador.steam_inteira(ctx)`, logo depois de `processar`; 0.18.2): jogos de `steam_promo` fora da lista (e fora de `jogo`: nada que você tem, ignora, silenciou ou marcou "tenho"), `tipo='jogo'` sem +18, com `rcount ≥ steam_inteira_avisos.analises_minimas` e `entrou` nas últimas 36 h (`steam_inteira.coletar` copia `entrou` do retrato anterior; sem retrato anterior vale "antigo", então a 1ª coleta nunca avisa). O tipo vem de `aval.tipos` filtrado por `analise.avisa_por` (os tipos de `alerta.tipos`, padrão só Selo). Um aviso por promoção (`notificado_promo`), máximo `max_por_rodada` (3) por checagem e o resto vira "+N promoções da Steam inteira"; respeita pausa e silêncio e entra na tabela `alerta` (aba Notificações, nome e capa vêm de `steam_promo`).
 
 ## Painel
 

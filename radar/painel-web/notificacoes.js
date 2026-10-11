@@ -31,7 +31,7 @@ function desenharNotif(){
     return `<div class="nf-row" data-open="${n.appid}">${art(n.appid,n.nome||n.appid,n.capa)}
     <div style="min-width:0"><div class="nf-nome">${esc(n.nome||n.appid)}</div><div class="nf-mot"><span class="nf-tag" style="--c:${t.c}">${esc(t.t)}</span><span>${esc(t.txt)}</span></div>
     <div class="nf-meta">${esc(n.loja||'')} · ${nfHora(n.quando)}${a.length?` · avisado ${a.length+1} vezes; antes ${a.slice(0,2).map(x=>brl(x.preco)+' em '+fmtISO(x.quando).replace(',',' às')).join(', ')}`:''}</div></div>
-    <div class="nf-preco"><span class="nf-p tnum">${brl(n.preco)}</span>${nfAgora(n)}</div>${cartBtn(n.appid)}</div>`;}).join('')}</div>`).join('')
+    <div class="nf-preco"><span class="nf-p tnum">${brl(n.preco)}</span>${nfAgora(n)}</div>${cartBtn(n.appid,!IDX.has(n.appid))}</div>`;}).join('')}</div>`).join('')
     :`<div class="empty">Nenhuma notificação de ${f==='keyshop'?'keyshop':'loja oficial'}.</div>`;
 }
 $('#tab-notif').addEventListener('click',e=>{const b=e.target.closest('[data-nf]');if(b){S.nf=b.dataset.nf;save();desenharNotif();return;}

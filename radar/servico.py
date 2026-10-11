@@ -77,6 +77,10 @@ def ciclo(log=print, forcar=False, sem_limite=False, steam_agora=False):
         notif = Notificador(b, cfg, log)
         novos = notif.processar(alertas)
         try:
+            notif.steam_inteira(ctx)
+        except Exception as e:
+            log("Avisos da Steam inteira falharam: %s" % e)
+        try:
             notif.terminando(candidatos_fim(b, alertas, cfg))
         except Exception as e:
             log("Aviso de fim de promocao falhou: %s" % e)

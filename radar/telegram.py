@@ -73,6 +73,15 @@ def conectar(token):
     return True, "@" + (r.get("result") or {}).get("username", "")
 
 
+def conversa_valida(token, chat_id):
+    """O bot ainda alcanca essa conversa? (trocar so o token do mesmo bot mantem a conversa vinculada)
+    True/False pela resposta do Telegram; None se nao deu para saber (sem rede): quem chama mantem o vinculo."""
+    ok, r = _chamar(token, "getChat", {"chat_id": chat_id})
+    if ok:
+        return True
+    return False if str(r).startswith(("Bad Request", "Forbidden")) else None
+
+
 def achar_conversa(token):
     """Chat de quem mandou mensagem ao bot. Devolve (chat_id, nome) ou (None, motivo)."""
     ok, r = _chamar(token, "getUpdates", {"limit": 50})

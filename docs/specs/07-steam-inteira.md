@@ -25,7 +25,7 @@ A aba Promoções só mostra a lista de desejos (+ monitorados). Na SteamDB dá 
 - Na Steam inteira, quem está na sua lista (ou monitorado) aparece com a linha completa (piso, "Costuma voltar", tipos de recorde); os demais vêm com o que a Steam informa (preço, corte, fim, análises, nota, lançamento). Filtros que dependem de histórico ("Mostrar só" recordes, "Costuma voltar") só acham os jogos da lista.
 - Relação com o jogo funciona nos dois: na lista, monitorado, no carrinho, seguido, ignorado, já tenho. Limitação: "Tenho o jogo base" e "Silenciado" só valem para jogos da lista.
 - Linha de jogo fora da lista: clicar abre a página na Steam (não há ficha sem histórico); **+** põe no carrinho do Radar e passa a monitorar (como "Adicionar jogo").
-- **[decidido]** Vitrine e avisos continuam só com a lista (avisar a Steam inteira seria centenas de toasts por dia).
+- **[decidido]** Vitrine e avisos continuam só com a lista (avisar a Steam inteira seria centenas de toasts por dia). *(0.18.2, pedido do dono: os avisos passaram a cobrir a Steam inteira com filtro estrito: só os tipos ligados em `alerta.tipos` (Selo por padrão), jogo (sem DLC nem +18), `analises_minimas` 500, que entrou em promoção nas últimas 36 h e que o usuário não tem, não ignora nem silenciou; máximo 3 por checagem, o resto vira resumo; `notificador.steam_inteira`. A vitrine continua só com a lista.)*
 - Desempenho: as linhas leves ficam em memória com `__slots__` (~50 MB com 108 mil); a ordenação passa a ser por chaves estáveis (era `cmp_to_key`, lento com 100 mil). Meta: `/api/promocoes` ≤ 300 ms com 108 mil itens.
 
 ## Revisão do dono (08/10, noite)

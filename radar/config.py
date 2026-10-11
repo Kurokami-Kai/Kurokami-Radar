@@ -96,11 +96,14 @@ PADRAO = {
 
     # Promocoes da Steam inteira na aba Promocoes (spec 07): ~1 MB por consulta num dia comum, ~16 MB em grande promocao
     "steam_inteira": True,
+    # avisos da Steam inteira (jogos FORA da sua lista): so o que o alerta.tipos liga (padrao: Selo), de jogo (nao DLC) com
+    # pelo menos analises_minimas, que entrou em promocao ha pouco; maximo por rodada (o resto vira um resumo)
+    "steam_inteira_avisos": {"ativo": True, "analises_minimas": 500, "max_por_rodada": 3},
     # historico (para Selo, Menor em 2 anos, Costuma voltar) de quem esta perto do recorde: N jogos por rodada
     # (a ITAD aceita ~100 chamadas a cada 5 min, e a lista tambem usa)
     "steam_inteira_hist_por_rodada": 60,
 
-    "intervalos_minutos": {"itad": 30, "ggdeals": 60, "steam": 180, "steam_inteira": 60},
+    "intervalos_minutos": {"itad": 15, "ggdeals": 60, "steam": 180, "steam_inteira": 15},
     # verificacao completa (tudo, sem limite de ritmo): a 1a sempre; depois a cada N dias (0 = so manual)
     "verificacao_completa_dias": 7,
     # A loja da Steam so responde ~200 chamadas a cada 5 min. O que depende dela (conteudo de edicoes,
@@ -116,6 +119,9 @@ PADRAO = {
 # e a escolha do usuario passa a valer (se ele religar, fica ligado).
 MIGRACOES = {
     "keyshop_alerta_off": lambda cfg: cfg["keyshops"].update(ativo=False),
+    # 0.19: checagem de promocoes a cada 15 min (quem ficou nos antigos 30/60 passa para 15; valor escolhido a mao fica)
+    "intervalos_15min": lambda cfg: [cfg["intervalos_minutos"].update({k: 15}) for k, v in (("itad", 30), ("steam_inteira", 60))
+                                     if cfg["intervalos_minutos"].get(k) == v],
 }
 
 
@@ -156,6 +162,21 @@ def _migrar(cfg):
         salvar(cfg)
     except OSError as e:
         print("!! nao consegui gravar o config.json (%s)" % e)
+
+
+def marcar_todas_as_lojas(titulos):
+    """Migracao `todas_as_lojas` (0.18.2): le o config.json de agora (o `cfg` do ciclo pode estar velho, o painel pode ter
+    salvo no meio), troca so `lojas` e `migracoes` e grava. Devolve a lista nova, ou None se o arquivo nao estiver legivel."""
+    try:
+        with open(caminhos.ARQ_CONFIG, encoding="utf-8-sig") as f:
+            disco = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+    disco["lojas"] = sorted(titulos, key=str.lower)
+    disco["migracoes"] = list(disco.get("migracoes") or []) + ["todas_as_lojas"]
+    with open(caminhos.ARQ_CONFIG, "w", encoding="utf-8") as f:
+        json.dump(disco, f, ensure_ascii=False, indent=2)
+    return disco["lojas"]
 
 
 def salvar(cfg):

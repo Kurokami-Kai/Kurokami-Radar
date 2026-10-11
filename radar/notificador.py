@@ -5,13 +5,19 @@
 - quando a promocao acaba, o jogo "rearma" e volta a avisar na proxima;
 - horario de silencio guarda os avisos para depois; acima do limite, vira um resumo."""
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from . import caminhos, notificar, telegram
 from .banco import agora
 
 ESQUEMA = """CREATE TABLE IF NOT EXISTS notificado(
   appid INTEGER PRIMARY KEY, loja TEXT, preco INTEGER, quando TEXT, ativo INTEGER DEFAULT 1)"""
+
+
+ESQUEMA_PROMO = "CREATE TABLE IF NOT EXISTS notificado_promo(appid INTEGER PRIMARY KEY, entrou TEXT)"
+# texto de cada tipo de preco na Steam inteira (as mesmas frases da lista; a aba Notificacoes as reconhece pelo comeco)
+MOTIVO_PROMO = {"novo": "menor preço já registrado", "igual": "mesmo preço do menor já registrado", "24m": "menor preço em 2 anos"}
+HORAS_ENTROU = 36   # so avisa quem entrou na Steam inteira nas ultimas 36 h (o Selo chega com o historico, aos poucos)
 
 
 def brl(c):
@@ -31,6 +37,7 @@ class Notificador:
     def __init__(self, banco, cfg, log=print):
         self.b, self.cfg, self.log = banco, cfg, log
         self.b.con.execute(ESQUEMA)
+        self.b.con.execute(ESQUEMA_PROMO)
 
     def _avisar(self, titulo, texto, clique=None, botoes=(), imagem=None, rodape=None, foto=None):
         """Um aviso, nos dois canais: toast do Windows (se ativo) e Telegram (se ligado)."""
@@ -166,6 +173,71 @@ class Notificador:
             titulo = a["nome"]
         self._avisar(titulo, linha1 + "\n" + linha2, clique=oferta, botoes=botoes, imagem=img, rodape=rodape,
                      foto=j["capa"] if j else None)
+
+    def steam_inteira(self, ctx):
+        """Avisa jogos da Steam inteira FORA da sua lista (a lista tem o caminho de `processar`): so os tipos ligados em
+        alerta.tipos (padrao: Selo), jogos (sem DLC, sem +18) com analises_minimas, que entraram em promocao nas ultimas
+        36 h e que voce nao tem, nao ignora nem silenciou. Uma vez por promocao; acima de max_por_rodada vira um resumo."""
+        from . import conta_steam
+        from .analise import NOME_TIPO, avisa_por, ordem_tipo, tipo_oferta
+        sc = self.cfg.get("steam_inteira_avisos") or {}
+        if not (self.cfg.get("steam_inteira", True) and sc.get("ativo", True)) or not self.b.meta("linha_de_base"):
+            return []
+        if self.b.meta("pausado") or em_silencio(self.cfg):
+            return []
+        desde = (datetime.now(timezone.utc) - timedelta(hours=HORAS_ENTROU)).replace(microsecond=0).isoformat()
+        minimo = int(sc.get("analises_minimas") or 0)
+        ja = {r["appid"]: r["entrou"] for r in self.b.q("SELECT appid, entrou FROM notificado_promo")}
+        fora = set(ctx.jogos) | {r["appid"] for r in self.b.q("SELECT appid FROM silenciado")}             | {r["appid"] for r in self.b.q("SELECT appid FROM tenho_manual")} | conta_steam.relacao(self.cfg)["ignorados"]
+        achados = []
+        for r in self.b.q("SELECT * FROM steam_promo WHERE tipo='jogo' AND COALESCE(adulto,0)=0 AND entrou>=? AND rcount>=?",
+                          desde, minimo):
+            if r["appid"] in fora or ja.get(r["appid"]) == r["entrou"] or not r["aval"]:
+                continue
+            try:
+                aval = json.loads(r["aval"])
+            except ValueError:
+                continue
+            if aval.get("provisorio"):   # so a marca da ITAD, sem historico: espera a avaliacao de verdade
+                continue
+            tipos = avisa_por(aval.get("tipos") or [], r["corte"], self.cfg.get("alerta"))
+            if not tipos:
+                continue
+            t = tipo_oferta(tipos)
+            if t == "selo":
+                motivo = "Selo Kurokami: " + (aval.get("selo_motivo") or "o menor preço em muito tempo")
+            else:
+                motivo = MOTIVO_PROMO[t]
+            achados.append(dict(r, tipo_oferta=t, motivo=motivo))
+        # quem saiu da promocao deixa de ocupar a tabela
+        self.b.con.execute("DELETE FROM notificado_promo WHERE appid NOT IN (SELECT appid FROM steam_promo)")
+        if not achados:
+            self.b.commit()
+            return []
+        achados.sort(key=lambda a: (ordem_tipo(a["tipo_oferta"]), -(a["rcount"] or 0)))
+        limite = max(1, int(sc.get("max_por_rodada") or 3))
+        for a in achados:
+            self.b.con.execute("INSERT OR REPLACE INTO notificado_promo VALUES(?,?)", (a["appid"], a["entrou"]))
+        if self.cfg.get("notificacoes", {}).get("ativas", True) or telegram.ligado(self.cfg):
+            for a in achados[:limite]:
+                steam = "https://store.steampowered.com/app/%d/" % a["appid"]
+                nome = a["nome"]
+                titulo = ("SELO KUROKAMI · %s" if a["tipo_oferta"] == "selo" else NOME_TIPO[a["tipo_oferta"]] + " · %s") % nome
+                motivo = a["motivo"][len("Selo Kurokami: "):] if a["tipo_oferta"] == "selo" else a["motivo"]
+                self._avisar(titulo, "%s · -%d%% na Steam\n%s" % (brl(a["preco"]), a["corte"], motivo[0].upper() + motivo[1:]),
+                             clique=steam, botoes=[("Abrir oferta", steam), ("Não avisar mais", self._acao("silenciar", a["appid"]))],
+                             imagem=notificar.capa(a["appid"], a["capa"]), foto=a["capa"],
+                             rodape="%s · %d análises" % (a["rotulo"] or "Sem rótulo", a["rcount"] or 0) if a["rcount"] else None)
+            if len(achados) > limite:
+                resto = achados[limite:]
+                self._avisar("+%d promoç%s da Steam inteira" % (len(resto), "ões" if len(resto) > 1 else "ão"),
+                             ", ".join(a["nome"] for a in resto[:4]) + ("…" if len(resto) > 4 else ""),
+                             clique=self._lista_url(), botoes=[("Ver lista", self._lista_url())])
+        self.b.con.executemany("INSERT INTO alerta(appid, loja, preco, motivo, quando, enviado) VALUES(?,?,?,?,?,1)",
+                               [(a["appid"], "Steam", a["preco"], a["motivo"], agora()) for a in achados])
+        self.b.commit()
+        self.log("Steam inteira: %d aviso(s) de jogos fora da sua lista" % len(achados))
+        return achados
 
     def _acao(self, acao, appid):
         from . import painel

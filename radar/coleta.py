@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime, timezone
 
-from . import analise, caminhos, credenciais, dlc as dlcmod, ggdeals, itad, progresso, rede, steam, steam_inteira
+from . import analise, caminhos, config, credenciais, dlc as dlcmod, ggdeals, itad, progresso, rede, steam, steam_inteira
 from .banco import agora
 from .config import modo_do_jogo
 
@@ -88,7 +88,7 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
     banco.commit()   # nada de transacao aberta durante a rede (o painel tambem grava)
     steam_ligada = cfg.get("steam_inteira", True)
     if steam_ligada and (steam_agora or forcar or _min_desde(
-            banco, "ult_steam_inteira") >= cfg["intervalos_minutos"].get("steam_inteira", 60)):
+            banco, "ult_steam_inteira") >= cfg["intervalos_minutos"].get("steam_inteira", 15)):
         try:
             steam_inteira.coletar(banco, cfg, log, k_itad)
         except Exception as e:   # nao derruba a coleta da lista; tenta de novo na proxima rodada
@@ -356,6 +356,14 @@ def _cache_itad(cfg, banco):
 def coletar_itad(cfg, banco, wl, chave, importar_hist, log):
     pais = cfg["pais"]
     achadas, faltando, todas = itad.resolver_lojas(chave, pais, cfg["lojas"])
+    if "todas_as_lojas" not in cfg["migracoes"] and todas:
+        # 0.18.2: o padrao passou a ser TODAS as lojas marcadas (uma vez so; depois vale o que o usuario escolher)
+        novas = config.marcar_todas_as_lojas([x["title"] for x in todas])
+        if novas:
+            cfg["lojas"] = novas
+            cfg["migracoes"].append("todas_as_lojas")
+            achadas, faltando, _ = itad.resolver_lojas(chave, pais, cfg["lojas"])
+            log("   lojas: todas as %d da ITAD marcadas (padrao novo; desmarque em Configuracoes -> Lojas)" % len(todas))
     if faltando:
         log("   fora da ITAD (%s): %s - sem preco por loja para elas" % (pais, ", ".join(faltando)))
     # coleta de todas as lojas (custa o mesmo numero de chamadas); o config so filtra exibicao e alertas,

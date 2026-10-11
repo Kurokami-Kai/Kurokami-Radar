@@ -21,14 +21,14 @@ async function renderCfg(){
       <li>Ligue "Avisar também no Telegram" e clique em <b>Enviar teste</b>. Pronto: os avisos chegam no celular.</li></ol>
       <p>O token é como uma senha: fica só neste PC e não deve ser mandado a ninguém. Se vazar, envie <b>/revoke</b> ao BotFather e conecte de novo. Só quem mandar mensagem ao bot antes do passo 4 é vinculado, então não compartilhe o link do bot até terminar.</p></details>`;
   const tgHtml=()=>{const t=(CFG.notificacoes||{}).telegram||{};
-    if(!TGTOK)return `${tgGuia(true)}
+    if(!TGTOK)return `${t.chat_id?'<div class="hint">O token não está mais no Gerenciador de Credenciais do Windows. Cole o mesmo token de novo: a conversa já vinculada é mantida.</div>':tgGuia(true)}
       ${row('Token do bot','Fica só neste PC, no Gerenciador de Credenciais do Windows.',`<input class="cfg-txt" id="tgTok" type="password" autocomplete="off" placeholder="123456:ABC…"><button class="btn-go2" data-tg="token" type="button">Conectar</button>`)}`;
     if(!t.chat_id)return `${tgGuia(true)}<div class="hint">Bot conectado. Agora abra o bot no Telegram, toque em <b>Iniciar</b> (ou mande qualquer mensagem) e clique em Vincular.</div>
       ${row('Sua conversa','',`<button class="btn-go2" data-tg="vincular" type="button">Vincular conversa</button><button class="btn-ghost" data-tg="remover" type="button">Trocar o bot</button>`)}`;
     return `${tgGuia(false)}${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
       ${row('Conexão','Bot conectado e conversa vinculada.',`<button class="btn-ghost" data-tg="testar" type="button">Enviar teste</button><button class="btn-ghost" data-tg="remover" type="button">Desconectar</button>`)}`;};
   const sec=(id,t,p,corpo)=>`<section class="cfg-sec" data-sec="${id}" hidden><header><h3>${t}</h3>${p?`<p>${p}</p>`:''}</header>${corpo}</section>`;
-  const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
+  const sa=c.steam_inteira_avisos||{},a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
   const FREQ={selo:'~0,2 avisos por semana (0,7 em grandes promoções)',novo:'~2 avisos por semana (6 em grandes promoções)',
     igual:'~14 avisos por semana (34 em grandes promoções)','24m':'~2 avisos por semana (3 em grandes promoções)'};
   const atual=ls.get('cfgSec','avisos');
@@ -58,15 +58,19 @@ async function renderCfg(){
    ${sec('telegram','Telegram','Os mesmos avisos no celular, de graça, por um bot seu do Telegram.',`<div class="cfg-card" id="tgBox">${tgHtml()}</div>`)}
    ${sec('freq','Frequência','De quanto em quanto tempo o Hunter busca preços. A primeira verificação é sempre completa.',
      `<div class="cfg-card"><h4>Verificação rápida</h4>
-      ${row('Preços nas lojas (ITAD)',`A cada ${iv.itad} min e no "Verificar agora": preços em todas as lojas.`,num('intervalos_minutos.itad',iv.itad,5,10,null,'min'))}
+      ${row('Preços nas lojas (ITAD)',`A cada ${iv.itad} min e no "Verificar agora": preços em todas as lojas.`,num('intervalos_minutos.itad',iv.itad,5,15,null,'min'))}
       ${row('Keyshops (GG.deals)','A GG.deals só atualiza de hora em hora; menos que 60 não ajuda.',num('intervalos_minutos.ggdeals',iv.ggdeals,10,60,null,'min'))}
       ${row('Catálogo da Steam','',num('intervalos_minutos.steam',iv.steam,30,60,null,'min'))}</div>
      <div class="cfg-card"><h4>Verificação completa</h4>
       ${row('Fazer a completa a cada','Também catálogo da Steam, biblioteca, listas de DLC, edições, bundles e histórico, sem limite de ritmo. 0 = só quando você pedir.',num('verificacao_completa_dias',c.verificacao_completa_dias??7,1,0,90,'dias'))}
       ${row('Verificação completa agora','Acompanhe pelo status no topo.','<button class="btn-ghost" id="btnTudo" type="button">Começar agora</button>')}</div>`)}
    ${sec('steam','Steam inteira','Todas as promoções da Steam, além da sua lista (Ofertas → Promoções → Steam inteira).',
-     `<div class="cfg-card">${swRow('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam','Não gera avisos: os avisos continuam só para a sua lista.')}
-      ${row('Atualizar a cada','Também atualiza no "Verificar agora". Cada consulta substitui a anterior: ~1 MB num dia comum, ~16 MB e ~3 min em grande promoção.',num('intervalos_minutos.steam_inteira',iv.steam_inteira??60,15,30,1440,'min'))}</div>`)}
+     `<div class="cfg-card">${swRow('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam','Alimenta a aba Promoções e os avisos de jogos fora da sua lista (abaixo).')}
+      ${row('Atualizar a cada','Também atualiza no "Verificar agora". Cada consulta substitui a anterior: ~1 MB num dia comum, ~16 MB e ~3 min em grande promoção (aumente se a internet for limitada).',num('intervalos_minutos.steam_inteira',iv.steam_inteira??15,15,15,1440,'min'))}</div>
+     <div class="cfg-card"><h4>Avisos de jogos fora da sua lista</h4>
+      ${swRow('steam_inteira_avisos.ativo',sa.ativo!==false,'Avisar promoções de jogos que não estão na sua lista','Só os tipos ligados em Avisos (por padrão, o Selo Kurokami), de jogos que você não tem nem ignora e que entraram em promoção há pouco. Um aviso por promoção.')}
+      ${row('Análises mínimas','Ignora jogos com menos análises que isso (evita jogos desconhecidos).',num('steam_inteira_avisos.analises_minimas',sa.analises_minimas??500,100,0,null,'análises'))}
+      ${row('Máximo por checagem','Acima disso, os demais viram um resumo.',num('steam_inteira_avisos.max_por_rodada',sa.max_por_rodada??3,1,1,20,'avisos'))}</div>`)}
    ${sec('keyshops','Keyshops','Preços de lojas de chaves, via GG.deals. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".',
      `<div class="cfg-card">${swRow('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata','Desligado por padrão: a GG.deals dava muito alarme falso.')}
       ${row('Abaixo de','',num('keyshops.preco_maximo',k.preco_maximo,1,0,null,'R$',1))}

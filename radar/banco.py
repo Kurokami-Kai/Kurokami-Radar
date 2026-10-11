@@ -107,7 +107,9 @@ class Banco:
                     "ALTER TABLE steam_promo ADD COLUMN hl1 INTEGER",
                     "ALTER TABLE steam_promo ADD COLUMN aval TEXT",
                     # +18 (descritores de conteudo 3 e 4 da Steam): fica oculto nas Promocoes por padrao
-                    "ALTER TABLE steam_promo ADD COLUMN adulto INTEGER"):
+                    "ALTER TABLE steam_promo ADD COLUMN adulto INTEGER",
+                    # quando o item entrou em promocao (aviso da Steam inteira so de quem entrou ha pouco)
+                    "ALTER TABLE steam_promo ADD COLUMN entrou TEXT"):
             try:
                 self.con.execute(sql)
             except sqlite3.OperationalError:

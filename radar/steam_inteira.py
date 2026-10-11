@@ -208,8 +208,13 @@ def coletar(banco, cfg, log=print, chave_itad=None):
             log("   recordes da Steam inteira pela ITAD falharam (%s)" % explicar(e))
     avaliar(banco, cfg, novos)
     quando = agora()
+    # entrou = quando o item apareceu na Steam inteira (so quem entrou ha pouco gera aviso). Sem retrato anterior, ou
+    # de antes desta coluna, vale "antigo": a primeira coleta nunca vira uma avalanche de avisos.
+    antes = {r["appid"]: r["entrou"] for r in banco.q("SELECT appid, entrou FROM steam_promo")}
+    for a, n in novos.items():
+        n["entrou"] = (antes.get(a) or BAIXADO_ANTIGO) if a in antes else (quando if antes else BAIXADO_ANTIGO)
     cols = ("appid", "tipo", "nome", "pacote", "preco", "cheio", "corte", "fim", "rpos", "rcount", "rotulo", "lancamento",
-            "capa", "flag", "hl1", "aval", "adulto")
+            "capa", "flag", "hl1", "aval", "adulto", "entrou")
     banco.con.execute("DELETE FROM steam_promo")
     banco.con.executemany("INSERT INTO steam_promo(%s, visto) VALUES(%s)" % (", ".join(cols), ", ".join("?" * (len(cols) + 1))),
                           [tuple(n[c] for c in cols) + (quando,) for n in novos.values()])

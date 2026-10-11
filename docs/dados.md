@@ -14,7 +14,7 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `oferta_atual` | snapshot das ofertas vigentes (última resposta da ITAD) com `drm_steam`, `flag` (H/N/S), `expira`. **Usar esta tabela para "preço de agora"**, nunca o último registro do histórico |
 | `gg` | última leitura da GG.deals |
 | `historico_importado` | jogos cujo histórico da ITAD já foi importado (`escopo='todas'`) |
-| `steam_promo` | spec 07: retrato das promoções da Steam inteira (`appid` PK, `tipo` jogo/dlc/outro, `nome`, `pacote`, `preco`, `cheio`, `corte`, `fim` epoch, `rpos`, `rcount`, `rotulo`, `lancamento` epoch, `capa`, `visto`, `flag` marca da ITAD na oferta da Steam N/H/S, `hl1` menor de 1 ano em todas as lojas da ITAD, `aval` JSON `{tipos, selo_motivo, piso_ref, volta_texto, volta_ordem, volta_dica, inicio}` ou `{tipos, provisorio}` só com a marca, `adulto` 1 se a Steam marca conteúdo sexual (descritores 3 ou 4)); substituído inteiro a cada coleta (~15 MB em grande promoção) |
+| `steam_promo` | spec 07: retrato das promoções da Steam inteira (`appid` PK, `tipo` jogo/dlc/outro, `nome`, `pacote`, `preco`, `cheio`, `corte`, `fim` epoch, `rpos`, `rcount`, `rotulo`, `lancamento` epoch, `capa`, `visto`, `flag` marca da ITAD na oferta da Steam N/H/S, `hl1` menor de 1 ano em todas as lojas da ITAD, `aval` JSON `{tipos, selo_motivo, piso_ref, volta_texto, volta_ordem, volta_dica, inicio}` ou `{tipos, provisorio}` só com a marca, `adulto` 1 se a Steam marca conteúdo sexual (descritores 3 ou 4), `entrou` ISO UTC de quando o item apareceu na Steam inteira: herdado do retrato anterior; `2000-01-01…` = já estava lá ou sem retrato anterior, nunca avisa); substituído inteiro a cada coleta (~15 MB em grande promoção) |
 | `promo_estado` | Steam inteira, por appid: `gid` (`''` = a ITAD não conhece; tenta de novo em 30 dias), `mapeado`, `baixado`/`preco_baixado` (histórico), `visto` (última coleta em que estava; 60 dias fora = apagado), `flag`, `hl`, `hl1`, `menores_preco`, `menores_quando` (marca guardada: repedida quando o preço muda ou após 1 dia) |
 | `promo_hist` | histórico (lojas marcadas, pela ITAD) só de quem esteve perto do recorde na Steam inteira: `appid, loja, preco, cheio, corte, quando` (PK appid+loja+quando; ~150 linhas por jogo) |
 | `tempo_jogo` | spec 09: `appid, minutos, ultima` (epoch) do `GetOwnedGames`; substituída a cada leitura da biblioteca pela API (sem chave da Steam fica vazia) |
@@ -23,6 +23,7 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `consulta_lenta` | cache das consultas lentas da loja (`pacote`, `dlcs`; `dlcs_falha` = última falha do plano B, não conta como consultado) com data |
 | `alerta` | notificações enviadas |
 | `notificado` | estado por jogo para não repetir aviso (preço avisado, ativo) |
+| `notificado_promo` | avisos da Steam inteira (jogos fora da lista): `appid` PK, `entrou` da promoção já avisada (um aviso por promoção); apaga quem saiu de `steam_promo` |
 | `tenho_manual`, `silenciado` | ações do usuário no painel |
 | `meta` | chave→JSON (abaixo) |
 
@@ -35,14 +36,14 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 ## `config.json` (padrões em `config.PADRAO`)
 
 - `perfil_steam`, `pais`, `userdata_json`, `pasta_kurokami_precos`
-- `lojas` (alertam e entram nos preços do painel), `somente_drm_steam` (esconde de todo o painel a oferta que não ativa na Steam e o histórico dela; o histórico `preco` não guarda DRM: usa `oferta_atual.drm_steam=0` + `banco.LOJAS_SEM_STEAM`)
+- `lojas` (alertam e entram nos preços do painel; desde a 0.18.2 o padrão é **todas** as lojas da ITAD: a primeira coleta marca todas, uma vez só, migração `todas_as_lojas` em `migracoes`), `somente_drm_steam` (esconde de todo o painel a oferta que não ativa na Steam e o histórico dela; o histórico `preco` não guarda DRM: usa `oferta_atual.drm_steam=0` + `banco.LOJAS_SEM_STEAM`)
 - `alerta`: `tipos{selo,novo,igual,24m}` (o que avisa; padrão só `selo`), `desconto_minimo` (vale para novo, igual e 24m), `selo_corte_minimo` (Selo só a partir desse corte; padrão 0), `dias_minimos_completo`, `tolerancia_pct`, `janela_dias`/`perto` (informativos). Ignorados, ficam por compatibilidade: `raridade_minima` e `favoritos_top` (desde a 0.15), `score_minimo`, `avaliacao_minima` e `ignorar_sem_avaliacoes` (desde a 0.14)
 - `keyshops`: `ativo` (padrão `false` desde a 0.16), `preco_maximo`, `pct_do_menor_oficial`
 - `migracoes[]`: mudanças de padrão já aplicadas a este arquivo (`config.MIGRACOES`, cada uma roda uma vez em `carregar()`; depois vale a escolha do usuário). Hoje: `keyshop_alerta_off`
 - `dlc`: `ignorar_cosmeticos|extras|atalhos|pacotes|gratis|itens` (0.18.2, padrão ligado), `preco_minimo` (reais, 0 = off), `so_expansoes` (só classe história/pacote conta). `dlc.ignorada(classe, preco, cfg, tenho=)` vale para o "falta", o custo completo e, desde a 0.18.2, para as DLCs que você tem na Biblioteca (contagem e valor). Classes: + `item`; `dlc.classificar(nome, nome_do_jogo)` tira o título do jogo do começo do nome antes das regras
 - `completo`: `padrao`, `jogos{appid:"completo"}`
 - `bundles`, `notificacoes` (`ativas, max_por_rodada, melhora_minima_reais, silencio{}, termina_em_breve_horas, telegram{ativo, chat_id}`; o `chat_id` não é segredo, o token do bot fica no keyring)
-- `steam_inteira` (bool, padrão true: coleta da Steam inteira), `steam_inteira_hist_por_rodada` (60: históricos da Steam inteira por rodada; a ITAD aceita ~100 chamadas em 5 min), `intervalos_minutos{itad, ggdeals, steam, steam_inteira}` (Steam inteira: 60 min), `chamadas_lentas_por_rodada`, `verificacao_completa_dias`, `historico.importar_dias`
+- `steam_inteira` (bool, padrão true: coleta da Steam inteira), `steam_inteira_hist_por_rodada` (60: históricos da Steam inteira por rodada; a ITAD aceita ~100 chamadas em 5 min), `steam_inteira_avisos{ativo, analises_minimas, max_por_rodada}` (padrão true/500/3: avisos de jogos da Steam inteira fora da lista, pelos tipos de `alerta.tipos`), `intervalos_minutos{itad, ggdeals, steam, steam_inteira}` (padrão 15/60/180/15 desde a 0.18.2; a migração `intervalos_15min` troca só os antigos 30 e 60), `chamadas_lentas_por_rodada`, `verificacao_completa_dias`, `historico.importar_dias`
 - `extras[]`, `painel{rede_local}`, `atualizacao{repo, verificar}`
 
 `config.carregar()` faz merge do arquivo sobre `PADRAO`, então chaves novas não exigem migração. **Mudar o valor padrão de uma chave que já existe** não chega a quem já tem o arquivo (o `config.json` guarda tudo desde a 1ª vez): para isso, acrescente uma entrada em `config.MIGRACOES`. Arquivo ilegível nunca é migrado (seria sobrescrito).

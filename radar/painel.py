@@ -1143,7 +1143,9 @@ def post_sair(_d):
 
 def api_notificacoes(_q):
     b = Banco()
-    rows = [dict(r) for r in b.q("""SELECT a.*, j.nome, j.capa FROM alerta a LEFT JOIN jogo j ON j.appid=a.appid
+    # jogos fora da lista (avisos da Steam inteira) tem nome e capa no retrato steam_promo
+    rows = [dict(r) for r in b.q("""SELECT a.*, COALESCE(j.nome, p.nome) AS nome, COALESCE(j.capa, p.capa) AS capa FROM alerta a
+                                     LEFT JOIN jogo j ON j.appid=a.appid LEFT JOIN steam_promo p ON p.appid=a.appid
                                      ORDER BY a.quando DESC LIMIT 200""")]
     b.con.close()
     return {"itens": rows}
@@ -1171,7 +1173,7 @@ def post_config(dados):
     novo = dados.get("config") or {}
     tg = (cfg.get("notificacoes") or {}).get("telegram")
     for k in ("lojas", "somente_drm_steam", "alerta", "keyshops", "dlc", "notificacoes", "intervalos_minutos", "completo", "extras",
-              "verificacao_completa_dias"):
+              "verificacao_completa_dias", "steam_inteira", "steam_inteira_avisos"):
         if k in novo:
             cfg[k] = novo[k]
     if tg is not None and isinstance(cfg.get("notificacoes"), dict):
@@ -1196,7 +1198,10 @@ def post_telegram(d):
         if not ok:
             return {"ok": False, "erro": r}
         credenciais.gravar("telegram", token)
-        t["chat_id"] = ""
+        if credenciais.ler("telegram") != token:   # o Gerenciador de Credenciais nao guardou: melhor dizer agora que perder depois
+            return {"ok": False, "erro": "O Windows não guardou o token no Gerenciador de Credenciais. Tente de novo; se repetir, veja o radar.log."}
+        if t.get("chat_id") and telegram.conversa_valida(token, t["chat_id"]) is False:   # mesmo bot: a conversa continua vinculada
+            t.update(chat_id="", ativo=False)
         config.salvar(cfg)
         return {"ok": True, "bot": r}
     token = credenciais.ler("telegram")
