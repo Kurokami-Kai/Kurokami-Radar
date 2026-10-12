@@ -7,6 +7,7 @@
 /*incluir configuracoes.css*/
 /*incluir promocoes.css*/
 /*incluir paginas.css*/
+/*incluir progresso.css*/
 </style></head><body>
 <div class="ab" id="abertura" aria-hidden="true">
   <svg viewBox="0 0 64 64"><circle class="ab-disco" cx="32" cy="32" r="29" pathLength="100" fill="#0b0b0b" stroke="#e11d2e" stroke-width="3.5"/><circle class="ab-anel" cx="32" cy="32" r="16" fill="none" stroke="#8a1220" stroke-width="2.5" stroke-dasharray="11.5 5.3"/><path class="ab-mira" d="M32 8v10M32 46v10M8 32h10M46 32h10" stroke="#e11d2e" stroke-width="4" stroke-linecap="round"/><circle class="ab-ponto" cx="32" cy="32" r="5" fill="#ff2a3d"/></svg>
@@ -23,6 +24,8 @@
         <div class="ddm"><button data-tab="vale" data-sub="dest">Destaques</button><button data-tab="vale" data-sub="promo">Promoções</button><button data-tab="vale" data-sub="lista">Lista de desejos</button><hr><button data-tab="lista" data-ir="promo">Tabela com todos os filtros</button></div></div>
       <div class="dd"><button data-tab="bib" data-tabs="bib" data-sub="bib" aria-haspopup="true">Biblioteca</button>
         <div class="ddm"><button data-tab="bib" data-sub="bib">Biblioteca</button><button data-tab="bib" data-sub="completar">Completar</button><hr><button data-dlcpromo>DLCs dos meus jogos em promoção ↗</button></div></div>
+      <div class="dd"><button data-tab="prog" data-tabs="prog" aria-haspopup="true">Status</button>
+        <div class="ddm"><button data-tab="prog">Progresso</button></div></div>
       <div class="dd"><button data-tab="cfg" data-tabs="cfg notif" aria-haspopup="true">Configurações</button>
         <div class="ddm"><button data-tab="cfg">Configurações</button><button data-tab="notif">Notificações</button></div></div>
       <button data-tab="carr" data-tabs="carr">Carrinho <span id="carrN" style="color:var(--disc-fg)"></span></button>
@@ -80,6 +83,11 @@
     </div>
   </section>
 
+  <section id="tab-prog" class="wrap tabsec" hidden>
+    <div class="shead"><h2>Progresso</h2><span class="aside">o que você realmente jogou, pelo tempo e pelas conquistas</span></div>
+    <div id="progCorpo"></div>
+  </section>
+
   <section id="tab-notif" class="wrap tabsec" hidden>
     <div class="shead"><h2>Notificações</h2><a class="aside nf-cfg" href="#" data-nfcfg>Escolher o que avisa ›</a></div>
     <div id="notifTopo"></div>
@@ -106,6 +114,7 @@
 /*incluir paginas.js*/
 /*incluir carrinho.js*/
 /*incluir notificacoes.js*/
+/*incluir progresso.js*/
 /*incluir configuracoes.js*/
 /*incluir conta.js*/
 /*incluir status.js*/

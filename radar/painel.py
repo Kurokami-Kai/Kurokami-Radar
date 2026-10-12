@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import re
 import urllib.parse as _up
 
-from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, ficha, steam
+from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, ficha, jogados, steam
 from .rede import http_json
 from .banco import SO_DRM_SQL, Banco
 
@@ -1151,6 +1151,14 @@ def api_notificacoes(_q):
     return {"itens": rows}
 
 
+def api_progresso(_q):
+    """Aba Status > Progresso: tempo jogado e conquistas de cada jogo que voce tem (radar/jogados.py)."""
+    b = Banco()
+    r = jogados.resumo(b)
+    b.con.close()
+    return r
+
+
 def api_alertas(_q):
     b = Banco()
     ult = b.meta("ultimos_alertas") or {}
@@ -1402,7 +1410,7 @@ def _limpar_sessao_qr():
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/jogo_extra": api_jogo_extra, "/api/hltb": api_hltb, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
-       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine}
+       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/progresso": api_progresso}
 POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,

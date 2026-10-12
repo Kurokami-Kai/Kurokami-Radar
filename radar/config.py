@@ -109,6 +109,8 @@ PADRAO = {
     # A loja da Steam so responde ~200 chamadas a cada 5 min. O que depende dela (conteudo de edicoes,
     # lista de DLCs) vai sendo completado aos poucos, sem atrasar a checagem de precos.
     "chamadas_lentas_por_rodada": 120,
+    # conquistas de cada jogo jogado (aba Status > Progresso): N jogos por rodada da pista lenta, 1 chamada cada
+    "conquistas_por_rodada": 60,
     "historico": {"importar_dias": 1825},
 
     # mudancas de padrao ja aplicadas a este config.json (cada uma roda uma vez so; ver _migrar)

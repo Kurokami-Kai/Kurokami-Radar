@@ -2,6 +2,9 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.18.3
+- **Nova aba Status → Progresso:** mostra o que você realmente jogou. No topo, os números da biblioteca (jogos, realmente jogados, platinados, horas jogadas, não jogados); uma barra com a biblioteca dividida em **platinados**, **em andamento**, **0% de conquistas**, **sem conquistas**, **nunca jogados**; os **mais jogados** em horas; quantos jogos você joga por faixa de horas; e a última vez que jogou, por ano. Embaixo, a lista jogo a jogo de cada grupo (com a barra de conquistas). Jogo com conquistas e **0% feito** conta como **não jogado** (pode ser só farm de cartas); uma caixinha deixa contar como jogado de novo. As conquistas de cada jogo jogado são lidas aos poucos, em segundo plano (cerca de 60 a cada 3 minutos); precisa da chave da Steam e do perfil com jogos públicos.
+
 ## 0.18.2
 - **Duas pistas de coleta:** a checagem de promoções (Steam inteira, preços das lojas, GG.deals e avisos) agora roda sozinha de 15 em 15 minutos e **nunca espera** o trabalho lento. O catálogo da Steam, a biblioteca, as DLCs e o histórico de preços (que na IsThereAnyDeal leva dezenas de minutos por causa do limite de chamadas) rodam **em segundo plano**, ao lado, sem atrasar os avisos. No painel, ao clicar no status do topo, o "Segundo plano" aparece numa seção própria. A verificação completa continua existindo: a parte rápida acontece na hora e a lenta segue em segundo plano. Na primeira instalação os avisos só começam depois que o histórico é baixado, para não avisar tudo de uma vez.
 - **Checagem de promoções a cada 15 minutos** (antes 30): preços das lojas e Steam inteira. Quem estava no padrão antigo passa para 15 sozinho; quem escolheu outro valor em Configurações → Frequência mantém. Com o PC desligado não há checagem; ao ligar, o Hunter recupera o que perdeu.

@@ -10,10 +10,11 @@ function mostraFrame(t){const f=FR[t],el=$('#'+f.id);scrollTo(0,0);ajustaTopo();
     el.onload=()=>{el.hidden=false;$('#'+f.id+'Msg').hidden=true;if(S.tab===t){focaFrame();buscaPend(f,el);}};el.src=f.url+'?t='+Date.now()+'#'+f.sub;}
   else{try{el.contentWindow.irSub(f.sub);}catch(e){}focaFrame();buscaPend(f,el);}}
 function focaFrame(){const f=FR[S.tab];if(f)try{$('#'+f.id).contentWindow.focus();}catch(e){}}
-/* Teclado do painel. 1–4 trocam de seção (Ofertas, Biblioteca, Configurações, Carrinho); ⇧1–⇧3, de página dentro dela;
-   "/" e Esc abrem a busca; uma letra solta abre a busca já com ela. Com o foco num iframe, a página repassa 1–4 por KH.irSecao. */
-const SECOES=['vale','bib','cfg','carr'];
-const SUBS_SECAO={vale:['dest','promo','lista'],bib:['bib','completar'],cfg:['cfg','notif']};
+/* Teclado do painel. 1–5 trocam de seção (Ofertas, Biblioteca, Configurações, Carrinho, Status); ⇧1–⇧3, de página dentro dela;
+   "/" e Esc abrem a busca; uma letra solta abre a busca já com ela. Com o foco num iframe, a página repassa 1–5 por KH.irSecao. */
+const TABS=['vale','lista','bib','carr','notif','cfg','prog'];
+const SECOES=['vale','bib','cfg','carr','prog'];
+const SUBS_SECAO={vale:['dest','promo','lista'],bib:['bib','completar'],cfg:['cfg','notif'],prog:['prog']};
 const secaoDe=t=>t==='lista'?'vale':t==='notif'?'cfg':t;
 function irSecao(n){const t=SECOES[n-1];if(!t||S.tab===t)return;setTab(t);}
 function irPagina(n){const sec=secaoDe(S.tab),s=(SUBS_SECAO[sec]||[])[n-1];if(!s)return;if(FR[sec]){FR[sec].sub=s;setTab(sec);}else setTab(s);}

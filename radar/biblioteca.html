@@ -555,7 +555,7 @@ document.addEventListener('keydown',e=>{
   const m={ArrowLeft:'l',ArrowRight:'r',ArrowUp:'u',ArrowDown:'d'}[e.key];
   if(m){andar(m);e.preventDefault();return;}
   if(e.key==='Enter'&&tg.matches('[data-it],[data-ic]')){e.preventDefault();abre(+(tg.dataset.it??tg.dataset.ic));return;}
-  const dg=/^(?:Digit|Numpad)([1-9])$/.exec(/^Numpad/.test(e.code||'')&&!/^\d$/.test(e.key)?'':e.code||'');   // 1–4: seções do painel; ⇧1–⇧2: páginas daqui
+  const dg=/^(?:Digit|Numpad)([1-9])$/.exec(/^Numpad/.test(e.code||'')&&!/^\d$/.test(e.key)?'':e.code||'');   // 1–5: seções do painel; ⇧1–⇧2: páginas daqui
   if(dg){e.preventDefault();if(!e.shiftKey){if(PAI&&PAI.irSecao)PAI.irSecao(+dg[1]);}else if(SUBS[+dg[1]-1]){S.sub=SUBS[+dg[1]-1][0];S.q='';S.busca=false;desenha();scrollTo(0,0);}return;}
   if(e.shiftKey&&e.code==='KeyT'){S.modo[S.sub]=S.sub==='bib'?(modo()==='colecao'?'franquias':'colecao'):(modo()==='capas'?'texto':'capas');desenha();return;}
   if(e.key.length===1&&/\p{L}/u.test(e.key)){e.preventDefault();abreBusca(e.key);return;}   // uma letra solta abre a busca já com ela

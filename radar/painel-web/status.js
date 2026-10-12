@@ -54,14 +54,14 @@ $('#btnPausa').addEventListener('click',async()=>{const r=await post('/api/pausa
 $('#btnVerif').addEventListener('click',async()=>{const r=await post('/api/verificar');if(!r.ok){toast(r.erro);return;}toast('Checando…');
   pollResumo.ativo=true;setTimeout(()=>carregarResumo().catch(()=>{}),1500);});
 async function carregarLista(){const d=await api('/api/lista');L=d.itens;IDX=new Map(L.map(o=>[o.appid,o]));render();}
-function render(){if(FR[S.tab])mostraFrame(S.tab);else if(S.tab==='lista')renderLista();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else renderCfg();}
+function render(){if(FR[S.tab])mostraFrame(S.tab);else if(S.tab==='lista')renderLista();else if(S.tab==='carr')renderCarr();else if(S.tab==='notif')renderNotif();else if(S.tab==='prog')renderJogados();else renderCfg();}
 
 async function pollResumo(){try{await carregarResumo();}catch(e){}const P=(RES&&RES.progresso)||{};
   if(pollResumo.ativo&&!P.ativo){pollResumo.ativo=false;Object.keys(FR).forEach(k=>{FR[k].velho=true;});await carregarLista();try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}toast('Verificação concluída');}
   if(P.ativo)pollResumo.ativo=true;setTimeout(pollResumo,P.ativo||(P.lenta&&P.lenta.ativo)?3000:30000);}
 (async()=>{try{const c=await api('/api/carrinho');CARR=c.itens.map(i=>({appid:i.appid,modo:i.modo,loja:i.pedida})).concat(c.bundles.map(b=>({bundle:b.bundle,modo:b.modo})));$('#carrN').textContent=CARR.length?'('+CARR.length+')':'';}catch(e){}
   const h=location.hash.slice(1);  // #vale, #lista... (o resumo "Tipo ligado" abre a vitrine com #vale)
-  setTab(['vale','lista','bib','carr','notif','cfg'].includes(h)?h:['vale','lista','bib','carr','notif','cfg'].includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();
+  setTab(TABS.includes(h)?h:TABS.includes(S.tab)?S.tab:'vale');await carregarResumo();await carregarLista();
   if(!VIT){try{VIT=await api('/api/vitrine');atualizarStatus();}catch(e){}}setTimeout(pollResumo,3000);
   carregarConta();setTimeout(conferirExt,600);   // a extensão marca o <html> no fim do carregamento
   if(location.search.includes('steam=ok')){history.replaceState(null,'',location.pathname+location.hash);setTab('cfg');toast('Entrou pela Steam: perfil atualizado. A lista e a biblioteca passam para este perfil na próxima verificação (use "Verificar agora").');}})();

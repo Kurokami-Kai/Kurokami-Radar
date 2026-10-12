@@ -124,7 +124,7 @@ document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if
 
 /* ================= abas ================= */
 function setTab(t){ENTRANDO=S.tab!==t;S.tab=t;save();document.body.dataset.tab=t;document.body.classList.toggle('emframe',!!FR[t]);try{history.replaceState(null,'','#'+t);}catch(e){}$$('.nav [data-tabs]').forEach(b=>b.setAttribute('aria-current',b.dataset.tabs.split(' ').includes(t)?'page':'false'));
-  ['vale','lista','bib','carr','notif','cfg'].forEach(x=>$('#tab-'+x).hidden=x!==t);render();}
+  ['vale','lista','bib','carr','notif','cfg','prog'].forEach(x=>$('#tab-'+x).hidden=x!==t);render();}
 $('#logoHome').addEventListener('click',e=>{e.preventDefault();setTab('vale');window.scrollTo({top:0,behavior:'smooth'});});
 $('.nav').addEventListener('click',e=>{if(e.target.closest('[data-dlcpromo]')){KH.dlcsPromo();e.target.blur();return;}
   const b=e.target.closest('[data-tab]');if(!b)return;

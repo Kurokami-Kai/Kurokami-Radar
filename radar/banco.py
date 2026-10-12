@@ -64,6 +64,9 @@ CREATE TABLE IF NOT EXISTS promo_hist(
 CREATE TABLE IF NOT EXISTS tempo_jogo(appid INTEGER PRIMARY KEY, minutos INTEGER, ultima INTEGER);
 CREATE TABLE IF NOT EXISTS ficha_cache(appid INTEGER, fonte TEXT, dados TEXT, quando TEXT, PRIMARY KEY(appid, fonte));
 CREATE TABLE IF NOT EXISTS franquia_manual(appid INTEGER PRIMARY KEY, nome TEXT, quando TEXT);
+-- aba Status > Progresso: conquistas de cada jogo jogado (feitas/total; total 0 = sem conquistas, -1 = a consulta falhou);
+-- minutos = tempo jogado na hora da consulta (so consulta de novo quando o tempo muda)
+CREATE TABLE IF NOT EXISTS conquista_jogo(appid INTEGER PRIMARY KEY, feitas INTEGER, total INTEGER, minutos INTEGER, quando TEXT);
 """
 
 
@@ -205,6 +208,9 @@ class Banco:
         """tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo."""
         self.con.execute("DELETE FROM tempo_jogo")
         self.con.executemany("INSERT INTO tempo_jogo VALUES(?,?,?)", [(a, m, u) for a, (m, u) in tempos.items()])
+
+    def salvar_conquistas(self, appid, feitas, total, minutos):
+        self.con.execute("INSERT OR REPLACE INTO conquista_jogo VALUES(?,?,?,?,?)", (appid, feitas, total, minutos, agora()))
 
     def definir_itad(self, appid, gid):
         self.con.execute("UPDATE jogo SET itad_id=? WHERE appid=?", (gid, appid))

@@ -81,11 +81,11 @@ def biblioteca_api(chave, steamid):
     return [g["appid"] for g in jogos]
 
 
-def conquistas(chave, steamid, appid):
+def conquistas(chave, steamid, appid, ritmo=None):
     """Conquistas do jogo na conta (ficha, 1 chamada). Jogo sem conquistas: total 0. Perfil privado: erro 403."""
     try:
         r = http_json(API + "ISteamUserStats/GetPlayerAchievements/v1/?" + urllib.parse.urlencode(
-            {"key": chave, "steamid": steamid, "appid": appid, "l": "brazilian"}), tentativas=2, timeout=15)
+            {"key": chave, "steamid": steamid, "appid": appid, "l": "brazilian"}), tentativas=2, timeout=15, ritmo=ritmo)
     except urllib.error.HTTPError as e:
         if e.code == 400 and "no stats" in (getattr(e, "corpo", "") or "").lower():
             return {"feitas": 0, "total": 0}

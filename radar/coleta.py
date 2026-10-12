@@ -2,7 +2,8 @@
 import json
 import os
 import time
-from datetime import datetime, timezone
+import urllib.error
+from datetime import datetime, timedelta, timezone
 
 from . import analise, caminhos, config, credenciais, dlc as dlcmod, ggdeals, itad, progresso, rede, steam, steam_inteira
 from .banco import agora
@@ -32,6 +33,8 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
     sid = banco.meta("steamid")
     if not sid or banco.meta("steamid_perfil") != perfil:  # trocou de perfil: resolve de novo
         sid = steam.resolver_steamid(k_steam, perfil)
+        if banco.meta("steamid") not in (None, sid):
+            banco.con.execute("DELETE FROM conquista_jogo")   # conquistas eram da conta anterior
         banco.meta("steamid", sid)
         banco.meta("steamid_perfil", perfil)
     ud = {}
@@ -343,6 +346,11 @@ def atualizar_lenta(cfg, banco, forcar=False, sem_limite=False, log=print):
             banco.commit()
         except Exception as e:
             log("   biblioteca falhou (%s), tento na proxima" % e)
+    try:
+        if coletar_conquistas(cfg, banco, k_steam, sid, log):
+            restante = True
+    except Exception as e:
+        log("   conquistas falharam (%s), tento na proxima" % rede.explicar(e))
     if k_itad:
         hist_ok = True   # False so se a ITAD estiver limitando (a importacao parou no meio)
         try:
@@ -367,6 +375,48 @@ def atualizar_lenta(cfg, banco, forcar=False, sem_limite=False, log=print):
             except Exception as e:
                 log("   historico da Steam inteira falhou (%s), tento na proxima" % rede.explicar(e))
     return restante
+
+
+def coletar_conquistas(cfg, banco, k_steam, sid, log):
+    """Conquistas de cada jogo jogado (aba Status > Progresso), `conquistas_por_rodada` por vez. Fila: quem nunca foi
+    consultado; quem tem conquista a fazer e mudou o tempo jogado desde a consulta; consulta falha ha 7 dias; o resto
+    ha 60 dias. Perfil privado (403) ou limite (429) param a rodada. True = ainda ha fila."""
+    if not k_steam or not sid:
+        return False
+    por = cfg.get("conquistas_por_rodada", 60)
+    dias = lambda n: (datetime.now(timezone.utc) - timedelta(days=n)).replace(microsecond=0).isoformat()
+    fila = banco.q("""SELECT t.appid, t.minutos FROM tempo_jogo t JOIN jogo j ON j.appid=t.appid AND j.possuido=1
+        LEFT JOIN conquista_jogo c ON c.appid=t.appid
+        WHERE t.minutos>0 AND (j.tipo IS NULL OR j.tipo='jogo') AND (c.appid IS NULL
+           OR (c.total<0 AND c.quando<?) OR (c.total>0 AND c.feitas<c.total AND c.minutos<>t.minutos) OR c.quando<?)
+        ORDER BY c.appid IS NOT NULL, t.minutos DESC""", dias(7), dias(60))
+    if not fila:
+        return False
+    lote = fila[:por]
+    log("Conquistas: %d de %d jogos jogados..." % (len(lote), len(fila)))
+    seguidas, parou = 0, False
+    for r in lote:
+        try:
+            c = steam.conquistas(k_steam, sid, r["appid"], ritmo=rede.RITMO["steam"])
+            banco.salvar_conquistas(r["appid"], c["feitas"], c["total"], r["minutos"])
+            seguidas = 0
+        except urllib.error.HTTPError as e:
+            if e.code == 403:
+                log("   conquistas: a Steam recusou (403: perfil ou detalhes dos jogos privados?); tento na proxima checagem")
+                parou = True
+                break
+            banco.salvar_conquistas(r["appid"], 0, -1, r["minutos"])
+            seguidas += 1
+        except Exception as e:   # sem rede, limite ou resposta ruim: este jogo fica sem marca e vem de novo
+            log("   conquistas: %s" % rede.explicar(e))
+            seguidas += 1
+        if seguidas >= 3:
+            log("   conquistas: 3 falhas seguidas, paro por agora")
+            parou = True
+            break
+        banco.commit()
+    banco.commit()
+    return not parou and len(fila) > len(lote)
 
 
 def coletar_biblioteca(cfg, banco, possuidos, k_itad, log):
