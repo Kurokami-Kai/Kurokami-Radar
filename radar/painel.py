@@ -1156,6 +1156,11 @@ def api_progresso(_q):
     b = Banco()
     r = jogados.resumo(b)
     b.con.close()
+    # as conquistas sao lidas pela pista lenta, que so existe com o Hunter rodando (bandeja); so o painel nao le nada
+    lenta = getattr(CONTROLE["servico"], "lenta", None)
+    r["coletando"] = bool(lenta)
+    if r["pendentes"] and lenta and not lenta.ocupada:
+        lenta.acordar.set()   # abriu a aba com conquistas por ler: nao espera os 10 min da conferencia
     return r
 
 

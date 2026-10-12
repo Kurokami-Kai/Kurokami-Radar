@@ -91,6 +91,7 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
   - `salvar_jogo(j)`
   - `marcar_listas(wishlist, possuidos, prioridade)`
   - `salvar_tempo_jogo(tempos)` — tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo.
+  - `salvar_conquistas(appid, feitas, total, minutos)`
   - `definir_itad(appid, gid)`
   - `nome_jogo(appid)`
   - `salvar_dlc(appid, pai, classe)`
@@ -146,6 +147,7 @@ Orquestra a coleta: Steam (catalogo) -> ITAD (precos por loja + historico) -> GG
 - `atualizar(cfg, banco, forcar, importar_hist, sem_limite, log, steam_agora, faixa)` — faixa "tudo" (linha de comando): tudo em sequencia, como sempre. faixa "rapida" (o servico, de 15 em 15 min): listas,
 - `catalogo_steam(cfg, banco, wl, possuidos, sid, k_steam, log, orcamento)`
 - `atualizar_lenta(cfg, banco, forcar, sem_limite, log)` — Pista lenta (thread propria, 0.18.2): catalogo da Steam (detalhes, edicoes, DLCs, bundles), biblioteca (1x por dia),
+- `coletar_conquistas(cfg, banco, k_steam, sid, log)` — Conquistas de cada jogo jogado (aba Status > Progresso), `conquistas_por_rodada` por vez. Fila: quem nunca foi
 - `coletar_biblioteca(cfg, banco, possuidos, k_itad, log)` — Precos, franquias e menor historico de tudo que voce tem (jogos e DLCs).
 - `_cache_itad(cfg, banco)`
 - `importar_historicos(cfg, banco, chave, mapa, shop_ids, log)` — Historico (todas as lojas) dos jogos que ainda nao o tem, uma vez por jogo. Grava e confirma a cada jogo (a pista
@@ -231,6 +233,12 @@ IsThereAnyDeal: lojas, mapeamento de ids, precos por loja (com DRM) e historico.
 Janela de primeiro uso para as chaves. Campo de texto do Windows: Ctrl+V e o botao direito funcionam.
 
 - `abrir()`
+
+## `radar/jogados.py`
+Aba Status > Progresso: o que voce realmente jogou. Junta o tempo jogado (tempo_jogo, do GetOwnedGames) com as
+
+- `estado(minutos, feitas, total)`
+- `resumo(b)`
 
 ## `radar/notificador.py`
 Decide QUAIS alertas viram notificacao:
@@ -325,6 +333,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `post_atualizar_app(_d)`
 - `post_sair(_d)`
 - `api_notificacoes(_q)`
+- `api_progresso(_q)` — Aba Status > Progresso: tempo jogado e conquistas de cada jogo que voce tem (radar/jogados.py).
 - `api_alertas(_q)`
 - `api_config(_q)`
 - `post_config(dados)`
@@ -446,7 +455,7 @@ Steam: lista de desejos, biblioteca, detalhes da loja, DLCs e opcoes de compra.
 - `perfil_publico(steamid)` — {"nome", "avatar"} do perfil (XML da comunidade, sem chave), para o icone no topo do painel. None se falhar.
 - `wishlist(chave, steamid)`
 - `biblioteca_api(chave, steamid)`
-- `conquistas(chave, steamid, appid)` — Conquistas do jogo na conta (ficha, 1 chamada). Jogo sem conquistas: total 0. Perfil privado: erro 403.
+- `conquistas(chave, steamid, appid, ritmo)` — Conquistas do jogo na conta (ficha, 1 chamada). Jogo sem conquistas: total 0. Perfil privado: erro 403.
 - `detalhes_loja(appid, pais)` — O que a ficha mostra da pagina da loja (1 chamada, sem ritmo: e a pessoa abrindo a ficha, nunca em lote).
 - `ler_userdata(arquivo)`
 - `url_asset(item)`

@@ -8,7 +8,8 @@ const pgJogou=j=>j.estado==='platina'||j.estado==='andamento'||j.estado==='pouco
 async function renderJogados(){
   if(!JG)$('#progCorpo').innerHTML='<div class="empty">Lendo a biblioteca…</div>';
   try{JG=await api('/api/progresso');}catch(e){$('#progCorpo').innerHTML='<div class="empty">Não consegui ler o progresso agora.</div>';return;}
-  desenharJogados();}
+  desenharJogados();clearTimeout(renderJogados.t);
+  if(JG.pendentes&&JG.coletando&&S.tab==='prog')renderJogados.t=setTimeout(()=>{if(S.tab==='prog')renderJogados();},30000);}
 function pgColunas(itens){const mx=Math.max(1,...itens.map(i=>i.n));
   return `<div class="pg-cols">${itens.map(i=>`<div class="pg-col" title="${esc(i.tip||'')}"><span class="pg-cn tnum">${fmtN(i.n)}</span><span class="pg-cb"><i style="height:${Math.max(i.n?3:0,Math.round(i.n/mx*100))}%"></i></span><span class="pg-cr">${esc(i.rot)}</span></div>`).join('')}</div>`;}
 function pgLinha(j){const pct=j.total?Math.round(j.feitas/j.total*100):0;
@@ -32,7 +33,8 @@ function desenharJogados(){
   const lista=[...por[f]].sort((a,b)=>f==='andamento'?(b.feitas/b.total-a.feitas/a.total)||b.minutos-a.minutos:f==='nunca'?a.nome.localeCompare(b.nome,'pt-BR'):b.minutos-a.minutos);
   const quantos=S.pgMais||40;
   box.innerHTML=`
-   ${JG.pendentes?`<div class="pg-aviso">Lendo as conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} em segundo plano (cerca de 60 a cada 3 minutos). Até lá eles contam como jogados, e os números abaixo ainda mudam.</div>`:''}
+   ${JG.pendentes?(JG.coletando?`<div class="pg-aviso">Lendo as conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} em segundo plano (cerca de 100 a cada 3 minutos). Até lá eles contam como jogados, e os números abaixo ainda mudam. A tela se atualiza sozinha.</div>`
+     :`<div class="pg-aviso">As conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} ainda não foram lidas, e elas só são lidas com o Hunter rodando (ícone na bandeja do Windows). Só o painel aberto não lê nada.</div>`):''}
    <div class="pg-kpis">${kpi(fmtN(J.length),'jogos na biblioteca')}${kpi(fmtN(jogados.length),'realmente jogados',Math.round(jogados.length/J.length*100)+'% da biblioteca')}
      ${kpi(fmtN(por.platina.length),'platinados',por.platina.length+por.andamento.length?Math.round(por.platina.length/(por.platina.length+por.andamento.length)*100)+'% dos jogados que têm conquistas':'')}
      ${kpi(fmtN(Math.round(horas/60)),'horas jogadas',foraH?fmtN(Math.round(foraH/60))+' h em jogos sem nenhuma conquista (mais de 4 h) ficaram de fora':'')}
