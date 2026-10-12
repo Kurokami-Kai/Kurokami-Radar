@@ -4,11 +4,15 @@ conquistas de cada jogo (conquista_jogo, coletadas aos poucos pela pista lenta).
 Estado de cada jogo (nunca DLC):
   platina   todas as conquistas feitas
   andamento algumas feitas
-  zero      tem conquistas, nenhuma feita: conta como NAO jogado (provavel farm de cartas / idle); o painel deixa o dono
-            contar de novo como jogado
-  sem       jogado e o jogo nao tem conquistas (so as horas dizem)
+  zero      tem conquistas, nenhuma feita e mais de 4 h: NAO conta como jogado (quem joga 4 h pega alguma; provavel
+            farm de cartas / jogo aberto parado)
+  sem       o jogo nao tem conquistas e passa de 4 h: tambem NAO conta (mesma razao)
+  pouco     ate 4 h e nenhuma conquista feita (tenha o jogo conquistas ou nao): conta como jogado (so experimentou)
   nunca     0 minutos
   pendente  jogado, mas as conquistas ainda nao foram consultadas (ou a consulta falhou)"""
+
+
+LIMITE_SEM_CONQUISTA = 240   # minutos: acima disso, sem nenhuma conquista feita, o jogo nao conta como jogado
 
 
 def estado(minutos, feitas, total):
@@ -16,11 +20,13 @@ def estado(minutos, feitas, total):
         return "nunca"
     if total is None or total < 0:
         return "pendente"
-    if total == 0:
-        return "sem"
-    if feitas >= total:
+    if total > 0 and feitas >= total:
         return "platina"
-    return "andamento" if feitas > 0 else "zero"
+    if feitas > 0:
+        return "andamento"
+    if minutos <= LIMITE_SEM_CONQUISTA:
+        return "pouco"
+    return "sem" if total == 0 else "zero"
 
 
 def resumo(b):
