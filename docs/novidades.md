@@ -2,6 +2,9 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.18.5
+- **Progresso: com o farm de cartas ligado, jogos cujas conquistas ainda não foram lidas ficam de fora dos números e dos gráficos** (antes contavam como jogados e inflavam "realmente jogados", as horas e o gráfico da última vez que jogou, já que o programa de farm atualiza essa data). Os números crescem conforme a leitura avança.
+
 ## 0.18.4
 - **Progresso: opção para quem usa programa de farm de cartas** (Configurações → Jogos). Ligada, jogo sem nenhuma conquista feita (tenha o jogo conquistas ou não) conta como **não jogado**, porque as horas podem ser só do programa; em Status → Progresso → *Sem conquistas feitas*, o botão **Joguei de verdade** marca os que você jogou mesmo e tira da lista de não jogados (e **Desmarcar** desfaz). Desligada (padrão), todo jogo com horas conta como jogado. Isso troca a regra das 4 horas da 0.18.3.
 

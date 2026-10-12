@@ -7,7 +7,8 @@ const PG_ESTADOS=[['platina','Platinados','todas as conquistas'],['andamento','E
 const PG_COR={platina:'var(--sinal)',andamento:'#8a1520',semc:'#4a1016',marcado:'#9a9a9a',nunca:'#2a2a2a',pendente:'#454545'};
 const fmtH=m=>{const h=m/60;return h<1?(m?'<1 h':'0 h'):(h<10?h.toFixed(1).replace('.',','):Math.round(h).toLocaleString('pt-BR'))+' h';};
 const pgGrupo=j=>j.estado==='zero'||j.estado==='sem'?(JG.farm&&j.marcado?'marcado':'semc'):j.estado;
-const pgJogou=j=>{const g=pgGrupo(j);return g==='platina'||g==='andamento'||g==='pendente'||g==='marcado'||(g==='semc'&&!JG.farm);};
+// pendente (conquistas ainda não lidas): com o farm ligado não dá para saber, então fica de fora de tudo até ser lido; desligado, horas bastam
+const pgJogou=j=>{const g=pgGrupo(j);return g==='platina'||g==='andamento'||g==='marcado'||((g==='semc'||g==='pendente')&&!JG.farm);};
 async function renderJogados(){
   if(!JG)$('#progCorpo').innerHTML='<div class="empty">Lendo a biblioteca…</div>';
   try{JG=await api('/api/progresso');}catch(e){$('#progCorpo').innerHTML='<div class="empty">Não consegui ler o progresso agora.</div>';return;}
@@ -38,14 +39,14 @@ function desenharJogados(){
   const lista=[...por[f]].sort((a,b)=>f==='andamento'?(b.feitas/b.total-a.feitas/a.total)||b.minutos-a.minutos:f==='nunca'?a.nome.localeCompare(b.nome,'pt-BR'):b.minutos-a.minutos);
   const quantos=S.pgMais||40;
   box.innerHTML=`
-   ${JG.pendentes?(JG.coletando?`<div class="pg-aviso">Lendo as conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} em segundo plano (cerca de 100 a cada 3 minutos). Até lá eles contam como jogados, e os números abaixo ainda mudam. A tela se atualiza sozinha.</div>`
+   ${JG.pendentes?(JG.coletando?`<div class="pg-aviso">Lendo as conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} em segundo plano (cerca de 100 a cada 3 minutos). ${JG.farm?'Até lá eles ficam fora dos números e dos gráficos abaixo, que crescem conforme a leitura avança.':'Até lá eles contam como jogados.'} A tela se atualiza sozinha.</div>`
      :`<div class="pg-aviso">As conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} ainda não foram lidas, e elas só são lidas com o Hunter rodando (ícone na bandeja do Windows). Só o painel aberto não lê nada.</div>`):''}
    <div class="pg-opc">${JG.farm?'<b>Farm de cartas ligado:</b> jogo sem nenhuma conquista feita conta como <b>não jogado</b>. Jogou de verdade? Em <i>Sem conquistas feitas</i>, use <i>Joguei de verdade</i>.'
      :'Usou programa de farm de cartas? Ligue para os jogos sem conquista contarem como <b>não jogados</b>.'} <a href="#" data-pgcfg>${JG.farm?'Desligar':'Ligar'} em Configurações ›</a></div>
-   <div class="pg-kpis">${kpi(fmtN(J.length),'jogos na biblioteca')}${kpi(fmtN(jogados.length),'realmente jogados',Math.round(jogados.length/J.length*100)+'% da biblioteca')}
+   <div class="pg-kpis">${kpi(fmtN(J.length),'jogos na biblioteca')}${kpi(fmtN(jogados.length),'realmente jogados',Math.round(jogados.length/J.length*100)+'% da biblioteca'+(JG.farm&&por.pendente.length?' · sem contar '+fmtN(por.pendente.length)+' ainda sendo lidos':''))}
      ${kpi(fmtN(por.platina.length),'platinados',por.platina.length+por.andamento.length?Math.round(por.platina.length/(por.platina.length+por.andamento.length)*100)+'% dos jogados que têm conquistas':'')}
      ${kpi(fmtN(Math.round(horas/60)),'horas jogadas',foraH?fmtN(Math.round(foraH/60))+' h em jogos sem nenhuma conquista ficaram de fora':'')}
-     ${kpi(fmtN(J.length-jogados.length),'não jogados',JG.farm&&por.semc.length?fmtN(por.nunca.length)+' sem horas + '+fmtN(por.semc.length)+' sem conquista feita':'sem nenhum minuto')}</div>
+     ${kpi(fmtN(J.length-jogados.length-(JG.farm?por.pendente.length:0)),'não jogados',JG.farm&&por.semc.length?fmtN(por.nunca.length)+' sem horas + '+fmtN(por.semc.length)+' sem conquista feita':'sem nenhum minuto')}</div>
    <h3 class="pg-h">Sua biblioteca por progresso</h3>
    <div class="pg-seg" role="img" aria-label="Biblioteca por progresso">${seg.map(([k,t])=>`<i style="flex:${por[k].length};background:${PG_COR[k]}" title="${t}: ${por[k].length}"></i>`).join('')}</div>
    <div class="pg-leg">${seg.map(([k,t])=>`<span><i style="background:${PG_COR[k]}"></i>${t} <b class="tnum">${fmtN(por[k].length)}</b><small>${sub(k)}</small></span>`).join('')}</div>
