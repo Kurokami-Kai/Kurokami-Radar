@@ -327,6 +327,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `api_acesso(_q)`
 - `post_acesso(d)`
 - `post_tenho(d)` — Marca/desmarca "ja tenho" (para compras feitas depois do userdata.json).
+- `post_jogou(d)` — Marca/desmarca "joguei de verdade" num jogo sem conquista feita (aba Status > Progresso, farm de cartas ligado).
 - `post_silenciar(d)`
 - `post_atualizar_tudo(_d)`
 - `_itens_para_steam()` — Itens da Steam do carrinho do Hunter (pacote ou bundle) para mandar ao carrinho da conta; descobre na hora o pacote que falta.
