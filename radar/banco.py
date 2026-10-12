@@ -66,6 +66,8 @@ CREATE TABLE IF NOT EXISTS ficha_cache(appid INTEGER, fonte TEXT, dados TEXT, qu
 CREATE TABLE IF NOT EXISTS franquia_manual(appid INTEGER PRIMARY KEY, nome TEXT, quando TEXT);
 -- aba Status > Progresso: conquistas de cada jogo jogado (feitas/total; total 0 = sem conquistas, -1 = a consulta falhou);
 -- minutos = tempo jogado na hora da consulta (so consulta de novo quando o tempo muda)
+-- jogos sem conquista feita que o dono marcou como jogados de verdade (so vale com `farm_cartas` ligado)
+CREATE TABLE IF NOT EXISTS jogou_manual(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS conquista_jogo(appid INTEGER PRIMARY KEY, feitas INTEGER, total INTEGER, minutos INTEGER, quando TEXT);
 """
 

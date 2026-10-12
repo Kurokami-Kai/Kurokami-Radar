@@ -2,7 +2,7 @@
 let CFG=null,TGTOK=false;
 const CFG_SECOES=[['avisos','Avisos','o que dispara um aviso'],['lojas','Lojas','de onde pode vir'],['notif','Notificações','no Windows, silêncio'],['telegram','Telegram','avisos no celular'],
   ['freq','Frequência','de quanto em quanto tempo'],['steam','Steam inteira','todas as promoções'],['keyshops','Keyshops','GG.deals'],
-  ['dlc','DLCs','no custo completo'],['acesso','Celular e outros PCs','abrir pela rede']];
+  ['dlc','DLCs','no custo completo'],['jogos','Jogos','farm de cartas'],['acesso','Celular e outros PCs','abrir pela rede']];
 async function renderCfg(){
   const d=await api('/api/config');CFG=d.config;TGTOK=!!d.telegram_token;const c=CFG;
   const lojas=[...new Set([...(d.lojas_itad||[]),...c.lojas])].sort((a,b)=>a.localeCompare(b));
@@ -71,6 +71,8 @@ async function renderCfg(){
       ${swRow('steam_inteira_avisos.ativo',sa.ativo!==false,'Avisar promoções de jogos que não estão na sua lista','Só os tipos ligados em Avisos (por padrão, o Selo Kurokami), de jogos que você não tem nem ignora e que entraram em promoção há pouco. Um aviso por promoção.')}
       ${row('Análises mínimas','Ignora jogos com menos análises que isso (evita jogos desconhecidos).',num('steam_inteira_avisos.analises_minimas',sa.analises_minimas??500,100,0,null,'análises'))}
       ${row('Máximo por checagem','Acima disso, os demais viram um resumo.',num('steam_inteira_avisos.max_por_rodada',sa.max_por_rodada??3,1,1,20,'avisos'))}</div>`)}
+   ${sec('jogos','Jogos','Como a aba Status → Progresso conta o que você jogou.',
+     `<div class="cfg-card">${swRow('farm_cartas',!!c.farm_cartas,'Uso programa de farm de cartas','Ligado: jogo sem nenhuma conquista feita (tenha o jogo conquistas ou não) conta como não jogado, porque as horas podem ser só do programa. Você pode marcar, jogo a jogo, os que jogou de verdade (Status → Progresso → Sem conquistas feitas → Joguei de verdade). Desligado: todo jogo com horas conta como jogado.')}</div>`)}
    ${sec('keyshops','Keyshops','Preços de lojas de chaves, via GG.deals. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".',
      `<div class="cfg-card">${swRow('keyshops.ativo',k.ativo,'Alertar keyshop quando estiver muito barata','Desligado por padrão: a GG.deals dava muito alarme falso.')}
       ${row('Abaixo de','',num('keyshops.preco_maximo',k.preco_maximo,1,0,null,'R$',1))}

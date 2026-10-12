@@ -34,7 +34,7 @@ Servidor: `painel.py` (`ThreadingHTTPServer`), porta 80 com reserva na 8787. Tud
 | `/api/config` | `config, lojas_itad[], classes, telegram_token` (bool: há token do bot no keyring; o token nunca sai do PC) |
 | `/api/carrinho` | `itens[]` (sempre `loja`/`pedida` = `Steam`: o carrinho é só da Steam, `sumiu` = a Steam não vende o jogo agora, `url` = página da Steam, `lojas[]` = só a oferta da Steam; `modo`; `raridade`, `selo`, `selo_motivo`, `piso_tipo`, `piso_ref`, `tipo_oferta`, `corte`, `em_bundle`, `fim`), `bundles[]` (preço para você, itens), `sugestoes[]` (bundles com ≥1 item do carrinho), `steam[]`, `sem_pacote[]` |
 | `/api/buscar?q=` | busca na loja (nome, appid ou link) → `itens[{appid,nome,capa,preco,corte,tipo,na_lista,possuido}]` |
-| `/api/progresso` | aba Status → Progresso: `jogos[]` (`appid, nome, capa, minutos, ultima` epoch, `feitas, total` das conquistas, `estado`: `platina`/`andamento`/`zero`/`sem`/`pouco`/`nunca`/`pendente`, ver `radar/jogados.py`) de tudo que você tem (sem DLC), e `pendentes` (jogados com conquistas ainda não lidas) |
+| `/api/progresso` | aba Status → Progresso: `jogos[]` (`appid, nome, capa, minutos, ultima` epoch, `feitas, total` das conquistas, `marcado` (bool: marcado como "joguei de verdade"), `estado`: `platina`/`andamento`/`zero`/`sem`/`nunca`/`pendente`, ver `radar/jogados.py`) de tudo que você tem (sem DLC), `pendentes` (jogados com conquistas ainda não lidas), `coletando` (o Hunter está rodando, então a pista lenta lê as conquistas) e `farm` (`config.farm_cartas`) |
 | `/api/biblioteca` | `jogos[]` (valor, DLCs que contam, faltantes com preço/menor, bundles), `total{hoje,cheio,menor,falta_*}`, `franquias[]` (séries), `sem_lista_dlc, sem_dados, atualizado, falta_ids`, `dlcs_promo[]` (DLCs que contam, que você não tem, de jogos que você tem, com desconto agora: `appid, nome, capa, pai, pai_nome, preco, cheio, corte, loja, so_steam` (preço só do catálogo da Steam), `fim, tipo_oferta, piso_ref`) |
 | `/api/acesso` | `rede_local, porta, ips[], pin, links[]` (só local) |
 
@@ -52,6 +52,7 @@ Todo POST bem-sucedido invalida o cache das linhas de Promoções (refeito na pr
 | `/api/pausar` | — | alterna pausa das notificações |
 | `/api/carrinho` | `{itens:[{appid,modo}|{bundle,modo}]}` (`modo`: `conta` (padrão)\|`presente`\|`privado`; `loja` é ignorada e gravada como `Steam`) | grava `dados/carrinho.json` (sem repetidos); devolve `{ok, n, lojas{appid: loja}}` |
 | `/api/extra` | `{appid, remover?}` | monitora/para de monitorar jogo fora da wishlist (`config.extras`) |
+| `/api/jogou` | `{appid, jogou}` | "joguei de verdade" num jogo sem conquista feita (tabela `jogou_manual`; só vale com `farm_cartas` ligado) |
 | `/api/tenho` | `{appid, tenho}` | "já tenho" manual (tabela `tenho_manual`), tira do carrinho |
 | `/api/silenciar` | `{appid, mudo}` | sem notificações para o jogo |
 | `/api/acesso` | `{rede_local?, novo_codigo?}` | liga/desliga rede local (reinicia o servidor), troca o PIN |

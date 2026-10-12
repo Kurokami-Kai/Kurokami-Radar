@@ -1071,6 +1071,19 @@ def post_tenho(d):
     return {"ok": True}
 
 
+def post_jogou(d):
+    """Marca/desmarca "joguei de verdade" num jogo sem conquista feita (aba Status > Progresso, farm de cartas ligado)."""
+    a = int(d["appid"])
+    b = Banco()
+    if d.get("jogou", True):
+        b.con.execute("INSERT OR REPLACE INTO jogou_manual VALUES(?,?)", (a, datetime.now(timezone.utc).isoformat()))
+    else:
+        b.con.execute("DELETE FROM jogou_manual WHERE appid=?", (a,))
+    b.commit()
+    b.con.close()
+    return {"ok": True}
+
+
 def post_silenciar(d):
     a = int(d["appid"])
     b = Banco()
@@ -1159,6 +1172,7 @@ def api_progresso(_q):
     # as conquistas sao lidas pela pista lenta, que so existe com o Hunter rodando (bandeja); so o painel nao le nada
     lenta = getattr(CONTROLE["servico"], "lenta", None)
     r["coletando"] = bool(lenta)
+    r["farm"] = bool(config.carregar().get("farm_cartas"))
     if r["pendentes"] and lenta and not lenta.ocupada:
         lenta.acordar.set()   # abriu a aba com conquistas por ler: nao espera os 10 min da conferencia
     return r
@@ -1186,7 +1200,7 @@ def post_config(dados):
     novo = dados.get("config") or {}
     tg = (cfg.get("notificacoes") or {}).get("telegram")
     for k in ("lojas", "somente_drm_steam", "alerta", "keyshops", "dlc", "notificacoes", "intervalos_minutos", "completo", "extras",
-              "verificacao_completa_dias", "steam_inteira", "steam_inteira_avisos"):
+              "verificacao_completa_dias", "steam_inteira", "steam_inteira_avisos", "farm_cartas"):
         if k in novo:
             cfg[k] = novo[k]
     if tg is not None and isinstance(cfg.get("notificacoes"), dict):
@@ -1416,7 +1430,7 @@ GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
        "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/progresso": api_progresso}
-POST = {"/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
+POST = {"/api/jogou": post_jogou, "/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,

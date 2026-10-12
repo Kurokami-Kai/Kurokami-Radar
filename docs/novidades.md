@@ -2,6 +2,9 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.18.4
+- **Progresso: opção para quem usa programa de farm de cartas** (Configurações → Jogos). Ligada, jogo sem nenhuma conquista feita (tenha o jogo conquistas ou não) conta como **não jogado**, porque as horas podem ser só do programa; em Status → Progresso → *Sem conquistas feitas*, o botão **Joguei de verdade** marca os que você jogou mesmo e tira da lista de não jogados (e **Desmarcar** desfaz). Desligada (padrão), todo jogo com horas conta como jogado. Isso troca a regra das 4 horas da 0.18.3.
+
 ## 0.18.3
 - **Nova aba Status → Progresso:** mostra o que você realmente jogou. No topo, os números da biblioteca (jogos, realmente jogados, platinados, horas jogadas, não jogados); uma barra com a biblioteca dividida em **platinados**, **em andamento**, **0% de conquistas**, **sem conquistas**, **só experimentados**, **nunca jogados**; os **mais jogados** em horas; quantos jogos você joga por faixa de horas; e a última vez que jogou, por ano. Embaixo, a lista jogo a jogo de cada grupo (com a barra de conquistas). Jogo com **mais de 4 horas e nenhuma conquista feita** (tenha o jogo conquistas ou não) **não conta como jogado**: quem joga 4 horas costuma pegar alguma, então é provável farm de cartas ou jogo aberto parado. Até 4 horas sem conquista conta como jogado (só experimentou). As conquistas de cada jogo jogado são lidas aos poucos, em segundo plano (cerca de 100 a cada 3 minutos, e ao abrir a aba a leitura começa na hora); isso só acontece com o Hunter rodando na bandeja, e precisa da chave da Steam e do perfil com jogos públicos.
 

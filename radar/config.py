@@ -111,6 +111,8 @@ PADRAO = {
     "chamadas_lentas_por_rodada": 120,
     # conquistas de cada jogo jogado (aba Status > Progresso): N jogos por rodada da pista lenta, 1 chamada cada
     "conquistas_por_rodada": 100,
+    # usa programa de farm de cartas: jogo sem nenhuma conquista feita conta como NAO jogado na aba Status > Progresso
+    "farm_cartas": False,
     "historico": {"importar_dias": 1825},
 
     # mudancas de padrao ja aplicadas a este config.json (cada uma roda uma vez so; ver _migrar)
