@@ -112,25 +112,34 @@ function fxTempo(){const jg=MJ.jogado;if(!jg)return '';
   if(jg.sessoes)kv.push(['Sessões',Object.entries(jg.sessoes).map(([a,n])=>`${esc(a)}: ${esc(String(n))}`).join(' · ')+' <span style="color:var(--muted)">(Replay da Steam)</span>']);
   return `<div class="fx-cx" style="margin-bottom:10px"><h3 style="margin-top:0">Tempo de jogo</h3><dl class="fx-kv">${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>`;}
 /* aba Conquistas (só de jogo que você tem): uma a uma, como na Steam */
-let MCQ={f:'todas',n:60};
+let MCQ={f:'todas',n:60,o:'rec',q:''};
+const CQ_ORD=[['rec','Mais recentes'],['rara','Mais raras'],['facil','Mais fáceis'],['nome','A–Z']];
 function fxConq(){
   const c=MX&&MX.conq;
   if(!c){return `<div class="fx-vazio">${MX===undefined?'Buscando as conquistas na Steam…':MX&&MX.falhou?'Não deu para buscar as conquistas agora; abra a ficha de novo daqui a pouco.':MX&&!('conq' in MX)?'Para ver as conquistas, entre com a Steam e coloque a chave da Steam em Configurações.':'Não consegui ler as conquistas: o perfil ou os detalhes dos jogos estão privados na Steam?'}</div>`;}
   if(!c.total)return '<div class="fx-vazio">Este jogo não tem conquistas.</div>';
   if(!c.lista)return '<div class="fx-vazio">A lista de conquistas não veio; abra a ficha de novo.</div>';
-  const L=c.lista,rara=x=>x.pct!=null&&x.pct<10,fp=p=>p.toLocaleString('pt-BR',{maximumFractionDigits:p<10?1:0});
+  const L=c.lista,rara=x=>x.pct!=null&&x.pct<10;
   const cont={todas:L.length,feitas:c.feitas,faltam:L.length-c.feitas,raras:L.filter(rara).length};
   if(!(MCQ.f in cont))MCQ.f='todas';
-  const it=L.filter(x=>MCQ.f==='feitas'?x.feita:MCQ.f==='faltam'?!x.feita:MCQ.f==='raras'?rara(x):true)
-    .sort((a,b)=>a.feita!==b.feita?(a.feita?-1:1):a.feita?(b.quando||0)-(a.quando||0):(b.pct==null?-1:b.pct)-(a.pct==null?-1:a.pct));
+  return `<div class="fx-cx"><div style="font-size:13px;color:var(--muted)">Conquistas · ${c.feitas} de ${c.total}</div><div class="fx-barra"><i style="width:${c.feitas/c.total*100}%"></i></div>
+    <div class="fx-vazio" style="margin-bottom:10px">${c.feitas===c.total?'Platinado: todas as conquistas':'Faltam '+(c.total-c.feitas)+' para platinar'}</div>
+    <div class="fx-cqbar"><span class="seg">${[['todas','Todas'],['feitas','Feitas'],['faltam','Faltam'],['raras','Raras']].map(([k,t])=>`<button data-cqf="${k}" aria-pressed="${MCQ.f===k}">${t} · ${cont[k]}</button>`).join('')}</span>
+      <label class="fx-cqo">Ordem <select id="cqOrd">${CQ_ORD.map(([k,t])=>`<option value="${k}"${MCQ.o===k?' selected':''}>${t}</option>`).join('')}</select></label>
+      <input type="search" id="cqBusca" placeholder="Buscar conquista…" value="${esc(MCQ.q)}" autocomplete="off"></div>
+    <div id="cqLista">${fxConqLista(c)}</div></div>`;}
+/* a lista da aba Conquistas (filtro, busca e ordem); redesenhada sozinha ao digitar, para a busca não perder o foco */
+function fxConqLista(c){
+  const L=c.lista,rara=x=>x.pct!=null&&x.pct<10,fp=p=>p.toLocaleString('pt-BR',{maximumFractionDigits:p<10?1:0}),q=MCQ.q.trim().toLowerCase();
+  const pc=(x,vazio)=>x.pct==null?vazio:x.pct;
+  const ord={rec:(a,b)=>a.feita!==b.feita?(a.feita?-1:1):a.feita?(b.quando||0)-(a.quando||0):pc(b,-1)-pc(a,-1),
+    rara:(a,b)=>pc(a,101)-pc(b,101),facil:(a,b)=>pc(b,-1)-pc(a,-1),nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[MCQ.o]||(()=>0);
+  const it=L.filter(x=>(MCQ.f==='feitas'?x.feita:MCQ.f==='faltam'?!x.feita:MCQ.f==='raras'?rara(x):true)&&(!q||(x.nome+' '+(x.desc||'')).toLowerCase().includes(q))).sort(ord);
   const lin=x=>`<div class="fx-cq${x.feita?'':' falta'}">${x.icone?`<img src="${esc(x.icone)}" alt="" loading="lazy" width="48" height="48">`:'<i class="cq-ic"></i>'}
     <div class="cq-tx"><b>${esc(x.nome)}</b><span>${esc(x.oculta?'Conquista oculta: a Steam só mostra a descrição depois de feita.':x.desc||'')}</span></div>
     <div class="cq-pc">${x.pct!=null?`<b class="${rara(x)?'rara':''}">${fp(x.pct)}%</b><small>${rara(x)?'rara · ':''}dos jogadores</small>`:''}${x.feita&&x.quando?`<small class="cq-em">${fmtUnix(x.quando)}</small>`:''}</div></div>`;
-  return `<div class="fx-cx"><div style="font-size:13px;color:var(--muted)">Conquistas · ${c.feitas} de ${c.total}</div><div class="fx-barra"><i style="width:${c.feitas/c.total*100}%"></i></div>
-    <div class="fx-vazio" style="margin-bottom:10px">${c.feitas===c.total?'Platinado: todas as conquistas':'Faltam '+(c.total-c.feitas)+' para platinar'}</div>
-    <span class="seg">${[['todas','Todas'],['feitas','Feitas'],['faltam','Faltam'],['raras','Raras']].map(([k,t])=>`<button data-cqf="${k}" aria-pressed="${MCQ.f===k}">${t} · ${cont[k]}</button>`).join('')}</span>
-    <div class="fx-cqs">${it.slice(0,MCQ.n).map(lin).join('')||'<div class="fx-vazio">Nenhuma nesta lista.</div>'}</div>
-    ${it.length>MCQ.n?`<button class="fx-mais" style="display:block;margin:10px auto 0" data-cqmais>Mostrar mais (${it.length-MCQ.n})</button>`:''}</div>`;}
+  return `<div class="fx-cqs">${it.slice(0,MCQ.n).map(lin).join('')||'<div class="fx-vazio">Nenhuma conquista nesta lista.</div>'}</div>
+    ${it.length>MCQ.n?`<button class="fx-mais" style="display:block;margin:10px auto 0" data-cqmais>Mostrar mais (${it.length-MCQ.n})</button>`:''}`;}
 function fxVale(){
   const o=MJ.item||IDX.get(MJ.jogo.appid)||{};let s='';
   if(MJ.tenho){
@@ -282,10 +291,13 @@ function fxMedir(){   // "mais" só se a descrição não coube; setas só onde 
   $('#mbody .fx-seta.e').hidden=t.scrollLeft<4;$('#mbody .fx-seta.d').hidden=t.scrollLeft+t.clientWidth>=t.scrollWidth-4;
 }
 addEventListener('resize',()=>{if(MJ&&!$('#modal').hidden){fxMedir();if($('#chart'))desenharGrafico();}});
+const cqRefaz=()=>{const c=MX&&MX.conq;if(c&&c.lista&&$('#cqLista'))$('#cqLista').innerHTML=fxConqLista(c);};
+$('#mbody').addEventListener('input',e=>{if(e.target.id==='cqBusca'){MCQ.q=e.target.value;MCQ.n=60;cqRefaz();}});
+$('#mbody').addEventListener('change',e=>{if(e.target.id==='cqOrd'){MCQ.o=e.target.value;MCQ.n=60;cqRefaz();}});
 $('#mbody').addEventListener('click',async e=>{
   const ab=e.target.closest('[data-aba]');if(ab){fxAba(ab.dataset.aba);return;}
-  const cf=e.target.closest('[data-cqf]');if(cf){MCQ.f=cf.dataset.cqf;MCQ.n=60;fxAba('conq');return;}
-  const cm=e.target.closest('[data-cqmais]');if(cm){const p=$('#fxPainel'),y=p.scrollTop;MCQ.n+=60;fxAba('conq');p.scrollTop=y;return;}
+  const cf=e.target.closest('[data-cqf]');if(cf){MCQ.f=cf.dataset.cqf;MCQ.n=60;const p=$('#fxPainel'),y=p.scrollTop;fxAba('conq');p.scrollTop=y;return;}
+  const cm=e.target.closest('[data-cqmais]');if(cm){const p=$('#fxPainel'),y=p.scrollTop;MCQ.n+=60;cqRefaz();p.scrollTop=y;return;}
   const fc=e.target.closest('[data-ficha]');if(fc){e.preventDefault();abrirJogo(+fc.dataset.ficha);return;}
   const ca=e.target.closest('[data-car]');if(ca){const t=$('#mbody .fx-trilho');t.scrollBy({left:+ca.dataset.car*t.clientWidth*.8});return;}
   const ma=e.target.closest('[data-mais]');if(ma){const d=$('#mbody .fx-desc');d.classList.toggle('aberta');ma.textContent=d.classList.contains('aberta')?'menos':'mais';return;}

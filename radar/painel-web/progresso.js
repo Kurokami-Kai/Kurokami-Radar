@@ -40,8 +40,6 @@ function desenharJogados(){
   const top=[...jogados].sort((a,b)=>b.minutos-a.minutos).slice(0,15),mx=top.length?top[0].minutos:1;
   const seg=PG_ESTADOS.filter(([k])=>por[k].length);
   const sub=k=>k==='semc'?(JG.farm?'não contam como jogados (farm de cartas ligado)':'contam como jogados (farm de cartas desligado)'):PG_ESTADOS.find(x=>x[0]===k)[2];
-  const lista=[...por[f]].sort((a,b)=>f==='andamento'?(b.feitas/b.total-a.feitas/a.total)||b.minutos-a.minutos:f==='nunca'?a.nome.localeCompare(b.nome,'pt-BR'):b.minutos-a.minutos);
-  const quantos=S.pgMais||40;
   box.innerHTML=`
    ${JG.pendentes?(JG.coletando?`<div class="pg-aviso">Lendo as conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} em segundo plano (cerca de 100 a cada 3 minutos). ${JG.farm?'Até lá eles ficam fora dos números e dos gráficos abaixo, que crescem conforme a leitura avança.':'Até lá eles contam como jogados.'} A tela se atualiza sozinha.</div>`
      :`<div class="pg-aviso">As conquistas de ${fmtN(JG.pendentes)} jogo${JG.pendentes>1?'s':''} ainda não foram lidas, e elas só são lidas com o Hunter rodando (ícone na bandeja do Windows). Só o painel aberto não lê nada.</div>`):''}
@@ -63,9 +61,25 @@ function desenharJogados(){
    <h3 class="pg-h">Jogo a jogo</h3>
    <div class="nf-bar"><div class="nf-seg">${PG_ESTADOS.filter(([k])=>por[k].length||k===f).map(([k,t])=>`<button type="button" data-pgl="${k}" aria-pressed="${f===k}">${t}<span>${fmtN(por[k].length)}</span></button>`).join('')}</div>
      <span class="nf-info">${esc(sub(f))}</span></div>
-   <div class="pg-lista">${lista.slice(0,quantos).map(pgLinha).join('')||'<div class="empty">Nenhum jogo aqui.</div>'}</div>
-   ${lista.length>quantos?`<div class="pg-mais"><button class="btn-ghost" type="button" data-pgmais>Mostrar mais (${fmtN(lista.length-quantos)})</button></div>`:''}`;
+   <div class="pg-filtro"><input type="search" id="pgBusca" placeholder="Buscar jogo…" value="${esc(S.pgBusca||'')}" autocomplete="off">
+     <label>Ordem <select id="pgOrd">${PG_ORD.map(([k,t])=>`<option value="${k}"${(S.pgOrd||'padrao')===k?' selected':''}>${t}</option>`).join('')}</select></label>
+     <span class="nf-info">a conquista mais rara de cada jogo fica na ficha dele, aba Conquistas</span></div>
+   <div id="pgListaBox">${pgListaHtml()}</div>`;
 }
+const PG_ORD=[['padrao','Padrão da lista'],['horas','Mais horas jogadas'],['conq','Mais conquistas feitas'],['faltam','Faltam menos para platinar'],['pct','% de conquistas'],['total','Mais conquistas no jogo'],['recente','Jogado há menos tempo'],['nome','A–Z']];
+/* o "Jogo a jogo" (situação, busca e ordem); redesenhado sozinho ao digitar, para a busca não perder o foco */
+function pgListaHtml(){
+  const f=PG_ESTADOS.some(([k])=>k===S.pgLista)?S.pgLista:'platina',o=S.pgOrd||'padrao',q=(S.pgBusca||'').trim().toLowerCase();
+  const faltam=j=>j.total>0&&j.feitas<j.total?j.total-j.feitas:1e9,pct=j=>j.total?j.feitas/j.total:-1;
+  const cmp={padrao:(a,b)=>f==='andamento'?(b.feitas/b.total-a.feitas/a.total)||b.minutos-a.minutos:f==='nunca'?a.nome.localeCompare(b.nome,'pt-BR'):b.minutos-a.minutos,
+    horas:(a,b)=>b.minutos-a.minutos,conq:(a,b)=>b.feitas-a.feitas||b.minutos-a.minutos,faltam:(a,b)=>faltam(a)-faltam(b)||b.minutos-a.minutos,
+    pct:(a,b)=>pct(b)-pct(a)||b.minutos-a.minutos,total:(a,b)=>b.total-a.total||b.minutos-a.minutos,recente:(a,b)=>(b.ultima||0)-(a.ultima||0),
+    nome:(a,b)=>a.nome.localeCompare(b.nome,'pt-BR')}[o]||(()=>0);
+  const lista=JG.jogos.filter(j=>pgGrupo(j)===f&&(!q||j.nome.toLowerCase().includes(q))).sort(cmp),quantos=S.pgMais||40;
+  return `<div class="pg-lista">${lista.slice(0,quantos).map(pgLinha).join('')||'<div class="empty">Nenhum jogo aqui.</div>'}</div>
+   ${lista.length>quantos?`<div class="pg-mais"><button class="btn-ghost" type="button" data-pgmais>Mostrar mais (${fmtN(lista.length-quantos)})</button></div>`:''}`;}
+$('#tab-prog').addEventListener('input',e=>{if(e.target.id==='pgBusca'&&JG){S.pgBusca=e.target.value;S.pgMais=40;$('#pgListaBox').innerHTML=pgListaHtml();}});
+$('#tab-prog').addEventListener('change',e=>{if(e.target.id==='pgOrd'&&JG){S.pgOrd=e.target.value;S.pgMais=40;$('#pgListaBox').innerHTML=pgListaHtml();}});
 $('#tab-prog').addEventListener('click',async e=>{
   const an=e.target.closest('[data-pgano]');if(an){pgAbrir({ano:+an.dataset.pgano});return;}
   const fh=e.target.closest('[data-pgh]');if(fh){pgAbrir(PGD&&PGD.h===+fh.dataset.pgh?null:{h:+fh.dataset.pgh});return;}
@@ -76,7 +90,7 @@ $('#tab-prog').addEventListener('click',async e=>{
     if(r&&r.ok){const x=JG.jogos.find(y=>y.appid===a);if(x)x.marcado=v;desenharJogados();}return;}
   if(e.target.closest('[data-pgcfg]')){e.preventDefault();ls.set('cfgSec','jogos');setTab('cfg');window.scrollTo(0,0);return;}
   const b=e.target.closest('[data-pgl]');if(b){S.pgLista=b.dataset.pgl;S.pgMais=40;save();desenharJogados();return;}
-  if(e.target.closest('[data-pgmais]')){S.pgMais=(S.pgMais||40)+60;desenharJogados();return;}});
+  if(e.target.closest('[data-pgmais]')){S.pgMais=(S.pgMais||40)+60;$('#pgListaBox').innerHTML=pgListaHtml();return;}});
 
 /* ---- Clique nos gráficos: uma faixa de horas, ou um ano jogo a jogo como o Steam Replay (/api/replay, radar/replay.py).
    Com o farm de cartas ligado, o servidor já tira os jogos de farm do Replay; o resto da aba usa pgJogou. ---- */

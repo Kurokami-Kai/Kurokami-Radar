@@ -8,8 +8,11 @@
 .mt-st{margin-top:8px;font-size:13px;color:var(--muted)}.mt-st b{color:#fff;font-weight:400;font-size:16px}
 .mt-off{color:var(--dim)}.mt-ok{color:var(--sinal)}
 .mt .fx-barra{margin:6px 0}
-.mt-dias{display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:6px}
-.mt-dias i{flex:1;background:#3a3a3a;min-height:2px}.mt-dias i.ok{background:var(--sinal)}
+.mt-dias{margin-top:6px}
+.mt-barras{position:relative;display:flex;align-items:flex-end;gap:3px;height:38px}
+.mt-barras i{flex:1;background:#3a3a3a;min-height:2px}.mt-barras i.ok{background:var(--sinal)}
+.mt-meta{position:absolute;left:0;right:0;height:0;border-top:1px dashed #ffffff66;pointer-events:none}
+.mt-rot{display:flex;gap:3px}.mt-rot em{flex:1;text-align:center;font-style:normal;font-size:10px;color:var(--dim)}
 .mt-lista{font-size:12px;color:var(--muted);line-height:1.5}
 .mt-nota{grid-column:1/-1;margin:0;font-size:12px;color:var(--dim)}
 @media(max-width:720px){.mt{grid-template-columns:1fr}}

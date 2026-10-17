@@ -12,9 +12,10 @@ function desenharMetas(){
   const box=$('#metasBox'),m=MT.meta,alvo=m.horas_dia*60;if(!box||!MT)return;
   const mx=Math.max(alvo,...MT.dias.map(d=>d.min),1);
   const dia=MT.dias.map(d=>{const dt=new Date(d.dia+'T12:00:00'),ok=alvo>0&&d.min>=alvo;
-    return `<i class="${ok?'ok':''}" style="height:${Math.max(d.min?6:2,Math.round(d.min/mx*100))}%" title="${dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','')}: ${d.min?mtH(d.min):'não jogou'}"></i>`;}).join('');
+    return [`<i class="${ok?'ok':''}" style="height:${Math.max(d.min?6:2,Math.round(d.min/mx*100))}%" title="${dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','')}: ${d.min?mtH(d.min):'não jogou'}"></i>`,`<em>${dt.getDate()}</em>`];});
+  const jogosHoje=MT.hoje_jogos.length?`<div class="mt-lista">Hoje: ${MT.hoje_jogos.map(x=>`<a href="#" data-open="${x.appid}">${esc(x.nome)}</a> ${mtH(x.min)}`).join(' · ')}</div>`:'<div class="mt-lista">Nenhum jogo registrado hoje ainda.</div>';
   const hoje=alvo?`<div class="mt-st"><b class="tnum">${mtH(MT.hoje)}</b> de ${mtH(alvo)} hoje${MT.hoje>=alvo?' · <span class="mt-ok">meta batida</span>':''}${MT.sequencia>1?` · ${MT.sequencia} dias seguidos batendo a meta`:''}</div>
-      <div class="fx-barra"><i style="width:${Math.min(100,MT.hoje/alvo*100)}%"></i></div><div class="mt-dias" aria-label="Horas jogadas nos últimos 14 dias">${dia}</div>`
+      <div class="fx-barra"><i style="width:${Math.min(100,MT.hoje/alvo*100)}%"></i></div>${jogosHoje}<div class="mt-dias" aria-label="Horas jogadas nos últimos 14 dias" title="Últimos 14 dias; a linha é a meta"><div class="mt-barras">${dia.map(x=>x[0]).join('')}<b class="mt-meta" style="bottom:${Math.min(100,alvo/mx*100)}%"></b></div><div class="mt-rot">${dia.map(x=>x[1]).join('')}</div></div>`
     :'<div class="mt-st mt-off">Desligada: ponha as horas por dia que você quer jogar.</div>';
   const fim=m.terminar_qtd?`<div class="mt-st"><b class="tnum">${MT.terminados.length}</b> de ${m.terminar_qtd} ${m.terminar_qtd>1?'jogos platinados':'jogo platinado'} ${MT_POR[m.terminar_por]}${MT.terminados.length>=m.terminar_qtd?' · <span class="mt-ok">meta batida</span>':''}</div>
       <div class="fx-barra"><i style="width:${Math.min(100,MT.terminados.length/m.terminar_qtd*100)}%"></i></div>
@@ -23,7 +24,7 @@ function desenharMetas(){
   box.innerHTML=`<div class="mt"><h3>Metas para jogar mais</h3>
     <div class="mt-col"><label>Jogar <input type="number" id="mtHoras" min="0" max="24" step="0.25" value="${m.horas_dia||''}" placeholder="0"> h por dia</label>${hoje}</div>
     <div class="mt-col"><label>Platinar <input type="number" id="mtQtd" min="0" max="99" step="1" value="${m.terminar_qtd||''}" placeholder="0"> jogos <select id="mtPor">${Object.entries(MT_POR).map(([k,t])=>`<option value="${k}"${m.terminar_por===k?' selected':''}>${t}</option>`).join('')}</select></label>${fim}</div>
-    <p class="mt-nota">0 desliga a meta. As horas contam a partir de quando o Hunter passou a acompanhar${MT.base?'':' (a primeira leitura ainda vai ser feita)'}${MT.farm?'; jogos de farm de cartas não contam':''}. O aviso sai no Windows e aqui.</p></div>`;}
+    <p class="mt-nota">0 desliga a meta. A Steam só atualiza o tempo quando você fecha o jogo e o Hunter lê de 15 em 15 minutos: a sessão aparece aqui até uns 15 minutos depois de fechar. As horas contam a partir de quando o Hunter passou a acompanhar${MT.base?'':' (a primeira leitura ainda vai ser feita)'}${MT.farm?'; jogos de farm de cartas não contam':''}. O aviso sai no Windows e aqui.</p></div>`;}
 async function salvarMetas(){
   const n={horas_dia:+$('#mtHoras').value||0,terminar_qtd:+$('#mtQtd').value||0,terminar_por:$('#mtPor').value};
   const r=await post('/api/config',{config:{metas:n}});if(r.ok===false)return;

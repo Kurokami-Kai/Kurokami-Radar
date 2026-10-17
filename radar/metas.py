@@ -44,17 +44,21 @@ def _chave(por, hoje):
     return str(hoje.year) if por == "ano" else "%d-%02d" % (hoje.year, hoje.month)
 
 
-def _por_dia(b, cfg, desde):
-    """{dia ISO: minutos} desde `desde`, sem os jogos de farm de cartas (se a opcao estiver ligada)."""
+def _por_dia(b, cfg, desde, hoje=None):
+    """({dia ISO: minutos}, [{appid, nome, min}] de `hoje`) desde `desde`, sem os jogos de farm de cartas (se a opcao estiver ligada)."""
     farm = set()
     if cfg.get("farm_cartas"):
         from . import jogados
         farm = jogados.farmados(b)
-    out = {}
-    for r in b.q("SELECT dia, appid, minutos FROM horas_dia WHERE dia>=?", desde.isoformat()):
-        if r["appid"] not in farm:
-            out[r["dia"]] = out.get(r["dia"], 0) + (r["minutos"] or 0)
-    return out
+    out, jogos = {}, []
+    for r in b.q("""SELECT h.dia, h.appid, h.minutos, j.nome FROM horas_dia h LEFT JOIN jogo j ON j.appid=h.appid
+                    WHERE h.dia>=? ORDER BY h.minutos DESC""", desde.isoformat()):
+        if r["appid"] in farm:
+            continue
+        out[r["dia"]] = out.get(r["dia"], 0) + (r["minutos"] or 0)
+        if hoje and r["dia"] == hoje.isoformat():
+            jogos.append({"appid": r["appid"], "nome": r["nome"] or str(r["appid"]), "min": r["minutos"] or 0})
+    return out, jogos
 
 
 def _data_local(iso):
@@ -78,7 +82,7 @@ def resumo(b, cfg, hoje=None):
     """O que o painel mostra: a meta, o de hoje, os ultimos 14 dias, a sequencia de dias batendo a meta e os platinados do periodo."""
     hoje = hoje or datetime.now().date()
     m = _config(cfg)
-    dias = _por_dia(b, cfg, hoje - timedelta(days=59))
+    dias, jogos = _por_dia(b, cfg, hoje - timedelta(days=59), hoje)
     alvo = round(m["horas_dia"] * 60)
     ult = [{"dia": (hoje - timedelta(days=i)).isoformat(), "min": dias.get((hoje - timedelta(days=i)).isoformat(), 0)}
            for i in range(13, -1, -1)]
@@ -90,7 +94,7 @@ def resumo(b, cfg, hoje=None):
         d -= timedelta(days=1)
     ini = _inicio(m["terminar_por"], hoje)
     fim = _terminados(b, ini)
-    return {"meta": m, "hoje": dias.get(hoje.isoformat(), 0), "dias": ult, "sequencia": seq,
+    return {"meta": m, "hoje": dias.get(hoje.isoformat(), 0), "hoje_jogos": jogos[:6], "dias": ult, "sequencia": seq,
             "terminados": fim, "desde": ini.isoformat(), "farm": bool(cfg.get("farm_cartas")),
             "base": b.um("SELECT COUNT(*) n FROM horas_dia")["n"] > 0}
 
