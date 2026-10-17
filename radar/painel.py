@@ -162,10 +162,10 @@ def api_resumo(_q):
 # Uma linha por jogo da lista (+ monitorados), com tudo que a vitrine, a aba Promocoes e /api/lista mostram.
 # Montar custa ~0,5 s (analisa o historico de todos); filtrar/ordenar no cache custa milissegundos. O cache e
 # refeito quando termina uma coleta (servico), em qualquer POST do painel, quando o config muda e quando o
-# userdata.json muda de data (conta_steam.assinatura); por seguranca, vence em 10 minutos.
+# userdata.json muda de data (conta_steam.assinatura); por seguranca, vence em 2 horas.
 _LINHAS = {"itens": None, "sig": None, "quando": 0, "ms": None}
 _TRAVA_LINHAS = threading.Lock()
-VALIDADE_LINHAS = 600
+VALIDADE_LINHAS = 7200
 
 
 def invalidar_linhas():

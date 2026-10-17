@@ -13,7 +13,7 @@ from .banco import LOJAS_SEM_STEAM, SO_DRM_SQL, Banco
 from .previsao import Previsor, eventos
 
 CDN = 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/'
-VALIDADE = 600          # segundos; invalidar() vence antes
+VALIDADE = 7200         # segundos; invalidar() vence antes (a coleta, de 15 em 15 min, remonta em segundo plano: nunca fica sem cache)
 _CACHE = {}
 _GER = [0]              # geração: invalidar() muda, e o que foi montado antes deixa de valer
 _TRAVAS = {'ofertas': threading.Lock(), 'biblioteca': threading.Lock(), 'timer': threading.Lock()}

@@ -175,7 +175,14 @@ def avaliar(banco, cfg, itens):
     feitos = set()
     atual, linhas = None, []
     # linha_do_tempo ordena cada loja por conta propria: ORDER BY appid usa a chave primaria (sem ordenar a tabela)
-    for r in banco.con.execute("SELECT appid, loja, preco, corte, quando FROM promo_hist ORDER BY appid"):
+    if len(com_hist) <= 500:   # poucos jogos (a lenta reavalia so os que baixou): nao varre os milhoes de linhas
+        ids = sorted(com_hist)
+        regs = (r for k in range(0, len(ids), 250) for r in banco.con.execute(
+            "SELECT appid, loja, preco, corte, quando FROM promo_hist WHERE appid IN (%s) ORDER BY appid" % ",".join("?" * len(ids[k:k + 250])),
+            ids[k:k + 250]))
+    else:
+        regs = banco.con.execute("SELECT appid, loja, preco, corte, quando FROM promo_hist ORDER BY appid")
+    for r in regs:
         if r[0] != atual:
             if atual in com_hist:
                 com(atual, linhas)
@@ -274,6 +281,7 @@ def historicos(banco, cfg, chave, log=print, por_rodada=60):
     if not ids:
         return 0
     feitos, t0 = 0, time.time()
+    baixados = []
     lote = fila[:por_rodada]
     if lote:
         log("Steam inteira: historico de %d de %d itens perto do recorde..." % (len(lote), len(fila)))
@@ -296,12 +304,18 @@ def historicos(banco, cfg, chave, log=print, por_rodada=60):
                               [(r["appid"], g[0], g[1], g[2], g[3], utc(g[4])) for g in regs if g[1] is not None])
         banco.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=? WHERE appid=?", (agora(), r["preco"], r["appid"]))
         feitos += 1
+        baixados.append(r["appid"])
         if feitos % 5 == 0:
             banco.commit()
-    itens = {r["appid"]: dict(r) for r in banco.q("SELECT appid, preco, corte, flag FROM steam_promo")}
-    avaliar(banco, cfg, itens)
-    banco.con.executemany("UPDATE steam_promo SET aval=? WHERE appid=?", [(it["aval"], a) for a, it in itens.items()])
-    banco.meta("promo_avaliado", agora())
+    if baixados:   # reavalia so quem ganhou historico: o resto nao mudou (a rapida reavalia tudo a cada coleta)
+        itens = {}
+        for k in range(0, len(baixados), 250):
+            parte = baixados[k:k + 250]
+            itens.update({r["appid"]: dict(r) for r in banco.q(
+                "SELECT appid, preco, corte, flag FROM steam_promo WHERE appid IN (%s)" % ",".join("?" * len(parte)), parte)})
+        avaliar(banco, cfg, itens)
+        banco.con.executemany("UPDATE steam_promo SET aval=? WHERE appid=?", [(it["aval"], a) for a, it in itens.items()])
+        banco.meta("promo_avaliado", agora())
     banco.commit()
     log("   %d historicos baixados em %.0fs (faltam %d)" % (feitos, time.time() - t0, len(fila) - feitos))
     return feitos
