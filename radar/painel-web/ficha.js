@@ -211,7 +211,7 @@ function fxListaAbas(){
     ['sobre','Sobre o jogo',[h&&h.story?horas(h.story)+' para zerar':'',MJ.dlcs.length?MJ.dlcs.length+' DLCs':''].filter(Boolean).join(' · ')||'notas e detalhes']].filter(Boolean);
 }
 function fxAbas(){const L=fxListaAbas();if(!L.some(a=>a[0]===MABA))MABA=L[0][0];
-  return `<div class="fx-abas" role="tablist" aria-label="Partes da ficha">${L.map(([k,t,r],i)=>`<button class="fx-aba" role="tab" data-aba="${k}" aria-selected="${k===MABA}" title="Atalho: tecla ${i+1}"><i class="k">${i+1}</i><b>${esc(t)}</b><span>${esc(r)}</span></button>`).join('')}</div>`;}
+  return `<div class="fx-abas" role="tablist" aria-label="Partes da ficha">${L.map(([k,t,r],i)=>`<button class="fx-aba" role="tab" data-aba="${k}" aria-selected="${k===MABA}" title="Atalho: Shift+${i+1}"><i class="k">${i+1}</i><b>${esc(t)}</b><span>${esc(r)}</span></button>`).join('')}</div>`;}
 const fxPainel=()=>({vale:fxVale,hist:fxHist,lojas:fxLojas,fr:fxFileira,sobre:fxSobre})[MABA]();
 function fxAba(k){MABA=k;$$('#mbody .fx-aba').forEach(b=>b.setAttribute('aria-selected',b.dataset.aba===k));
   const p=$('#fxPainel');p.innerHTML=fxPainel();p.scrollTop=0;if($('#chart'))desenharGrafico();fxTrilho();}

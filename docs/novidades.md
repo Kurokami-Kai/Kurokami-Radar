@@ -2,6 +2,9 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.18.7
+- **Teclas 1 a 5 do painel na ordem do menu:** a 3 abre **Status**, a 4 **Configurações** e a 5 **Carrinho** (antes a 3 ia para Configurações). Na ficha do jogo, a dica das abas agora diz Shift+número, que é a tecla que de fato funciona.
+
 ## 0.18.6
 - **Mais rápido:** a aba Ofertas não fica mais ~50 s para abrir nos últimos 5 minutos de cada checagem (o cache vencia antes da próxima e agora dura 2 h, sendo remontado a cada coleta). E o histórico em segundo plano reavalia só os jogos que baixou (de ~80 s para menos de 1 s por passada), deixando o painel e a checagem mais leves. A avaliação da Steam inteira a cada checagem passou de ~13 s para menos de 1 s (só refaz os jogos cujo preço ou histórico mudou), Ofertas monta em cerca de metade do tempo, e botões como "Verificar agora" ou pausar não remontam mais Ofertas à toa. Depois de uma checagem, Ofertas só refaz a análise dos jogos que mudaram (de ~30 s para ~5 s sem mudanças e ~9 s com algumas dezenas de jogos alterados).
 - **Status → Progresso: clique nos gráficos para ver jogo a jogo.** Num ano do gráfico "Última vez que jogou", abre **o seu ano como no Steam Replay** (os dados são os do próprio Replay da Steam, de 2023 em diante): horas, jogos (e quantos eram novos para você), sessões, conquistas, a maior sequência de dias, as horas **mês a mês** (clique num mês para ver só ele) e a lista jogo a jogo, com horas, sessões e a parte do ano de cada um. **‹ ›** passam de ano e "ver na Steam" abre o Replay original. Com o farm de cartas ligado, os jogos de farm saem das horas, das sessões, dos meses e da lista (o topo diz quantos e quantas horas). Ano sem Replay (antes de 2022, ano com pouco jogo ou o ano atual, que a Steam fecha em dezembro) mostra os jogos que você jogou pela última vez nele. Numa coluna de "Quanto você joga cada jogo", aparecem os jogos daquela faixa de horas.
