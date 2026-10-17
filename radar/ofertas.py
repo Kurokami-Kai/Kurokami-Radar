@@ -16,6 +16,11 @@ CDN = 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/'
 VALIDADE = 7200         # segundos; invalidar() vence antes (a coleta, de 15 em 15 min, remonta em segundo plano: nunca fica sem cache)
 _CACHE = {}
 _GER = [0]              # geração: invalidar() muda, e o que foi montado antes deixa de valer
+_MEMO = {}              # 'p': (contexto, {appid: (assinatura, linha, historico, quando, dia)}); troca inteira por atribuição (a rápida, a lenta e o aquecer rodam juntas)
+VALIDADE_MEMO = 7200    # segundos (como steam_inteira.VALIDADE_AVAL): a análise depende da data; cada jogo vence em um ponto de 0 a 30 min depois, para não refazer todos juntos
+# o que alimenta a linha de um jogo da Steam inteira (_linha e analise.analisar); com `baixado` e a capa/franquia, é a assinatura dele
+_CAMPOS_P = ('nome', 'capa', 'preco', 'cheio', 'corte', 'tipo_oferta', 'selo', 'piso_ref', 'volta_texto', 'volta_dica', 'selo_motivo',
+             'rpos', 'rcount', 'fim', 'lancamento', 'em_breve', 'loja', 'na_lista', 'no_carrinho', 'piso_geral', 'inicio', 'tipo', 'tenho')
 _TRAVAS = {'ofertas': threading.Lock(), 'biblioteca': threading.Lock(), 'timer': threading.Lock()}
 
 
@@ -95,10 +100,16 @@ def _montar_ofertas():
         so_drm = cfg.get('somente_drm_steam')
         lojas = set((b.meta('promo_lojas') or {}).get('nomes') or []) or set(cfg.get('lojas') or [])
         lojas_l = lojas | ({'Steam (direto)'} if 'Steam' in lojas else set())
-        com_hist = {r[0] for r in b.q('SELECT appid FROM promo_estado WHERE baixado IS NOT NULL')}
+        com_hist = {r[0]: r[1] for r in b.q('SELECT appid, baixado FROM promo_estado WHERE baixado IS NOT NULL')}
 
         ev = eventos(_linhas_de(b, 'preco', {'Steam'}, [x['appid'] for x in lista_db]).values(), agora)
         pv = Previsor(agora, ev)
+        # o que vale para todos os jogos: se mudar, nenhuma linha guardada serve (os eventos da Steam entram na previsão de cada um)
+        ctx = (tuple(sorted(lojas)), bool(so_drm), json.dumps(cfg.get('alerta') or {}, sort_keys=True, default=str), tuple(ev))
+        hoje = agora_dt.date().isoformat()
+        memo_ctx, memo = _MEMO.get('p') or (None, {})
+        if memo_ctx != ctx:
+            memo = {}
         promo, resp = _todas({'fonte': 'steam', 'ordem': [['corte', 'desc'], ['nome', 'asc']]})
         lista, _ = _todas({'fonte': 'steam', 'relacao': {'na_lista': 'exigir'}, 'ordem': [['corte', 'desc'], ['nome', 'asc']]})
 
@@ -118,14 +129,32 @@ def _montar_ofertas():
 
         lid = {o['appid'] for o in lista}
         fora = [o for o in promo if o['appid'] not in lid]
-        ph = _linhas_de(b, 'promo_hist', lojas, [o['appid'] for o in fora if o['appid'] in com_hist], so_drm)
+        # só os jogos cuja assinatura mudou (ou venceu) releem o histórico e refazem a análise
+        sigs, pend = {}, set()
+        for o in fora:
+            a = o['appid']
+            sg = tuple(o.get(k) for k in _CAMPOS_P) + (cv.get(a), fr.get(a), com_hist.get(a))
+            sigs[a] = sg
+            m = memo.get(a)
+            if not (m and m[0] == sg and m[4] == hoje and agora - m[3] < VALIDADE_MEMO + a % 1800):
+                pend.add(a)
+        ph = _linhas_de(b, 'promo_hist', lojas, [a for a in pend if a in com_hist], so_drm)
+        feitos = {}
         P = []
         for o in promo:
-            if o['appid'] in lid:
-                P.append(o['appid'])          # o mesmo jogo da lista (a página usa a linha da lista)
+            a = o['appid']
+            if a in lid:
+                P.append(a)          # o mesmo jogo da lista (a página usa a linha da lista)
                 continue
-            lin = ph.get(o['appid'])
-            an = prev = None
+            m = memo.get(a)
+            if a not in pend:
+                P.append(m[1])
+                feitos[a] = m
+                if m[2]:
+                    H[a] = m[2]
+                continue
+            lin = ph.get(a)
+            an = prev = h = None
             if lin and o.get('preco') is not None:
                 x = analise.analisar(lin, o['preco'], o.get('corte') or 0, agora_=agora, cfg_alerta={})
                 tipos = analise.tipos_de(x)
@@ -137,8 +166,11 @@ def _montar_ofertas():
                 prev = pv.prever(lin, o['preco'], o.get('corte') or 0, t, True, o.get('fim'))
                 h = pv.hist(lin)
                 if h:
-                    H[o['appid']] = h
-            P.append(_linha(o, cv, fr, bool(an), prev, an))
+                    H[a] = h
+            lin_p = _linha(o, cv, fr, bool(an), prev, an)
+            P.append(lin_p)
+            feitos[a] = (sigs[a], lin_p, h, agora, hoje)
+        _MEMO['p'] = (ctx, feitos)
 
         # séries da biblioteca (pelo nome, como em series.py): "série que você tem" em Bons e baratos e no recorte
         lib = defaultdict(list)
