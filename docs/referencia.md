@@ -66,6 +66,15 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
 - `ordem_tipo(t)`
 - `chave_aviso(a)` — Ordem dos avisos (e do max_por_rodada): selo, novo, igual, 24m (keyshop e completo depois); maior corte primeiro.
 
+## `radar/aovivo.py`
+Jogo rodando agora, em tempo real, para as metas de jogar (radar/metas.py).
+
+- `lendo()` — O appid do jogo da Steam rodando agora, ou 0.
+- `somar(b, appid, seg)`
+- `limpar(b)` — Apaga o que zerou e o que a Steam nao confirmou em 3 dias.
+- **class `AoVivo`** — 
+  - `run()`
+
 ## `radar/atualizador.py`
 Atualizacao pelo GitHub Releases: verifica, baixa o instalador novo e instala por cima (dados ficam).
 
@@ -91,7 +100,7 @@ SQLite local. Precos sao gravados so quando mudam, entao o historico
   - `meta(chave, valor)`
   - `salvar_jogo(j)`
   - `marcar_listas(wishlist, possuidos, prioridade)`
-  - `salvar_tempo_jogo(tempos)` — tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo.
+  - `salvar_tempo_jogo(tempos, duas)` — tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo. duas: {appid: minutos
   - `salvar_conquistas(appid, feitas, total, minutos)`
   - `definir_itad(appid, gid)`
   - `nome_jogo(appid)`
@@ -199,6 +208,7 @@ Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca na coleta
 - `extras(b, cfg, a, tenho, log_erro)` — {loja, aug, conq}: do cache ou buscados em paralelo (o que faltar ou venceu). Fonte que falhou vem None.
 - `hltb_lote(b, appids, log_erro, maximo)` — {appid: {story, extras, complete} em minutos, ou None}: o HLTB de varios jogos (ficha da franquia), do mesmo
 - `jogado(b, a, farm)` — Tempo jogado; com `farm_cartas` ligado (farm=True), jogo de farm (jogados.farmados) vem com 0 minutos e as horas em "farm".
+- `_historico_jogo(b, a)` — O que o Hunter sabe do jogo alem do total: sessoes e primeira vez (Steam Replay, anos ja lidos) e os ultimos 30 dias
 - `fileira(b, ctx, a, nome, marcadas, so_drm)` — A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
 
 ## `radar/ggdeals.py`
@@ -241,6 +251,21 @@ Aba Status > Progresso: o que voce realmente jogou. Junta o tempo jogado (tempo_
 - `estado(minutos, feitas, total)`
 - `farmados(b)` — Jogos que, com `farm_cartas` ligado, contam como nao jogados: horas, nenhuma conquista feita (zero ou sem) e o dono
 - `resumo(b)`
+
+## `radar/metas.py`
+Metas para jogar mais (aba Status > Progresso): contra a "sindrome do PC gamer" (comprar e nao jogar).
+
+- `normalizar(m)` — A meta que veio do painel, limpa: horas de 0 a 24 (passo de 0,25), jogos de 0 a 99, periodo valido.
+- `_config(cfg)`
+- `_inicio(por, hoje)`
+- `_chave(por, hoje)`
+- `_por_dia(b, cfg, desde, hoje)` — ({dia ISO: minutos}, [{appid, nome, min}] de `hoje`) desde `desde`, sem os jogos de farm de cartas (se a opcao estiver ligada).
+- `_data_local(iso)`
+- `_terminados(b, desde)` — Jogos platinados desde `desde` (dia local), do mais novo ao mais antigo: [{appid, nome, quando}].
+- `resumo(b, cfg, hoje)` — O que o painel mostra: a meta, o de hoje, os ultimos 14 dias, a sequencia de dias batendo a meta e os platinados do periodo.
+- `_pendente(b, tipo, titulo, texto)`
+- `avaliar(b, cfg, log, hoje)` — Confere as metas e avisa as que acabaram de ser batidas (1x por dia / por periodo). Devolve os avisos novos.
+- `pegar_pendentes(b, vistos)` — Os avisos que o pop-up ainda nao mostrou; `vistos` > 0 apaga os `vistos` primeiros (um aviso novo, chegado entre
 
 ## `radar/notificador.py`
 Decide QUAIS alertas viram notificacao:
@@ -341,6 +366,8 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `api_notificacoes(_q)`
 - `api_replay(q)` — Status > Progresso: um ano jogo a jogo, do Steam Replay (radar/replay.py), sem os jogos de farm de cartas.
 - `api_progresso(_q)` — Aba Status > Progresso: tempo jogado e conquistas de cada jogo que voce tem (radar/jogados.py).
+- `api_metas(_q)` — Metas de jogar (radar/metas.py): o resumo para a aba Status e os avisos que o pop-up ainda nao mostrou.
+- `post_metas_visto(d)`
 - `api_alertas(_q)`
 - `api_config(_q)`
 - `post_config(dados)`
@@ -471,6 +498,8 @@ Steam: lista de desejos, biblioteca, detalhes da loja, DLCs e opcoes de compra.
 - `wishlist(chave, steamid)`
 - `biblioteca_api(chave, steamid)`
 - `conquistas(chave, steamid, appid, ritmo)` — Conquistas do jogo na conta (ficha, 1 chamada). Jogo sem conquistas: total 0. Perfil privado: erro 403.
+- `conquistas_detalhe(chave, steamid, appid)` — Conquistas do jogo uma a uma para a ficha (3 chamadas, so ao abrir): {feitas, total, lista}. Cada item: id, nome,
+- `conquistas_brutas(chave, steamid, appid)` — A lista crua do GetPlayerAchievements (None = jogo sem conquistas).
 - `detalhes_loja(appid, pais)` — O que a ficha mostra da pagina da loja (1 chamada, sem ritmo: e a pessoa abrindo a ficha, nunca em lote).
 - `ler_userdata(arquivo)`
 - `url_asset(item)`
