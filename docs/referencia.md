@@ -36,7 +36,8 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
 - `_iso(t)`
 - `_igual(preco, ref)` — Centavos de diferenca (<= R$ 0,10 ou 1%) contam como igual.
 - `_metade(preco, recorde)` — Preco pela metade do recorde anterior, com a mesma folga de centavos do "igual" (R$ 0,10 ou 1% da metade).
-- `linha_do_tempo(linhas, agora_)` — Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
+- `linha_do_tempo(linhas, agora_)` — Mesma lista de `linhas` e mesmo `agora_` em seguida (analisar, prever e hist no mesmo jogo) devolvem o resultado
+- `_linha_do_tempo(linhas, agora_)` — Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
 - `episodios(segs, folga)` — Promocoes como episodios: [(ini, fim, maior_corte)]. Um intervalo sem desconto menor que `folga`
 - `analisar(linhas, preco, corte, agora_, cfg_alerta)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
 - `tipos_de(an)` — Tipos de preco da oferta (nao exclusivos): selo, novo (inclui "raro" sem Selo), igual, 24m.
@@ -197,7 +198,7 @@ Ficha do jogo (spec 09): o que so a ficha usa. Buscado ao abrir (nunca na coleta
 - `augmented(appid)` — HLTB em minutos (FF VII Remake: 1935 = 32 h, como no site), jogadores e notas de usuarios/criticos.
 - `extras(b, cfg, a, tenho, log_erro)` — {loja, aug, conq}: do cache ou buscados em paralelo (o que faltar ou venceu). Fonte que falhou vem None.
 - `hltb_lote(b, appids, log_erro, maximo)` — {appid: {story, extras, complete} em minutos, ou None}: o HLTB de varios jogos (ficha da franquia), do mesmo
-- `jogado(b, a)`
+- `jogado(b, a, farm)` — Tempo jogado; com `farm_cartas` ligado (farm=True), jogo de farm (jogados.farmados) vem com 0 minutos e as horas em "farm".
 - `fileira(b, ctx, a, nome, marcadas, so_drm)` — A franquia do jogo entre os que o Hunter conhece (biblioteca e lista), em ordem de lancamento, com o preco de
 
 ## `radar/ggdeals.py`
@@ -238,6 +239,7 @@ Janela de primeiro uso para as chaves. Campo de texto do Windows: Ctrl+V e o bot
 Aba Status > Progresso: o que voce realmente jogou. Junta o tempo jogado (tempo_jogo, do GetOwnedGames) com as
 
 - `estado(minutos, feitas, total)`
+- `farmados(b)` — Jogos que, com `farm_cartas` ligado, contam como nao jogados: horas, nenhuma conquista feita (zero ou sem) e o dono
 - `resumo(b)`
 
 ## `radar/notificador.py`
@@ -270,7 +272,8 @@ Dados das páginas novas de Ofertas e Biblioteca (spec 09, amostra 8 de Ofertas 
 - `_cache(nome, fazer)` — Um cálculo por vez para cada página; quem chega no meio espera o mesmo resultado.
 - `curta(u)`
 - `_linhas_de(b, tabela, lojas, appids, so_drm)` — so_drm (somente_drm_steam): em `preco` sem o histórico que não ativa na Steam; `promo_hist` não guarda DRM,
-- `_todas(q)` — Todas as páginas de /api/promocoes com o pedido q (no próprio processo).
+- `_todas(q)` — Todos os itens de /api/promocoes com o pedido q (no próprio processo), filtrados e ordenados uma vez só:
+- `_dict(o)`
 - `_linha(o, cv, fr, hist, prev, an)` — Uma linha no formato da amostra (os índices são lidos pela função M() da página).
 - `_montar_ofertas()`
 - `dados_ofertas()`
@@ -305,6 +308,8 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `_ler_q(qs)` — Valida o q= de /api/promocoes. Campo ou valor desconhecido -> PedidoInvalido; ausente = sem filtro.
 - `_filtros(f)` — {grupo: predicado}; as contagens de um grupo usam todos os outros.
 - `_ordenar(itens, ordem)` — Ordena pelos campos na ordem dada; sem valor sempre por ultimo; empate final pelo appid.
+- `_candidatos(f)` — (itens, filtros, conta, steam_info): tudo que o pedido f pode devolver, antes dos filtros.
+- `todos_promocoes(q)` — (itens filtrados e ordenados, steam_info) de TODAS as paginas do pedido q (dict, como o q= de /api/promocoes), de uma vez
 - `api_promocoes(qs)` — Explorador da aba Promocoes: filtra, conta e pagina no Hunter (pensando na Steam inteira, spec 07).
 - `api_vitrine(_q)` — Prateleiras de Ofertas → Destaques (antiga "Vale a pena"): um bloco por tipo (exclusivo), so jogos (sem DLCs), sem os que voce tem. O Selo vale com
 - `_rar_info(an)` — O 'por que essa raridade' da ficha.
@@ -334,6 +339,7 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `post_atualizar_app(_d)`
 - `post_sair(_d)`
 - `api_notificacoes(_q)`
+- `api_replay(q)` — Status > Progresso: um ano jogo a jogo, do Steam Replay (radar/replay.py), sem os jogos de farm de cartas.
 - `api_progresso(_q)` — Aba Status > Progresso: tempo jogado e conquistas de cada jogo que voce tem (radar/jogados.py).
 - `api_alertas(_q)`
 - `api_config(_q)`
@@ -419,6 +425,14 @@ HTTP com JSON, backoff em 429/5xx e ritmo adaptativo (mesma logica do KurokamiPr
 Pagina local com os alertas atuais. Abre no navegador.
 
 - `gerar(alertas, capas, novos_ids)`
+
+## `radar/replay.py`
+Status > Progresso > o ano jogo a jogo: o mesmo dado do Steam Replay (ISaleFeatureService/GetUserYearInReview, com a
+
+- `baixar(chave, steamid, ano)` — Replay de um ano, compacto; None se a Steam nao tem (ano fora, perfil privado, pouco jogado).
+- `_nomes_fora(b, appids)` — Nome dos jogos do Replay que o Hunter nao conhece (demos, jogos que nao estao na conta): {appid: nome}.
+- `_do_cache(b, ano, chave, steamid)`
+- `do_ano(b, ano, chave, farm)` — O que a aba mostra: {"ok", "motivo"?, "jogos": [...], "meses": [...], ...}, sem os jogos de farm.
 
 ## `radar/series.py`
 Agrupa jogos da mesma serie pelo nome, em vez do campo "franquia" da Steam
