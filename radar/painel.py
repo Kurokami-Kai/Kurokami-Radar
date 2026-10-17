@@ -1456,6 +1456,11 @@ POST = {"/api/jogou": post_jogou, "/api/config": post_config, "/api/dlc": post_d
         "/api/telegram": post_telegram}
 
 
+# POST que nao mexe em nada que Promocoes, Ofertas ou Biblioteca mostram: nao refaz as linhas nem remonta as paginas
+POST_SEM_DADOS = {"/api/verificar", "/api/pausar", "/api/acesso", "/api/sair", "/api/atualizar_tudo", "/api/atualizar_app",
+                  "/api/telegram"}
+
+
 def _log_erro(rota, e):
     import logging
     import traceback
@@ -1681,9 +1686,10 @@ class Handler(BaseHTTPRequestHandler):
             n = int(self.headers.get("Content-Length") or 0)
             d = json.loads(self.rfile.read(n) or b"{}")
             r = f(d)
-            invalidar_linhas()  # silenciar, extra, tenho, carrinho, modo, dlc, config... mudam as linhas de Promocoes
-            from . import ofertas
-            ofertas.aquecer(3)  # Ofertas e Biblioteca prontas de novo quando você voltar a elas
+            if urlparse(self.path).path not in POST_SEM_DADOS:
+                invalidar_linhas()  # silenciar, extra, tenho, carrinho, modo, dlc, config... mudam as linhas de Promocoes
+                from . import ofertas
+                ofertas.aquecer(3)  # Ofertas e Biblioteca prontas de novo quando você voltar a elas
             self._json(r)
         except Exception as e:
             _log_erro(self.path, e)

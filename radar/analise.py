@@ -1,5 +1,7 @@
 """Score, custo completo, bundles com desconto do que voce ja tem e regras de alerta."""
 import json
+import threading
+from operator import itemgetter
 
 from . import dlc as dlcmod
 from .config import modo_do_jogo
@@ -72,7 +74,25 @@ def _metade(preco, recorde):
     return _igual(preco, recorde * 0.5)
 
 
+_CHAVE_EVENTO, _CORTE = itemgetter(0, 1), itemgetter(1)
+_ULTIMA = threading.local()   # por thread: (linhas, agora_, resultado) da ultima chamada com `agora_` fixo; a rapida, a lenta e o aquecer nao se atrapalham
+
+
 def linha_do_tempo(linhas, agora_=None):
+    """Mesma lista de `linhas` e mesmo `agora_` em seguida (analisar, prever e hist no mesmo jogo) devolvem o resultado
+    da chamada anterior: a conta e a parte mais cara de montar Ofertas e de avaliar a Steam inteira. Quem chama nao
+    altera a lista devolvida."""
+    if agora_ is None:
+        return _linha_do_tempo(linhas, None)
+    u = getattr(_ULTIMA, 'v', (None, None, None))
+    if u[0] is linhas and u[1] == agora_:
+        return u[2]
+    out = _linha_do_tempo(linhas, agora_)
+    _ULTIMA.v = (linhas, agora_, out)
+    return out
+
+
+def _linha_do_tempo(linhas, agora_=None):
     """Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
     Cada registro vale ate o proximo da mesma loja; promocao sem fim registrado vence em 45 dias;
     brindes (R$ 0) ficam de fora. Trechos sem nenhuma loja ativa tem menor_preco None."""
@@ -101,19 +121,20 @@ def linha_do_tempo(linhas, agora_=None):
                 eventos.append((fim, 0, loja, (p, c), (loja, k)))
     if not eventos:
         return []
-    eventos.sort(key=lambda e: (e[0], e[1]))
-    ativos, segs = {}, []
+    eventos.sort(key=_CHAVE_EVENTO)
+    pcs, rids, segs = {}, {}, []   # por loja ativa: (preco, corte) e o id do registro (o laco abaixo roda milhoes de vezes: sem geradores)
     for i, (t, tipo, loja, pc, rid) in enumerate(eventos):
         if tipo == 1:
-            ativos[loja] = (pc, rid)
-        elif loja in ativos and ativos[loja][1] == rid:
-            del ativos[loja]
+            pcs[loja] = pc
+            rids[loja] = rid
+        elif rids.get(loja) == rid:
+            del pcs[loja], rids[loja]
         z = eventos[i + 1][0] if i + 1 < len(eventos) else agora_
         if z <= t:
             continue
-        if ativos:
-            p, c = min(v[0] for v in ativos.values())
-            segs.append((t, z, p, c, max(v[0][1] for v in ativos.values())))
+        if pcs:
+            p, c = min(pcs.values())
+            segs.append((t, z, p, c, max(pcs.values(), key=_CORTE)[1]))
         else:
             segs.append((t, z, None, 0, 0))
     # junta trechos vizinhos iguais

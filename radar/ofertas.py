@@ -127,7 +127,7 @@ def _montar_ofertas():
             lin = ph.get(o['appid'])
             an = prev = None
             if lin and o.get('preco') is not None:
-                x = analise.analisar(lin, o['preco'], o.get('corte') or 0, cfg_alerta={})
+                x = analise.analisar(lin, o['preco'], o.get('corte') or 0, agora_=agora, cfg_alerta={})
                 tipos = analise.tipos_de(x)
                 volta, _ = analise.costuma_voltar(x, o.get('corte') or 0)
                 an = {'selo': x['selo'], 'selo_motivo': x['selo_motivo'], 'piso_ref': x['piso_ref'],

@@ -155,23 +155,41 @@ def _aval(linhas, preco, corte, al):
                        "inicio": an["inicio"]}, separators=(",", ":"))
 
 
+_MEMO_AVAL = {}   # appid -> (assinatura, aval, quando): a rapida reavalia 19 mil itens a cada ciclo e quase nenhum mudou
+VALIDADE_AVAL = 2 * 3600   # a avaliacao depende da data (ex.: recorde com 1,5 ano): refaz de vez em quando
+
+
 def avaliar(banco, cfg, itens):
     """Preenche it["aval"] (JSON) de cada item {appid: {preco, corte, flag}}: com historico, a mesma avaliacao da
     lista (lojas marcadas); sem ele, so a marca da ITAD (N novo recorde, H igual ao recorde) ate o historico chegar.
     Le o historico agrupado por jogo (sem carregar tudo na memoria)."""
     lojas = set((banco.meta("promo_lojas") or {}).get("nomes") or [])
-    com_hist = {r["appid"] for r in banco.q("SELECT appid FROM promo_estado WHERE baixado IS NOT NULL")} & set(itens)
+    baixado = {r["appid"]: r["baixado"] for r in banco.q("SELECT appid, baixado FROM promo_estado WHERE baixado IS NOT NULL")}
+    com_hist = set(baixado) & set(itens)
     al = cfg["alerta"]
+    ctx = (tuple(sorted(lojas)), json.dumps(al, sort_keys=True, default=str))
+    t_memo = time.time()
+
+    def memorizar(a):
+        it = itens[a]
+        _MEMO_AVAL[a] = ((it["preco"], it["corte"], it.get("flag"), baixado[a], ctx), it["aval"], t_memo)
 
     def com(a, linhas):
         feitos.add(a)
         it = itens[a]
         it["aval"] = _aval(linhas, it["preco"], it["corte"], al) or it["aval"]
+        memorizar(a)
     for it in itens.values():
         t = {"N": ["novo"], "H": ["igual"]}.get(it.get("flag"))
         it["aval"] = json.dumps({"tipos": t, "provisorio": True}) if t else None
     if not com_hist or not lojas:
         return
+    for a in list(com_hist):   # nada mudou desde a ultima avaliacao (preco, corte, marca, historico, lojas, regras): reaproveita
+        m = _MEMO_AVAL.get(a)
+        it = itens[a]
+        if m and m[0] == (it["preco"], it["corte"], it.get("flag"), baixado[a], ctx) and t_memo - m[2] < VALIDADE_AVAL + a % 1800:   # o resto espalha os vencimentos (senao todos refazem no mesmo ciclo)
+            it["aval"] = m[1]
+            com_hist.discard(a)
     feitos = set()
     atual, linhas = None, []
     # linha_do_tempo ordena cada loja por conta propria: ORDER BY appid usa a chave primaria (sem ordenar a tabela)
