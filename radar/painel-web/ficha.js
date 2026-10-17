@@ -66,7 +66,7 @@ function fxTiles(){
     const conq=c&&c.total?`<div class="fx-tile"><small>Conquistas</small><div class="fx-anel">${fxAnel(c.feitas/c.total)}<b>${c.feitas}/${c.total}</b></div><span>${c.feitas===c.total?'platinado':Math.round(c.feitas/c.total*100)+'% · faltam '+(c.total-c.feitas)}</span></div>`
       :fxTile('Conquistas',c?'—':fxBusca('…','—'),c?'sem conquistas':fxBusca('buscando…',MX&&MX.falhou?'não deu para buscar':MX&&!('conq' in MX)?'precisa da chave da Steam':'perfil com jogos privados?'));
     const st=j.preco_steam,cs=j.desconto_steam>0;
-    return `<div class="fx-tiles">${fxTile('Tempo jogado',jg?horas(min||0):'—',jg?(jg.ultima?'última vez '+fmtUnix(jg.ultima):'nunca jogado'):'vem na próxima verificação')}${conq}
+    return `<div class="fx-tiles">${fxTile('Tempo jogado',jg?(jg.farm?'não jogado':horas(min||0)):'—',jg?(jg.farm?horas(jg.farm)+' só de farm de cartas (nenhuma conquista feita)':jg.ultima?'última vez '+fmtUnix(jg.ultima):'nunca jogado'):'vem na próxima verificação')}${conq}
       ${h&&h.story?fxTile('Para zerar',horas(h.story),min?`você: ${Math.round(min/h.story*100)}%${h.complete?' · '+horas(h.complete)+' tudo':''}`:(h.complete?horas(h.complete)+' para completar':'')):semH}
       ${anal}${fxTile('Na Steam hoje',st!=null?`${cs?`<span class="pc">-${j.desconto_steam}%</span>`:''}${brl(st)}`:'—',st!=null?'para dar de presente':'sem preço',cs?'verde':'')}</div>`;
   }

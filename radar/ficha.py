@@ -116,9 +116,16 @@ def hltb_lote(b, appids, log_erro=None, maximo=60):
     return out
 
 
-def jogado(b, a):
+def jogado(b, a, farm=False):
+    """Tempo jogado; com `farm_cartas` ligado (farm=True), jogo de farm (jogados.farmados) vem com 0 minutos e as horas em "farm"."""
     r = b.um("SELECT minutos, ultima FROM tempo_jogo WHERE appid=?", a)
-    return {"minutos": r["minutos"], "ultima": r["ultima"]} if r else None
+    if not r:
+        return None
+    if farm and r["minutos"]:
+        from . import jogados
+        if a in jogados.farmados(b):
+            return {"minutos": 0, "ultima": None, "farm": r["minutos"]}
+    return {"minutos": r["minutos"], "ultima": r["ultima"]}
 
 
 def fileira(b, ctx, a, nome, marcadas, so_drm=False):

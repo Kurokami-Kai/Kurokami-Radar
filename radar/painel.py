@@ -616,7 +616,7 @@ def api_jogo(q):
 def _ficha_local(b, ctx, cfg, a, r):
     """O que a ficha nova (spec 09) le junto, sem rede: a fileira da franquia e o tempo jogado."""
     r["franquia"] = ficha.fileira(b, ctx, a, r["jogo"].get("nome"), _marcadas(cfg), cfg.get("somente_drm_steam"))
-    r["jogado"] = ficha.jogado(b, a)
+    r["jogado"] = ficha.jogado(b, a, bool(cfg.get("farm_cartas")))
 
 
 def api_jogo_extra(q):
@@ -1164,6 +1164,22 @@ def api_notificacoes(_q):
     return {"itens": rows}
 
 
+def api_replay(q):
+    """Status > Progresso: um ano jogo a jogo, do Steam Replay (radar/replay.py), sem os jogos de farm de cartas."""
+    from . import credenciais, replay
+    try:
+        ano = int((q.get("ano") or ["0"])[0])
+    except ValueError:
+        return {"ano": 0, "ok": False, "motivo": "Ano inválido."}
+    b = Banco()
+    try:
+        return replay.do_ano(b, ano, credenciais.ler("steam"), bool(config.carregar().get("farm_cartas")))
+    except Exception as e:   # tentar: o painel pede de novo no próximo clique
+        return {"ano": ano, "ok": False, "tentar": True, "motivo": "Não consegui falar com a Steam agora (%s)." % e}
+    finally:
+        b.con.close()
+
+
 def api_progresso(_q):
     """Aba Status > Progresso: tempo jogado e conquistas de cada jogo que voce tem (radar/jogados.py)."""
     b = Banco()
@@ -1429,7 +1445,7 @@ def _limpar_sessao_qr():
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/jogo_extra": api_jogo_extra, "/api/hltb": api_hltb, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
-       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/progresso": api_progresso}
+       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/progresso": api_progresso, "/api/replay": api_replay}
 POST = {"/api/jogou": post_jogou, "/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,

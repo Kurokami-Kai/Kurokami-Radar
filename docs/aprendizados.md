@@ -8,6 +8,7 @@ Só lições que continuam valendo (o diário de cada tarefa fica no `git log`).
 - **"Contraditório" costuma ser duas definições do mesmo termo** (ex.: "esta promoção" em `analise` × `previsao`): imprimir os dados do jogo do print num script do scratchpad acha em 1 rodada.
 - **Moeda da API:** a ITAD manda `history/v2` na moeda da loja e `prices/v3` convertido; confira `currency` antes de comparar preço de duas rotas. Muitos Selos de uma vez = dado errado, não critério errado (reproduza um jogo com a cópia do banco instalado em `%LOCALAPPDATA%\Kurokami Radar`, não o `dados/` do repositório, que pode ser velho).
 - **Empate escolhe a primeira linha do banco:** ao mostrar "a loja do melhor preço", desempate pela Steam.
+- **`meta` guarda JSON:** lido por SQL direto, o `steamid` vem com aspas (`"7656…"`) e a Steam responde 400 "Missing required routing parameter"; use `Banco.meta()`.
 - `GetOwnedGames` não traz DLCs (só o `rgOwnedApps` da extensão); a ITAD tem cota (~100 chamadas em 5 min: espaçar e parar no primeiro 429).
 
 ## Painel e navegador do app
@@ -28,8 +29,7 @@ Só lições que continuam valendo (o diário de cada tarefa fica no `git log`).
 - Nunca terminar comando com `cat` sem arquivo (trava esperando entrada); `Set-Content` grava BOM: commit com `git commit -F`.
 
 ## Testar
-- Testar mesmo quando parece simples (o "Esc" quebrou o `/` inteiro).
-- Lógica sem rede: cópia do banco + chamar `painel.api_*` direto; `tools/rodar_instalado.py` acha o que os sintéticos não acham.
+- Testar mesmo quando parece simples (o "Esc" quebrou o `/` inteiro). Lógica sem rede: cópia do banco + chamar `painel.api_*` direto; `tools/rodar_instalado.py` acha o que os sintéticos não acham.
 - Não rodar coleta pelo app do dono para encher amostra (API de listagem + banco em modo leitura).
 - O revisor em paralelo com os docs pegou erros reais várias vezes: vale em mudança de lógica.
 - A loja do Edge recusa `description` acima de 132 caracteres no `manifest.json` (o `checar.py` confere).

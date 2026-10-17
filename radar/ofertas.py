@@ -8,7 +8,7 @@ import time
 from collections import defaultdict
 from datetime import datetime, timezone
 
-from . import analise, caminhos, config, series
+from . import analise, caminhos, config, jogados, series
 from .banco import LOJAS_SEM_STEAM, SO_DRM_SQL, Banco
 from .previsao import Previsor, eventos
 
@@ -172,6 +172,8 @@ def _montar_biblioteca():
         ctx = analise.Contexto(b, config.carregar())
         J = ctx.jogos
         tempo = {r['appid']: (r['minutos'], r['ultima']) for r in b.q('SELECT appid, minutos, ultima FROM tempo_jogo')}
+        if config.carregar().get('farm_cartas'):   # horas só de farm de cartas não contam como jogadas
+            tempo.update({x: (0, None) for x in jogados.farmados(b)})
         conhecidos = [x for x in ctx.possuidos | ctx.lista if (J.get(x) or {}).get('tipo') == 'jogo' and J[x].get('nome')]
         itens = [{'appid': x, 'nome': J[x]['nome'], 'franquia': J[x].get('franquia')} for x in conhecidos]
         fr = series.franquias(itens, {r['appid']: r['nome'] for r in b.q('SELECT appid, nome FROM franquia_manual')})

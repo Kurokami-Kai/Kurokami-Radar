@@ -24,6 +24,14 @@ def estado(minutos, feitas, total):
     return "sem" if total == 0 else "zero"
 
 
+def farmados(b):
+    """Jogos que, com `farm_cartas` ligado, contam como nao jogados: horas, nenhuma conquista feita (zero ou sem) e o dono
+    nao marcou "joguei de verdade". Quem chama confere se a opcao esta ligada. Pendentes (nao lidos) ficam de fora."""
+    return {r["appid"] for r in b.q("""SELECT t.appid FROM tempo_jogo t JOIN conquista_jogo c ON c.appid=t.appid
+                                       LEFT JOIN jogou_manual m ON m.appid=t.appid
+                                       WHERE t.minutos>0 AND c.total>=0 AND COALESCE(c.feitas,0)=0 AND m.appid IS NULL""")}
+
+
 def resumo(b):
     linhas = b.q("""SELECT t.appid, j.nome, j.capa, t.minutos, t.ultima, c.feitas, c.total, m.appid IS NOT NULL AS marcado
                     FROM tempo_jogo t JOIN jogo j ON j.appid=t.appid AND j.possuido=1

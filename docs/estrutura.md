@@ -29,7 +29,8 @@ Kurokami Hunter/
 │   ├── conta_steam.py       # seguidos e ignorados da conta Steam (userdata.json); único leitor de rgFollowedApps/rgIgnoredApps
 │   ├── servico.py           # ciclo() e thread Servico (agenda, completa periódica)
 │   ├── progresso.py         # estado da checagem em andamento (painel e tooltip)
-│   ├── jogados.py           # aba Status → Progresso: estado de cada jogo (platina, andamento, 0%, sem conquistas, nunca) a partir de tempo_jogo e conquista_jogo
+│   ├── jogados.py           # aba Status → Progresso: estado de cada jogo (platina, andamento, 0%, sem conquistas, nunca) a partir de tempo_jogo e conquista_jogo; farmados() = jogos de farm de cartas
+│   ├── replay.py            # Status → Progresso: um ano jogo a jogo pelo Steam Replay (GetUserYearInReview), cache em meta, sem os jogos de farm
 │   ├── relatorio.py         # dados/alertas.html (página estática de reserva)
 │   ├── painel.py            # servidor HTTP + API JSON + PIN + Entrar pela Steam + pedido para a extensão
 │   ├── painel.html          # o painel (só o HTML): topo, Carrinho, Status/Progresso, Configurações, Notificações, Tabela, ficha do jogo; /*incluir x*/ puxa as partes

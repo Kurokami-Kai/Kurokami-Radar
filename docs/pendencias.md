@@ -22,6 +22,9 @@
 
 Em ordem aproximada de valor. Nada aqui foi iniciado.
 
+- **Desempenho (pedido do dono, 17/10: "péssimo; até no meu PC a verificação demora demais"):** medir antes de mexer (`radar.log` com o tempo de cada etapa da rápida e da lenta; quanto o painel espera). Pista: a consulta do Progresso leva 0,01 s, mas `/api/progresso` levou 6,8 s logo depois de abrir o painel de teste, então o servidor do painel divide o processo (e o GIL) com trabalho pesado em Python (montar Ofertas/Biblioteca no `ofertas.aquecer`, coleta). Candidatos: montar Ofertas/Biblioteca menos vezes ou em processo à parte, índices nas consultas grandes, e cortar etapas da verificação que não mudaram.
+- **Status → visual por jogo como a página nova de conquistas da Steam** (pedido do dono, 17/10): ao abrir um jogo no Progresso, uma tela própria com a capa grande, a barra de conquistas, as conquistas feitas e as que faltam (ícone, nome, descrição, raridade em % e data em que pegou), em vez de só a linha da lista. Fonte: `GetPlayerAchievements` (já usado, com `l=brazilian`) + `GetSchemaForGame` (ícones) + `GetGlobalAchievementPercentagesForApp` (raridade).
+
 - **Telegram, o que falta** (base e avisos de oferta feitos na 0.18.0): avisos de **eventos da Steam** (festivais; fonte: feed `store.steampowered.com/feeds/news/app/593110/`), **Humble Bundle** (JSON `landingPage-json-data` de `humblebundle.com/bundles`, ou ITAD `games/bundles/v2`), **campanhas novas da Nuuvem** (links `/promo/<nome>` da home) e **cupons da Nuuvem** (texto de banners/campanhas; sem página pública de cupons). Cada fonte vira um tipo ligável em Notificações → Telegram.
 - **Bundles de outras lojas** (Humble, Fanatical) via ITAD `games/bundles/v2`.
 - **Hype Games e 2Game**: fora da ITAD; só lendo o site (frágil).
