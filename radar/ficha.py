@@ -53,10 +53,12 @@ def extras(b, cfg, a, tenho, log_erro=None):
     fontes = {"loja": lambda: steam.detalhes_loja(a, cfg["pais"]), "aug": lambda: augmented(a)}
     chave, sid = credenciais.ler("steam"), b.meta("steamid")
     if tenho and chave and sid:
-        fontes["conq"] = lambda: steam.conquistas(chave, sid, a)
+        fontes["conq"] = lambda: steam.conquistas_detalhe(chave, sid, a)
     out, buscar = {}, {}
     for f, fn in fontes.items():
         c = _do_cache(b, a, f)
+        if f == "conq" and c and c.get("total") and "lista" not in c:
+            c = None   # cache de antes da lista de conquistas
         if c is None:
             buscar[f] = fn
         else:
@@ -118,14 +120,44 @@ def hltb_lote(b, appids, log_erro=None, maximo=60):
 
 def jogado(b, a, farm=False):
     """Tempo jogado; com `farm_cartas` ligado (farm=True), jogo de farm (jogados.farmados) vem com 0 minutos e as horas em "farm"."""
-    r = b.um("SELECT minutos, ultima FROM tempo_jogo WHERE appid=?", a)
+    r = b.um("SELECT minutos, ultima, min_2sem FROM tempo_jogo WHERE appid=?", a)
     if not r:
         return None
     if farm and r["minutos"]:
         from . import jogados
         if a in jogados.farmados(b):
             return {"minutos": 0, "ultima": None, "farm": r["minutos"]}
-    return {"minutos": r["minutos"], "ultima": r["ultima"]}
+    d = {"minutos": r["minutos"], "ultima": r["ultima"], "min_2sem": r["min_2sem"] or 0}
+    d.update(_historico_jogo(b, a))
+    return d
+
+
+def _historico_jogo(b, a):
+    """O que o Hunter sabe do jogo alem do total: sessoes e primeira vez (Steam Replay, anos ja lidos) e os ultimos 30 dias
+    (`horas_dia`: so conta de quando o Hunter passou a acompanhar). Sem dado, as chaves nem vem."""
+    out = {}
+    sess, primeira = {}, None
+    for r in b.q("SELECT chave, valor FROM meta WHERE chave LIKE 'replay_%'"):
+        try:
+            dado = (json.loads(r["valor"]) or {}).get("dado") or {}
+        except (ValueError, TypeError):
+            continue
+        for g in dado.get("jogos") or []:
+            if g.get("appid") == a:
+                if g.get("sessoes"):
+                    sess[r["chave"][7:]] = g["sessoes"]
+                if g.get("primeira") and (primeira is None or g["primeira"] < primeira):
+                    primeira = g["primeira"]
+    if sess:
+        out["sessoes"] = dict(sorted(sess.items()))
+    if primeira:
+        out["primeira"] = primeira
+    desde = (datetime.now().date() - timedelta(days=29)).isoformat()
+    h = b.um("SELECT COALESCE(SUM(minutos),0) m, COUNT(*) d FROM horas_dia WHERE appid=? AND dia>=?", a, desde)
+    if h and h["m"]:
+        base = b.um("SELECT MIN(dia) d FROM horas_dia")
+        out["dias30"] = {"min": h["m"], "dias": h["d"], "desde": base["d"] if base else None}
+    return out
 
 
 def fileira(b, ctx, a, nome, marcadas, so_drm=False):

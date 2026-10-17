@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import re
 import urllib.parse as _up
 
-from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, ficha, jogados, steam
+from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, ficha, jogados, metas, steam
 from .rede import http_json
 from .banco import SO_DRM_SQL, Banco
 
@@ -1208,6 +1208,26 @@ def api_progresso(_q):
     return r
 
 
+def api_metas(_q):
+    """Metas de jogar (radar/metas.py): o resumo para a aba Status e os avisos que o pop-up ainda nao mostrou."""
+    b = Banco()
+    try:
+        r = metas.resumo(b, config.carregar())
+        r["pendentes"] = metas.pegar_pendentes(b)
+        return r
+    finally:
+        b.con.close()
+
+
+def post_metas_visto(d):
+    b = Banco()
+    try:
+        metas.pegar_pendentes(b, vistos=max(0, int(d.get("n") or 0)))
+    finally:
+        b.con.close()
+    return {"ok": True}
+
+
 def api_alertas(_q):
     b = Banco()
     ult = b.meta("ultimos_alertas") or {}
@@ -1229,6 +1249,8 @@ def post_config(dados):
     cfg = config.carregar()
     novo = dados.get("config") or {}
     tg = (cfg.get("notificacoes") or {}).get("telegram")
+    if "metas" in novo:
+        cfg["metas"] = metas.normalizar(novo["metas"])
     for k in ("lojas", "somente_drm_steam", "alerta", "keyshops", "dlc", "notificacoes", "intervalos_minutos", "completo", "extras",
               "verificacao_completa_dias", "steam_inteira", "steam_inteira_avisos", "farm_cartas"):
         if k in novo:
@@ -1459,8 +1481,8 @@ def _limpar_sessao_qr():
 GET = {"/api/resumo": api_resumo, "/api/lista": api_lista, "/api/jogo": api_jogo, "/api/jogo_extra": api_jogo_extra, "/api/hltb": api_hltb, "/api/alertas": api_alertas,
        "/api/notificacoes": api_notificacoes, "/api/config": api_config, "/api/carrinho": api_carrinho,
        "/api/buscar": api_buscar, "/api/biblioteca": api_biblioteca, "/api/acesso": api_acesso,
-       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/progresso": api_progresso, "/api/replay": api_replay}
-POST = {"/api/jogou": post_jogou, "/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
+       "/api/promocoes": api_promocoes, "/api/vitrine": api_vitrine, "/api/progresso": api_progresso, "/api/metas": api_metas, "/api/replay": api_replay}
+POST = {"/api/jogou": post_jogou, "/api/metas_visto": post_metas_visto, "/api/config": post_config, "/api/dlc": post_dlc, "/api/modo": post_modo,
         "/api/verificar": post_verificar, "/api/pausar": post_pausar, "/api/carrinho": post_carrinho,
         "/api/extra": post_extra, "/api/acesso": post_acesso, "/api/sair": post_sair, "/api/tenho": post_tenho,
         "/api/silenciar": post_silenciar, "/api/atualizar_tudo": post_atualizar_tudo,

@@ -30,11 +30,12 @@ Kurokami Hunter/
 │   ├── servico.py           # ciclo() e thread Servico (agenda, completa periódica)
 │   ├── progresso.py         # estado da checagem em andamento (painel e tooltip)
 │   ├── jogados.py           # aba Status → Progresso: estado de cada jogo (platina, andamento, 0%, sem conquistas, nunca) a partir de tempo_jogo e conquista_jogo; farmados() = jogos de farm de cartas
+│   ├── metas.py             # metas de jogar (horas por dia, platinar N jogos): resumo, avaliar (aviso 1x) e metas_pendentes do pop-up; lê horas_dia e terminado
 │   ├── replay.py            # Status → Progresso: um ano jogo a jogo pelo Steam Replay (GetUserYearInReview), cache em meta, sem os jogos de farm
 │   ├── relatorio.py         # dados/alertas.html (página estática de reserva)
 │   ├── painel.py            # servidor HTTP + API JSON + PIN + Entrar pela Steam + pedido para a extensão
 │   ├── painel.html          # o painel (só o HTML): topo, Carrinho, Status/Progresso, Configurações, Notificações, Tabela, ficha do jogo; /*incluir x*/ puxa as partes
-│   ├── painel-web/          # CSS e JS do painel, um arquivo por seção (base, promocoes, ficha, paginas, carrinho, notificacoes, progresso, configuracoes, conta, status); o painel.py junta numa página só
+│   ├── painel-web/          # CSS e JS do painel, um arquivo por seção (base, promocoes, ficha, paginas, carrinho, notificacoes, progresso, metas, configuracoes, conta, status); o painel.py junta numa página só
 │   ├── ofertas.html         # aba Ofertas (Destaques, Promoções, Lista; spec 09, amostra 8), aberta num iframe; dados em /*DADOS*/{}
 │   ├── biblioteca.html      # aba Biblioteca (Coleção/Franquias, Completar; spec 09, H2), aberta num iframe
 │   ├── ofertas.py           # monta os dados das duas páginas (cache; aquecido depois de cada coleta)

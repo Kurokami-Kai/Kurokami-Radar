@@ -68,6 +68,9 @@ CREATE TABLE IF NOT EXISTS franquia_manual(appid INTEGER PRIMARY KEY, nome TEXT,
 -- minutos = tempo jogado na hora da consulta (so consulta de novo quando o tempo muda)
 -- jogos sem conquista feita que o dono marcou como jogados de verdade (so vale com `farm_cartas` ligado)
 CREATE TABLE IF NOT EXISTS jogou_manual(appid INTEGER PRIMARY KEY, quando TEXT);
+-- metas de jogar (radar/metas.py): minutos ganhos por jogo em cada dia local; jogos que passaram a ter todas as conquistas
+CREATE TABLE IF NOT EXISTS horas_dia(dia TEXT, appid INTEGER, minutos INTEGER, PRIMARY KEY(dia, appid));
+CREATE TABLE IF NOT EXISTS terminado(appid INTEGER PRIMARY KEY, quando TEXT);
 CREATE TABLE IF NOT EXISTS conquista_jogo(appid INTEGER PRIMARY KEY, feitas INTEGER, total INTEGER, minutos INTEGER, quando TEXT);
 """
 
@@ -114,7 +117,9 @@ class Banco:
                     # +18 (descritores de conteudo 3 e 4 da Steam): fica oculto nas Promocoes por padrao
                     "ALTER TABLE steam_promo ADD COLUMN adulto INTEGER",
                     # quando o item entrou em promocao (aviso da Steam inteira so de quem entrou ha pouco)
-                    "ALTER TABLE steam_promo ADD COLUMN entrou TEXT"):
+                    "ALTER TABLE steam_promo ADD COLUMN entrou TEXT",
+                    # minutos jogados nas ultimas 2 semanas (GetOwnedGames)
+                    "ALTER TABLE tempo_jogo ADD COLUMN min_2sem INTEGER"):
             try:
                 self.con.execute(sql)
             except sqlite3.OperationalError:
@@ -206,12 +211,34 @@ class Banco:
         if prioridade:
             self.con.executemany("UPDATE jogo SET prioridade=? WHERE appid=?", [(p, a) for a, p in prioridade.items()])
 
-    def salvar_tempo_jogo(self, tempos):
-        """tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo."""
+    def salvar_tempo_jogo(self, tempos, duas=None):
+        """tempos: {appid: (minutos, ultima_unix)} da ultima leitura da biblioteca; substitui tudo. duas: {appid: minutos
+        nas ultimas 2 semanas}. Antes de substituir, o que cada jogo ganhou desde a leitura anterior entra em `horas_dia`
+        (metas de jogar): no dia local da ultima vez jogada (ou de hoje); jogo novo na conta so conta se tem ate 12 h
+        (senao seria um jogo que ja vinha com horas); a 1a leitura so cria a base."""
+        antes = {r["appid"]: r["minutos"] or 0 for r in self.q("SELECT appid, minutos FROM tempo_jogo")}
+        hoje = datetime.now().date()
+        if antes:
+            for a, (m, u) in tempos.items():
+                m = m or 0
+                d = m - antes[a] if a in antes else (m if m <= 720 else 0)
+                if d <= 0:
+                    continue
+                try:
+                    dia = min(datetime.fromtimestamp(u).date(), hoje) if u else hoje
+                except (OSError, OverflowError, ValueError):
+                    dia = hoje
+                self.con.execute("INSERT INTO horas_dia VALUES(?,?,?) ON CONFLICT(dia, appid) DO UPDATE SET minutos=minutos+excluded.minutos",
+                                 (dia.isoformat(), a, d))
+        duas = duas or {}
         self.con.execute("DELETE FROM tempo_jogo")
-        self.con.executemany("INSERT INTO tempo_jogo VALUES(?,?,?)", [(a, m, u) for a, (m, u) in tempos.items()])
+        self.con.executemany("INSERT INTO tempo_jogo(appid, minutos, ultima, min_2sem) VALUES(?,?,?,?)",
+                             [(a, m, u, duas.get(a)) for a, (m, u) in tempos.items()])
 
     def salvar_conquistas(self, appid, feitas, total, minutos):
+        ant = self.um("SELECT feitas, total FROM conquista_jogo WHERE appid=?", appid)
+        if ant and (ant["total"] or 0) > 0 and (ant["feitas"] or 0) < ant["total"] and total > 0 and feitas >= total:
+            self.con.execute("INSERT OR IGNORE INTO terminado VALUES(?,?)", (appid, agora()))   # platinou desde a leitura anterior
         self.con.execute("INSERT OR REPLACE INTO conquista_jogo VALUES(?,?,?,?,?)", (appid, feitas, total, minutos, agora()))
 
     def definir_itad(self, appid, gid):

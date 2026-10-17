@@ -59,6 +59,7 @@ def perfil_publico(steamid):
 
 ULTIMA_PRIORIDADE = {}  # appid -> posicao na lista de desejos (0 = topo), da ultima leitura
 ULTIMO_TEMPO = {}       # appid -> (minutos jogados, ultima vez em unix), da ultima leitura da biblioteca
+DUAS_SEMANAS = {}       # appid -> minutos jogados nas ultimas 2 semanas, da mesma leitura
 
 
 def wishlist(chave, steamid):
@@ -78,6 +79,8 @@ def biblioteca_api(chave, steamid):
     jogos = ((r or {}).get("response") or {}).get("games", [])
     ULTIMO_TEMPO.clear()
     ULTIMO_TEMPO.update({int(g["appid"]): (g.get("playtime_forever") or 0, g.get("rtime_last_played") or None) for g in jogos})
+    DUAS_SEMANAS.clear()
+    DUAS_SEMANAS.update({int(g["appid"]): g["playtime_2weeks"] for g in jogos if g.get("playtime_2weeks")})
     return [g["appid"] for g in jogos]
 
 
@@ -92,6 +95,55 @@ def conquistas(chave, steamid, appid, ritmo=None):
         raise
     cs = ((r or {}).get("playerstats") or {}).get("achievements") or []
     return {"feitas": sum(1 for c in cs if c.get("achieved")), "total": len(cs)}
+
+
+def conquistas_detalhe(chave, steamid, appid):
+    """Conquistas do jogo uma a uma para a ficha (3 chamadas, so ao abrir): {feitas, total, lista}. Cada item: id, nome,
+    desc, feita, quando (unix), pct (% global de quem conquistou, ou None), icone, oculta. O esquema (icones) e o % global
+    sao opcionais: se falharem a lista vem sem eles. Jogo sem conquistas: total 0."""
+    base = conquistas_brutas(chave, steamid, appid)
+    if base is None:
+        return {"feitas": 0, "total": 0}
+    esq, pct = {}, {}
+    try:
+        r = http_json(API + "ISteamUserStats/GetSchemaForGame/v2/?" + urllib.parse.urlencode(
+            {"key": chave, "appid": appid, "l": "brazilian"}), tentativas=2, timeout=15)
+        for c in (((r or {}).get("game") or {}).get("availableGameStats") or {}).get("achievements") or []:
+            esq[c.get("name")] = c
+    except Exception:
+        pass
+    try:
+        r = http_json(API + "ISteamUserStats/GetGlobalAchievementPercentagesForApp/v2/?" + urllib.parse.urlencode({"gameid": appid}),
+                      tentativas=2, timeout=15)
+        for c in ((r or {}).get("achievementpercentages") or {}).get("achievements") or []:
+            try:
+                pct[c.get("name")] = round(float(c.get("percent")), 1)
+            except (TypeError, ValueError):
+                pass
+    except Exception:
+        pass
+    lista = []
+    for c in base:
+        e = esq.get(c.get("apiname")) or {}
+        feita = bool(c.get("achieved"))
+        desc = c.get("description") or e.get("description") or ""
+        lista.append({"id": c.get("apiname"), "nome": c.get("name") or e.get("displayName") or c.get("apiname"), "desc": desc,
+                      "feita": feita, "quando": (c.get("unlocktime") or None) if feita else None, "pct": pct.get(c.get("apiname")),
+                      "icone": (e.get("icon") if feita else e.get("icongray") or e.get("icon")) or None,
+                      "oculta": bool(e.get("hidden")) and not feita and not desc})
+    return {"feitas": sum(1 for x in lista if x["feita"]), "total": len(lista), "lista": lista}
+
+
+def conquistas_brutas(chave, steamid, appid):
+    """A lista crua do GetPlayerAchievements (None = jogo sem conquistas)."""
+    try:
+        r = http_json(API + "ISteamUserStats/GetPlayerAchievements/v1/?" + urllib.parse.urlencode(
+            {"key": chave, "steamid": steamid, "appid": appid, "l": "brazilian"}), tentativas=2, timeout=15)
+    except urllib.error.HTTPError as e:
+        if e.code == 400 and "no stats" in (getattr(e, "corpo", "") or "").lower():
+            return None
+        raise
+    return ((r or {}).get("playerstats") or {}).get("achievements") or None
 
 
 def detalhes_loja(appid, pais):

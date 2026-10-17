@@ -11,6 +11,7 @@ const pgGrupo=j=>j.estado==='zero'||j.estado==='sem'?(JG.farm&&j.marcado?'marcad
 // pendente (conquistas ainda não lidas): com o farm ligado não dá para saber, então fica de fora de tudo até ser lido; desligado, horas bastam
 const pgJogou=j=>{const g=pgGrupo(j);return g==='platina'||g==='andamento'||g==='marcado'||((g==='semc'||g==='pendente')&&!JG.farm);};
 async function renderJogados(){
+  renderMetas();
   if(!JG)$('#progCorpo').innerHTML='<div class="empty">Lendo a biblioteca…</div>';
   try{JG=await api('/api/progresso');}catch(e){$('#progCorpo').innerHTML='<div class="empty">Não consegui ler o progresso agora.</div>';return;}
   desenharJogados();clearTimeout(renderJogados.t);

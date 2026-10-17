@@ -8,7 +8,7 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
 
-from . import analise, caminhos, coleta, config, credenciais, progresso, rede, relatorio
+from . import analise, caminhos, coleta, config, credenciais, metas, progresso, rede, relatorio
 from .banco import Banco
 from .notificador import Notificador
 
@@ -95,6 +95,10 @@ def ciclo(log=print, forcar=False, sem_limite=False, steam_agora=False, faixa="t
             notif.terminando(candidatos_fim(b, alertas, cfg))
         except Exception as e:
             log("Aviso de fim de promocao falhou: %s" % e)
+        try:
+            metas.avaliar(b, cfg, log)
+        except Exception as e:
+            log("Metas falharam: %s" % e)
         from .banco import agora
         b.meta("ultimos_alertas", {"quando": agora(), "itens": alertas, "novos": [a["appid"] for a in novos]})
         b.commit()
@@ -146,6 +150,10 @@ def ciclo_lento(log=print, forcar=False):
         log(msg)
     try:
         restante = coleta.atualizar_lenta(cfg, b, forcar=forcar, sem_limite=forcar, log=log_)
+        try:
+            metas.avaliar(b, cfg, log_)   # um jogo platinado na rodada lenta pode bater a meta de terminar
+        except Exception as e:
+            log_("Metas falharam: %s" % e)
         from .banco import agora
         if forcar:
             b.meta("ult_completa", agora())

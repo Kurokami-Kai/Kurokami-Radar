@@ -65,10 +65,9 @@ function fxTiles(){
     const jg=MJ.jogado,min=jg&&jg.minutos,c=MX&&MX.conq;
     const conq=c&&c.total?`<div class="fx-tile"><small>Conquistas</small><div class="fx-anel">${fxAnel(c.feitas/c.total)}<b>${c.feitas}/${c.total}</b></div><span>${c.feitas===c.total?'platinado':Math.round(c.feitas/c.total*100)+'% · faltam '+(c.total-c.feitas)}</span></div>`
       :fxTile('Conquistas',c?'—':fxBusca('…','—'),c?'sem conquistas':fxBusca('buscando…',MX&&MX.falhou?'não deu para buscar':MX&&!('conq' in MX)?'precisa da chave da Steam':'perfil com jogos privados?'));
-    const st=j.preco_steam,cs=j.desconto_steam>0;
     return `<div class="fx-tiles">${fxTile('Tempo jogado',jg?(jg.farm?'não jogado':horas(min||0)):'—',jg?(jg.farm?horas(jg.farm)+' só de farm de cartas (nenhuma conquista feita)':jg.ultima?'última vez '+fmtUnix(jg.ultima):'nunca jogado'):'vem na próxima verificação')}${conq}
       ${h&&h.story?fxTile('Para zerar',horas(h.story),min?`você: ${Math.round(min/h.story*100)}%${h.complete?' · '+horas(h.complete)+' tudo':''}`:(h.complete?horas(h.complete)+' para completar':'')):semH}
-      ${anal}${fxTile('Na Steam hoje',st!=null?`${cs?`<span class="pc">-${j.desconto_steam}%</span>`:''}${brl(st)}`:'—',st!=null?'para dar de presente':'sem preço',cs?'verde':'')}</div>`;
+      ${anal}${fxTile('Últimas 2 semanas',jg&&!jg.farm?(jg.min_2sem?horas(jg.min_2sem):'—'):'—',jg&&!jg.farm?(jg.min_2sem?'jogadas':'sem jogar'):'')}</div>`;
   }
   const cheio=(MJ.lojas.find(l=>l.loja===o.loja)||{}).cheio;
   const melhor=o.preco!=null?fxTile('Melhor preço',`${MJ.corte>0?`<span class="pc">-${MJ.corte}%</span>`:''}${brl(o.preco)}`,`na ${esc(o.loja||'')}${cheio&&cheio>o.preco?' · de '+brl(cheio):''}`,MJ.corte>0?'verde':'')
@@ -103,6 +102,35 @@ function fxFileira(){
       <div class="ano">${m.lancamento?new Date(m.lancamento*1000).getFullYear():m.em_breve?'em breve':''}${!m.tenho&&m.preco!=null?` · <span class="pr">${brl(m.preco)}</span>`:''}</div></a>`).join('')}</div></div>`;
 }
 /* painel 1: vale a pena (ou seu progresso, se já tem) */
+/* tempo de jogo de quem tem o jogo: total, 2 semanas, última e primeira vez, sessões (Replay) e os últimos 30 dias (horas_dia) */
+function fxTempo(){const jg=MJ.jogado;if(!jg)return '';
+  const kv=[['Total',jg.farm?`não jogado · ${horas(jg.farm)} só de farm de cartas`:horas(jg.minutos)],
+    ['Últimas 2 semanas',jg.min_2sem?horas(jg.min_2sem):'não jogou'],
+    ['Última vez',jg.ultima?fmtUnix(jg.ultima):'nunca jogado']];
+  if(jg.primeira)kv.push(['Primeira vez',fmtUnix(jg.primeira)]);
+  if(jg.dias30)kv.push(['Últimos 30 dias',`${horas(jg.dias30.min)} em ${jg.dias30.dias} ${jg.dias30.dias>1?'dias':'dia'}${jg.dias30.desde?` <span style="color:var(--muted)">(o Hunter conta desde ${esc(jg.dias30.desde.split('-').reverse().join('/'))})</span>`:''}`]);
+  if(jg.sessoes)kv.push(['Sessões',Object.entries(jg.sessoes).map(([a,n])=>`${esc(a)}: ${esc(String(n))}`).join(' · ')+' <span style="color:var(--muted)">(Replay da Steam)</span>']);
+  return `<div class="fx-cx" style="margin-bottom:10px"><h3 style="margin-top:0">Tempo de jogo</h3><dl class="fx-kv">${kv.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>`;}
+/* aba Conquistas (só de jogo que você tem): uma a uma, como na Steam */
+let MCQ={f:'todas',n:60};
+function fxConq(){
+  const c=MX&&MX.conq;
+  if(!c){return `<div class="fx-vazio">${MX===undefined?'Buscando as conquistas na Steam…':MX&&MX.falhou?'Não deu para buscar as conquistas agora; abra a ficha de novo daqui a pouco.':MX&&!('conq' in MX)?'Para ver as conquistas, entre com a Steam e coloque a chave da Steam em Configurações.':'Não consegui ler as conquistas: o perfil ou os detalhes dos jogos estão privados na Steam?'}</div>`;}
+  if(!c.total)return '<div class="fx-vazio">Este jogo não tem conquistas.</div>';
+  if(!c.lista)return '<div class="fx-vazio">A lista de conquistas não veio; abra a ficha de novo.</div>';
+  const L=c.lista,rara=x=>x.pct!=null&&x.pct<10,fp=p=>p.toLocaleString('pt-BR',{maximumFractionDigits:p<10?1:0});
+  const cont={todas:L.length,feitas:c.feitas,faltam:L.length-c.feitas,raras:L.filter(rara).length};
+  if(!(MCQ.f in cont))MCQ.f='todas';
+  const it=L.filter(x=>MCQ.f==='feitas'?x.feita:MCQ.f==='faltam'?!x.feita:MCQ.f==='raras'?rara(x):true)
+    .sort((a,b)=>a.feita!==b.feita?(a.feita?-1:1):a.feita?(b.quando||0)-(a.quando||0):(b.pct==null?-1:b.pct)-(a.pct==null?-1:a.pct));
+  const lin=x=>`<div class="fx-cq${x.feita?'':' falta'}">${x.icone?`<img src="${esc(x.icone)}" alt="" loading="lazy" width="48" height="48">`:'<i class="cq-ic"></i>'}
+    <div class="cq-tx"><b>${esc(x.nome)}</b><span>${esc(x.oculta?'Conquista oculta: a Steam só mostra a descrição depois de feita.':x.desc||'')}</span></div>
+    <div class="cq-pc">${x.pct!=null?`<b class="${rara(x)?'rara':''}">${fp(x.pct)}%</b><small>${rara(x)?'rara · ':''}dos jogadores</small>`:''}${x.feita&&x.quando?`<small class="cq-em">${fmtUnix(x.quando)}</small>`:''}</div></div>`;
+  return `<div class="fx-cx"><div style="font-size:13px;color:var(--muted)">Conquistas · ${c.feitas} de ${c.total}</div><div class="fx-barra"><i style="width:${c.feitas/c.total*100}%"></i></div>
+    <div class="fx-vazio" style="margin-bottom:10px">${c.feitas===c.total?'Platinado: todas as conquistas':'Faltam '+(c.total-c.feitas)+' para platinar'}</div>
+    <span class="seg">${[['todas','Todas'],['feitas','Feitas'],['faltam','Faltam'],['raras','Raras']].map(([k,t])=>`<button data-cqf="${k}" aria-pressed="${MCQ.f===k}">${t} · ${cont[k]}</button>`).join('')}</span>
+    <div class="fx-cqs">${it.slice(0,MCQ.n).map(lin).join('')||'<div class="fx-vazio">Nenhuma nesta lista.</div>'}</div>
+    ${it.length>MCQ.n?`<button class="fx-mais" style="display:block;margin:10px auto 0" data-cqmais>Mostrar mais (${it.length-MCQ.n})</button>`:''}</div>`;}
 function fxVale(){
   const o=MJ.item||IDX.get(MJ.jogo.appid)||{};let s='';
   if(MJ.tenho){
@@ -111,7 +139,8 @@ function fxVale(){
       <div class="fx-vazio" style="margin-bottom:12px">${c.feitas===c.total?'Platinado: todas as conquistas':'Faltam '+(c.total-c.feitas)+' para platinar'}</div>`:'';
     const dl=MJ.dlcs.length?`<div style="font-size:13px;color:var(--muted);margin-bottom:2px">DLCs · tenho ${tem.length} de ${MJ.dlcs.length}${faltam.length?` · faltam ${faltam.length} que contam`:''}</div>
       ${faltam.slice(0,6).map(d=>`<div class="fx-l"><span>${esc(d.nome||d.appid)}</span><span>${brl(d.preco)}</span></div>`).join('')}`:'';
-    return conq||dl?`<div class="fx-cx">${conq}${dl}</div>`:'<div class="fx-vazio">Sem conquistas nem DLCs para acompanhar.</div>';
+    const tp=fxTempo();
+    return tp+(conq||dl?`<div class="fx-cx">${conq}${dl}</div>`:tp?'':'<div class="fx-vazio">Sem conquistas nem DLCs para acompanhar.</div>');
   }else{
     const pv=porqueVolta(MJ),t=!MJ.selo&&MJ.corte>0&&TITULO_TIPO[MJ.tipo_oferta];
     if(MOP.vered)s+=fxVered(MOP.vered);
@@ -204,15 +233,19 @@ function fxListaAbas(){
   const vende=MJ.lojas.filter(l=>l.vende).sort((x,y)=>x.atual-y.atual),b=vende.find(l=>l.marcada)||vende[0],ns=Object.keys(MJ.historico).length;
   const vale=MJ.tenho?(c&&c.total?`${c.feitas} de ${c.total} conquistas`:MJ.dlcs.length?`DLCs: tenho ${MJ.dlcs.filter(d=>d.tenho).length} de ${MJ.dlcs.length}`:'conquistas e DLCs')
     :v?v.rot+(v.sub?' · '+v.sub:''):MJ.selo?'Selo Kurokami':MJ.corte>0?(TITULO_TIPO[MJ.tipo_oferta]||`-${MJ.corte}% agora`):'sem promoção agora';
-  return [['vale',MJ.tenho?'Seu progresso':'Vale a pena?',vale],
+  const fr=F&&F.total>=2?['fr','Franquia',`${F.nome} · tenho ${F.tenho} de ${F.total}`]:null;
+  const sobre=['sobre','Sobre o jogo',[h&&h.story?horas(h.story)+' para zerar':'',MJ.dlcs.length?MJ.dlcs.length+' DLCs':''].filter(Boolean).join(' · ')||'notas e detalhes'];
+  if(MJ.tenho){const jg=MJ.jogado;   // quem tem o jogo não precisa de preço: progresso, conquistas, franquia e o resto
+    return [['vale','Seu progresso',jg?(jg.farm?'não jogado':horas(jg.minutos)+' jogadas'+(jg.min_2sem?' · '+horas(jg.min_2sem)+' em 2 semanas':'')):vale],
+      ['conq','Conquistas',c?(c.total?`${c.feitas} de ${c.total}${c.feitas===c.total?' · platinado':''}`:'este jogo não tem'):MX===undefined?'buscando…':'não deu para ler'],fr,sobre].filter(Boolean);}
+  return [['vale','Vale a pena?',vale],
     ['hist','Histórico de preços',o.pisos&&o.pisos.sempre!=null?'menor de sempre '+brl(o.pisos.sempre):ns?`${ns} ${ns>1?'lojas':'loja'}`:'sem histórico'],
     ['lojas','Preço em todas as lojas',b?`${vende.length} ${vende.length>1?'lojas':'loja'} · ${brl(b.atual)} na ${b.loja}`:'nenhuma vende agora'],
-    F&&F.total>=2?['fr','Franquia',`${F.nome} · tenho ${F.tenho} de ${F.total}`]:null,
-    ['sobre','Sobre o jogo',[h&&h.story?horas(h.story)+' para zerar':'',MJ.dlcs.length?MJ.dlcs.length+' DLCs':''].filter(Boolean).join(' · ')||'notas e detalhes']].filter(Boolean);
+    fr,sobre].filter(Boolean);
 }
 function fxAbas(){const L=fxListaAbas();if(!L.some(a=>a[0]===MABA))MABA=L[0][0];
   return `<div class="fx-abas" role="tablist" aria-label="Partes da ficha">${L.map(([k,t,r],i)=>`<button class="fx-aba" role="tab" data-aba="${k}" aria-selected="${k===MABA}" title="Atalho: Shift+${i+1}"><i class="k">${i+1}</i><b>${esc(t)}</b><span>${esc(r)}</span></button>`).join('')}</div>`;}
-const fxPainel=()=>({vale:fxVale,hist:fxHist,lojas:fxLojas,fr:fxFileira,sobre:fxSobre})[MABA]();
+const fxPainel=()=>({vale:fxVale,conq:fxConq,hist:fxHist,lojas:fxLojas,fr:fxFileira,sobre:fxSobre})[MABA]();
 function fxAba(k){MABA=k;$$('#mbody .fx-aba').forEach(b=>b.setAttribute('aria-selected',b.dataset.aba===k));
   const p=$('#fxPainel');p.innerHTML=fxPainel();p.scrollTop=0;if($('#chart'))desenharGrafico();fxTrilho();}
 function renderModal(){
@@ -251,6 +284,8 @@ function fxMedir(){   // "mais" só se a descrição não coube; setas só onde 
 addEventListener('resize',()=>{if(MJ&&!$('#modal').hidden){fxMedir();if($('#chart'))desenharGrafico();}});
 $('#mbody').addEventListener('click',async e=>{
   const ab=e.target.closest('[data-aba]');if(ab){fxAba(ab.dataset.aba);return;}
+  const cf=e.target.closest('[data-cqf]');if(cf){MCQ.f=cf.dataset.cqf;MCQ.n=60;fxAba('conq');return;}
+  const cm=e.target.closest('[data-cqmais]');if(cm){const p=$('#fxPainel'),y=p.scrollTop;MCQ.n+=60;fxAba('conq');p.scrollTop=y;return;}
   const fc=e.target.closest('[data-ficha]');if(fc){e.preventDefault();abrirJogo(+fc.dataset.ficha);return;}
   const ca=e.target.closest('[data-car]');if(ca){const t=$('#mbody .fx-trilho');t.scrollBy({left:+ca.dataset.car*t.clientWidth*.8});return;}
   const ma=e.target.closest('[data-mais]');if(ma){const d=$('#mbody .fx-desc');d.classList.toggle('aberta');ma.textContent=d.classList.contains('aberta')?'menos':'mais';return;}

@@ -113,6 +113,8 @@ PADRAO = {
     "conquistas_por_rodada": 100,
     # usa programa de farm de cartas: jogo sem nenhuma conquista feita conta como NAO jogado na aba Status > Progresso
     "farm_cartas": False,
+    # metas para jogar mais (aba Status > Progresso, radar/metas.py): 0 = desligada; terminar_por: semana, mes ou ano
+    "metas": {"horas_dia": 0, "terminar_qtd": 0, "terminar_por": "mes"},
     "historico": {"importar_dias": 1825},
 
     # mudancas de padrao ja aplicadas a este config.json (cada uma roda uma vez so; ver _migrar)

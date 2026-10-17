@@ -35,6 +35,8 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
         sid = steam.resolver_steamid(k_steam, perfil)
         if banco.meta("steamid") not in (None, sid):
             banco.con.execute("DELETE FROM conquista_jogo")   # conquistas eram da conta anterior
+            for t in ("tempo_jogo", "horas_dia", "terminado"):   # tempo e metas tambem: senao a diferenca entre contas viraria horas
+                banco.con.execute("DELETE FROM " + t)
         banco.meta("steamid", sid)
         banco.meta("steamid_perfil", perfil)
     ud = {}
@@ -62,7 +64,7 @@ def atualizar(cfg, banco, forcar=False, importar_hist=True, sem_limite=False, lo
             # tempo jogado e ultima vez, para a ficha; resposta vazia (perfil privado) nao apaga o que ja havia
             if steam.ULTIMO_TEMPO:
                 try:
-                    banco.salvar_tempo_jogo(steam.ULTIMO_TEMPO)
+                    banco.salvar_tempo_jogo(steam.ULTIMO_TEMPO, steam.DUAS_SEMANAS)
                 except Exception as e:
                     log("   tempo jogado nao gravado (%s)" % e)
     mantida = bool(falhou and not do_retrato)
