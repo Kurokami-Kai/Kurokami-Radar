@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 import re
 import urllib.parse as _up
 
-from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, ficha, jogados, metas, steam
+from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, aovivo, ficha, jogados, metas, steam
 from .rede import http_json
 from .banco import SO_DRM_SQL, Banco
 
@@ -1214,6 +1214,9 @@ def api_metas(_q):
     try:
         r = metas.resumo(b, config.carregar())
         r["pendentes"] = metas.pegar_pendentes(b)
+        a = aovivo.lendo()   # o jogo rodando agora (registro do Windows)
+        j = b.um("SELECT nome FROM jogo WHERE appid=?", a) if a else None
+        r["agora"] = {"appid": a, "nome": (j["nome"] if j and j["nome"] else str(a))} if a and j else None
         return r
     finally:
         b.con.close()

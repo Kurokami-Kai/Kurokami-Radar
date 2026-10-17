@@ -71,6 +71,8 @@ CREATE TABLE IF NOT EXISTS jogou_manual(appid INTEGER PRIMARY KEY, quando TEXT);
 -- metas de jogar (radar/metas.py): minutos ganhos por jogo em cada dia local; jogos que passaram a ter todas as conquistas
 CREATE TABLE IF NOT EXISTS horas_dia(dia TEXT, appid INTEGER, minutos INTEGER, PRIMARY KEY(dia, appid));
 CREATE TABLE IF NOT EXISTS terminado(appid INTEGER PRIMARY KEY, quando TEXT);
+-- jogo rodando agora (radar/aovivo.py): segundos jogados que a Steam ainda nao confirmou; saem quando a leitura da biblioteca confirma
+CREATE TABLE IF NOT EXISTS ao_vivo(appid INTEGER PRIMARY KEY, seg INTEGER, quando TEXT);
 CREATE TABLE IF NOT EXISTS conquista_jogo(appid INTEGER PRIMARY KEY, feitas INTEGER, total INTEGER, minutos INTEGER, quando TEXT);
 """
 
@@ -230,6 +232,7 @@ class Banco:
                     dia = hoje
                 self.con.execute("INSERT INTO horas_dia VALUES(?,?,?) ON CONFLICT(dia, appid) DO UPDATE SET minutos=minutos+excluded.minutos",
                                  (dia.isoformat(), a, d))
+                self.con.execute("UPDATE ao_vivo SET seg=MAX(0, seg-?) WHERE appid=?", (d * 60, a))   # a Steam confirmou: sai do "ao vivo"
         duas = duas or {}
         self.con.execute("DELETE FROM tempo_jogo")
         self.con.executemany("INSERT INTO tempo_jogo(appid, minutos, ultima, min_2sem) VALUES(?,?,?,?)",

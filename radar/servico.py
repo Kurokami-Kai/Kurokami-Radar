@@ -8,7 +8,7 @@ import traceback
 from datetime import datetime, timedelta, timezone
 from logging.handlers import RotatingFileHandler
 
-from . import analise, caminhos, coleta, config, credenciais, metas, progresso, rede, relatorio
+from . import analise, aovivo, caminhos, coleta, config, credenciais, metas, progresso, rede, relatorio
 from .banco import Banco
 from .notificador import Notificador
 
@@ -242,6 +242,7 @@ class Servico(threading.Thread):
 
     def run(self):
         falhas = 0
+        aovivo.AoVivo(self).start()   # o jogo rodando agora, para as metas (le o registro, sem rede)
         while not self.parar:
             espera = (self.proxima - datetime.now()).total_seconds()
             if espera > 0:

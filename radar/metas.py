@@ -58,6 +58,18 @@ def _por_dia(b, cfg, desde, hoje=None):
         out[r["dia"]] = out.get(r["dia"], 0) + (r["minutos"] or 0)
         if hoje and r["dia"] == hoje.isoformat():
             jogos.append({"appid": r["appid"], "nome": r["nome"] or str(r["appid"]), "min": r["minutos"] or 0})
+    if hoje:   # o que esta rodando e a Steam ainda nao confirmou (radar/aovivo.py) conta em hoje
+        por = {j["appid"]: j for j in jogos}
+        for r in b.q("SELECT a.appid, a.seg, j.nome FROM ao_vivo a LEFT JOIN jogo j ON j.appid=a.appid WHERE a.seg>=30"):
+            if r["appid"] in farm:
+                continue
+            m = round(r["seg"] / 60)
+            out[hoje.isoformat()] = out.get(hoje.isoformat(), 0) + m
+            if r["appid"] in por:
+                por[r["appid"]]["min"] += m
+            else:
+                jogos.append({"appid": r["appid"], "nome": r["nome"] or str(r["appid"]), "min": m})
+        jogos.sort(key=lambda j: -j["min"])
     return out, jogos
 
 
@@ -115,10 +127,10 @@ def avaliar(b, cfg, log=print, hoje=None):
     avisados = b.meta("metas_avisos") or {}
     novos = []
     if m["horas_dia"] and r["hoje"] >= round(m["horas_dia"] * 60) and avisados.get("horas_dia") != hoje.isoformat():
-        h = r["hoje"] / 60
-        t = "Meta do dia batida: %s h" % (("%.1f" % h).replace(".", ",") if h < 10 else round(h))
-        x = "Você jogou %s h hoje (meta: %s h)%s." % (("%.1f" % h).replace(".", ","), ("%g" % m["horas_dia"]).replace(".", ","),
-                                                     " · %d dias seguidos" % r["sequencia"] if r["sequencia"] > 1 else "")
+        fh = lambda mi: "%d min" % mi if mi < 60 else (("%.1f" % (mi / 60)).replace(".", ",") if mi < 600 else str(round(mi / 60))) + " h"
+        t = "Meta do dia batida: %s" % fh(r["hoje"])
+        x = "Você jogou %s hoje (meta: %s)%s." % (fh(r["hoje"]), fh(round(m["horas_dia"] * 60)),
+                                                 " · %d dias seguidos" % r["sequencia"] if r["sequencia"] > 1 else "")
         avisados["horas_dia"] = hoje.isoformat()
         novos.append(("horas_dia", t, x))
     ch = _chave(m["terminar_por"], hoje)

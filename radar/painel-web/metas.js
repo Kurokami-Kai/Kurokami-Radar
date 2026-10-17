@@ -21,10 +21,11 @@ function desenharMetas(){
       <div class="fx-barra"><i style="width:${Math.min(100,MT.terminados.length/m.terminar_qtd*100)}%"></i></div>
       ${MT.terminados.length?`<div class="mt-lista">${MT.terminados.slice(0,6).map(x=>`<a href="#" data-open="${x.appid}">${esc(x.nome)}</a>`).join(' · ')}</div>`:'<div class="mt-lista">Nenhum ainda neste período (conta o que for platinado depois desta versão).</div>'}`
     :'<div class="mt-st mt-off">Desligada: ponha quantos jogos você quer platinar.</div>';
-  box.innerHTML=`<div class="mt"><h3>Metas para jogar mais</h3>
+  const agora=MT.agora?`<div class="mt-agora"><i></i>Jogando agora: <a href="#" data-open="${MT.agora.appid}">${esc(MT.agora.nome)}</a> <span>· as horas de hoje contam ao vivo</span></div>`:'';
+  box.innerHTML=`<div class="mt"><h3>Metas para jogar mais</h3>${agora}
     <div class="mt-col"><label>Jogar <input type="number" id="mtHoras" min="0" max="24" step="0.25" value="${m.horas_dia||''}" placeholder="0"> h por dia</label>${hoje}</div>
     <div class="mt-col"><label>Platinar <input type="number" id="mtQtd" min="0" max="99" step="1" value="${m.terminar_qtd||''}" placeholder="0"> jogos <select id="mtPor">${Object.entries(MT_POR).map(([k,t])=>`<option value="${k}"${m.terminar_por===k?' selected':''}>${t}</option>`).join('')}</select></label>${fim}</div>
-    <p class="mt-nota">0 desliga a meta. A Steam só atualiza o tempo quando você fecha o jogo e o Hunter lê de 15 em 15 minutos: a sessão aparece aqui até uns 15 minutos depois de fechar. As horas contam a partir de quando o Hunter passou a acompanhar${MT.base?'':' (a primeira leitura ainda vai ser feita)'}${MT.farm?'; jogos de farm de cartas não contam':''}. O aviso sai no Windows e aqui.</p></div>`;}
+    <p class="mt-nota">0 desliga a meta. Com o Hunter aberto, o jogo que está rodando conta ao vivo (a cada 30 s); a Steam confirma o tempo quando o jogo fecha, sem contar em dobro. As horas contam a partir de quando o Hunter passou a acompanhar${MT.base?'':' (a primeira leitura ainda vai ser feita)'}${MT.farm?'; jogos de farm de cartas não contam':''}. O aviso sai no Windows e aqui.</p></div>`;}
 async function salvarMetas(){
   const n={horas_dia:+$('#mtHoras').value||0,terminar_qtd:+$('#mtQtd').value||0,terminar_por:$('#mtPor').value};
   const r=await post('/api/config',{config:{metas:n}});if(r.ok===false)return;
@@ -43,4 +44,5 @@ async function metasPoll(){
     const sai=()=>{el.classList.remove('v');setTimeout(()=>{el.remove();fim();},400);};el.onclick=sai;setTimeout(sai,8000);});}
   try{await fetch('/api/metas_visto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({n:p.length})});}catch(e){}
   MTPOP=false;if(S.tab==='prog')renderMetas();}
-setTimeout(metasPoll,4000);setInterval(metasPoll,60000);
+setTimeout(metasPoll,4000);setInterval(metasPoll,30000);
+setInterval(()=>{if(S.tab==='prog'&&!document.hidden&&MT&&(MT.agora||MT.meta.horas_dia))renderMetas();},30000);   // ao vivo: o cartão se atualiza enquanto há jogo rodando
