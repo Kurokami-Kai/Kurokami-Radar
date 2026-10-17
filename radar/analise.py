@@ -1,6 +1,7 @@
 """Score, custo completo, bundles com desconto do que voce ja tem e regras de alerta."""
 import json
 import threading
+from datetime import datetime as _datetime
 from operator import itemgetter
 
 from . import dlc as dlcmod
@@ -51,9 +52,8 @@ JANELA_RARIDADE = 730    # dias (24 meses)
 
 
 def _ts(q):
-    from datetime import datetime
     try:
-        return datetime.fromisoformat(str(q).replace("Z", "+00:00")).timestamp()
+        return _datetime.fromisoformat(q if isinstance(q, str) else str(q)).timestamp()   # o fromisoformat do 3.11+ já lê o "Z"
     except ValueError:
         return None
 
@@ -100,13 +100,14 @@ def _linha_do_tempo(linhas, agora_=None):
     agora_ = agora_ or time.time()
     VALIDADE_PROMO = 45 * DIA
     por_loja = {}
+    tem_corte = bool(linhas) and "corte" in linhas[0].keys()   # as linhas vêm de uma consulta só: todas com ou todas sem
     for r in linhas:
         if not r["preco"]:
             continue
         t = _ts(r["quando"])
         if t is None or t > agora_:
             continue
-        corte = (r["corte"] if "corte" in r.keys() else 0) or 0
+        corte = (r["corte"] if tem_corte else 0) or 0
         por_loja.setdefault(r["loja"], []).append((t, r["preco"], corte))
     # eventos: (tempo, tipo 0=sai/1=entra, loja, (preco, corte), id do registro)
     eventos = []

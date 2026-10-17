@@ -480,16 +480,30 @@ def _ordenar(itens, ordem):
     return out
 
 
-def api_promocoes(qs):
-    """Explorador da aba Promocoes: filtra, conta e pagina no Hunter (pensando na Steam inteira, spec 07)."""
-    f = _ler_q(qs)
+def _candidatos(f):
+    """(itens, filtros, conta, steam_info): tudo que o pedido f pode devolver, antes dos filtros."""
     itens, cfg, conta = linhas_promocoes()
     steam_info = {"ligada": bool(cfg.get("steam_inteira", True)), "quando": None, "itens": 0}
     if f["fonte"] == "steam" and steam_info["ligada"]:
         leves, steam_info["quando"] = linhas_steam(itens)
         steam_info["itens"] = len(leves) + sum(1 for o in itens if o["corte"])
         itens = itens + leves
-    filt = _filtros(f)
+    return itens, _filtros(f), conta, steam_info
+
+
+def todos_promocoes(q):
+    """(itens filtrados e ordenados, steam_info) de TODAS as paginas do pedido q (dict, como o q= de /api/promocoes), de uma vez
+    e sem as contagens; os itens sao os objetos do cache (dict da lista ou LinhaSteam), nada e copiado."""
+    f = _ler_q({"q": [json.dumps(q)]})
+    itens, filt, _conta, steam_info = _candidatos(f)
+    sel = [o for o in itens if all(p(o) for p in filt.values())]
+    return _ordenar(sel, f["ordem"]), steam_info
+
+
+def api_promocoes(qs):
+    """Explorador da aba Promocoes: filtra, conta e pagina no Hunter (pensando na Steam inteira, spec 07)."""
+    f = _ler_q(qs)
+    itens, filt, conta, steam_info = _candidatos(f)
     passa = lambda o, sem=None: all(p(o) for g, p in filt.items() if g != sem)
     sel = [o for o in itens if passa(o)]
     contagens = {"mostrar_so": dict.fromkeys(analise.TIPOS, 0), "tipo": dict.fromkeys(TIPO_ITEM, 0)}

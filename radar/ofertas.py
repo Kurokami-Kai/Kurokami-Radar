@@ -62,15 +62,14 @@ def _linhas_de(b, tabela, lojas, appids, so_drm=False):
 
 
 def _todas(q):
-    """Todas as páginas de /api/promocoes com o pedido q (no próprio processo)."""
+    """Todos os itens de /api/promocoes com o pedido q (no próprio processo), filtrados e ordenados uma vez só:
+    (itens, info da Steam). Os da Steam inteira vêm como LinhaSteam (veja _dict)."""
     from . import painel
-    out, pg = [], 1
-    while True:
-        r = painel.api_promocoes({'q': [json.dumps(dict(q, pagina=pg, por_pagina=250))]})
-        out += r['itens']
-        if pg * 250 >= r['total']:
-            return out, r
-        pg += 1
+    return painel.todos_promocoes(q)
+
+
+def _dict(o):
+    return o if isinstance(o, dict) else o.como_dict()
 
 
 def _linha(o, cv, fr, hist, prev, an=None):
@@ -110,8 +109,9 @@ def _montar_ofertas():
         memo_ctx, memo = _MEMO.get('p') or (None, {})
         if memo_ctx != ctx:
             memo = {}
-        promo, resp = _todas({'fonte': 'steam', 'ordem': [['corte', 'desc'], ['nome', 'asc']]})
+        promo, st = _todas({'fonte': 'steam', 'ordem': [['corte', 'desc'], ['nome', 'asc']]})
         lista, _ = _todas({'fonte': 'steam', 'relacao': {'na_lista': 'exigir'}, 'ordem': [['corte', 'desc'], ['nome', 'asc']]})
+        lista = [_dict(o) for o in lista]
 
         H = {}
         lh = _linhas_de(b, 'preco', lojas_l, [o['appid'] for o in lista], so_drm)
@@ -133,7 +133,7 @@ def _montar_ofertas():
         sigs, pend = {}, set()
         for o in fora:
             a = o['appid']
-            sg = tuple(o.get(k) for k in _CAMPOS_P) + (cv.get(a), fr.get(a), com_hist.get(a))
+            sg = tuple(o[k] for k in _CAMPOS_P) + (cv.get(a), fr.get(a), com_hist.get(a))
             sigs[a] = sg
             m = memo.get(a)
             if not (m and m[0] == sg and m[4] == hoje and agora - m[3] < VALIDADE_MEMO + a % 1800):
@@ -153,6 +153,7 @@ def _montar_ofertas():
                 if m[2]:
                     H[a] = m[2]
                 continue
+            o = _dict(o)
             lin = ph.get(a)
             an = prev = h = None
             if lin and o.get('preco') is not None:
@@ -185,8 +186,7 @@ def _montar_ofertas():
             k = series.chave(r[1] or '')
             if k in lib:
                 AF[r[0]] = series.rotulo(lib[k] + [r[1]])
-        st = resp.get('steam') or {}
-        return {'P': P, 'PT': resp['total'], 'L': L, 'steam': st.get('itens') or 0, 'quando': agora_dt.isoformat(),
+        return {'P': P, 'PT': len(promo), 'L': L, 'steam': st.get('itens') or 0, 'quando': agora_dt.isoformat(),
                 'EV': [int(t) for t in ev], 'H': H, 'AF': AF}
     finally:
         b.con.close()
