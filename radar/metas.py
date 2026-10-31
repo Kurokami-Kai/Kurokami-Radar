@@ -4,8 +4,8 @@ Duas metas, ambas opcionais (0 = desligada), em `config["metas"]`:
   `Banco.salvar_tempo_jogo`), no dia local. Com `farm_cartas` ligado, jogo de farm (`jogados.farmados`) nao conta.
 - `terminar_qtd` por `terminar_por` (semana, mes, ano): platinar N jogos (`terminado`, preenchida por `Banco.salvar_conquistas`
   quando um jogo passa a ter todas as conquistas). Conta daqui para a frente: o que ja estava platinado nao entra.
-Ao bater uma meta: aviso do Windows/Telegram (`Notificador._avisar`, 1x por dia ou periodo) e um aviso guardado em
-`meta["metas_pendentes"]` que o painel mostra num pop-up e apaga (`/api/metas_visto`)."""
+Ao bater uma meta: um aviso guardado em `meta["metas_pendentes"]` (1x por dia ou periodo) que o painel mostra num pop-up e
+apaga (`/api/metas_visto`). Sem aviso do Windows/Telegram: as notificacoes sao so de jogos da lista de desejos."""
 from datetime import date, datetime, timedelta
 
 PADRAO = {"horas_dia": 0, "terminar_qtd": 0, "terminar_por": "mes"}
@@ -145,15 +145,6 @@ def avaliar(b, cfg, log=print, hoje=None):
     for tipo, t, x in novos:
         _pendente(b, tipo, t, x)
     b.commit()
-    try:
-        from .notificador import Notificador, em_silencio
-        from . import painel
-        if not em_silencio(cfg) and not b.meta("pausado"):
-            n = Notificador(b, cfg, log)
-            for tipo, t, x in novos:
-                n._avisar(t, x, clique=painel.url() + "#prog")
-    except Exception as e:   # o pop-up do painel continua valendo
-        log("Aviso de meta falhou: %s" % e)
     log("Metas batidas: %s" % ", ".join(n[0] for n in novos))
     return novos
 

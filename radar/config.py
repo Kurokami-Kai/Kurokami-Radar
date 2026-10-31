@@ -98,7 +98,6 @@ PADRAO = {
     "steam_inteira": True,
     # avisos da Steam inteira (jogos FORA da sua lista): so o que o alerta.tipos liga (padrao: Selo), de jogo (nao DLC) com
     # pelo menos analises_minimas, que entrou em promocao ha pouco; maximo por rodada (o resto vira um resumo)
-    "steam_inteira_avisos": {"ativo": True, "analises_minimas": 500, "max_por_rodada": 3},
     # historico (para Selo, Menor em 2 anos, Costuma voltar) de quem esta perto do recorde: N jogos por rodada
     # (a ITAD aceita ~100 chamadas a cada 5 min, e a lista tambem usa)
     "steam_inteira_hist_por_rodada": 60,

@@ -12,7 +12,7 @@ import urllib.parse as _up
 
 from . import VERSAO, analise, caminhos, config, conta_steam, dlc as dlcmod, aovivo, ficha, jogados, metas, steam
 from .rede import http_json
-from .banco import SO_DRM_SQL, Banco
+from .banco import SO_DRM_SQL, Banco, lojas_com_drm
 
 PORTAS = (80, 8787)       # tenta a 80 (link sem numero); se estiver ocupada, usa a 8787
 PORTA = 8787              # a que ficou valendo
@@ -691,7 +691,7 @@ def _jogo_steam(b, cfg, ctx, a):
             if o.appid == a:
                 _aplicar_aval(o, sp.get("aval"))
                 break
-    nomes = set((b.meta("promo_lojas") or {}).get("nomes") or [])
+    nomes = lojas_com_drm((b.meta("promo_lojas") or {}).get("nomes"), cfg)
     hist, linhas = {}, []
     for r in b.q("SELECT loja, preco, corte, quando FROM promo_hist WHERE appid=? ORDER BY quando", a):
         hist.setdefault(r["loja"], []).append([r["quando"], r["preco"]])
@@ -1255,7 +1255,7 @@ def post_config(dados):
     if "metas" in novo:
         cfg["metas"] = metas.normalizar(novo["metas"])
     for k in ("lojas", "somente_drm_steam", "alerta", "keyshops", "dlc", "notificacoes", "intervalos_minutos", "completo", "extras",
-              "verificacao_completa_dias", "steam_inteira", "steam_inteira_avisos", "farm_cartas"):
+              "verificacao_completa_dias", "steam_inteira", "farm_cartas"):
         if k in novo:
             cfg[k] = novo[k]
     if tg is not None and isinstance(cfg.get("notificacoes"), dict):

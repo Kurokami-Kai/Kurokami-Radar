@@ -204,6 +204,7 @@ def _montar_biblioteca():
         ctx = analise.Contexto(b, config.carregar())
         J = ctx.jogos
         tempo = {r['appid']: (r['minutos'], r['ultima']) for r in b.q('SELECT appid, minutos, ultima FROM tempo_jogo')}
+        tempo.update({x: (0, None) for x, (m, _u) in tempo.items() if m and m < jogados.MIN_JOGADO})   # só abriu o jogo: não conta
         if config.carregar().get('farm_cartas'):   # horas só de farm de cartas não contam como jogadas
             tempo.update({x: (0, None) for x in jogados.farmados(b)})
         conhecidos = [x for x in ctx.possuidos | ctx.lista if (J.get(x) or {}).get('tipo') == 'jogo' and J[x].get('nome')]

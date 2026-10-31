@@ -4,7 +4,7 @@
 let JG=null;
 let PGD=null,pgA0=2022;const RP={};   // clique nos gráficos (fim do arquivo). PGD: {h: faixa} ou {ano, mes?}; RP: ano → /api/replay
 const PG_ESTADOS=[['platina','Platinados','todas as conquistas'],['andamento','Em andamento','algumas conquistas'],['semc','Sem conquistas feitas','jogo sem conquistas ou com 0% feito'],
-  ['marcado','Marcados como jogados','sem conquista, mas você jogou de verdade'],['nunca','Nunca jogados','0 minutos'],['pendente','Lendo conquistas','a Steam ainda não respondeu']];
+  ['marcado','Marcados como jogados','sem conquista, mas você jogou de verdade'],['nunca','Nunca jogados','0 minutos, ou só abriu (menos de 10 min)'],['pendente','Lendo conquistas','a Steam ainda não respondeu']];
 const PG_COR={platina:'var(--sinal)',andamento:'#8a1520',semc:'#4a1016',marcado:'#9a9a9a',nunca:'#2a2a2a',pendente:'#454545'};
 const fmtH=m=>{const h=m/60;return h<1?(m?'<1 h':'0 h'):(h<10?h.toFixed(1).replace('.',','):Math.round(h).toLocaleString('pt-BR'))+' h';};
 const pgGrupo=j=>j.estado==='zero'||j.estado==='sem'?(JG.farm&&j.marcado?'marcado':'semc'):j.estado;
@@ -23,7 +23,7 @@ const PG_FAIXAS=[['< 1 h',0,60],['1–5 h',60,300],['5–20 h',300,1200],['20–
 function pgLinha(j){const pct=j.total?Math.round(j.feitas/j.total*100):0,g=pgGrupo(j);
   const btn=JG.farm&&(g==='semc'||g==='marcado')?`<button type="button" class="btn-ghost pg-j" data-pgj="${j.appid}" data-v="${g==='semc'?1:0}">${g==='semc'?'Joguei de verdade':'Desmarcar'}</button>`:'';
   return `<div class="pg-row" data-open="${j.appid}">${art(j.appid,j.nome,j.capa)}<div class="pg-n"><span class="pg-nome">${esc(j.nome)}</span>
-    <span class="pg-sub">${g==='nunca'?'nunca jogado':fmtH(j.minutos)+' jogadas'+(j.ultima?' · última vez em '+new Date(j.ultima*1000).toLocaleDateString('pt-BR',{month:'2-digit',year:'numeric'}):'')}</span></div>
+    <span class="pg-sub">${g==='nunca'?(j.minutos?'só abriu · '+j.minutos+' min':'nunca jogado'):fmtH(j.minutos)+' jogadas'+(j.ultima?' · última vez em '+new Date(j.ultima*1000).toLocaleDateString('pt-BR',{month:'2-digit',year:'numeric'}):'')}</span></div>
     <div class="pg-conq">${j.total?`<span class="pg-bar"><i style="width:${pct}%;background:${PG_COR[g]}"></i></span><span class="tnum">${j.feitas}/${j.total} · ${pct}%</span>`:`<span class="pg-sub">${g==='pendente'?'lendo conquistas…':g==='nunca'?'':'sem conquistas'}</span>`}${btn}</div></div>`;}
 function desenharJogados(){
   const J=JG.jogos,box=$('#progCorpo');

@@ -28,7 +28,7 @@ async function renderCfg(){
     return `${tgGuia(false)}${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
       ${row('Conexão','Bot conectado e conversa vinculada.',`<button class="btn-ghost" data-tg="testar" type="button">Enviar teste</button><button class="btn-ghost" data-tg="remover" type="button">Desconectar</button>`)}`;};
   const sec=(id,t,p,corpo)=>`<section class="cfg-sec" data-sec="${id}" hidden><header><h3>${t}</h3>${p?`<p>${p}</p>`:''}</header>${corpo}</section>`;
-  const sa=c.steam_inteira_avisos||{},a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
+  const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
   const FREQ={selo:'~0,2 avisos por semana (0,7 em grandes promoções)',novo:'~2 avisos por semana (6 em grandes promoções)',
     igual:'~14 avisos por semana (34 em grandes promoções)','24m':'~2 avisos por semana (3 em grandes promoções)'};
   const atual=ls.get('cfgSec','avisos');
@@ -65,12 +65,8 @@ async function renderCfg(){
       ${row('Fazer a completa a cada','Também catálogo da Steam, biblioteca, listas de DLC, edições, bundles e histórico, sem limite de ritmo. 0 = só quando você pedir.',num('verificacao_completa_dias',c.verificacao_completa_dias??7,1,0,90,'dias'))}
       ${row('Verificação completa agora','Acompanhe pelo status no topo.','<button class="btn-ghost" id="btnTudo" type="button">Começar agora</button>')}</div>`)}
    ${sec('steam','Steam inteira','Todas as promoções da Steam, além da sua lista (Ofertas → Promoções → Steam inteira).',
-     `<div class="cfg-card">${swRow('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam','Alimenta a aba Promoções e os avisos de jogos fora da sua lista (abaixo).')}
-      ${row('Atualizar a cada','Também atualiza no "Verificar agora". Cada consulta substitui a anterior: ~1 MB num dia comum, ~16 MB e ~3 min em grande promoção (aumente se a internet for limitada).',num('intervalos_minutos.steam_inteira',iv.steam_inteira??15,15,15,1440,'min'))}</div>
-     <div class="cfg-card"><h4>Avisos de jogos fora da sua lista</h4>
-      ${swRow('steam_inteira_avisos.ativo',sa.ativo!==false,'Avisar promoções de jogos que não estão na sua lista','Só os tipos ligados em Avisos (por padrão, o Selo Kurokami), de jogos que você não tem nem ignora e que entraram em promoção há pouco. Um aviso por promoção.')}
-      ${row('Análises mínimas','Ignora jogos com menos análises que isso (evita jogos desconhecidos).',num('steam_inteira_avisos.analises_minimas',sa.analises_minimas??500,100,0,null,'análises'))}
-      ${row('Máximo por checagem','Acima disso, os demais viram um resumo.',num('steam_inteira_avisos.max_por_rodada',sa.max_por_rodada??3,1,1,20,'avisos'))}</div>`)}
+     `<div class="cfg-card">${swRow('steam_inteira',c.steam_inteira!==false,'Buscar todas as promoções da Steam','Alimenta a aba Promoções (não gera avisos: os avisos são só dos jogos da sua lista de desejos).')}
+      ${row('Atualizar a cada','Também atualiza no "Verificar agora". Cada consulta substitui a anterior: ~1 MB num dia comum, ~16 MB e ~3 min em grande promoção (aumente se a internet for limitada).',num('intervalos_minutos.steam_inteira',iv.steam_inteira??15,15,15,1440,'min'))}</div>`)}
    ${sec('jogos','Jogos','Como a aba Status → Progresso conta o que você jogou.',
      `<div class="cfg-card">${swRow('farm_cartas',!!c.farm_cartas,'Uso programa de farm de cartas','Ligado: jogo sem nenhuma conquista feita (tenha o jogo conquistas ou não) conta como não jogado, porque as horas podem ser só do programa. Você pode marcar, jogo a jogo, os que jogou de verdade (Status → Progresso → Sem conquistas feitas → Joguei de verdade). Desligado: todo jogo com horas conta como jogado.')}</div>`)}
    ${sec('keyshops','Keyshops','Preços de lojas de chaves, via GG.deals. O preço de keyshop continua na ficha do jogo e no filtro "Keyshop bem mais barata".',

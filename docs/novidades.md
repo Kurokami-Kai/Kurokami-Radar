@@ -2,6 +2,11 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.18.8
+- **Só avisa jogo da sua lista de desejos:** saíram os avisos de promoções da Steam inteira (e a seção em Configurações → Steam inteira), o aviso do Windows/Telegram das metas de jogar (o pop-up do painel continua) e o "termina em breve" de jogo que está no carrinho mas não na lista.
+- **"Só chave ativável na Steam" sem vazamento:** lojas que a IsThereAnyDeal nunca marcou com DRM Steam (JoyBuggy, ZOOM Platform, GG.deals oficial) e o histórico de GOG/Epic/etc. da Steam inteira (Selo, ficha) ficavam de fora só em parte; agora saem de tudo.
+- **Abrir o jogo não conta como jogado:** jogo com menos de 10 minutos, sem conquista feita e sem a marca "joguei de verdade", fica em "Nunca jogados" (mostra "só abriu · N min") em Status → Progresso e na Biblioteca. A Steam grava 0,1 h só de abrir.
+
 ## 0.18.7
 - **Teclas 1 a 5 do painel na ordem do menu:** a 3 abre **Status**, a 4 **Configurações** e a 5 **Carrinho** (antes a 3 ia para Configurações). Na ficha do jogo, a dica das abas agora diz Shift+número, que é a tecla que de fato funciona.
 - **Ficha do jogo que você já tem, redesenhada:** sem Histórico de preços, Preço em todas as lojas nem "Na Steam hoje". Agora: **Seu progresso** (tempo de jogo: total, últimas 2 semanas, última e primeira vez, sessões do Replay, últimos 30 dias), **Conquistas** (uma a uma como na Steam: ícone, descrição, data, % global de quem conquistou, filtros Todas/Feitas/Faltam/Raras), Franquia e Sobre. O 5º número virou "Últimas 2 semanas". Jogos que você não tem ficam como eram.

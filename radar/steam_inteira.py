@@ -13,7 +13,7 @@ import urllib.parse
 from datetime import datetime, timedelta, timezone
 
 from . import analise, itad, progresso
-from .banco import BAIXADO_ANTIGO, agora, utc
+from .banco import BAIXADO_ANTIGO, agora, lojas_com_drm, utc
 from .rede import RITMO, explicar, http_json
 
 QUERY = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -163,7 +163,7 @@ def avaliar(banco, cfg, itens):
     """Preenche it["aval"] (JSON) de cada item {appid: {preco, corte, flag}}: com historico, a mesma avaliacao da
     lista (lojas marcadas); sem ele, so a marca da ITAD (N novo recorde, H igual ao recorde) ate o historico chegar.
     Le o historico agrupado por jogo (sem carregar tudo na memoria)."""
-    lojas = set((banco.meta("promo_lojas") or {}).get("nomes") or [])
+    lojas = lojas_com_drm((banco.meta("promo_lojas") or {}).get("nomes"), cfg)
     baixado = {r["appid"]: r["baixado"] for r in banco.q("SELECT appid, baixado FROM promo_estado WHERE baixado IS NOT NULL")}
     com_hist = set(baixado) & set(itens)
     al = cfg["alerta"]
@@ -377,7 +377,7 @@ def historico_um(banco, cfg, chave, appid, log=print):
     banco.con.executemany("INSERT OR IGNORE INTO promo_hist VALUES(?,?,?,?,?,?)",
                           [(appid, g[0], g[1], g[2], g[3], utc(g[4])) for g in regs if g[1] is not None])
     banco.con.execute("UPDATE promo_estado SET baixado=?, preco_baixado=? WHERE appid=?", (agora(), r["preco"], appid))
-    nomes = set(nomes or [])
+    nomes = lojas_com_drm(nomes, cfg)
     linhas = [dict(x) for x in banco.q("SELECT loja, preco, corte, quando FROM promo_hist WHERE appid=? ORDER BY quando", appid)
               if x["loja"] in nomes]
     aval = _aval(linhas, r["preco"], r["corte"], cfg["alerta"])

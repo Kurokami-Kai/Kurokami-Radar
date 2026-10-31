@@ -9,10 +9,21 @@ from . import caminhos
 BAIXADO_ANTIGO = "2000-01-01T00:00:00+00:00"   # promo_estado.baixado de um historico em moeda errada: refazer inteiro
 
 # somente_drm_steam: o historico (tabela preco) nao guarda o DRM, entao fica de fora o que a ITAD diz hoje que nao ativa na Steam
-# (oferta_atual.drm_steam = 0) e as lojas que nunca vendem chave Steam. Vale para `preco` sem apelido, no WHERE.
-LOJAS_SEM_STEAM = ("GOG", "Epic Game Store", "Microsoft Store", "Ubisoft Store", "EA Store", "Blizzard")
+# (oferta_atual.drm_steam = 0), as lojas que nunca vendem chave Steam e as que a ITAD nunca marcou com DRM Steam (sem evidencia,
+# fora: JoyBuggy, GG.deals oficial). Vale para `preco` sem apelido, no WHERE.
+LOJAS_SEM_STEAM = ("GOG", "Epic Game Store", "Microsoft Store", "Ubisoft Store", "EA Store", "Blizzard", "ZOOM Platform")
+LOJAS_STEAM_FIXAS = ("Steam (direto)", "Completo (Steam)", "GG.deals keyshop")   # nao passam pela ITAD: o DRM e Steam por definicao
 SO_DRM_SQL = (" AND loja NOT IN (%s) AND NOT EXISTS (SELECT 1 FROM oferta_atual od WHERE od.appid=preco.appid"
-              " AND od.loja=preco.loja AND od.drm_steam=0)" % ",".join("'%s'" % l for l in LOJAS_SEM_STEAM))
+              " AND od.loja=preco.loja AND od.drm_steam=0)"
+              " AND (loja IN (%s) OR loja IN (SELECT loja FROM oferta_atual WHERE drm_steam=1))"
+              % (",".join("'%s'" % l for l in LOJAS_SEM_STEAM), ",".join("'%s'" % l for l in LOJAS_STEAM_FIXAS)))
+
+
+def lojas_com_drm(nomes, cfg):
+    """Os nomes de loja sem as que nunca vendem chave Steam, quando `somente_drm_steam` esta ligado (para `promo_hist`,
+    que nao guarda o DRM)."""
+    nomes = set(nomes or [])
+    return nomes - set(LOJAS_SEM_STEAM) if cfg.get("somente_drm_steam") else nomes
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS jogo(

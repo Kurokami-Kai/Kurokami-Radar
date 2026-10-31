@@ -34,7 +34,7 @@ def _fim_iso(v):
 
 
 def candidatos_fim(b, alertas, cfg):
-    """O que esta no carrinho ou "vale a pena" e tem data de fim conhecida (ITAD ou Steam)."""
+    """O que esta no carrinho ou "vale a pena", esta na lista de desejos e tem data de fim conhecida (ITAD ou Steam)."""
     import json as _json
     try:
         with open(caminhos.ARQ_CARRINHO, encoding="utf-8") as f:
@@ -45,8 +45,8 @@ def candidatos_fim(b, alertas, cfg):
     out = []
     marc = {l.lower() for l in cfg["lojas"]}
     for a in carr | set(alvo):
-        j = b.um("SELECT nome, preco_steam, desconto_steam, fim_desconto FROM jogo WHERE appid=?", a)
-        if not j:
+        j = b.um("SELECT nome, preco_steam, desconto_steam, fim_desconto FROM jogo WHERE appid=? AND na_lista=1", a)
+        if not j:   # so avisa jogo da lista de desejos
             continue
         ofs = [dict(r) for r in b.q("SELECT * FROM oferta_atual WHERE appid=? AND corte>0", a)
                if r["loja"].lower() in marc and (r["drm_steam"] or not cfg.get("somente_drm_steam"))]
@@ -87,10 +87,6 @@ def ciclo(log=print, forcar=False, sem_limite=False, steam_agora=False, faixa="t
             novos = []
         else:
             novos = notif.processar(alertas)
-        try:
-            notif.steam_inteira(ctx)
-        except Exception as e:
-            log("Avisos da Steam inteira falharam: %s" % e)
         try:
             notif.terminando(candidatos_fim(b, alertas, cfg))
         except Exception as e:

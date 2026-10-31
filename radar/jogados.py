@@ -8,12 +8,16 @@ Estado de cada jogo (nunca DLC):
   sem       o jogo nao tem conquistas
   (zero e sem: o painel os junta em "sem conquistas feitas". Com `farm_cartas` ligado (Configuracoes -> Jogos) NAO contam
   como jogados, salvo os que o dono marcou em `jogou_manual`; desligado, contam)
-  nunca     0 minutos
+  nunca     0 minutos, ou menos de MIN_JOGADO sem nenhuma conquista e sem a marca "joguei de verdade" (a Steam
+            grava 0,1 h so de abrir o jogo)
   pendente  jogado, mas as conquistas ainda nao foram consultadas (ou a consulta falhou)"""
 
 
-def estado(minutos, feitas, total):
-    if not minutos:
+MIN_JOGADO = 10   # abaixo disso (e sem conquista feita, sem marca manual) o jogo so foi aberto: nao conta como jogado
+
+
+def estado(minutos, feitas, total, marcado=False):
+    if not minutos or (minutos < MIN_JOGADO and not feitas and not marcado):
         return "nunca"
     if total is None or total < 0:
         return "pendente"
@@ -40,6 +44,6 @@ def resumo(b):
                     WHERE j.nome IS NOT NULL AND (j.tipo IS NULL OR j.tipo='jogo')""")
     jogos = [{"appid": r["appid"], "nome": r["nome"], "capa": r["capa"], "minutos": r["minutos"] or 0, "ultima": r["ultima"],
               "marcado": bool(r["marcado"]), "feitas": r["feitas"] or 0, "total": max(r["total"] or 0, 0),
-              "estado": estado(r["minutos"], r["feitas"] or 0, r["total"])} for r in linhas]
+              "estado": estado(r["minutos"], r["feitas"] or 0, r["total"], bool(r["marcado"]))} for r in linhas]
     # pendentes: ainda nao consultados (consulta que falhou, total -1, tambem aparece como "pendente", mas nao no aviso)
     return {"jogos": jogos, "pendentes": sum(1 for r, j in zip(linhas, jogos) if j["estado"] == "pendente" and r["total"] is None)}
