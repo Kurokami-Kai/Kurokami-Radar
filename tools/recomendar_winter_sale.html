@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Winter Sale: o que comprar — Kurokami Hunter</title>
+<style>
+/* paleta Kurokami: --acao compra, --sinal ativo/importante, --azul texto clicável; calor #262626 → #4a1016 → #8a1520 → #d63031 → #ff4757 */
+:root{--bg:#050505;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#7f7f7f;--azul:#ff7675;--sinal:#ff4757;--acao:#d63031;--acao2:#ea2027;--vbg:#4a1016;--vtx:#ff8a94;--borda:#ffffff14}
+*{box-sizing:border-box}
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none}
+body{margin:0;background:radial-gradient(ellipse 1000px 420px at 50% -140px,#5a0f18 0,#050505 70%) no-repeat,var(--bg);background-color:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
+button{font:inherit;color:inherit}
+a{color:var(--azul);text-decoration:none}a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--sinal);outline-offset:3px}
+main{max-width:1180px;margin:0 auto;padding:0 16px 90px}
+.topo{display:flex;align-items:center;gap:6px 18px;flex-wrap:wrap;padding:14px 0 10px;border-bottom:1px solid var(--borda)}
+.topo .marca{color:#fff;font-size:13px;letter-spacing:.12em;text-transform:uppercase}.topo .marca b{color:var(--sinal);font-weight:400}
+.topo .sp{flex:1}
+.topo a,.topo button{background:none;border:0;color:var(--fraco);font-size:13px;cursor:pointer;padding:4px 0}
+.topo a:hover,.topo button:hover{color:#fff;text-decoration:none}
+/* faixa da venda */
+.hero{padding:26px 0 8px}
+.hero h1{margin:0;font-size:30px;font-weight:300;color:#fff;letter-spacing:.01em}.hero h1 b{color:var(--sinal);font-weight:400}
+.hero p{margin:6px 0 0;color:var(--fraco)}.hero p b{color:#fff;font-weight:400}
+.cestas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 6px}
+.cesta{background:#0d0d0dd9;border:0;text-align:left;padding:12px 14px;cursor:pointer;box-shadow:inset 3px 0 0 var(--c,#333);min-width:0}
+.cesta:hover{background:#161616}.cesta[aria-pressed=true]{background:#1c1c1c;box-shadow:inset 3px 0 0 var(--c,#333),0 0 0 1px #ffffff26}
+.cesta small{display:block;color:var(--dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+.cesta b{display:block;color:#fff;font-weight:400;font-size:22px;margin-top:2px}
+.cesta span{display:block;color:var(--fraco);font-size:12.5px;margin-top:2px}.cesta span i{font-style:normal;color:var(--vtx)}
+.v-compre{--c:var(--acao)}.v-espere{--c:var(--sinal)}.v-alem{--c:#8a1520}.v-sem{--c:#3d3d3d}.v-talvez{--c:#3d3d3d}
+/* vereditos */
+.vd{display:inline-block;font-size:11.5px;padding:2px 7px;border-radius:2px;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+.vd.compre{background:var(--acao);color:#fff}.vd.espere{background:var(--vbg);color:var(--vtx)}.vd.alem{background:#262626;color:var(--vtx);box-shadow:inset 0 0 0 1px #8a1520}
+.vd.sem,.vd.talvez{background:#262626;color:#bdbdbd}
+/* bloco de preço da loja */
+.preco{display:inline-flex;align-items:stretch;font-variant-numeric:tabular-nums;white-space:nowrap}
+.preco .pct{background:#262626;color:#e6e6e6;font-size:17px;padding:0 7px;display:flex;align-items:center}
+.preco .pct[data-calor="1"]{background:#2a1a1a;color:#e8b4b4}.preco .pct[data-calor="2"]{background:var(--vbg);color:var(--vtx)}.preco .pct[data-calor="3"]{background:#8a1520;color:#fff}.preco .pct[data-calor="4"]{background:var(--acao);color:#fff}.preco .pct[data-calor="5"]{background:var(--sinal);color:#000}
+.preco .vals{background:#1a1a1a;padding:2px 8px;display:flex;flex-direction:column;justify-content:center;line-height:1.15}
+.preco .vals s{color:var(--dim);font-size:11px}.preco .vals b{color:#fff;font-weight:400;font-size:14px}
+.preco.so .vals{padding:5px 8px}
+.ch{display:inline-block;padding:0 5px;font-size:12px;background:#262626;color:#e6e6e6}
+.ch[data-calor="1"]{background:#2a1a1a;color:#e8b4b4}.ch[data-calor="2"]{background:var(--vbg);color:var(--vtx)}.ch[data-calor="3"]{background:#8a1520;color:#fff}.ch[data-calor="4"]{background:var(--acao);color:#fff}.ch[data-calor="5"]{background:var(--sinal);color:#000}
+/* capas */
+.cap{position:relative;display:block;background:#161616;overflow:hidden}
+.cap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
+.cap .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;font-size:12px;color:#fff;background:linear-gradient(160deg,hsl(var(--h) 35% 28%),hsl(var(--h) 40% 12%))}
+.cap.h{aspect-ratio:460/215}.cap.v{aspect-ratio:2/3}
+/* destaques */
+.secao{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;margin:34px 0 12px;border-bottom:1px solid var(--borda);padding-bottom:6px}
+.secao h2{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.09em;color:#fff;margin:0}
+.secao span{color:var(--fraco);font-size:12.5px;flex:1;min-width:200px}
+.secao button{background:#262626;border:0;color:#d2d2d2;padding:4px 10px;border-radius:2px;cursor:pointer;font-size:12.5px}.secao button:hover{background:#333;color:#fff}
+.dest{display:grid;grid-template-columns:1.6fr 1fr 1fr;grid-template-rows:auto auto;gap:12px}
+.dc{background:var(--pan);cursor:pointer;min-width:0;display:flex;flex-direction:column;transition:background .15s}
+.dc:hover{background:#181818}.dc:hover .cap img{filter:brightness(1.08)}
+.dc:first-child{grid-row:span 2}
+.dc .corpo{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.dc .nm{color:#fff;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc:first-child .nm{font-size:20px}
+.dc .rz{color:var(--fraco);font-size:12.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:36px}
+.dc:first-child .rz{-webkit-line-clamp:4;min-height:0;font-size:13.5px}
+.dc .pe{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;flex-wrap:wrap}
+/* barra de filtros */
+.tool{position:sticky;top:0;z-index:10;background:#050505f2;border-bottom:1px solid var(--borda);padding:8px 0;margin-top:30px;display:flex;flex-direction:column;gap:6px}
+.abas{display:flex;gap:2px;overflow-x:auto}
+.abas button{background:none;border:0;color:var(--fraco);padding:7px 12px;cursor:pointer;white-space:nowrap;font-size:13.5px;box-shadow:inset 0 -2px 0 transparent}
+.abas button:hover{color:#fff}.abas button[aria-pressed=true]{color:#fff;box-shadow:inset 0 -2px 0 var(--sinal)}
+.abas button i{font-style:normal;color:var(--dim);font-size:12px;margin-left:5px}
+.linha{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.chips span{color:var(--dim);font-size:11.5px;margin-right:4px;text-transform:uppercase;letter-spacing:.05em}
+.chips button{background:#ffffff0d;border:0;color:var(--fraco);padding:4px 10px;border-radius:2px;cursor:pointer;font-size:12.5px}
+.chips button:hover{background:#ffffff1a;color:#fff}.chips button[aria-pressed=true]{background:#3d3d3d;color:#fff}
+.linha .sp{flex:1}
+.linha input{background:#0d0d0d;border:0;box-shadow:inset 0 0 0 1px #333;color:#fff;padding:6px 10px;border-radius:2px;font:inherit;font-size:13px;width:230px;max-width:100%}
+.linha input:focus{box-shadow:inset 0 0 0 1px var(--sinal);outline:0}
+.ativo{display:inline-flex;align-items:center;gap:6px;background:var(--vbg);color:var(--vtx);font-size:12.5px;padding:3px 4px 3px 9px;border-radius:2px}
+.ativo button{background:none;border:0;color:var(--vtx);cursor:pointer;padding:0 4px;font-size:14px}
+/* linhas (estilo das abas da loja) */
+.lista{display:flex;flex-direction:column;gap:4px}
+.row{display:grid;grid-template-columns:184px minmax(0,1fr) 150px auto;gap:14px;align-items:center;background:var(--pan);padding:0 12px 0 0;cursor:pointer;min-height:69px}
+.row:hover{background:#181818}
+.row .cap{width:184px;height:69px;aspect-ratio:auto}
+.row .tx{min-width:0;padding:6px 0}
+.row .nm{color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .rz{color:var(--fraco);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .tg{color:var(--dim);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.row .pv{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.row .pv small{color:var(--dim);font-size:11px;white-space:nowrap}
+.mais{display:block;margin:8px auto 0;background:#262626;border:0;color:#d2d2d2;padding:7px 18px;border-radius:2px;cursor:pointer}.mais:hover{background:#333;color:#fff}
+/* tira de calor: maior desconto de cada mes */
+.tira{display:flex;gap:1px;height:16px;align-items:stretch}
+.tira i{flex:1;background:#1c1c1c;position:relative}
+.tira i.x{background:transparent}
+.tira i[data-calor="1"]{background:#3a2020}.tira i[data-calor="2"]{background:var(--vbg)}.tira i[data-calor="3"]{background:#8a1520}.tira i[data-calor="4"]{background:var(--acao)}.tira i[data-calor="5"]{background:var(--sinal)}
+.tira i.inv::after{content:"";position:absolute;left:0;right:0;top:-4px;height:2px;background:#ffffff40}
+.tira i.reg{box-shadow:-2px 0 0 #fff}
+.tira-l{display:flex;justify-content:space-between;color:var(--dim);font-size:11px;margin-top:3px}
+.vazio{color:var(--fraco);padding:40px 0;text-align:center}
+/* ficha */
+.fundo{position:fixed;inset:0;z-index:50;background:#000c;display:none;overflow-y:auto;padding:30px 12px}
+.fundo.on{display:block}
+.ficha{max-width:980px;margin:0 auto;background:#0d0d0d;box-shadow:0 20px 60px #000;position:relative}
+.fx{position:absolute;top:8px;right:10px;z-index:3;background:#000a;border:0;color:#fff;font-size:22px;cursor:pointer;padding:2px 11px;border-radius:2px}.fx:hover{background:#000}
+.fbanner{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0}
+.fbanner .cap{aspect-ratio:460/215}
+.fbanner .lado{padding:16px 20px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.fbanner h2{margin:0;font-size:22px;font-weight:400;color:#fff;padding-right:30px}
+.meta{color:var(--fraco);font-size:12.5px}.meta strong{color:#fff;font-weight:400}
+.fcorpo{padding:4px 20px 22px}
+.veredito{margin:14px 0 4px;padding:12px 16px;background:#161616;box-shadow:inset 3px 0 0 var(--c)}
+.veredito h3{margin:0 0 4px;font-size:18px;font-weight:400;color:#fff}
+.veredito p{margin:0;color:var(--txt);font-size:13.5px}
+.caixas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+.cx{background:#161616;padding:9px 12px}
+.cx small{display:block;color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.cx b{font-weight:400;color:#fff;font-size:18px;font-variant-numeric:tabular-nums}
+.cx em{font-style:normal;color:var(--fraco);font-size:12px;display:block}
+.cx.ac b{color:var(--sinal)}
+h4{font-size:12.5px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:22px 0 8px;border-bottom:1px solid var(--borda);padding-bottom:5px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{color:var(--dim);font-weight:400;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px}
+td{padding:6px 8px;border-top:1px solid #ffffff0d;font-variant-numeric:tabular-nums}
+td.n,th.n{text-align:right}
+tr.esp td{background:#ffffff08}tr.aqui td{background:#4a101666}
+.tw{overflow-x:auto}
+.pb{display:inline-block;vertical-align:middle;width:110px;height:8px;background:#ffffff12;margin-right:8px}.pb i{display:block;height:100%;background:var(--acao)}
+.nota{color:var(--fraco);font-size:12.5px;margin:8px 0 0;line-height:1.6}.nota b{color:#fff;font-weight:400}
+.aviso{margin:10px 0;padding:9px 14px;background:#4a10168c;box-shadow:inset 3px 0 0 var(--sinal);font-size:13px}
+.ftira .tira{height:26px}
+.met{padding:22px 24px 26px}.met h2{margin:0;color:#fff;font-weight:400;font-size:22px}
+@media(max-width:900px){.cestas{grid-template-columns:repeat(2,minmax(0,1fr))}.dest{grid-template-columns:1fr 1fr}.dc:first-child{grid-column:span 2;grid-row:auto}
+  .row{grid-template-columns:120px minmax(0,1fr) auto}.row .cap{width:120px;height:56px}.row .ti{display:none}}
+@media(max-width:600px){.hero h1{font-size:24px}.dest{grid-template-columns:1fr}.dc:first-child{grid-column:auto}
+  .row{grid-template-columns:96px minmax(0,1fr);padding:0;align-items:start;gap:10px}.row .cap{width:96px;height:45px;margin-top:6px}.row .pv{grid-column:2;align-items:flex-start;flex-direction:row;flex-wrap:wrap;padding-bottom:8px}
+  .fbanner{grid-template-columns:1fr}.fcorpo,.fbanner .lado{padding-left:14px;padding-right:14px}.fundo{padding:0}.linha input{width:100%}}
+</style>
+</head>
+<body>
+<main id="main"></main>
+<div class="fundo" id="fundo"><div class="ficha" id="ficha"></div></div>
+<script>
+/*DADOS*/
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const brl=c=>'R$ '+(c/100).toFixed(2).replace('.',',');
+const brl0=c=>'R$ '+Math.round(c/100).toLocaleString('pt-BR');
+const pct=p=>p==null?'—':p<=0?'<1%':p>=99?'99%+':p+'%';
+const calorD=p=>p>=80?5:p>=65?4:p>=50?3:p>=30?2:p>0?1:0;
+const chip=p=>p>0?`<span class="ch" data-calor="${calorD(p)}">-${p}%</span>`:'';
+const precoSteam=(ch,c)=>{if(!c)return ch;const p=ch*(100-c)/100;return Math.floor((p+1)/10)*10-1;};
+const corteDe=(l,p)=>Math.max(0,Math.round(100*(1-p/l.ch)));
+const mesAno=s=>s?s.slice(5)+'/'+s.slice(0,4):'';
+// capas: o gerador tirou 'appid/' e '?t=' (1 = nome padrão da Steam; '/x' = caminho sem appid)
+const CDN='https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/', CL='https://cdn.cloudflare.steamstatic.com/steam/apps/';
+const url=(l,x,pad)=>x==null?null:typeof x==='string'&&/^https?:/.test(x)?x:CDN+(x===1?l.a+'/'+pad:x[0]==='/'?x.slice(1):l.a+'/'+x);
+const capasH=l=>[url(l,l.hd,'header.jpg'),CL+l.a+'/header.jpg',url(l,l.cv,'library_600x900_2x.jpg'),CL+l.a+'/library_600x900.jpg'].filter(Boolean);
+const capasV=l=>[url(l,l.cv,'library_600x900_2x.jpg'),CL+l.a+'/library_600x900.jpg',url(l,l.hd,'header.jpg')].filter(Boolean);
+const LA=new Map(L.map(l=>[l.a,l]));
+function cf(img){
+  const l=LA.get(+img.dataset.a), c=img.dataset.k==='v'?capasV(l):capasH(l), i=(+img.dataset.s||0)+1;
+  if(i>=c.length){img.remove();return;}
+  img.dataset.s=i;img.src=c[i];
+}
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+function cap(l,k){k=k||'h';const c=k==='v'?capasV(l):capasH(l);
+  return `<span class="cap ${k}"><img loading="lazy" data-a="${l.a}" data-k="${k}" src="${c[0]}" alt="" onerror="cf(this)"><span class="ph" style="--h:${hue(l.n)}">${esc(l.n)}</span></span>`;}
+// ---- vereditos
+const V={compre:['Compre agora','A oferta de hoje dificilmente fica mais barata no inverno.'],
+  espere:['Espere a Winter Sale','O inverno deve sair mais barato que hoje.'],
+  alem:['Espere além do inverno','Jogo novo, ainda longe do desconto que jogos da faixa costumam alcançar.'],
+  sem:['Sem promoção prevista','Pouca chance de desconto no inverno.'],
+  talvez:['Tanto faz','Diferença pequena entre hoje e o inverno.']};
+const ORDEM_V=['compre','espere','alem','sem','talvez'];
+const provavel=l=>l.md, eco=l=>l.h-l.md;
+function razao(l){
+  const piso=l.pz!=null&&l.ms?(l.md<=l.ms*1.01+10?` · é o menor da Steam neste preço cheio (${brl(l.ms)})`:''):'';
+  if(l.v==='compre')return `Hoje -${l.hc}% = ${brl(l.h)}${l.fim?' até '+l.fim:''}. No inverno, só ${pct(l.pcai)} de chance de ficar mais barato${l.ms&&l.h<=l.ms*1.01+10?' · já é o menor da Steam neste preço cheio':''}.`;
+  if(l.v==='espere')return `${pct(l.pcai)} de chance de cair. Provável: ${brl(l.md)} (-${l.cm}%), ${brl(eco(l))} a menos que hoje${piso}.`;
+  if(l.v==='alem')return `Lançado há ${l.id} ${l.id===1?'mês':'meses'}; ${M.traj[l.fx].nome} chegam a -${l.ak}% com ~${l.am} meses. Inverno: provável -${l.cm}% (${brl(l.md)}); -${l.ak}% (${brl(precoSteam(l.ch,l.ak))}) só ${pct(l.ai)}. Até o próximo inverno: ${pct(l.aa)}.`;
+  if(l.v==='sem')return `Só ${pct(l.pp)} de chance de ter promoção no inverno${l.p1!=null?' (nunca teve neste preço cheio)':''}.`;
+  return `${pct(l.pcai)} de chance de cair; provável ${brl(l.md)}, economia pequena (${brl(Math.max(eco(l),0))}).`;
+}
+function blocoPreco(l,alvo){
+  // alvo=true: preço provável no inverno; senão o de hoje (riscado = preço cheio, como na loja)
+  if(alvo&&l.md<l.h){const c=corteDe(l,l.md);return `<span class="preco"><span class="pct" data-calor="${calorD(c)}">-${c}%</span><span class="vals"><s>${brl(l.ch)}</s><b>${brl(l.md)}</b></span></span>`;}
+  if(l.hc)return `<span class="preco"><span class="pct" data-calor="${calorD(l.hc)}">-${l.hc}%</span><span class="vals"><s>${brl(l.ch)}</s><b>${brl(l.h)}</b></span></span>`;
+  return `<span class="preco so"><span class="vals"><b>${brl(l.h)}</b></span></span>`;
+}
+function tira(l){
+  // um caractere por mês (corte/5 em base 20; '.' = sem histórico); dez/jan marcados; traço branco = começo do preço cheio de hoje
+  const [y0,m0]=M.tira_ini.split('-').map(Number);
+  return `<span class="tira" title="Maior desconto da Steam em cada mês (36 meses)">${[...l.tr].map((ch,i)=>{const m=(m0-1+i)%12, y=y0+Math.floor((m0-1+i)/12);
+    if(ch==='.')return '<i class="x"></i>';const c=parseInt(ch,20)*5;
+    return `<i data-calor="${calorD(c)}" class="${m===11||m===0?'inv':''} ${i===l.tri?'reg':''}" title="${String(m+1).padStart(2,'0')}/${y}: ${c?'-'+c+'%':'sem desconto'}"></i>`}).join('')}</span>`;
+}
+// ---- estado
+const st={v:'todos',tipo:'jogo',faixa:'',ord:'op',q:'',fr:'',lim:{}};
+const FAIXAS=[['','Qualquer preço'],['25','Até R$ 25'],['50','R$ 25–50'],['100','R$ 50–100'],['mais','R$ 100+']];
+const ORD={op:['Melhor oportunidade',(a,b)=>b.sc-a.sc],eco:['Maior economia',(a,b)=>eco(b)-eco(a)],
+  desc:['Maior desconto provável',(a,b)=>b.cm-a.cm||eco(b)-eco(a)],cai:['Mais chance de cair',(a,b)=>b.pcai-a.pcai||b.cm-a.cm],
+  rec:['Chance de novo menor (Steam)',(a,b)=>(b.pn||0)-(a.pn||0)||b.cm-a.cm],barato:['Menor preço provável',(a,b)=>a.md-b.md],az:['A–Z',(a,b)=>a.n.localeCompare(b.n)]};
+function passa(l,semV){
+  if(!semV&&st.v!=='todos'&&l.v!==st.v)return false;
+  if(st.tipo==='jogo'&&l.t==='dlc')return false;
+  if(st.tipo==='dlc'&&l.t!=='dlc')return false;
+  if(st.faixa){const p=l.md/100;if(st.faixa==='25'&&p>25||st.faixa==='50'&&(p<=25||p>50)||st.faixa==='100'&&(p<=50||p>100)||st.faixa==='mais'&&p<=100)return false;}
+  if(st.fr&&l.f!==st.fr)return false;
+  if(st.q){const q=st.q.toLowerCase();if(!l.n.toLowerCase().includes(q)&&!l.f.toLowerCase().includes(q))return false;}
+  return true;
+}
+// ---- peças
+function dias(){const [d,m,a]=M.inicio.split('/').map(Number);return Math.max(0,Math.ceil((Date.UTC(a,m-1,d)-Date.now())/864e5));}
+function cestas(){
+  const it=L.filter(l=>passa(l,true)), por=v=>it.filter(l=>l.v===v), s=(a,f)=>a.reduce((x,l)=>x+f(l),0);
+  const c=por('compre'),e=por('espere'),a=por('alem');
+  const b=(v,tit,n,linha)=>`<button class="cesta v-${v}" data-cv="${v}" aria-pressed="${st.v===v}"><small>${tit}</small><b>${n}</b><span>${linha}</span></button>`;
+  return `<div class="cestas">${b('compre','Compre agora',c.length,`cesta hoje <i>${brl0(s(c,l=>l.h))}</i>`)}
+   ${b('espere','Espere a Winter Sale',e.length,`${brl0(s(e,l=>l.h))} hoje → <i>${brl0(s(e,l=>l.md))}</i> provável`)}
+   ${b('alem','Espere além do inverno',a.length,`jogos novos: o ápice vem depois`)}
+   ${b('sem','Sem promoção prevista',por('sem').length,`${por('talvez').length} mais em "tanto faz"`)}</div>`;
+}
+function destaque(l){
+  return `<div class="dc" data-a="${l.a}" role="button" tabindex="0">${cap(l,'h')}<div class="corpo">
+    <div class="nm" title="${esc(l.n)}">${esc(l.n)}</div><div><span class="vd ${l.v}">${V[l.v][0]}</span></div>
+    <div class="rz">${esc(razao(l))}</div>
+    <div class="pe"><small style="color:var(--dim);font-size:11.5px">${l.v==='compre'?'hoje':'provável no inverno'}</small>${blocoPreco(l,l.v!=='compre')}</div></div></div>`;
+}
+function linha(l){
+  const tags=[l.f!==l.n?l.f:'',l.t==='dlc'?'DLC':'',l.ano||'',l.rc>=50?l.rp+'% de '+l.rc.toLocaleString('pt-BR')+' análises':''].filter(Boolean).join(' · ');
+  return `<div class="row" data-a="${l.a}" role="button" tabindex="0">${cap(l,'h')}
+    <div class="tx"><div class="nm" title="${esc(l.n)}"><span class="vd ${l.v}" style="margin-right:7px">${V[l.v][0]}</span>${esc(l.n)}</div>
+     <div class="rz" title="${esc(razao(l))}">${esc(razao(l))}</div><div class="tg">${esc(tags)}</div></div>
+    <div class="ti">${tira(l)}</div>
+    <div class="pv">${l.v==='compre'||l.v==='sem'?blocoPreco(l,false):blocoPreco(l,true)}<small>${l.v==='compre'||l.v==='sem'?'hoje':'provável no inverno · '+pct(l.pcai)+' de cair'}</small></div></div>`;
+}
+function ferramentas(){
+  const n=v=>L.filter(l=>(v==='todos'||l.v===v)&&passa(l,true)).length;
+  const btn=(k,v,rot,at)=>`<button data-${k}="${v}" aria-pressed="${at===v}">${rot}</button>`;
+  return `<div class="tool"><div class="abas">${['todos',...ORDEM_V].map(v=>`<button data-v="${v}" aria-pressed="${st.v===v}">${v==='todos'?'Todos':V[v][0]}<i>${n(v)}</i></button>`).join('')}</div>
+   <div class="linha"><div class="chips"><span>Tipo</span>${[['jogo','Jogos'],['dlc','DLCs'],['','Tudo']].map(([k,r])=>btn('tipo',k,r,st.tipo)).join('')}</div>
+   <div class="chips"><span>Preço no inverno</span>${FAIXAS.map(([k,r])=>btn('faixa',k,r,st.faixa)).join('')}</div>
+   ${st.fr?`<span class="ativo">Franquia: ${esc(st.fr)}<button data-tirafr="1" aria-label="Tirar filtro">✕</button></span>`:''}
+   <span class="sp"></span><input id="q" placeholder="Buscar jogo ou franquia…  ( / )" value="${esc(st.q)}" autocomplete="off"></div>
+   <div class="chips"><span>Ordem</span>${Object.entries(ORD).map(([k,v])=>btn('ord',k,v[0],st.ord)).join('')}</div></div>`;
+}
+const POR_SECAO=24;
+function secao(v,it){
+  const lim=st.lim[v]||POR_SECAO;
+  return `<div class="secao"><h2>${V[v][0]} · ${it.length}</h2><span>${V[v][1]}</span></div>
+    <div class="lista">${it.slice(0,lim).map(linha).join('')}</div>${it.length>lim?`<button class="mais" data-mais="${v}">Ver mais ${Math.min(it.length-lim,96)} de ${it.length-lim}</button>`:''}`;
+}
+function desenhar(){
+  const y=scrollY;
+  const it=L.filter(l=>passa(l)).sort(ORD[st.ord][1]);
+  const ops=L.filter(l=>(l.v==='espere'||l.v==='compre')&&l.t!=='dlc'&&l.rc>=300&&l.rp>=80).sort((a,b)=>b.sc-a.sc).slice(0,5);
+  let corpo;
+  if(!it.length)corpo='<div class="vazio">Nada com esse filtro.</div>';
+  else if(st.v==='todos')corpo=ORDEM_V.map(v=>[v,it.filter(l=>l.v===v)]).filter(x=>x[1].length).map(([v,x])=>secao(v,x)).join('');
+  else corpo=secao(st.v,it);
+  $('#main').innerHTML=`<div class="topo"><span class="marca">Kurokami <b>Hunter</b> · lista de desejos</span><span class="sp"></span>
+     <a href="previsao-winter-sale-${M.inicio.slice(-4)}.html">Franquias e cenários</a><button id="met">Como foi calculado</button></div>
+   <div class="hero"><h1>Winter Sale <b>${M.inicio.slice(-4)}</b> · o que comprar e o que esperar</h1>
+    <p>Venda de <b>${M.inicio}</b> a <b>${M.fim}</b> · faltam <b>${dias()}</b> dias · ${L.length} itens da sua lista com histórico · preços de hoje (${M.gerado}) e o que os invernos de 2023–2025 fizeram.</p>
+    ${cestas()}</div>
+   ${ops.length&&!st.q&&!st.fr?`<div class="secao"><h2>Melhores oportunidades</h2><span>Jogos bem avaliados com a maior economia provável e chance de chegar ao menor preço da Steam</span></div>
+    <div class="dest">${ops.map(destaque).join('')}</div>`:''}
+   ${ferramentas()}${corpo}`;
+  const q=$('#q');q.oninput=()=>{st.q=q.value;st.lim={};const p=q.selectionStart;desenhar();const n=$('#q');n.focus();n.setSelectionRange(p,p);};
+  scrollTo(0,y);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-v],[data-tipo],[data-faixa],[data-ord],[data-cv],[data-mais],[data-tirafr],[data-fr]');
+  if(b){const d=b.dataset;e.preventDefault();
+    if(d.mais)st.lim[d.mais]=(st.lim[d.mais]||POR_SECAO)+96;
+    else if(d.tirafr)st.fr='';
+    else if(d.fr!=null){st.fr=d.fr;fechar();}
+    else if(d.cv)st.v=st.v===d.cv?'todos':d.cv;
+    else{const k=Object.keys(d)[0];st[k]=d[k];}
+    if(!d.mais)st.lim={};
+    desenhar();if(d.cv||d.fr!=null)$('.tool').scrollIntoView({block:'start'});return;}
+  if(e.target.closest('#met')){metodo();return;}
+  if(e.target.closest('.fx')||e.target===$('#fundo')){fechar();return;}
+  const r=e.target.closest('.row[data-a],.dc[data-a]');if(r&&!r.closest('#ficha')){ficha(+r.dataset.a);}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if($('#fundo').classList.contains('on'))fechar();else if(document.activeElement===$('#q')){st.q='';desenhar();}}
+  else if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();$('#q').focus();}
+  else if(e.key==='Enter'&&document.activeElement.matches('.row,.dc'))document.activeElement.click();
+});
+function abrir(h){$('#ficha').innerHTML='<button class="fx" aria-label="Fechar">×</button>'+h;$('#ficha').querySelectorAll('table').forEach(x=>{const w=document.createElement('div');w.className='tw';x.replaceWith(w);w.appendChild(x);});$('#fundo').classList.add('on');$('#fundo').scrollTop=0;}
+function fechar(){$('#fundo').classList.remove('on');}
+// ---- ficha
+function escada(l){
+  const linhas=l.e.map(r=>[r[0],r[1],r[2]]);
+  if(!linhas.some(r=>r[1]===l.md)&&l.md<l.ch)linhas.push([corteDe(l,l.md),l.md,null]);
+  linhas.sort((a,b)=>a[0]-b[0]);
+  return `<table><tr><th>Desconto</th><th class="n">Preço</th><th>Chance de chegar ao menos aqui</th><th>Frente a hoje e ao menor da Steam</th></tr>`
+   +linhas.map(r=>{const [c,p,ch]=r;
+     const fr=[p<l.h?`<span style="color:var(--vtx)">${brl(l.h-p)} abaixo de hoje</span>`:p>l.h?`${brl(p-l.h)} acima de hoje`:'igual a hoje',
+       l.ms&&l.pz!=null?(p<l.ms*.99-10?'<span style="color:var(--sinal)">novo menor da Steam</span>':p<=l.ms*1.01+10?'<span style="color:var(--vtx)">empata o menor da Steam</span>':''):''].filter(Boolean).join(' · ');
+     return `<tr class="${p===l.md?'esp':''}"><td>${c?chip(c):'sem desconto'}${p===l.md?' <small style="color:var(--dim)">provável</small>':''}</td><td class="n">${brl(p)}</td>
+       <td>${ch==null?'<small style="color:var(--dim)">metade das chances</small>':`<span class="pb"><i style="width:${ch}%"></i></span>${pct(ch)}`}</td><td>${fr}</td></tr>`}).join('')+'</table>';
+}
+function apiceHtml(l){
+  const t=M.traj[l.fx]; if(!t)return '';
+  const linhas=Object.entries(t.k).map(([k,v])=>{k=+k;const ja=l.mx>=k;
+    return `<tr class="${k===t.apice?'esp':''}"><td>${chip(k)}${k===t.apice?' <small style="color:var(--dim)">ápice típico</small>':''}</td><td class="n">${v.med?'~'+v.med+' meses':'mais de 3 anos'}</td>
+     <td class="n">${v.m12}%</td><td class="n">${v.m24}%</td><td class="n">${v.m36}%</td><td>${ja?'<span style="color:var(--vtx)">já chegou</span>':k===l.ak?`inverno ${pct(l.ai)} · até o próximo ${pct(l.aa)}`:''}</td></tr>`}).join('');
+  return `<h4>Trajetória de desconto pela idade · ${esc(t.nome)}</h4>
+   <table><tr><th>Degrau</th><th class="n">Metade chega com</th><th class="n">até 1 ano</th><th class="n">2 anos</th><th class="n">3 anos</th><th>Este jogo${l.id!=null?' ('+l.id+' meses)':''}</th></tr>${linhas}</table>
+   <p class="nota">Quanto dos ${t.n.toLocaleString('pt-BR')} lançamentos desde out/2021 dessa faixa já tinha chegado a cada desconto na Steam, pela idade. ${l.id!=null&&l.id>48?'Este jogo é mais velho que a curva: ela serve só de referência.':''}</p>`;
+}
+function ficha(a){
+  const l=LA.get(a); if(!l)return;
+  const pr=l.e.length?Math.max(...l.e.map(r=>r[0])):0;
+  const regime=l.ri?`<div class="aviso">O preço cheio mudou em ${mesAno(l.ri)} (antes ${l.rc0?brl(l.rc0):'outro'}, hoje ${brl(l.ch)}): os recordes abaixo contam só desde então.${l.mb&&l.mb<(l.mn||1e12)*.95?` O menor de todo o histórico foi ${brl(l.mb)} (${esc(l.mbl)}, ${mesAno(l.mbq)}), sobre o preço antigo: não dá para comparar.`:''}</div>`:'';
+  const [y0,m0]=M.tira_ini.split('-').map(Number);
+  abrir(`<div class="fbanner">${cap(l,'h')}<div class="lado"><h2>${esc(l.n)}</h2>
+     <div class="meta">${l.f!==l.n?`Franquia <a href="#" data-fr="${esc(l.f)}">${esc(l.f)}</a> · `:''}${l.t==='dlc'?'DLC · ':''}${l.ano?l.ano+' · ':''}${l.rc>=50?l.rp+'% positivas ('+l.rc.toLocaleString('pt-BR')+') · ':''}<a href="https://store.steampowered.com/app/${l.a}/" target="_blank" rel="noopener">abrir na Steam</a></div>
+     <div style="margin-top:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div><small style="color:var(--dim);font-size:11px;display:block">HOJE</small>${blocoPreco(l,false)}</div>
+     ${l.md<l.h?`<div><small style="color:var(--dim);font-size:11px;display:block">PROVÁVEL NO INVERNO</small>${blocoPreco(l,true)}</div>`:''}</div></div></div>
+   <div class="fcorpo">
+   <div class="veredito v-${l.v}"><h3>${V[l.v][0]}</h3><p>${esc(razao(l))}</p></div>
+   ${regime}
+   <div class="caixas">
+    <div class="cx ac"><small>Fica mais barato que hoje</small><b>${pct(l.pcai)}</b><em>chance de algum desconto: ${pct(l.pp)}</em></div>
+    <div class="cx"><small>Provável no inverno</small><b>${brl(l.md)}</b><em>${l.cm?'-'+l.cm+'% · metade das chances é isso ou menos':'sem desconto'}</em></div>
+    <div class="cx"><small>Melhor cenário (1 em 6)</small><b>${brl(l.bm)}</b><em>${corteDe(l,l.bm)?'-'+corteDe(l,l.bm)+'%':'sem desconto'}</em></div>
+    <div class="cx"><small>Menor da Steam ${l.ri?'neste preço':'no histórico'}</small><b>${l.p1!=null?'—':l.ms?brl(l.ms):'—'}</b><em>${l.p1!=null?'nunca teve promoção neste preço cheio':l.pz!=null?mesAno(l.msq)+' · chega lá: '+pct(l.pz)+' · bate: '+pct(l.pn):''}</em></div>
+    <div class="cx"><small>Menor em qualquer loja</small><b>${l.mn?brl(l.mn):'—'}</b><em>${l.mn?esc(l.ml)+' · '+mesAno(l.mq)+(l.ml!=='Steam'?' · chave, câmbio de hoje':''):''}</em></div></div>
+   ${l.hc&&l.fim?`<p class="nota">A promoção de hoje (-${l.hc}%) vai até <b>${l.fim}</b>.</p>`:''}
+   <h4>Cenários na Winter Sale</h4>${escada(l)}
+   <p class="nota">A chance de cada degrau vem de como os invernos de 2023–2025 se comportaram em jogos parecidos (confiança ${l.c}, ponto de partida ${l.pc?'-'+l.pc+'%':'sem desconto'}: o maior desconto da Steam dos últimos 6 meses).</p>
+   <h4>Maior desconto da Steam por mês</h4><div class="ftira">${tira(l)}<div class="tira-l"><span>${String(m0).padStart(2,'0')}/${y0}</span><span>${l.tri>=0?'traço branco: começa o preço cheio de hoje · ':''}tracinho em cima: dez/jan</span><span>hoje</span></div></div>
+   <p class="nota">O histórico começa em out/2021 (ITAD): um preço de antes disso não aparece. ${l.mb&&l.mbl!=='Steam'?`Menor de todo o histórico (qualquer loja): ${brl(l.mb)} na ${esc(l.mbl)}, ${mesAno(l.mbq)}.`:''}</p>
+   ${l.fx&&(l.id==null||l.id<=60)?apiceHtml(l):''}</div>`);
+}
+// ---- método
+function metodo(){
+  const bt=M.bt, nm={compre:'Compre agora',espere:'Espere a Winter Sale',alem:'Espere além do inverno',sem:'Sem promoção prevista',talvez:'Tanto faz'};
+  const tab=(cab,rows)=>`<table><tr>${cab.map((c,i)=>`<th class="${i?'n':''}">${c}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${i?'n':''}">${c}</td>`).join('')}</tr>`).join('')}</table>`;
+  const ca=Object.entries(M.cal_anos);
+  $('#ficha').innerHTML='';
+  abrir(`<div class="met"><h2>Como foi calculado</h2>
+  <h4>A pergunta de cada jogo</h4>
+  <p class="nota">Para quem compra, o que importa é: <b>o inverno sai mais barato que hoje? quanto? com que chance?</b> e <b>chega no menor preço que a Steam já fez neste preço cheio?</b> Bater um recorde absoluto é raro por natureza (${Object.entries(M.taxa_novo).map(([y,v])=>y+': '+String(v).replace('.',',')+'%').join(' · ')} dos jogos por inverno) e o "menor de qualquer loja" costuma ser chave de loja estrangeira convertida pelo câmbio de hoje; por isso ele aparece na ficha, mas não decide o veredito.</p>
+  <h4>Os vereditos</h4>
+  <p class="nota"><b>Compre agora</b>: em promoção hoje e menos de 40% de chance de o inverno sair mais barato (ou já no menor da Steam neste preço cheio, com pouca chance de bater).<br>
+  <b>Espere a Winter Sale</b>: 50%+ de chance de cair e economia provável de R$ 2 e 5% ou mais.<br>
+  <b>Espere além do inverno</b>: jogo com menos de 4 anos que ainda não chegou ao ápice típico da faixa de preço; o inverno provavelmente fica 15+ pontos abaixo dele, com menos de 50% de chance de chegar lá, mas a curva por idade dá 50%+ de chegar até o próximo inverno.<br>
+  <b>Sem promoção prevista</b>: menos de 40% de chance de qualquer desconto. <b>Tanto faz</b>: o resto (diferença pequena).<br>
+  <b>Provável no inverno</b> = metade das chances é esse preço ou menos. <b>Melhor oportunidade</b> = economia provável × chance de chegar no menor da Steam × nota (DLC vale menos).</p>
+  <h4>Os vereditos nos invernos passados</h4>
+  <p class="nota">Cada jogo da lista em 2 de novembro de 2023, 2024 e 2025, só com o que se sabia naquele dia (chances sem o ano testado, curva por idade só com o que já tinha acontecido), comparado com o que aconteceu:</p>
+  ${tab(['Veredito','Casos','Inverno mais barato que 2/11','Economia média','Sem promoção no inverno','Ano seguinte 10% abaixo do inverno','Chegou ao ápice'],
+    ORDEM_V.filter(v=>bt[v]).map(v=>{const x=bt[v];return [nm[v],x.n,x.cai+'%',(x.eco>=0?'':'−')+Math.abs(x.eco)+'%',x.sem+'%',x.depois==null?'—':x.depois+'%',x.apice==null?'—':x.apice+'% de '+x.ap_n]}))}
+  <p class="nota">"Ano seguinte" vai do fim do inverno até a véspera do próximo (para 2025, só até hoje). "Chegou ao ápice": jogos novos que, no inverno ou depois, chegaram ao desconto típico da faixa.</p>
+  <h4>"Fica mais barato que hoje": previsto × aconteceu</h4>
+  ${tab(['Chance prevista','Casos','Previsto','Aconteceu'],M.bt_cx.map(c=>[c.faixa,c.n,c.prev+'%',c.real+'%']))}
+  <h4>Menor preço no regime do preço cheio</h4>
+  <p class="nota">O recorde conta só desde que vale o preço cheio de hoje: o período em que o cheio da Steam ficou a ±10% do atual (começa na primeira mudança depois do último preço fora da faixa). ${M.regime} dos ${L.length} jogos mudaram de preço cheio; em ${M.regime_muda} o recorde mudou mais de 5% com essa regra. Jogo sem promoção desde então vira "primeira promoção neste preço". No teste (ano de fora, regime calculado só com o que se sabia em 2/11):</p>
+  ${tab(['Inverno','Jogos','Chegar no menor da Steam: previsto','real','Bater o menor da Steam: previsto','real','Chegar no menor de qualquer loja: previsto','real'],
+    ca.map(([y,v])=>[y,v.n,v.esp_e,v.real_e,v.esp,v.real,M.cal_qq[y].esp_e,M.cal_qq[y].real_e]))}
+  <h4>Trajetória por idade</h4>
+  <p class="nota">Lançamentos desde out/2021 com o histórico da Steam no banco (a Steam inteira em promoção e a sua lista): Kaplan-Meier do tempo até o primeiro desconto de cada degrau, por faixa de preço cheio no lançamento. O "ápice típico" é o maior degrau que metade da faixa alcança em 3 anos. A curva para onde sobram menos de 30 jogos.</p>
+  ${tab(['Faixa','Lançamentos','Ápice típico','Metade a -33%','-50%','-66%','-75%'],Object.values(M.traj).map(t=>[t.nome,t.n.toLocaleString('pt-BR'),'-'+t.apice+'%',...[33,50,66,75].map(k=>t.k[k].med?'~'+t.k[k].med+' meses':'—')]))}
+  <p class="nota">Teste em 2/11/2023 e 2/11/2024 com todos os lançamentos do banco (só onde a curva da data já via a idade inteira): chance prevista de chegar ao ápice até o fim do inverno seguinte ao próximo × o que aconteceu.</p>
+  ${tab(['Chance prevista','Casos','Previsto','Aconteceu'],M.bt_ap.map(c=>[c.faixa,c.n,c.prev+'%',c.real+'%']))}
+  <h4>Limites</h4>
+  <p class="nota">Estatística, não garantia: não sabe de decisões da publicadora, de sequências nem de mudanças de preço cheio. A Promoção de Outono (fim de novembro) pode mudar o quadro. O histórico começa em out/2021. A curva por idade usa jogos que hoje aparecem em promoção (quem nunca desconta pesa menos) e, no teste, ficou um pouco cautelosa nas faixas do meio. "Espere além" só pôde ser testado em 2025 (antes, a curva ainda não via idades longas). Fora da página ficaram ${Object.values(M.sem).reduce((a,b)=>a+b,0)} itens (${Object.entries(M.sem).map(([k,v])=>v+' '+k).join(', ')}). Venda: ${M.inicio} a ${M.fim} (<a href="https://partner.steamgames.com/doc/marketing/upcoming_events/2026_winter_sale" target="_blank" rel="noopener">Steamworks</a>).</p></div>`);
+}
+desenhar();
+</script>
+</body>
+</html>

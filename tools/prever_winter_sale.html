@@ -184,7 +184,8 @@ function ferramentas(){
    <span class="sp"></span>
    <input id="q" placeholder="Buscar jogo ou franquia…" value="${esc(st.q)}" autocomplete="off">
    <span class="views">${btn('vista','col','Coleção',st.vista)}${btn('vista','fr','Franquias',st.vista)}</span>
-   <button class="bq-btn" id="met">Como foi calculado</button></div>`;
+   <button class="bq-btn" id="met">Como foi calculado</button>
+   <a class="bq-btn" style="text-decoration:none" href="recomendacoes-winter-sale-${M.inicio.slice(-4)}.html">O que comprar →</a></div>`;
 }
 function itemColecao(f){
   if(f.it.length===1){
@@ -241,12 +242,12 @@ const CONF={A:'Confiança A: o desconto previsto já apareceu 2+ vezes no últim
   B:'Confiança B: esse nível de desconto apareceu só 1 vez (ou o preço cheio mudou).',
   C:'Confiança C: jogo com menos de 18 meses; jogos novos costumam descontar mais a cada ano.'};
 function escadaHtml(l){
-  return `<table><tr><th>Cenário</th><th class="n">Desconto</th><th class="n">Preço</th><th>Chance de chegar ao menos aqui</th><th>Frente ao menor histórico</th></tr>`
+  return `<table><tr><th>Cenário</th><th class="n">Desconto</th><th class="n">Preço</th><th>Chance de chegar ao menos aqui</th><th>Frente ao menor da Steam</th></tr>`
    +l.e.map(r=>{
      const nome=r[0]===l.pc?'Esperado (ponto de partida)':r[0]<l.pc?'Abaixo do esperado':'Acima do esperado';
-     const tg=r[3]===2?`<span class="tg novo">novo menor histórico (${brl(l.mn-r[1])} abaixo)</span>`
-       :r[3]===1?`<span class="tg emp">empata o menor (${brl(l.mn)})</span>`
-       :l.mn?`<span class="tg">${brl(r[1]-l.mn)} acima do menor</span>`:'';
+     const tg=r[3]===2?`<span class="tg novo">novo menor da Steam (${brl(l.ms-r[1])} abaixo)</span>`
+       :r[3]===1?`<span class="tg emp">empata o menor da Steam (${brl(l.ms)})</span>`
+       :l.ms&&l.p1==null?`<span class="tg">${brl(r[1]-l.ms)} acima do menor da Steam</span>`:'';
      return `<tr class="${r[0]===l.pc?'esp':''} ${r[3]===2?'novo':''}"><td>${nome}</td><td class="n">${r[0]?chip(r[0]):'—'}</td><td class="n">${brl(r[1])}</td>
        <td><span class="pb"><i style="width:${r[2]}%"></i></span>${pct(r[2])}</td><td>${tg}</td></tr>`}).join('')+'</table>';
 }
@@ -268,10 +269,11 @@ function fichaJogo(a){
    <div class="caixas">
     <div class="cx"><small>Hoje na Steam</small><b>${brl(hoje(l))}</b><em>${l.hc?'-'+l.hc+'% (cheio '+brl(l.ch)+')':'preço cheio'}</em></div>
     <div class="cx"><small>Ponto de partida</small><b>${l.pc?brl(l.pp):'sem desconto'}</b><em>${l.pc?'-'+l.pc+': maior desconto dos últimos 6 meses':'sem promoção em 12 meses'}</em></div>
-    <div class="cx"><small>Menor preço da história</small><b>${l.mn?brl(l.mn):'—'}</b><em>${l.mn?esc(l.ml)+' · '+l.mq.slice(5)+'/'+l.mq.slice(0,4):''}</em></div>
+    <div class="cx"><small>Menor da Steam ${l.ri?'neste preço cheio':'no histórico'}</small><b>${l.ms?brl(l.ms):'—'}</b><em>${l.ms?l.msq.slice(5)+'/'+l.msq.slice(0,4):''}${l.mn&&l.mn<l.ms?' · qualquer loja: '+brl(l.mn)+' ('+esc(l.ml)+', chave)':''}</em></div>
     ${l.p1!=null?`<div class="cx rec"><small>1ª promoção nesta venda</small><b>${pct(l.p1)}</b><em>nunca teve desconto na Steam</em></div>`
-     :`<div class="cx rec"><small>Bate o menor da história</small><b>${l.pn==null?'—':pct(l.pn)}</b><em>${l.pe==null?'':'chega no menor (empate ou novo): '+pct(l.pe)}</em></div>`}</div></div></div>
-   ${l.hoje_no_menor?'<div class="aviso">Hoje o preço já está no menor da história (ou a 1% dele). A Winter Sale só ganha se for mais fundo que isso.</div>':''}
+     :`<div class="cx rec"><small>Bate o menor da Steam</small><b>${l.pn==null?'—':pct(l.pn)}</b><em>${l.pe==null?'':'chega no menor (empate ou novo): '+pct(l.pe)}</em></div>`}</div></div></div>
+   ${l.hoje_no_menor?'<div class="aviso">Hoje o preço já está no menor da Steam (ou a 1% dele). A Winter Sale só ganha se for mais fundo que isso.</div>':''}
+   ${l.ri?`<div class="aviso">O preço cheio mudou em ${l.ri.slice(5)}/${l.ri.slice(0,4)} (antes ${l.rc0?brl(l.rc0):'outro'}): o menor conta só desde então.${l.mb&&l.mb<(l.mn||1e12)*.95?' O menor de todo o histórico ('+brl(l.mb)+', '+esc(l.mbl)+') foi sobre o preço antigo.':''}</div>`:''}
    ${l.mud?'<div class="aviso">O preço cheio mudou: o desconto de partida vem de promoções sobre o preço antigo. Confie menos nesta previsão.</div>':''}
    <h4>Possibilidades de preço na Winter Sale</h4>${escadaHtml(l)}
    <p class="nota">${CONF[l.c]} As chances vêm de como os invernos de 2023–2025 se comportaram em jogos com a mesma confiança e faixa de desconto, em relação ao ponto de partida.${l.m<=24?' O histórico deste jogo tem '+l.m+' meses.':''}</p>
@@ -289,7 +291,7 @@ function fichaFr(nome){
     <div class="cx rec"><small>Recordes esperados</small><b>~${num1(f.en)}</b><em>chance de pelo menos 1: ${f.pAlgum}%</em></div></div>
    <h4>Jogos e DLCs da franquia</h4>
    ${it.map(l=>`<div class="lj" data-a="${l.a}"><img loading="lazy" data-a="${l.a}" src="${capaU(l)}" alt="" onerror="cf(this)">
-     <div><div class="nm">${esc(l.n)}</div><div class="sb">${l.ano||''} · hoje ${brl(hoje(l))}${l.hc?' (-'+l.hc+'%)':''} · menor da história ${l.mn?brl(l.mn):'—'}</div></div>
+     <div><div class="nm">${esc(l.n)}</div><div class="sb">${l.ano||''} · hoje ${brl(hoje(l))}${l.hc?' (-'+l.hc+'%)':''} · menor da Steam ${l.ms?brl(l.ms):'—'}</div></div>
      <div class="pv"><div>${l.pc?brl(l.pp)+' '+chip(l.pc):'sem desconto'}</div><div class="sb">ponto de partida</div></div>
      <div class="pv pn2"><div style="color:var(--sinal)">${l.pn!=null?pct(l.pn):l.p1!=null?pct(l.p1):'—'}</div><div class="sb">${l.p1!=null?'1ª promoção':'bate o menor'}</div></div></div>`).join('')}`);
 }
@@ -298,11 +300,11 @@ function metodo(){
   const ca=Object.entries(M.cal_anos), tx=M.taxa_novo; M.faixas=['menos de 5%','5% a 15%','15% a 30%','30% a 60%','60% ou mais'];
   abrir(`<h2>Como foi calculado</h2>
   <h4>A pergunta que importa</h4>
-  <p class="nota">Nos três últimos invernos, <b>${Object.entries(tx).map(([y,v])=>y+': '+String(v).replace('.',',')+'%').join(' · ')}</b> dos jogos da lista chegaram a um preço <b>abaixo do menor que já tinham tido</b> (qualquer loja marcada). O inverno é a venda em que mais jogos batem o recorde; por isso a página não dá "um preço" por jogo: dá a chance de cada cenário.</p>
+  <p class="nota">Nos três últimos invernos, <b>${Object.entries(tx).map(([y,v])=>y+': '+String(v).replace('.',',')+'%').join(' · ')}</b> dos jogos da lista chegaram a um preço <b>abaixo do menor que a Steam já tinha feito</b> no mesmo preço cheio. Para saber o que comprar, veja a <a style="color:var(--azul)" href="recomendacoes-winter-sale-${M.inicio.slice(-4)}.html">página de recomendações</a>. O inverno é a venda em que mais jogos batem o recorde; por isso a página não dá "um preço" por jogo: dá a chance de cada cenário.</p>
   <h4>Como cada jogo é calculado</h4>
   <p class="nota"><b>1. Ponto de partida:</b> o maior desconto que o jogo teve na Steam nos últimos 6 meses (sem promoção em 6 meses, nos últimos 12). Se o preço cheio mudou, só contam promoções sobre o preço de hoje quando existem.<br>
   <b>2. Escada de cenários:</b> nos invernos de 2023, 2024 e 2025, comparei o que cada jogo tinha em 2 de novembro com o que o inverno fez (maior desconto de 22/12 a 02/01). A diferença forma uma distribuição por confiança e faixa de desconto; dela sai a chance de o inverno chegar ao menos em cada degrau (10%, 15%, 20% … 90%).<br>
-  <b>3. Menor histórico:</b> o menor preço de todos os tempos nas suas lojas que vendem chave Steam (a ITAD começa em out/2021). <b>Novo menor</b> = o preço fica abaixo dele em mais de 1% e R$ 0,10; <b>empata</b> = até 1% ou R$ 0,10 acima. A chance de bater é a chance de o inverno chegar ao menos no desconto que faz o preço passar do limite.<br>
+  <b>3. Menor histórico:</b> o menor preço da <b>Steam</b> desde que vale o preço cheio de hoje (o cheio ficou a ±10% do atual; a ITAD começa em out/2021). O menor de qualquer loja (chave, muitas vezes estrangeira e convertida pelo câmbio de hoje) aparece na ficha só como informação. <b>Novo menor</b> = o preço fica abaixo dele em mais de 1% e R$ 0,10; <b>empata</b> = até 1% ou R$ 0,10 acima. A chance de bater é a chance de o inverno chegar ao menos no desconto que faz o preço passar do limite.<br>
   <b>Jogos que nunca tiveram promoção</b> não entram na conta de recorde (o "menor" deles seria o próprio preço cheio): aparecem como "1ª promoção" com a chance de ter o primeiro desconto nesta venda. <b>Preço cheio mudou</b> (marcado com *): o menor histórico vem do preço antigo e vale menos, então esses jogos não entram nas somas de recordes esperados e ficam atrás nas ordens por chance.<br>
   <b>4. Franquias:</b> as mesmas da Biblioteca (campo da Steam, agrupamento por nome e trocas feitas na ficha). "Recordes esperados" = soma das chances dos jogos.</p>
   <h4>Teste deixando um ano de fora</h4>
