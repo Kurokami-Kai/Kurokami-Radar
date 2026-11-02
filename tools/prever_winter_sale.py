@@ -112,6 +112,14 @@ def banda(p):
     return 0 if p == 0 else 1 if p <= 45 else 2 if p <= 69 else 3
 
 
+PREFIXO_CAPA = "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/"
+
+
+def capa_curta(u):
+    """Tira o prefixo da CDN (a pagina o recoloca); URL de outro lugar fica inteira."""
+    return (u[len(PREFIXO_CAPA):] if u and u.startswith(PREFIXO_CAPA) else u) or ""
+
+
 def preco_steam(cheio, c):
     """Preco da Steam BR: termina em 9 (R$ 29,99 x 50% = R$ 14,99)."""
     p = cheio * (100 - c) / 100
@@ -121,9 +129,9 @@ def preco_steam(cheio, c):
 def carregar(con):
     jogos = {}
     for r in con.execute("SELECT appid,nome,tipo,preco_steam,cheio_steam,desconto_steam,prioridade,em_breve,gratis,rcount,rpos,"
-                         "lancamento,franquia,pai FROM jogo WHERE na_lista=1"):
+                         "lancamento,franquia,pai,capa_v,capa FROM jogo WHERE na_lista=1"):
         jogos[r[0]] = dict(ap=r[0], nome=r[1], tipo=r[2], p=r[3], ch=r[4], co=r[5] or 0, pri=r[6] or 0, breve=r[7], gratis=r[8],
-                           rc=r[9], rp=r[10], lanc=r[11], franquia=r[12], pai=r[13])
+                           rc=r[9], rp=r[10], lanc=r[11], franquia=r[12], pai=r[13], cv=r[14], hd=r[15])
     S = {}
     for a, q, pr, ch, co in con.execute("SELECT appid,quando,preco,cheio,corte FROM preco WHERE loja='Steam' ORDER BY appid,quando"):
         if a in jogos:
@@ -322,7 +330,7 @@ def main():
                            pn=None if p_novo is None else round(p_novo * 100), pe=None if p_emp is None else round(p_emp * 100), p1=p1,
                            hoje_no_menor=int(bool(mn) and (j["p"] or 0) <= mn[0] * 1.01 + 10 and not pr1),
                            iv=inverno_do_jogo(rows, ap, S, H), ano=datetime.fromtimestamp(j["lanc"], UTC).year if j["lanc"] else 0,
-                           rc=j["rc"]))
+                           rc=j["rc"], cv=capa_curta(j["cv"]), hd=capa_curta(j["hd"])))
     taxa_novo = {}
     for y in ANOS_TESTE:
         v = [x for x in R if x["y"] == y and x["mn"] and not x["pr1"]]
