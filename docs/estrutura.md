@@ -58,7 +58,7 @@ Kurokami Hunter/
 │   ├── backtest_selo.py     # backtest do Selo e variantes sobre uma cópia temporária do banco (só números agregados)
 │   ├── backtest_tipos.py    # spec 04: backtest por tipo de recorde (Selo, novo, igual, 24m), métrica "não ficou mais barato em 12 meses"
 │   ├── backtest_previsao.py # spec 09: "esse preço volta?" (por grupo, em 1/3/6/12 meses) e data/preço da próxima promoção
-│   ├── prever_winter_sale.py (+ .html) # previsão do preço de cada item da lista na Winter Sale (maior corte dos últimos 6 meses; backtest 2023-25); gera dados/previsao-winter-sale-AAAA.html (só leitura)
+│   ├── prever_winter_sale.py (+ .html) # chances de preço de cada item da lista na Winter Sale (escada de cenários e chance de bater o menor histórico, calibrada deixando 1 ano de fora), por franquia no estilo da Biblioteca; gera dados/previsao-winter-sale-AAAA.html (só leitura)
 │   ├── medir_spec04.py      # spec 04: vitrine, avisos de hoje (regra atual × só Selo), userdata, DLCs em promoção, tempo do /api/lista
 │   ├── testar_openid.py     # testes sem rede da validação do OpenID (recusas: state, endereço, assinatura, nonce); entra no checar.py
 │   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê; --retrato grava os preços

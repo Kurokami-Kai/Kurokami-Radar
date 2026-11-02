@@ -5,139 +5,308 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Previsão Winter Sale — Kurokami Hunter</title>
 <style>
-:root{--bg:#0b0b0c;--p1:#141416;--p2:#1c1c1f;--lin:#2a2a2e;--tx:#ececee;--mu:#8d8d95;--acao:#e5312f;--sinal:#ff5a4f;--cinza:#2e2e33}
+/* paleta Kurokami (a mesma da Biblioteca): --acao compra, --sinal ativo/importante, --azul texto clicável, calor #262626 → #4a1016 → #8a1520 → #d63031 → #ff4757 */
+:root{--bg:#050505;--bg2:#000;--pan:#0d0d0d;--pan2:#161616;--txt:#d2d2d2;--fraco:#979797;--dim:#7f7f7f;--azul:#ff7675;--sinal:#ff4757;--acao:#d63031;--acao2:#ea2027;--vbg:#4a1016;--vtx:#ff8a94;--borda:#ffffff14}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 "Segoe UI",system-ui,sans-serif}
-.w{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
-h1{margin:0;font-size:26px;letter-spacing:.3px}h1 b{color:var(--acao)}
-.sub{color:var(--mu);margin:4px 0 18px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:16px}
-.k{background:var(--p1);border:1px solid var(--lin);border-radius:8px;padding:12px 14px;cursor:pointer;text-align:left;color:inherit;font:inherit}
-.k:hover,.k.on{border-color:var(--acao)}
-.k .n{font-size:26px;font-weight:700}.k .l{color:var(--mu);font-size:12px}
-.k.novo .n{color:var(--sinal)}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
-input,select,button{background:var(--p2);color:var(--tx);border:1px solid var(--lin);border-radius:6px;padding:8px 10px;font:inherit}
-input{min-width:240px;flex:1}
-button.sec{background:var(--cinza);cursor:pointer}
-details{background:var(--p1);border:1px solid var(--lin);border-radius:8px;padding:10px 14px;margin:10px 0}
-summary{cursor:pointer;font-weight:600}
-details p,details li{color:#c9c9cf}
-table.bt{border-collapse:collapse;margin:8px 0}table.bt td,table.bt th{border-bottom:1px solid var(--lin);padding:5px 12px;text-align:right}table.bt th:first-child,table.bt td:first-child{text-align:left}
-.tw{overflow-x:auto;border:1px solid var(--lin);border-radius:8px}
-table.t{width:100%;border-collapse:collapse;min-width:980px}
-.t th{position:sticky;top:0;background:var(--p2);text-align:left;padding:9px 10px;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--lin)}
-.t td{padding:8px 10px;border-bottom:1px solid var(--lin);vertical-align:middle}
-.t tr:hover td{background:#17171a}
-.jg{display:flex;gap:10px;align-items:center;min-width:280px}
-.jg img{width:92px;height:35px;object-fit:cover;border-radius:3px;background:var(--p2);flex:none}
-.jg a{color:var(--tx);text-decoration:none;font-weight:600}.jg a:hover{text-decoration:underline}
-.jg small{display:block;color:var(--mu)}
-.pr{font-weight:700;font-variant-numeric:tabular-nums}
-.pr s{display:block;color:var(--mu);font-weight:400;font-size:12px}
-.ch{display:inline-block;padding:1px 6px;border-radius:3px;font-weight:700;font-size:12px;margin-left:6px;background:#333;color:#ddd}
-.ch[data-calor="1"]{background:#3a2222;color:#f0b4b0}.ch[data-calor="2"]{background:#5a1f1d;color:#ffd0cc}
-.ch[data-calor="3"]{background:#8a2420;color:#fff}.ch[data-calor="4"]{background:#c42a26;color:#fff}.ch[data-calor="5"]{background:#ff3b2f;color:#fff}
-.prev .pr{font-size:17px;color:#fff}
-.v{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;white-space:nowrap}
-.v.novo{background:var(--acao);color:#fff}.v.igual{background:#7a1d1b;color:#fff}.v.perto{background:var(--cinza);color:#ddd}
-.v.acima,.v.sem,.v.nd,.v.cheio{background:#1f1f22;color:var(--mu);border:1px solid var(--lin)}
-.mn{color:var(--mu);font-size:12px;display:block;margin-top:3px}
-.cf{font-size:12px}.cf b{display:inline-block;width:20px;text-align:center;border-radius:3px;margin-right:6px;background:var(--cinza)}
-.cf b.A{background:#7a1d1b;color:#fff}.cf b.C{background:#1f1f22;color:var(--mu);border:1px solid var(--lin)}
-.cf span{color:var(--mu);display:block}
-.iv{font-size:12px;color:var(--mu);white-space:nowrap}.iv i{font-style:normal;color:#c9c9cf;margin-right:8px}
-.nota{font-size:12px;color:var(--sinal);display:block;margin-top:2px}
-.cont{color:var(--mu);margin:6px 2px}
-@media(max-width:700px){h1{font-size:21px}}
+body{margin:0;background:radial-gradient(ellipse 900px 380px at 50% -120px,#5a0f18 0,#050505 70%) no-repeat,var(--bg);background-color:var(--bg);color:var(--txt);font:14px/1.45 "Motiva Sans",Arial,Helvetica,sans-serif}
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--sinal);outline-offset:3px}
+main{max-width:1240px;margin:0 auto;padding:18px 16px 90px}
+h2{font-size:22px;font-weight:400;color:#fff;margin:0}h2 b{color:var(--sinal);font-weight:400}
+.pcab{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:12px}
+.pcab .res{color:var(--fraco);font-size:13px}.pcab .res b{color:#fff;font-weight:400}.pcab .res .g{color:var(--sinal)}
+.tool{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 18px;padding:8px 0;border-bottom:1px solid var(--borda);position:sticky;top:0;z-index:10;background:#050505f2}
+.chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.chips span{color:var(--dim);font-size:12px;margin-right:4px;text-transform:uppercase;letter-spacing:.05em}
+.chips button,.views button,.bq-btn{background:#ffffff0d;border:0;color:var(--fraco);padding:5px 11px;border-radius:2px;cursor:pointer;font-size:13px}
+.chips button:hover,.views button:hover,.bq-btn:hover{background:#ffffff1a;color:#fff}
+.chips button[aria-pressed=true],.views button[aria-pressed=true]{background:#3d3d3d;color:#fff}
+.views{display:inline-flex;gap:2px}
+.tool .sp{flex:1}
+.tool input{background:#0d0d0d;border:0;box-shadow:inset 0 0 0 1px #333;color:#fff;padding:6px 10px;border-radius:2px;font:inherit;font-size:13px;width:200px}
+.tool input:focus{box-shadow:inset 0 0 0 1px var(--sinal);outline:0}
+/* capas */
+.capa{position:relative;display:block;aspect-ratio:2/3;background:#0d0d0d;overflow:hidden;border:0;padding:0;cursor:pointer;width:100%}
+.capa img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+.capa .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-size:12px;color:#fff;background:linear-gradient(160deg,hsl(var(--h) 35% 28%),hsl(var(--h) 40% 12%))}
+.capa .ok{position:absolute;z-index:2;top:6px;left:6px;background:#000c;color:#e6e6e6;font-size:11px;padding:1px 6px;border-radius:2px}
+.capa .ok[data-calor="2"]{background:var(--vbg);color:var(--vtx)}.capa .ok[data-calor="3"]{background:#8a1520;color:#fff}.capa .ok[data-calor="4"]{background:var(--acao);color:#fff}.capa .ok[data-calor="5"]{background:var(--sinal);color:#000}
+.capa .pr{position:absolute;z-index:2;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:4px;background:linear-gradient(transparent,#000d 40%);padding:16px 6px 6px;font-size:12.5px;color:#fff}
+.capa .pr .c{background:var(--vbg);color:var(--vtx);font-size:11px;padding:0 4px}
+.capa .pr .c[data-calor="3"]{background:#8a1520;color:#fff}.capa .pr .c[data-calor="4"]{background:var(--acao);color:#fff}.capa .pr .c[data-calor="5"]{background:var(--sinal);color:#000}
+.vit{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:26px 20px}
+.it{min-width:0}
+.pilha{position:relative;padding:8px 8px 0 0}
+.pilha.s{padding:0}
+.pilha:not(.s)::before,.pilha:not(.s)::after{content:"";position:absolute;inset:8px 8px 0 0;background:#2a2a2a;border-radius:2px;transform:translate(8px,-8px);box-shadow:0 0 0 1px #ffffff10}
+.pilha:not(.s)::after{background:#1f1f1f;transform:translate(4px,-4px)}
+.pilha .capa{z-index:1;box-shadow:0 6px 16px #0009}
+.it:hover .capa img,.it .capa:focus-visible img{transform:scale(1.035)}
+.it .qt{position:absolute;z-index:3;left:6px;bottom:44px;background:#000c;color:#fff;font-size:12px;padding:2px 7px;border-radius:2px}
+.it .nm{color:#fff;margin-top:8px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .sub{color:var(--fraco);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .sub b{color:var(--vtx);font-weight:400}
+.secao{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px;border-bottom:1px solid var(--borda);padding-bottom:6px}
+.secao h3{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:0}
+.secao span{color:var(--fraco);font-size:12.5px}
+.bar{height:6px;background:#ffffff12;position:relative;margin:6px 0 10px}.bar i{position:absolute;inset:0 auto 0 0;background:var(--sinal)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.prat{background:var(--pan);padding:12px 14px 14px;min-width:0;cursor:pointer;border-left:3px solid transparent}
+.prat:hover{border-left-color:var(--azul);background:#141414}
+.prat .cab{display:flex;align-items:center;gap:10px}
+.prat .cab h3{font-size:16px;font-weight:400;color:#fff;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prat .cab small{color:var(--fraco);font-size:12.5px;white-space:nowrap}
+.prat .cab small b{color:var(--vtx);font-weight:400}
+.trilho{display:flex;gap:8px;overflow-x:auto}
+.trilho>div{flex:0 0 104px;min-width:0}
+.ano{font-size:11.5px;color:var(--dim);text-align:center;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tw{overflow-x:auto}
+.vazio{color:var(--fraco);padding:40px 0;text-align:center}
+/* fichas */
+.fundo{position:fixed;inset:0;z-index:50;background:#000c;display:none;overflow-y:auto;padding:30px 12px}
+.fundo.on{display:block}
+.ficha{max-width:980px;margin:0 auto;background:#0d0d0d;box-shadow:0 20px 60px #000;padding:22px 24px 26px;position:relative}
+.fx{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--fraco);font-size:22px;cursor:pointer;padding:4px 10px}.fx:hover{color:#fff}
+.fcab{display:flex;gap:20px;align-items:flex-start}
+.fcab .capa{width:150px;flex:none;cursor:default}
+.fcab h2{font-size:24px}
+.meta{color:var(--fraco);font-size:13px;margin-top:4px}
+.meta a{color:var(--azul);text-decoration:none}.meta a:hover{text-decoration:underline}
+.meta strong{color:#fff;font-weight:400}
+.caixas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:14px}
+.cx{background:#161616;padding:9px 12px}
+.cx small{display:block;color:var(--dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+.cx b{font-weight:400;color:#fff;font-size:18px;font-variant-numeric:tabular-nums}
+.cx em{font-style:normal;color:var(--fraco);font-size:12px;display:block}
+.cx.rec b{color:var(--sinal)}
+h4{font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.08em;color:#fff;margin:22px 0 8px;border-bottom:1px solid var(--borda);padding-bottom:5px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{color:var(--dim);font-weight:400;text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 8px}
+td{padding:7px 8px;border-top:1px solid #ffffff0d;font-variant-numeric:tabular-nums}
+td.n,th.n{text-align:right}
+tr.esp td{background:#ffffff08}
+tr.novo td{background:#4a101666}
+.ch{display:inline-block;padding:0 5px;font-size:12px;background:#262626;color:#e6e6e6}
+.ch[data-calor="1"]{background:#2a1a1a;color:#e8b4b4}.ch[data-calor="2"]{background:var(--vbg);color:var(--vtx)}.ch[data-calor="3"]{background:#8a1520;color:#fff}.ch[data-calor="4"]{background:var(--acao);color:#fff}.ch[data-calor="5"]{background:var(--sinal);color:#000}
+.pb{display:inline-block;vertical-align:middle;width:110px;height:8px;background:#ffffff12;margin-right:8px}.pb i{display:block;height:100%;background:var(--acao)}
+.tg{font-size:12px;color:var(--fraco)}.tg.novo{color:var(--sinal)}.tg.emp{color:var(--vtx)}
+.nota{color:var(--fraco);font-size:12.5px;margin:8px 0 0;line-height:1.6}
+.nota b{color:#fff;font-weight:400}
+.aviso{margin:10px 0;padding:10px 14px;background:#4a10168c;box-shadow:inset 3px 0 0 var(--sinal);font-size:13px}
+.lj{display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:8px 0;border-top:1px solid #ffffff0d;cursor:pointer}
+.lj:hover{background:#ffffff08}
+.lj img{width:44px;height:66px;object-fit:cover;background:#161616}
+.lj .nm{color:#fff}.lj .sb{color:var(--fraco);font-size:12.5px}
+.lj .pv{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}.fcab{flex-direction:column}.lj{grid-template-columns:44px 1fr auto}.lj .pn2{display:none}.ficha{padding:18px 14px}}
 </style>
 </head>
 <body>
-<div class="w">
-<h1>Previsão <b>Winter Sale</b> da sua lista</h1>
-<div class="sub" id="sub"></div>
-<div class="kpis" id="kpis"></div>
-
-<details>
-<summary>Como a previsão é feita e quanto ela acerta</summary>
-<p><b>Regra:</b> o desconto da Winter Sale é o <b>maior desconto que o jogo teve na Steam nos últimos 6 meses</b> (se não teve nenhum em 6 meses, nos últimos 12). O preço previsto aplica esse desconto ao preço cheio de hoje e arredonda para o final ,99 da Steam. Foi a regra que mais acertou entre as que testei com o histórico do seu banco (o último inverno sozinho, o maior de 12 meses, o maior de 24 meses, mediana, etc.).</p>
-<p><b>Teste com o passado:</b> para cada inverno de 2023, 2024 e 2025, a regra usou só o que se sabia em 2 de novembro daquele ano e foi comparada com o maior desconto de 22/12 a 02/01.</p>
-<div id="bt"></div>
-<p><b>Confiança:</b> <b>A</b> = o desconto previsto já apareceu 2 vezes ou mais no último ano e o jogo tem 18+ meses de histórico (ou ele nunca entrou em promoção). <b>B</b> = esse nível apareceu uma vez só (costuma ser promoção avulsa, então o inverno tende a ficar igual ou menor) ou o preço cheio mudou e só há promoções sobre o preço antigo; quando há promoção já no preço cheio de hoje, só ela conta. <b>C</b> = jogo com menos de 18 meses: o desconto tende a ficar <b>maior</b> que o previsto (jogos novos descontam mais a cada ano), trate como mínimo.</p>
-<p><b>Menor histórico</b> = o menor preço registrado desde out/2021 (limite do histórico da ITAD) nas suas lojas que vendem chave Steam. Se o preço cheio mudou desde as promoções antigas, o menor preço antigo não serve de régua e o jogo fica como "Preço cheio mudou". "Chega no menor" = o preço previsto fica a menos de 1% (ou R$ 0,10) dele, ou seja, empata o recorde; "Abaixo do menor" = fica abaixo. A "chance de bater o recorde" é a fração dos casos do teste (da mesma confiança) em que o inverno ficou 5+ pontos de desconto além do previsto.</p>
-<p><b>Limites:</b> é estatística, não garantia. A Promoção de Outono (fim de novembro) pode chegar antes e mudar o quadro. Se o preço cheio mudar até dezembro, o preço previsto muda junto (o desconto é o que se prevê). DLCs e jogos pequenos oscilam mais. Datas da venda: 17/12/2026 a 04/01/2027, segundo a <a style="color:var(--sinal)" href="https://partner.steamgames.com/doc/marketing/upcoming_events/2026_winter_sale">Steamworks</a>.</p>
-</details>
-
-<div class="bar">
-<input id="q" placeholder="Buscar jogo…" autocomplete="off">
-<select id="fv"><option value="">Todos os veredictos</option><option value="novo">Abaixo do menor histórico</option><option value="igual">Chega no menor histórico (empate)</option><option value="perto">Perto do menor (até +15%)</option><option value="acima">Longe do menor</option><option value="cheio">Preço cheio mudou</option><option value="sem">Sem desconto esperado</option></select>
-<select id="fc"><option value="">Toda confiança</option><option value="A">Confiança A</option><option value="B">Confiança B</option><option value="C">Confiança C</option></select>
-<select id="ft"><option value="">Jogos e DLCs</option><option value="jogo">Só jogos</option><option value="dlc">Só DLCs</option></select>
-<select id="so"><option value="v">Ordem: mais perto do recorde</option><option value="eco">Maior economia sobre hoje</option><option value="pc">Maior desconto previsto</option><option value="pp">Menor preço previsto</option><option value="pri">Ordem da lista de desejos</option><option value="n">Nome</option></select>
-<button class="sec" id="lm">Limpar</button>
-</div>
-<div class="cont" id="cont"></div>
-<div class="tw"><table class="t"><thead><tr>
-<th>Jogo</th><th>Hoje na Steam</th><th>Previsto na Winter Sale</th><th>Menor histórico</th><th>Confiança</th><th>Invernos passados</th>
-</tr></thead><tbody id="tb"></tbody></table></div>
-<div class="cont" id="sem"></div>
-</div>
+<main id="main"></main>
+<div class="fundo" id="fundo"><div class="ficha" id="ficha"></div></div>
 <script>
 /*DADOS*/
 const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const brl=c=>'R$ '+(c/100).toFixed(2).replace('.',',');
-const calor=p=>p>=80?5:p>=65?4:p>=50?3:p>=30?2:p>0?1:0;
-const chip=p=>p>0?`<span class="ch" data-calor="${calor(p)}">-${p}%</span>`:'';
-const VER={novo:'Novo menor histórico',igual:'Chega no menor histórico',perto:'Perto do menor',acima:'Longe do menor',sem:'Sem desconto esperado',nd:'Sem comparação',cheio:'Preço cheio mudou'};
-const ORD={novo:0,igual:1,perto:2,acima:3,cheio:4,nd:5,sem:6};
-const pct=x=>Math.round(x*100)+'%';
-let kv='';
-L.forEach(l=>{l.eco=(l.h||l.ch)-l.pp;l.ja=l.mn&&l.h<=l.mn+Math.max(10,l.mn*.01);});
-$('#sub').textContent=`Winter Sale ${M.inicio} a ${M.fim} · ${L.length} itens da sua lista de desejos · gerado em ${M.gerado} com o histórico de preços do seu banco`;
-function kpis(){
-  const c=k=>L.filter(l=>l.v===k).length, esp=L.filter(l=>l.pp<(l.h||l.ch)).length;
-  const defs=[['','Itens com previsão',L.length,''],['novo','Abaixo do menor histórico',c('novo'),'novo'],['igual','Chegam ao menor histórico (empate)',c('igual'),'novo'],['perto','Perto do menor',c('perto'),''],['sem','Sem desconto esperado',c('sem'),'']];
-  $('#kpis').innerHTML=defs.map(d=>`<button class="k ${d[3]} ${kv===d[0]?'on':''}" data-v="${d[0]}"><div class="n">${d[2]}</div><div class="l">${d[1]}</div></button>`).join('')
-   +`<div class="k" style="cursor:default"><div class="n">${esp}</div><div class="l">ficam mais baratos que hoje (esperar compensa)</div></div>`;
-  document.querySelectorAll('.k[data-v]').forEach(b=>b.onclick=()=>{kv=b.dataset.v;$('#fv').value=kv;draw();});
+const pct=p=>p<=0?'<1%':p>=99?'99%+':p+'%';
+const calor=p=>p>=60?5:p>=40?4:p>=25?3:p>=10?2:1;
+const calorD=p=>p>=80?5:p>=65?4:p>=50?3:p>=30?2:p>0?1:0;
+const chip=p=>p>0?`<span class="ch" data-calor="${calorD(p)}">-${p}%</span>`:'';
+const capaU=a=>`https://cdn.cloudflare.steamstatic.com/steam/apps/${a}/library_600x900.jpg`;
+const hue=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h};
+const hoje=l=>l.h||l.ch;
+const num1=x=>x.toFixed(1).replace('.',',');
+const st={vista:'col',ord:'rec',filtro:'todos',q:''};
+// ---- grupos por franquia
+const porF=new Map();
+L.forEach(l=>{if(!porF.has(l.f))porF.set(l.f,[]);porF.get(l.f).push(l);});
+function agregar(nome,it){
+  // preço cheio mudou (mud): o menor histórico vem do preço antigo; esses jogos não entram nas somas nem puxam a capa/ordem da franquia
+  const ok=it.filter(l=>!l.mud), base=ok.length?ok:it;
+  const en=ok.reduce((s,l)=>s+(l.pn||0)/100,0), nenhum=ok.reduce((s,l)=>s*(1-(l.pn||0)/100),1);
+  return {nome,it,en,pAlgum:Math.round((1-nenhum)*100),mxN:Math.max(...base.map(l=>l.pn||0)),mxE:Math.max(...base.map(l=>l.pe||0)),
+    hoje:it.reduce((s,l)=>s+hoje(l),0),prev:it.reduce((s,l)=>s+l.pp,0),mxC:Math.max(...it.map(l=>l.pc)),
+    mud:it.every(l=>l.mud),pri:Math.min(...it.map(l=>l.pri||1e9)),capa:base.slice().sort((a,b)=>(b.pn||0)-(a.pn||0)||(b.pe||0)-(a.pe||0))[0]};
 }
-function bt(){
-  const r=(n,o)=>`<tr><td>${n}</td><td>${o.n}</td><td>${pct(o.h25)}</td><td>${pct(o.h5)}</td><td>${pct(o.ao_menos)}</td><td>${pct(o.alem)}</td></tr>`;
-  const b=M.bt;
-  $('#bt').innerHTML=`<table class="bt"><tr><th></th><th>Casos</th><th>Acertou ±2,5 pontos</th><th>±5 pontos</th><th>Chegou ao menos no previsto</th><th>Foi 5+ pontos além</th></tr>`
-   +r('Todos',b.todos)+r('Confiança A',b.A)+r('Confiança B',b.B)+r('Confiança C',b.C)
-   +Object.entries(b.anos).map(([y,o])=>r('Inverno '+y,o)).join('')+'</table>';
+const FR=[...porF.entries()].map(([nome,it])=>{it.sort((a,b)=>(a.ano||9999)-(b.ano||9999)||a.n.localeCompare(b.n));return agregar(nome,it);});
+// ---- peças
+function capa(l){return `<img loading="lazy" src="${capaU(l.a)}" alt="" onerror="this.remove()"><span class="ph" style="--h:${hue(l.n)}" aria-hidden="true">${esc(l.n)}</span>`;}
+function capaBtn(l,corpo,attr){return `<span class="capa" ${attr||''} data-a="${l.a}" role="button" tabindex="0" title="${esc(l.n)}">${capa(l)}${corpo||''}</span>`;}
+function selo(l){
+  if(l.p1!=null)return `<span class="ok" data-calor="1" title="nunca teve promoção: a chance é a de ter a primeira nesta venda">1ª promoção ${pct(l.p1)}</span>`;
+  if(l.pe==null)return '';
+  return `<span class="ok" data-calor="${l.mud?1:calor(l.pe)}" title="${l.mud?'O preço cheio mudou: confie menos. ':''}chance de chegar ao menor preço da história (empatar ou bater)">${l.hoje_no_menor?'já no menor · ':'no menor '}${pct(l.pe)}${l.mud?'*':''}</span>`}
+function precoCapa(l){return `<span class="pr"><span>${l.pc?brl(l.pp):l.p1!=null?'sem promoção ainda':'sem desconto'}</span>${l.pc?`<span class="c" data-calor="${calorD(l.pc)}">-${l.pc}%</span>`:''}</span>`}
+// ---- filtros e ordem
+function passa(l){
+  if(st.filtro==='rec25'&&!((l.pn||0)>=25))return false;
+  if(st.filtro==='chega50'&&!((l.pe||0)>=50))return false;
+  if(st.filtro==='jogos'&&l.t==='dlc')return false;
+  if(st.q){const q=st.q.toLowerCase();if(!l.n.toLowerCase().includes(q)&&!l.f.toLowerCase().includes(q))return false;}
+  return true;
 }
-function ivHtml(l){return l.inv.length?l.inv.map(x=>`<i>${String(x[0]).slice(2)}: ${x[1]>0?'-'+x[1]+'%':'—'}</i>`).join(''):'sem inverno no histórico';}
-function filtrar(){
-  const q=$('#q').value.trim().toLowerCase(),fv=$('#fv').value,fc=$('#fc').value,ft=$('#ft').value;
-  let r=L.filter(l=>(!q||l.n.toLowerCase().includes(q))&&(!fv||l.v===fv)&&(!fc||l.c===fc)&&(!ft||(ft==='dlc'?l.t==='dlc':l.t!=='dlc')));
-  const s=$('#so').value;
-  const f={v:(a,b)=>ORD[a.v]-ORD[b.v]||b.eco-a.eco,eco:(a,b)=>b.eco-a.eco,pc:(a,b)=>b.pc-a.pc,pp:(a,b)=>a.pp-b.pp,
-    pri:(a,b)=>(a.pri||1e9)-(b.pri||1e9),n:(a,b)=>a.n.localeCompare(b.n)}[s];
-  return r.sort(f);
+function frFiltradas(){
+  return FR.map(f=>({f,it:f.it.filter(passa)})).filter(x=>x.it.length).map(x=>x.it.length===x.f.it.length?x.f:agregar(x.f.nome,x.it));
 }
-function draw(){
-  kv=$('#fv').value;kpis();
-  const r=filtrar();
-  $('#cont').textContent=r.length+' de '+L.length+' itens';
-  const T={A:'confiança alta',B:'este nível apareceu só 1 vez no último ano',C:'jogo novo: o desconto real tende a ser maior'};
-  $('#tb').innerHTML=r.map(l=>{
-    const cf=M.bt[l.c];
-    const nota=l.mud?'<span class="nota">preço cheio mudou: o desconto vem de promoções sobre o preço antigo</span>':l.ja?'<span class="nota">hoje já está no menor preço de todos os tempos</span>':(l.pp>=l.h&&l.hc>0?'<span class="nota">hoje já está igual ou melhor que o previsto</span>':'');
-    return `<tr><td><div class="jg"><img loading="lazy" src="https://cdn.cloudflare.steamstatic.com/steam/apps/${l.a}/capsule_184x69.jpg" onerror="this.style.visibility='hidden'" alt="">
-      <div><a href="https://store.steampowered.com/app/${l.a}/" target="_blank" rel="noopener">${l.n.replace(/</g,'&lt;')}</a><small>${l.t==='dlc'?'DLC · ':''}${l.pri?'#'+l.pri+' na lista':'sem posição na lista'}</small></div></div></td>
-      <td class="pr">${brl(l.h||l.ch)}${chip(l.hc)}<s>${l.hc?'cheio '+brl(l.ch):'preço cheio'}</s></td>
-      <td class="prev"><div class="pr">${l.pc?brl(l.pp):'sem desconto'}${chip(l.pc)}</div>${l.pc?'<s class="mn">cheio '+brl(l.ch)+'</s>':''}${nota}</td>
-      <td><span class="v ${l.v}">${VER[l.v]}</span>${l.v==='igual'?`<span class="mn">chance de bater o recorde: ~${pct(cf.alem)}</span>`:''}${l.mn?`<span class="mn">${brl(l.mn)} · ${l.ml}${l.mq?' · '+l.mq.slice(5)+'/'+l.mq.slice(0,4):''}</span>`:''}</td>
-      <td class="cf" title="${T[l.c]}"><b class="${l.c}">${l.c}</b>${l.pc?pct(cf.ao_menos)+' chegam ao menos lá':pct(cf.ao_menos)+' acertam'}<span>${l.m} meses de histórico</span></td>
-      <td class="iv">${ivHtml(l)}</td></tr>`}).join('');
+const ORD={rec:['Mais chance de novo menor',(a,b)=>(a.mud-b.mud)||b.mxN-a.mxN||b.mxE-a.mxE],
+  chega:['Mais chance de chegar no menor',(a,b)=>(a.mud-b.mud)||b.mxE-a.mxE||b.mxN-a.mxN],
+  desc:['Maior desconto previsto',(a,b)=>b.mxC-a.mxC],
+  eco:['Maior economia',(a,b)=>(b.hoje-b.prev)-(a.hoje-a.prev)],
+  az:['A–Z',(a,b)=>a.nome.localeCompare(b.nome)],
+  lista:['Lista de desejos',(a,b)=>a.pri-b.pri]};
+// ---- páginas
+function cabecalho(frs){
+  const itens=frs.reduce((s,f)=>s+f.it.length,0), en=frs.reduce((s,f)=>s+f.en,0);
+  const multi=frs.filter(f=>f.it.length>1).length;
+  return `<div class="pcab"><h2>Winter Sale <b>${M.inicio.slice(-4)}</b> · previsão</h2>
+   <div class="res"><b>${itens}</b> itens · <b>${frs.length}</b> franquias (${multi} com 2+ jogos) · esperados <span class="g">~${Math.round(en)} novos menores históricos</span> · venda de ${M.inicio} a ${M.fim}</div></div>`;
 }
-['#q','#fv','#fc','#ft','#so'].forEach(s=>$(s).addEventListener(s==='#q'?'input':'change',draw));
-$('#lm').onclick=()=>{$('#q').value='';['#fv','#fc','#ft'].forEach(s=>$(s).value='');$('#so').value='v';draw();};
-const sm=Object.entries(M.sem);
-$('#sem').textContent=sm.length?'Fora da previsão ('+sm.reduce((a,b)=>a+b[1],0)+'): '+sm.map(x=>x[1]+' '+x[0]).join(', ')+'.':'';
-bt();draw();
+function ferramentas(){
+  const btn=(k,v,rot,at)=>`<button data-${k}="${v}" aria-pressed="${at===v}">${rot}</button>`;
+  return `<div class="tool">
+   <div class="chips"><span>Ordem</span>${Object.entries(ORD).map(([k,v])=>btn('ord',k,v[0],st.ord)).join('')}</div>
+   <div class="chips"><span>Mostrar</span>${[['todos','Tudo'],['rec25','Novo menor ≥ 25%'],['chega50','Chega no menor ≥ 50%'],['jogos','Só jogos']].map(([k,r])=>btn('filtro',k,r,st.filtro)).join('')}</div>
+   <span class="sp"></span>
+   <input id="q" placeholder="Buscar jogo ou franquia…" value="${esc(st.q)}" autocomplete="off">
+   <span class="views">${btn('vista','col','Coleção',st.vista)}${btn('vista','fr','Franquias',st.vista)}</span>
+   <button class="bq-btn" id="met">Como foi calculado</button></div>`;
+}
+function itemColecao(f){
+  if(f.it.length===1){
+    const l=f.it[0];
+    return `<div class="it"><div class="pilha s">${capaBtn(l,selo(l)+precoCapa(l))}</div>
+      <div class="nm" title="${esc(l.n)}">${esc(l.n)}</div>
+      <div class="sub">${l.pn!=null?`bate o recorde: <b>${pct(l.pn)}</b>${l.mud?' · cheio mudou':''}`:l.p1!=null?`1ª promoção: <b>${pct(l.p1)}</b>`:'sem comparação'}</div></div>`;
+  }
+  const l=f.capa;
+  return `<div class="it"><div class="pilha" data-f="${esc(f.nome)}">${capaBtn(l,selo(l)+precoCapa(l)+`<span class="qt">${f.it.length} jogos</span>`,'data-pilha="1"')}</div>
+    <div class="nm" title="${esc(f.nome)}">${esc(f.nome)}</div><div class="sub">esperados ~${num1(f.en)} recordes · melhor: <b>${pct(f.mxN)}</b></div></div>`;
+}
+function prateleira(f){
+  return `<div class="prat" data-f="${esc(f.nome)}"><div class="cab"><h3>${esc(f.nome)}</h3>
+    <small>${f.it.length} jogos · esperados <b>~${num1(f.en)}</b> recordes</small></div>
+    <div class="bar" title="chance de pelo menos um jogo bater o menor preço: ${f.pAlgum}%"><i style="width:${f.pAlgum}%"></i></div>
+    <div class="trilho">${f.it.map(l=>`<div>${capaBtn(l,selo(l)+precoCapa(l))}<div class="ano">${l.ano||''}</div></div>`).join('')}</div></div>`;
+}
+function desenhar(){
+  const frs=frFiltradas().sort(ORD[st.ord][1]);
+  let corpo;
+  if(!frs.length)corpo='<div class="vazio">Nada com esse filtro.</div>';
+  else if(st.vista==='col')corpo=`<div class="vit">${frs.map(itemColecao).join('')}</div>`;
+  else{
+    const multi=frs.filter(f=>f.it.length>1), solo=frs.filter(f=>f.it.length===1);
+    corpo=(multi.length?`<div class="grid2">${multi.map(prateleira).join('')}</div>`:'')
+      +(solo.length?`<div class="secao"><h3>Avulsos</h3><span>${solo.length} jogos sem outro da mesma franquia na lista</span></div>
+        <div class="vit">${solo.map(itemColecao).join('')}</div>`:'');
+  }
+  $('#main').innerHTML=cabecalho(frs)+ferramentas()+corpo;
+  const q=$('#q');q.oninput=()=>{st.q=q.value;const p=q.selectionStart;desenhar();const n=$('#q');n.focus();n.setSelectionRange(p,p);};
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-ord],[data-filtro],[data-vista]');
+  if(b&&b.tagName==='BUTTON'){const k=Object.keys(b.dataset)[0];st[k]=b.dataset[k];desenhar();return;}
+  if(e.target.closest('#met')){metodo();return;}
+  if(e.target.closest('.fx')||e.target===$('#fundo')){fechar();return;}
+  const cp=e.target.closest('.capa[data-a]');
+  if(cp&&!cp.closest('#ficha')){
+    if(cp.dataset.pilha){fichaFr(cp.closest('.pilha').dataset.f);return;}
+    fichaJogo(+cp.dataset.a);e.stopPropagation();return;}
+  const pt=e.target.closest('.prat');if(pt){fichaFr(pt.dataset.f);return;}
+  const lj=e.target.closest('.lj[data-a]');if(lj){fichaJogo(+lj.dataset.a);return;}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if($('#fundo').classList.contains('on'))fechar();else if(document.activeElement===$('#q')){st.q='';desenhar();}}
+  else if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();$('#q').focus();}
+  else if(e.key==='Enter'&&document.activeElement.classList.contains('capa'))document.activeElement.click();
+});
+function abrir(h){$('#ficha').innerHTML='<button class="fx" aria-label="Fechar">×</button>'+h;$('#ficha').querySelectorAll('table').forEach(x=>{const w=document.createElement('div');w.className='tw';x.replaceWith(w);w.appendChild(x);});$('#fundo').classList.add('on');$('#fundo').scrollTop=0;}
+function fechar(){$('#fundo').classList.remove('on');}
+// ---- ficha do jogo
+const CONF={A:'Confiança A: o desconto previsto já apareceu 2+ vezes no último ano e o jogo tem 18+ meses de histórico.',
+  B:'Confiança B: esse nível de desconto apareceu só 1 vez (ou o preço cheio mudou).',
+  C:'Confiança C: jogo com menos de 18 meses; jogos novos costumam descontar mais a cada ano.'};
+function escadaHtml(l){
+  return `<table><tr><th>Cenário</th><th class="n">Desconto</th><th class="n">Preço</th><th>Chance de chegar ao menos aqui</th><th>Frente ao menor histórico</th></tr>`
+   +l.e.map(r=>{
+     const nome=r[0]===l.pc?'Esperado (ponto de partida)':r[0]<l.pc?'Abaixo do esperado':'Acima do esperado';
+     const tg=r[3]===2?`<span class="tg novo">novo menor histórico (${brl(l.mn-r[1])} abaixo)</span>`
+       :r[3]===1?`<span class="tg emp">empata o menor (${brl(l.mn)})</span>`
+       :l.mn?`<span class="tg">${brl(r[1]-l.mn)} acima do menor</span>`:'';
+     return `<tr class="${r[0]===l.pc?'esp':''} ${r[3]===2?'novo':''}"><td>${nome}</td><td class="n">${r[0]?chip(r[0]):'—'}</td><td class="n">${brl(r[1])}</td>
+       <td><span class="pb"><i style="width:${r[2]}%"></i></span>${pct(r[2])}</td><td>${tg}</td></tr>`}).join('')+'</table>';
+}
+function invernosHtml(l){
+  if(!l.iv.length)return '<p class="nota">Sem inverno anterior no histórico (o histórico da ITAD começa em out/2021).</p>';
+  return `<table><tr><th>Inverno</th><th class="n">Melhor desconto antes</th><th class="n">Desconto no inverno</th><th class="n">Menor preço no inverno</th><th>Resultado</th></tr>`
+   +l.iv.slice().reverse().map(r=>{
+     const alem=r[2]>r[1]+2.5, ab=r[2]<r[1]-2.5;
+     const res=[r[4]===1?'<span class="tg novo">novo menor histórico</span>':'',alem?'<span class="tg emp">foi além do que já tinha</span>':ab?'<span class="tg">ficou abaixo</span>':'<span class="tg">igual ao que já tinha</span>'].filter(Boolean).join(' · ');
+     return `<tr><td>${r[0]}/${String(r[0]+1).slice(2)}</td><td class="n">${r[1]?'-'+r[1]+'%':'—'}</td><td class="n">${r[2]?'-'+r[2]+'%':'—'}</td><td class="n">${brl(r[3])}</td><td>${res}</td></tr>`}).join('')+'</table>'
+   +'<p class="nota">"Melhor desconto antes" = o maior desconto dos 6 meses até 2 de novembro daquele ano (o ponto de partida que a previsão teria usado).</p>';
+}
+function fichaJogo(a){
+  const l=L.find(x=>x.a===a); if(!l)return;
+  const ivs=l.iv.filter(r=>r[4]>=0), nRec=ivs.filter(r=>r[4]===1).length;
+  abrir(`<div class="fcab"><span class="capa" style="cursor:default">${capa(l)}</span><div style="flex:1;min-width:0">
+   <h2>${esc(l.n)}</h2>
+   <div class="meta">${l.f!==l.n?'Franquia <strong>'+esc(l.f)+'</strong> · ':''}${l.t==='dlc'?'DLC · ':''}${l.ano?l.ano+' · ':''}${l.pri?'#'+l.pri+' na lista de desejos · ':''}<a href="https://store.steampowered.com/app/${l.a}/" target="_blank" rel="noopener">abrir na Steam</a></div>
+   <div class="caixas">
+    <div class="cx"><small>Hoje na Steam</small><b>${brl(hoje(l))}</b><em>${l.hc?'-'+l.hc+'% (cheio '+brl(l.ch)+')':'preço cheio'}</em></div>
+    <div class="cx"><small>Ponto de partida</small><b>${l.pc?brl(l.pp):'sem desconto'}</b><em>${l.pc?'-'+l.pc+': maior desconto dos últimos 6 meses':'sem promoção em 12 meses'}</em></div>
+    <div class="cx"><small>Menor preço da história</small><b>${l.mn?brl(l.mn):'—'}</b><em>${l.mn?esc(l.ml)+' · '+l.mq.slice(5)+'/'+l.mq.slice(0,4):''}</em></div>
+    ${l.p1!=null?`<div class="cx rec"><small>1ª promoção nesta venda</small><b>${pct(l.p1)}</b><em>nunca teve desconto na Steam</em></div>`
+     :`<div class="cx rec"><small>Bate o menor da história</small><b>${l.pn==null?'—':pct(l.pn)}</b><em>${l.pe==null?'':'chega no menor (empate ou novo): '+pct(l.pe)}</em></div>`}</div></div></div>
+   ${l.hoje_no_menor?'<div class="aviso">Hoje o preço já está no menor da história (ou a 1% dele). A Winter Sale só ganha se for mais fundo que isso.</div>':''}
+   ${l.mud?'<div class="aviso">O preço cheio mudou: o desconto de partida vem de promoções sobre o preço antigo. Confie menos nesta previsão.</div>':''}
+   <h4>Possibilidades de preço na Winter Sale</h4>${escadaHtml(l)}
+   <p class="nota">${CONF[l.c]} As chances vêm de como os invernos de 2023–2025 se comportaram em jogos com a mesma confiança e faixa de desconto, em relação ao ponto de partida.${l.m<=24?' O histórico deste jogo tem '+l.m+' meses.':''}</p>
+   <h4>Invernos passados deste jogo${ivs.length?' · bateu o menor histórico '+nRec+' de '+ivs.length:''}</h4>${invernosHtml(l)}`);
+}
+// ---- ficha da franquia
+function fichaFr(nome){
+  const f=FR.find(x=>x.nome===nome); if(!f)return;
+  const it=f.it;
+  abrir(`<h2>${esc(f.nome)}</h2>
+   <div class="meta">${it.length} ${it.length>1?'itens':'item'} na lista · ordem cronológica</div>
+   <div class="caixas">
+    <div class="cx"><small>Hoje (todos)</small><b>${brl(f.hoje)}</b></div>
+    <div class="cx"><small>Ponto de partida (todos)</small><b>${brl(f.prev)}</b><em>economiza ${brl(f.hoje-f.prev)} sobre hoje</em></div>
+    <div class="cx rec"><small>Recordes esperados</small><b>~${num1(f.en)}</b><em>chance de pelo menos 1: ${f.pAlgum}%</em></div></div>
+   <h4>Jogos e DLCs da franquia</h4>
+   ${it.map(l=>`<div class="lj" data-a="${l.a}"><img loading="lazy" src="${capaU(l.a)}" alt="" onerror="this.style.visibility='hidden'">
+     <div><div class="nm">${esc(l.n)}</div><div class="sb">${l.ano||''} · hoje ${brl(hoje(l))}${l.hc?' (-'+l.hc+'%)':''} · menor da história ${l.mn?brl(l.mn):'—'}</div></div>
+     <div class="pv"><div>${l.pc?brl(l.pp)+' '+chip(l.pc):'sem desconto'}</div><div class="sb">ponto de partida</div></div>
+     <div class="pv pn2"><div style="color:var(--sinal)">${l.pn!=null?pct(l.pn):l.p1!=null?pct(l.p1):'—'}</div><div class="sb">${l.p1!=null?'1ª promoção':'bate o menor'}</div></div></div>`).join('')}`);
+}
+// ---- método
+function metodo(){
+  const ca=Object.entries(M.cal_anos), tx=M.taxa_novo; M.faixas=['menos de 5%','5% a 15%','15% a 30%','30% a 60%','60% ou mais'];
+  abrir(`<h2>Como foi calculado</h2>
+  <h4>A pergunta que importa</h4>
+  <p class="nota">Nos três últimos invernos, <b>${Object.entries(tx).map(([y,v])=>y+': '+String(v).replace('.',',')+'%').join(' · ')}</b> dos jogos da lista chegaram a um preço <b>abaixo do menor que já tinham tido</b> (qualquer loja marcada). O inverno é a venda em que mais jogos batem o recorde; por isso a página não dá "um preço" por jogo: dá a chance de cada cenário.</p>
+  <h4>Como cada jogo é calculado</h4>
+  <p class="nota"><b>1. Ponto de partida:</b> o maior desconto que o jogo teve na Steam nos últimos 6 meses (sem promoção em 6 meses, nos últimos 12). Se o preço cheio mudou, só contam promoções sobre o preço de hoje quando existem.<br>
+  <b>2. Escada de cenários:</b> nos invernos de 2023, 2024 e 2025, comparei o que cada jogo tinha em 2 de novembro com o que o inverno fez (maior desconto de 22/12 a 02/01). A diferença forma uma distribuição por confiança e faixa de desconto; dela sai a chance de o inverno chegar ao menos em cada degrau (10%, 15%, 20% … 90%).<br>
+  <b>3. Menor histórico:</b> o menor preço de todos os tempos nas suas lojas que vendem chave Steam (a ITAD começa em out/2021). <b>Novo menor</b> = o preço fica abaixo dele em mais de 1% e R$ 0,10; <b>empata</b> = até 1% ou R$ 0,10 acima. A chance de bater é a chance de o inverno chegar ao menos no desconto que faz o preço passar do limite.<br>
+  <b>Jogos que nunca tiveram promoção</b> não entram na conta de recorde (o "menor" deles seria o próprio preço cheio): aparecem como "1ª promoção" com a chance de ter o primeiro desconto nesta venda. <b>Preço cheio mudou</b> (marcado com *): o menor histórico vem do preço antigo e vale menos, então esses jogos não entram nas somas de recordes esperados e ficam atrás nas ordens por chance.<br>
+  <b>4. Franquias:</b> as mesmas da Biblioteca (campo da Steam, agrupamento por nome e trocas feitas na ficha). "Recordes esperados" = soma das chances dos jogos.</p>
+  <h4>Teste deixando um ano de fora</h4>
+  <p class="nota">Para cada inverno, as chances foram calculadas só com os outros dois anos e comparadas com o que aconteceu (jogos que já tinham tido alguma promoção):</p>
+  <table><tr><th>Inverno</th><th class="n">Jogos</th><th class="n">Bater o menor: previsto</th><th class="n">real</th><th class="n">Chegar no menor: previsto</th><th class="n">real</th></tr>
+  ${ca.map(([y,v])=>`<tr><td>${y}</td><td class="n">${v.n}</td><td class="n">${v.esp}</td><td class="n">${v.real}</td><td class="n">${v.esp_e}</td><td class="n">${v.real_e}</td></tr>`).join('')}</table>
+  <p class="nota">Por faixa de chance prevista (os três anos juntos) — "chegar no menor" é a chance que aparece na etiqueta das capas:</p>
+  <table><tr><th>Chance prevista</th><th class="n">Chegar no menor: jogos</th><th class="n">previsto</th><th class="n">aconteceu</th><th class="n">Bater o menor: jogos</th><th class="n">previsto</th><th class="n">aconteceu</th></tr>
+  ${M.faixas.map(f=>{const e=M.cal_caixas.emp.find(c=>c.faixa===f)||{n:0,prev:0,real:0}, n=M.cal_caixas.novo.find(c=>c.faixa===f)||{n:0,prev:0,real:0};
+   const td=(c)=>c.n?`<td class="n">${c.n}</td><td class="n">${Math.round(c.prev*100)}%</td><td class="n">${Math.round(c.real*100)}%</td>`:'<td class="n">—</td><td class="n">—</td><td class="n">—</td>';
+   return `<tr><td>${f}</td>${td(e)}${td(n)}</tr>`}).join('')}</table>
+  <h4>Confiança</h4>
+  <p class="nota"><b>A</b> = o desconto de partida apareceu 2+ vezes no último ano e há 18+ meses de histórico. <b>B</b> = apareceu 1 vez ou o preço cheio mudou. <b>C</b> = jogo com menos de 18 meses: costuma descontar mais a cada ano, e é onde mais saem recordes.</p>
+  <h4>Limites</h4>
+  <p class="nota">Estatística, não garantia: ela não sabe de decisões da desenvolvedora nem de lançamentos de sequência. A Promoção de Outono (fim de novembro) pode mudar o quadro, e o preço cheio de dezembro é o que vale. Venda: ${M.inicio} a ${M.fim} (<a style="color:var(--azul)" href="https://partner.steamgames.com/doc/marketing/upcoming_events/2026_winter_sale" target="_blank" rel="noopener">Steamworks</a>). Fora da previsão ficaram ${Object.values(M.sem).reduce((a,b)=>a+b,0)} itens (${Object.entries(M.sem).map(([k,v])=>v+' '+k).join(', ')}).</p>`);
+}
+desenhar();
 </script>
 </body>
 </html>
