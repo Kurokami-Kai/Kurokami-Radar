@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Winter Sale na lista de desejos — Kurokami Hunter</title>
+<style>
+/* paleta Kurokami: --acao compra, --sinal ativo/importante, --azul texto clicável; calor #2a1a1a → #4a1016 → #8a1520 → #d63031 → #ff4757 */
+:root{--bg:#050505;--pan:#0f0f0f;--pan2:#181818;--txt:#d2d2d2;--fraco:#9a9a9a;--dim:#7a7a7a;--azul:#ff7675;--sinal:#ff4757;--acao:#d63031;--vbg:#4a1016;--vtx:#ff8a94;--borda:#ffffff14}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse 1000px 380px at 50% -140px,#5a0f18 0,#050505 70%) no-repeat,var(--bg);background-color:var(--bg);color:var(--txt);font:14px/1.4 "Motiva Sans",Arial,Helvetica,sans-serif}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--azul);text-decoration:none}a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--sinal);outline-offset:2px}
+main{max-width:1200px;margin:0 auto;padding:0 16px 80px}
+header{padding:26px 0 6px}
+h1{margin:0;font-size:28px;font-weight:300;color:#fff}h1 b{color:var(--sinal);font-weight:400}
+header p{margin:6px 0 0;color:var(--fraco)}
+.abas{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 10px}
+.aba{background:var(--pan2);border:0;padding:8px 14px;cursor:pointer;color:var(--fraco)}
+.aba b{color:#fff;font-weight:400;margin-left:6px}
+.aba[aria-pressed=true]{background:var(--acao);color:#fff}.aba[aria-pressed=true] b{color:#fff}
+.barra{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:5;background:#050505ee;padding:8px 0;border-bottom:1px solid var(--borda)}
+.barra input,.barra select{background:var(--pan2);border:1px solid var(--borda);padding:7px 10px}
+.barra input{flex:1;min-width:160px}
+.barra .n{color:var(--dim);font-size:12.5px}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:14px}
+.card{background:var(--pan);display:flex;flex-direction:column;position:relative;min-width:0}
+.card .cap{display:block;aspect-ratio:460/215;background:#141414;overflow:hidden;position:relative}
+.card .cap img{width:100%;height:100%;object-fit:cover;display:block}
+.card .cap .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:#fff;font-size:15px;background:linear-gradient(135deg,#1a1a1a,#3a0d12)}
+.card .cap img+.ph{display:none}
+.tenho{position:absolute;top:6px;right:6px;background:#000c;border:0;color:#ccc;font-size:11.5px;padding:3px 7px;cursor:pointer;opacity:0;transition:opacity .15s}
+.card:hover .tenho,.tenho:focus-visible{opacity:1}
+.corpo{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.nome{color:#fff;font-size:15px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nome a{color:#fff}
+.v{display:inline-block;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;align-self:flex-start}
+.v.espere{background:var(--vbg);color:var(--vtx)}.v.compre{background:var(--acao);color:#fff}.v.tanto{background:#262626;color:#bbb}.v.nao{background:#1a1a1a;color:#888}
+.inv{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.inv .rot{color:var(--dim);font-size:12px;width:100%}
+.inv b{color:#fff;font-size:24px;font-weight:400}
+.ch{font-size:13px;padding:1px 6px}
+[data-calor="0"]{background:#1a1a1a;color:#888}[data-calor="1"]{background:#2a1a1a;color:#e8b4b4}[data-calor="2"]{background:var(--vbg);color:var(--vtx)}[data-calor="3"]{background:#8a1520;color:#fff}[data-calor="4"]{background:var(--acao);color:#fff}[data-calor="5"]{background:var(--sinal);color:#000}
+.inv small{color:var(--fraco)}
+.hoje{display:flex;justify-content:space-between;gap:8px;color:var(--fraco);font-size:13px;border-top:1px solid var(--borda);padding-top:6px}
+.hoje b{color:#ddd;font-weight:400}
+.eco{color:var(--vtx)}
+.mot{margin:0;padding:0;list-style:none;color:var(--dim);font-size:12.5px}
+.mot li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+footer{margin-top:28px;color:var(--dim);font-size:12.5px;line-height:1.6}
+footer button{background:none;border:0;color:var(--azul);cursor:pointer;padding:0}
+.vazio{color:var(--fraco);padding:30px 0}
+@media (max-width:560px){h1{font-size:22px}.grade{grid-template-columns:1fr}.tenho{opacity:1}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Winter Sale <b>2026</b> na sua lista de desejos</h1>
+  <p id="sub"></p>
+</header>
+<div class="abas" id="abas"></div>
+<div class="barra">
+  <input id="busca" type="search" placeholder="Buscar jogo" aria-label="Buscar jogo">
+  <select id="teto" aria-label="Preço no inverno">
+    <option value="0">Qualquer preço</option><option value="3000">Até R$ 30</option><option value="5000">Até R$ 50</option>
+    <option value="10000">Até R$ 100</option><option value="20000">Até R$ 200</option>
+  </select>
+  <select id="ordem" aria-label="Ordem">
+    <option value="eco">Maior economia</option><option value="w">Mais barato no inverno</option>
+    <option value="pct">Maior desconto</option><option value="pri">Ordem da lista</option><option value="n">Nome</option>
+  </select>
+  <span class="n" id="n"></span>
+</div>
+<div class="grade" id="grade"></div>
+<footer id="rodape"></footer>
+</main>
+<script>
+/*DADOS*/
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const brl=c=>'R$ '+(c/100).toFixed(2).replace('.',',');
+const calor=p=>p>=80?5:p>=65?4:p>=50?3:p>=30?2:p>0?1:0;
+const corte=(l,p)=>Math.max(0,Math.round(100*(1-p/l.ch)));
+const V={espere:'Espere o inverno',compre:'Já está no preço',tanto:'Tanto faz',nao:'Não deve cair'};
+const ORD=['espere','compre','tanto','nao'];
+const CDN='https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/',CL='https://cdn.cloudflare.steamstatic.com/steam/apps/';
+const url=(l,x,pad)=>x==null?null:typeof x==='string'&&/^https?:/.test(x)?x:CDN+(x===1?l.a+'/'+pad:x[0]==='/'?x.slice(1):l.a+'/'+x);
+const capas=l=>[url(l,l.hd,'header.jpg'),CL+l.a+'/header.jpg',url(l,l.cv,'library_600x900_2x.jpg')].filter(Boolean);
+const LA=new Map(L.map(l=>[l.a,l]));
+function cf(img){const c=capas(LA.get(+img.dataset.a)),i=(+img.dataset.s||0)+1;if(i>=c.length){img.remove();return;}img.dataset.s=i;img.src=c[i];}
+// "já tenho": fica só neste navegador
+let oculto=new Set();try{oculto=new Set(JSON.parse(localStorage.getItem('kh-ws-tenho')||'[]'))}catch(e){}
+const salvar=()=>{try{localStorage.setItem('kh-ws-tenho',JSON.stringify([...oculto]))}catch(e){}};
+let aba='espere';
+function card(l){
+  const c=corte(l,l.w), ondeHoje=l.on==='keyshop'?'keyshop':l.on;
+  const eco=l.v==='espere'&&l.eco?`<span class="eco">economiza ${brl(l.eco)}</span>`:'';
+  const key=l.k&&l.on!=='keyshop'?` · keyshop ${brl(l.k)}`:'';
+  return `<article class="card">
+  <a class="cap" href="https://store.steampowered.com/app/${l.a}" target="_blank" rel="noopener"><img loading="lazy" data-a="${l.a}" src="${capas(l)[0]}" alt="" onerror="cf(this)"><span class="ph">${esc(l.n)}</span></a>
+  <button class="tenho" data-a="${l.a}" title="Esconder: já tenho este jogo">já tenho ✕</button>
+  <div class="corpo">
+    <div class="nome" title="${esc(l.n)}"><a href="https://store.steampowered.com/app/${l.a}" target="_blank" rel="noopener">${esc(l.n)}</a></div>
+    <span class="v ${l.v}">${V[l.v]}</span>
+    <div class="inv"><span class="rot">${l.v==='nao'?'No inverno':'Provável no inverno'+(l.wl&&l.wl!=='Steam'?' (melhor loja: '+esc(l.wl)+')':'')}</span>
+      <b>${brl(l.w)}</b><span class="ch" data-calor="${calor(c)}">${c?'-'+c+'%':'cheio'}</span>${l.wb?`<small>pode ir a ${brl(l.wb)}</small>`:''}</div>
+    <div class="hoje"><span>Hoje <b>${brl(l.ag)}</b> ${l.on==='keyshop'?'na keyshop':'na '+esc(ondeHoje)}${key}</span>${eco}</div>
+    <ul class="mot">${l.m.map(t=>`<li title="${esc(t)}">${esc(t)}</li>`).join('')}</ul>
+  </div></article>`;
+}
+function desenhar(){
+  const q=$('#busca').value.trim().toLowerCase(),teto=+$('#teto').value,o=$('#ordem').value;
+  const vis=L.filter(l=>!oculto.has(l.a));
+  const cont={};vis.forEach(l=>cont[l.v]=(cont[l.v]||0)+1);
+  $('#abas').innerHTML=[...ORD,'todos'].map(k=>`<button class="aba" data-k="${k}" aria-pressed="${aba===k}">${k==='todos'?'Todos':V[k]}<b>${k==='todos'?vis.length:cont[k]||0}</b></button>`).join('');
+  let r=vis.filter(l=>(aba==='todos'||l.v===aba)&&(!q||l.n.toLowerCase().includes(q))&&(!teto||l.w<=teto));
+  const f={eco:(a,b)=>(b.eco||0)-(a.eco||0)||a.w-b.w,w:(a,b)=>a.w-b.w,pct:(a,b)=>corte(b,b.w)-corte(a,a.w),
+    pri:(a,b)=>(a.pri||1e9)-(b.pri||1e9),n:(a,b)=>a.n.localeCompare(b.n)}[o];
+  r.sort(f);
+  $('#n').textContent=r.length+' jogo'+(r.length===1?'':'s');
+  $('#grade').innerHTML=r.length?r.map(card).join(''):'<p class="vazio">Nenhum jogo aqui.</p>';
+  const t=M.teste;
+  $('#rodape').innerHTML=`<p><b>Como ler:</b> “provável no inverno” é o preço mais provável na loja oficial mais barata (Steam, Nuuvem, GMG, Fanatical…), pelo corte que a Steam deve dar e por quanto as outras lojas ficaram abaixo dela no último inverno com o mesmo preço cheio. “Pode ir a” é o cenário bom (1 em 6). Keyshop entra com o preço de hoje (sem histórico de inverno ainda). Cupom de loja não aparece no histórico.</p>
+  <p><b>Teste no inverno 2025</b> (previsto em 2/11/2025): em ${t.perto}% de ${t.n} jogos o preço previsto ficou a até 15% do menor preço real (erro mediano ${t.mediana}%); dos ${t.espere} que seriam “espere”, ${t.espere_ok}% ficaram mais baratos no inverno.</p>
+  <p>Fora da página: ${Object.entries(M.fora).map(([k,v])=>v+' '+k).join(', ')}${Object.keys(M.sem).length?', '+Object.entries(M.sem).map(([k,v])=>v+' '+k).join(', '):''}.${oculto.size?` Escondidos por “já tenho”: ${oculto.size} (<button id="mostrar">mostrar de novo</button>).`:''} Gerado em ${M.gerado}.</p>`;
+}
+$('#abas').addEventListener('click',e=>{const b=e.target.closest('.aba');if(b){aba=b.dataset.k;desenhar();}});
+$('#grade').addEventListener('click',e=>{const b=e.target.closest('.tenho');if(b){oculto.add(+b.dataset.a);salvar();desenhar();}});
+$('#rodape').addEventListener('click',e=>{if(e.target.id==='mostrar'){oculto.clear();salvar();desenhar();}});
+['busca','teto','ordem'].forEach(id=>$('#'+id).addEventListener('input',desenhar));
+$('#sub').textContent=`Venda de ${M.inicio} a ${M.fim}. ${M.n} jogos da sua lista, sem DLC e sem o que você já tem.`;
+desenhar();
+</script>
+</body>
+</html>
