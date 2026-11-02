@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Previsão Winter Sale — Kurokami Hunter</title>
+<style>
+:root{--bg:#0b0b0c;--p1:#141416;--p2:#1c1c1f;--lin:#2a2a2e;--tx:#ececee;--mu:#8d8d95;--acao:#e5312f;--sinal:#ff5a4f;--cinza:#2e2e33}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 "Segoe UI",system-ui,sans-serif}
+.w{max-width:1280px;margin:0 auto;padding:20px 16px 60px}
+h1{margin:0;font-size:26px;letter-spacing:.3px}h1 b{color:var(--acao)}
+.sub{color:var(--mu);margin:4px 0 18px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:16px}
+.k{background:var(--p1);border:1px solid var(--lin);border-radius:8px;padding:12px 14px;cursor:pointer;text-align:left;color:inherit;font:inherit}
+.k:hover,.k.on{border-color:var(--acao)}
+.k .n{font-size:26px;font-weight:700}.k .l{color:var(--mu);font-size:12px}
+.k.novo .n{color:var(--sinal)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+input,select,button{background:var(--p2);color:var(--tx);border:1px solid var(--lin);border-radius:6px;padding:8px 10px;font:inherit}
+input{min-width:240px;flex:1}
+button.sec{background:var(--cinza);cursor:pointer}
+details{background:var(--p1);border:1px solid var(--lin);border-radius:8px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}
+details p,details li{color:#c9c9cf}
+table.bt{border-collapse:collapse;margin:8px 0}table.bt td,table.bt th{border-bottom:1px solid var(--lin);padding:5px 12px;text-align:right}table.bt th:first-child,table.bt td:first-child{text-align:left}
+.tw{overflow-x:auto;border:1px solid var(--lin);border-radius:8px}
+table.t{width:100%;border-collapse:collapse;min-width:980px}
+.t th{position:sticky;top:0;background:var(--p2);text-align:left;padding:9px 10px;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--lin)}
+.t td{padding:8px 10px;border-bottom:1px solid var(--lin);vertical-align:middle}
+.t tr:hover td{background:#17171a}
+.jg{display:flex;gap:10px;align-items:center;min-width:280px}
+.jg img{width:92px;height:35px;object-fit:cover;border-radius:3px;background:var(--p2);flex:none}
+.jg a{color:var(--tx);text-decoration:none;font-weight:600}.jg a:hover{text-decoration:underline}
+.jg small{display:block;color:var(--mu)}
+.pr{font-weight:700;font-variant-numeric:tabular-nums}
+.pr s{display:block;color:var(--mu);font-weight:400;font-size:12px}
+.ch{display:inline-block;padding:1px 6px;border-radius:3px;font-weight:700;font-size:12px;margin-left:6px;background:#333;color:#ddd}
+.ch[data-calor="1"]{background:#3a2222;color:#f0b4b0}.ch[data-calor="2"]{background:#5a1f1d;color:#ffd0cc}
+.ch[data-calor="3"]{background:#8a2420;color:#fff}.ch[data-calor="4"]{background:#c42a26;color:#fff}.ch[data-calor="5"]{background:#ff3b2f;color:#fff}
+.prev .pr{font-size:17px;color:#fff}
+.v{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:700;white-space:nowrap}
+.v.novo{background:var(--acao);color:#fff}.v.igual{background:#7a1d1b;color:#fff}.v.perto{background:var(--cinza);color:#ddd}
+.v.acima,.v.sem,.v.nd,.v.cheio{background:#1f1f22;color:var(--mu);border:1px solid var(--lin)}
+.mn{color:var(--mu);font-size:12px;display:block;margin-top:3px}
+.cf{font-size:12px}.cf b{display:inline-block;width:20px;text-align:center;border-radius:3px;margin-right:6px;background:var(--cinza)}
+.cf b.A{background:#7a1d1b;color:#fff}.cf b.C{background:#1f1f22;color:var(--mu);border:1px solid var(--lin)}
+.cf span{color:var(--mu);display:block}
+.iv{font-size:12px;color:var(--mu);white-space:nowrap}.iv i{font-style:normal;color:#c9c9cf;margin-right:8px}
+.nota{font-size:12px;color:var(--sinal);display:block;margin-top:2px}
+.cont{color:var(--mu);margin:6px 2px}
+@media(max-width:700px){h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Previsão <b>Winter Sale</b> da sua lista</h1>
+<div class="sub" id="sub"></div>
+<div class="kpis" id="kpis"></div>
+
+<details>
+<summary>Como a previsão é feita e quanto ela acerta</summary>
+<p><b>Regra:</b> o desconto da Winter Sale é o <b>maior desconto que o jogo teve na Steam nos últimos 6 meses</b> (se não teve nenhum em 6 meses, nos últimos 12). O preço previsto aplica esse desconto ao preço cheio de hoje e arredonda para o final ,99 da Steam. Foi a regra que mais acertou entre as que testei com o histórico do seu banco (o último inverno sozinho, o maior de 12 meses, o maior de 24 meses, mediana, etc.).</p>
+<p><b>Teste com o passado:</b> para cada inverno de 2023, 2024 e 2025, a regra usou só o que se sabia em 2 de novembro daquele ano e foi comparada com o maior desconto de 22/12 a 02/01.</p>
+<div id="bt"></div>
+<p><b>Confiança:</b> <b>A</b> = o desconto previsto já apareceu 2 vezes ou mais no último ano e o jogo tem 18+ meses de histórico (ou ele nunca entrou em promoção). <b>B</b> = esse nível apareceu uma vez só (costuma ser promoção avulsa, então o inverno tende a ficar igual ou menor) ou o preço cheio mudou e só há promoções sobre o preço antigo; quando há promoção já no preço cheio de hoje, só ela conta. <b>C</b> = jogo com menos de 18 meses: o desconto tende a ficar <b>maior</b> que o previsto (jogos novos descontam mais a cada ano), trate como mínimo.</p>
+<p><b>Menor histórico</b> = o menor preço registrado desde out/2021 (limite do histórico da ITAD) nas suas lojas que vendem chave Steam. Se o preço cheio mudou desde as promoções antigas, o menor preço antigo não serve de régua e o jogo fica como "Preço cheio mudou". "Chega no menor" = o preço previsto fica a menos de 1% (ou R$ 0,10) dele, ou seja, empata o recorde; "Abaixo do menor" = fica abaixo. A "chance de bater o recorde" é a fração dos casos do teste (da mesma confiança) em que o inverno ficou 5+ pontos de desconto além do previsto.</p>
+<p><b>Limites:</b> é estatística, não garantia. A Promoção de Outono (fim de novembro) pode chegar antes e mudar o quadro. Se o preço cheio mudar até dezembro, o preço previsto muda junto (o desconto é o que se prevê). DLCs e jogos pequenos oscilam mais. Datas da venda: 17/12/2026 a 04/01/2027, segundo a <a style="color:var(--sinal)" href="https://partner.steamgames.com/doc/marketing/upcoming_events/2026_winter_sale">Steamworks</a>.</p>
+</details>
+
+<div class="bar">
+<input id="q" placeholder="Buscar jogo…" autocomplete="off">
+<select id="fv"><option value="">Todos os veredictos</option><option value="novo">Abaixo do menor histórico</option><option value="igual">Chega no menor histórico (empate)</option><option value="perto">Perto do menor (até +15%)</option><option value="acima">Longe do menor</option><option value="cheio">Preço cheio mudou</option><option value="sem">Sem desconto esperado</option></select>
+<select id="fc"><option value="">Toda confiança</option><option value="A">Confiança A</option><option value="B">Confiança B</option><option value="C">Confiança C</option></select>
+<select id="ft"><option value="">Jogos e DLCs</option><option value="jogo">Só jogos</option><option value="dlc">Só DLCs</option></select>
+<select id="so"><option value="v">Ordem: mais perto do recorde</option><option value="eco">Maior economia sobre hoje</option><option value="pc">Maior desconto previsto</option><option value="pp">Menor preço previsto</option><option value="pri">Ordem da lista de desejos</option><option value="n">Nome</option></select>
+<button class="sec" id="lm">Limpar</button>
+</div>
+<div class="cont" id="cont"></div>
+<div class="tw"><table class="t"><thead><tr>
+<th>Jogo</th><th>Hoje na Steam</th><th>Previsto na Winter Sale</th><th>Menor histórico</th><th>Confiança</th><th>Invernos passados</th>
+</tr></thead><tbody id="tb"></tbody></table></div>
+<div class="cont" id="sem"></div>
+</div>
+<script>
+/*DADOS*/
+const $=s=>document.querySelector(s);
+const brl=c=>'R$ '+(c/100).toFixed(2).replace('.',',');
+const calor=p=>p>=80?5:p>=65?4:p>=50?3:p>=30?2:p>0?1:0;
+const chip=p=>p>0?`<span class="ch" data-calor="${calor(p)}">-${p}%</span>`:'';
+const VER={novo:'Novo menor histórico',igual:'Chega no menor histórico',perto:'Perto do menor',acima:'Longe do menor',sem:'Sem desconto esperado',nd:'Sem comparação',cheio:'Preço cheio mudou'};
+const ORD={novo:0,igual:1,perto:2,acima:3,cheio:4,nd:5,sem:6};
+const pct=x=>Math.round(x*100)+'%';
+let kv='';
+L.forEach(l=>{l.eco=(l.h||l.ch)-l.pp;l.ja=l.mn&&l.h<=l.mn+Math.max(10,l.mn*.01);});
+$('#sub').textContent=`Winter Sale ${M.inicio} a ${M.fim} · ${L.length} itens da sua lista de desejos · gerado em ${M.gerado} com o histórico de preços do seu banco`;
+function kpis(){
+  const c=k=>L.filter(l=>l.v===k).length, esp=L.filter(l=>l.pp<(l.h||l.ch)).length;
+  const defs=[['','Itens com previsão',L.length,''],['novo','Abaixo do menor histórico',c('novo'),'novo'],['igual','Chegam ao menor histórico (empate)',c('igual'),'novo'],['perto','Perto do menor',c('perto'),''],['sem','Sem desconto esperado',c('sem'),'']];
+  $('#kpis').innerHTML=defs.map(d=>`<button class="k ${d[3]} ${kv===d[0]?'on':''}" data-v="${d[0]}"><div class="n">${d[2]}</div><div class="l">${d[1]}</div></button>`).join('')
+   +`<div class="k" style="cursor:default"><div class="n">${esp}</div><div class="l">ficam mais baratos que hoje (esperar compensa)</div></div>`;
+  document.querySelectorAll('.k[data-v]').forEach(b=>b.onclick=()=>{kv=b.dataset.v;$('#fv').value=kv;draw();});
+}
+function bt(){
+  const r=(n,o)=>`<tr><td>${n}</td><td>${o.n}</td><td>${pct(o.h25)}</td><td>${pct(o.h5)}</td><td>${pct(o.ao_menos)}</td><td>${pct(o.alem)}</td></tr>`;
+  const b=M.bt;
+  $('#bt').innerHTML=`<table class="bt"><tr><th></th><th>Casos</th><th>Acertou ±2,5 pontos</th><th>±5 pontos</th><th>Chegou ao menos no previsto</th><th>Foi 5+ pontos além</th></tr>`
+   +r('Todos',b.todos)+r('Confiança A',b.A)+r('Confiança B',b.B)+r('Confiança C',b.C)
+   +Object.entries(b.anos).map(([y,o])=>r('Inverno '+y,o)).join('')+'</table>';
+}
+function ivHtml(l){return l.inv.length?l.inv.map(x=>`<i>${String(x[0]).slice(2)}: ${x[1]>0?'-'+x[1]+'%':'—'}</i>`).join(''):'sem inverno no histórico';}
+function filtrar(){
+  const q=$('#q').value.trim().toLowerCase(),fv=$('#fv').value,fc=$('#fc').value,ft=$('#ft').value;
+  let r=L.filter(l=>(!q||l.n.toLowerCase().includes(q))&&(!fv||l.v===fv)&&(!fc||l.c===fc)&&(!ft||(ft==='dlc'?l.t==='dlc':l.t!=='dlc')));
+  const s=$('#so').value;
+  const f={v:(a,b)=>ORD[a.v]-ORD[b.v]||b.eco-a.eco,eco:(a,b)=>b.eco-a.eco,pc:(a,b)=>b.pc-a.pc,pp:(a,b)=>a.pp-b.pp,
+    pri:(a,b)=>(a.pri||1e9)-(b.pri||1e9),n:(a,b)=>a.n.localeCompare(b.n)}[s];
+  return r.sort(f);
+}
+function draw(){
+  kv=$('#fv').value;kpis();
+  const r=filtrar();
+  $('#cont').textContent=r.length+' de '+L.length+' itens';
+  const T={A:'confiança alta',B:'este nível apareceu só 1 vez no último ano',C:'jogo novo: o desconto real tende a ser maior'};
+  $('#tb').innerHTML=r.map(l=>{
+    const cf=M.bt[l.c];
+    const nota=l.mud?'<span class="nota">preço cheio mudou: o desconto vem de promoções sobre o preço antigo</span>':l.ja?'<span class="nota">hoje já está no menor preço de todos os tempos</span>':(l.pp>=l.h&&l.hc>0?'<span class="nota">hoje já está igual ou melhor que o previsto</span>':'');
+    return `<tr><td><div class="jg"><img loading="lazy" src="https://cdn.cloudflare.steamstatic.com/steam/apps/${l.a}/capsule_184x69.jpg" onerror="this.style.visibility='hidden'" alt="">
+      <div><a href="https://store.steampowered.com/app/${l.a}/" target="_blank" rel="noopener">${l.n.replace(/</g,'&lt;')}</a><small>${l.t==='dlc'?'DLC · ':''}${l.pri?'#'+l.pri+' na lista':'sem posição na lista'}</small></div></div></td>
+      <td class="pr">${brl(l.h||l.ch)}${chip(l.hc)}<s>${l.hc?'cheio '+brl(l.ch):'preço cheio'}</s></td>
+      <td class="prev"><div class="pr">${l.pc?brl(l.pp):'sem desconto'}${chip(l.pc)}</div>${l.pc?'<s class="mn">cheio '+brl(l.ch)+'</s>':''}${nota}</td>
+      <td><span class="v ${l.v}">${VER[l.v]}</span>${l.v==='igual'?`<span class="mn">chance de bater o recorde: ~${pct(cf.alem)}</span>`:''}${l.mn?`<span class="mn">${brl(l.mn)} · ${l.ml}${l.mq?' · '+l.mq.slice(5)+'/'+l.mq.slice(0,4):''}</span>`:''}</td>
+      <td class="cf" title="${T[l.c]}"><b class="${l.c}">${l.c}</b>${l.pc?pct(cf.ao_menos)+' chegam ao menos lá':pct(cf.ao_menos)+' acertam'}<span>${l.m} meses de histórico</span></td>
+      <td class="iv">${ivHtml(l)}</td></tr>`}).join('');
+}
+['#q','#fv','#fc','#ft','#so'].forEach(s=>$(s).addEventListener(s==='#q'?'input':'change',draw));
+$('#lm').onclick=()=>{$('#q').value='';['#fv','#fc','#ft'].forEach(s=>$(s).value='');$('#so').value='v';draw();};
+const sm=Object.entries(M.sem);
+$('#sem').textContent=sm.length?'Fora da previsão ('+sm.reduce((a,b)=>a+b[1],0)+'): '+sm.map(x=>x[1]+' '+x[0]).join(', ')+'.':'';
+bt();draw();
+</script>
+</body>
+</html>
