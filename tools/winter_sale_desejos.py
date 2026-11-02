@@ -14,12 +14,14 @@ import collections
 import json
 import os
 import re
+import sqlite3
 import sys
 import unicodedata
 from datetime import datetime, timedelta
 
 import prever_winter_sale as pw
 import recomendar_winter_sale as rw
+from radar import analise  # noqa: E402 (prever_winter_sale ja pos a raiz no sys.path)
 
 SAIDA = os.path.join(pw.RAIZ, "dados", "winter-sale-lista-de-desejos.html")
 JA_TENHO = os.path.join(pw.RAIZ, "dados", "ja-tenho.txt")
@@ -113,6 +115,114 @@ def brl(c):
     return "R$ " + ("%.2f" % (c / 100)).replace(".", ",")
 
 
+TIPOS = ("selo", "novo", "igual", "24m")              # as 4 caixas do Hunter (analise.TIPOS), da mais forte para a mais fraca
+NOME_TIPO = {"selo": "Selo Kurokami", "novo": "Novo recorde", "igual": "Igual ao recorde", "24m": "Menor em 2 anos"}
+PESO_TIPO = {"selo": 1.0, "novo": .85, "igual": .7, "24m": .55, None: .3}
+
+
+def folga(x):
+    return max(10, x * 0.01)
+
+
+def meses_desde(aaaamm):
+    y, m = int(aaaamm[:4]), int(aaaamm[5:7])
+    return (pw.AGORA.year - y) * 12 + pw.AGORA.month - m
+
+
+def marca(p, rec, rec_q, m24, tem_promo):
+    """Caixa do preco p como o Hunter avisa (analise.analisar), contra o menor do regime em qualquer loja oficial:
+    selo (abaixo do recorde, que tem 18+ meses, ou pela metade dele; exige promocao anterior), novo, igual, 24m."""
+    if not rec:
+        return None
+    if p < rec - folga(rec):
+        meio = rec / 2
+        return "selo" if tem_promo and rec_q and (meses_desde(rec_q) >= 18 or p <= meio + folga(meio)) else "novo"
+    if abs(p - rec) <= folga(rec):
+        return "igual"
+    if m24 and p <= m24 + folga(m24):
+        return "24m"
+    return None
+
+
+def qualidade(rp, rc):
+    """0..1 pelas analises da Steam; poucas analises pesam menos."""
+    q = (rp or 70) / 100
+    return q * (.8 if (rc or 0) < 300 else 1)
+
+
+class SoLeitura:
+    """O minimo de radar.banco.Banco que analise.Contexto usa (q), sobre o banco aberto so para leitura."""
+
+    def __init__(self, banco):
+        self.con = sqlite3.connect("file:" + banco.replace("\\", "/") + "?mode=ro", uri=True)
+        self.con.row_factory = sqlite3.Row
+
+    def q(self, sql, *args):
+        return self.con.execute(sql, *args).fetchall()
+
+
+def cortes_dlc(con):
+    """appid -> maior corte da Steam no ultimo ano (promo_hist e preco): o que uma DLC costuma ter numa promocao."""
+    desde = (pw.AGORA - timedelta(days=400)).isoformat()
+    out = {}
+    for tab in ("promo_hist", "preco"):
+        for a, c in con.execute("SELECT appid,MAX(corte) FROM %s WHERE loja='Steam' AND quando>=? AND corte<100 GROUP BY appid" % tab, (desde,)):
+            out[a] = max(out.get(a) or 0, c or 0)
+    return out
+
+
+def completo(cx, a, w, ch, cm, cd):
+    """Jogo + expansoes (DLCs de historia e pacotes que voce nao tem): hoje (o jeito mais barato, com edicoes e bundles,
+    analise.melhor_combinacao) e no inverno (o jogo pelo preco provavel + cada DLC pelo maior corte dela no ultimo ano,
+    sem passar do corte do jogo; sem historico, ate -50%). None se as expansoes somam menos de 15% do jogo."""
+    rel = [d for d in cx.relevantes(a) if d not in cx.possuidos]
+    cheios = [cx.jogos.get(d, {}).get("cheio_steam") or 0 for d in rel]
+    if not rel or sum(cheios) < ch * .15:
+        return None
+    mc = cx.melhor_combinacao(a)
+    if not mc or not mc.get("custo_completo"):
+        return None
+    inv = w + round(sum(c * (100 - min(cm, cd.get(d) if cd.get(d) else 50)) / 100 for d, c in zip(rel, cheios)))
+    return dict(n=len(rel), hoje=mc["custo_completo"], inv=min(inv, mc["custo_completo"]), cheio=ch + sum(cheios),
+                como=mc["nome"] if mc.get("partes") else "")
+
+
+def apresentacao(out):
+    """O que a apresentacao mostra (listas de appids, na ordem): so jogos bem avaliados (80%+ e 300+ analises).
+    picks = espere com caixa provavel (Selo/recorde/igual/2 anos), pela forca da caixa x corte x avaliacao;
+    ja = o preco de hoje ja e o do inverno e esta numa caixa (ou keyshop abaixo do inverno); recordes = maior chance
+    de novo recorde; fr = franquias com 2+ jogos para comprar; dlc = jogo + expansoes; nao = jogos novos longe do
+    desconto tipico ou sem promocao prevista."""
+    bom = [l for l in out if (l.get("rp") or 0) >= 80 and (l.get("rc") or 0) >= 300]
+    q = {l["a"]: qualidade(l.get("rp"), l.get("rc")) for l in out}
+    corte = lambda l, p: max(0, 1 - p / l["ch"])                                         # noqa: E731
+    picks = sorted((l for l in bom if l["v"] == "espere" and l.get("mk")),     # forca da caixa x avaliacao x desconto x economia
+                   key=lambda l: -PESO_TIPO[l["mk"]] * q[l["a"]] * (.5 + corte(l, l["w"])) * (min(l["eco"], 15000) / 15000) ** .5)[:15]
+    ja = sorted((l for l in bom if l["v"] == "compre" and (l.get("mag") or (l["on"] == "keyshop" and l["ag"] <= l["w"]))),
+                key=lambda l: -corte(l, l["ag"]) * q[l["a"]])[:9]
+    rec = sorted((l for l in bom if l["v"] in ("espere", "tanto") and l["cn"]["novo"] >= 50),
+                 key=lambda l: -l["cn"]["novo"] * q[l["a"]])[:9]
+    grupos = collections.defaultdict(list)
+    for l in out:
+        if l.get("fr") and l["v"] in ("espere", "compre"):
+            grupos[l["fr"]].append(l)
+    fr = []
+    for nome, ls in grupos.items():
+        if len(ls) < 2:
+            continue
+        hoje, inv = sum(l["ag"] for l in ls), sum(min(l["w"], l["ag"]) for l in ls)
+        nota = sum(q[l["a"]] for l in ls) / len(ls)
+        fr.append(dict(nome=nome, itens=[l["a"] for l in sorted(ls, key=lambda l: -q[l["a"]])], hoje=hoje, inv=inv,
+                       ch=sum(l["ch"] for l in ls), s=(hoje - inv) * nota))
+    fr.sort(key=lambda g: -g["s"])
+    dlc = sorted((l for l in bom if l.get("cp") and l["cp"]["n"] <= 8 and l["v"] != "nao"),
+                 key=lambda l: -(l["cp"]["cheio"] - min(l["cp"]["hoje"], l["cp"]["inv"])) * q[l["a"]])[:6]
+    nao = sorted((l for l in bom if l.get("al") or l["v"] == "nao"), key=lambda l: -(l.get("rc") or 0))[:8]
+    return dict(picks=[l["a"] for l in picks], ja=[l["a"] for l in ja], rec=[l["a"] for l in rec],
+                fr=[{k: v for k, v in g.items() if k != "s"} for g in fr[:6]], nfr=len(fr),
+                dlc=[l["a"] for l in dlc], nao=[l["a"] for l in nao])
+
+
 def main():
     banco = sys.argv[1] if len(sys.argv) > 1 else pw.BANCO
     saida = sys.argv[2] if len(sys.argv) > 2 else SAIDA
@@ -133,6 +243,9 @@ def main():
     key = {}
     for a, pr, q in con.execute("SELECT appid,preco,quando FROM preco WHERE loja=? AND quando>=? AND preco>0 ORDER BY quando", (KEYSHOP, desde)):
         key[a] = pr                                 # o mais recente fica
+    cfg = json.load(open(os.path.join(pw.DADOS, "config.json"), encoding="utf-8"))
+    cx = analise.Contexto(SoLeitura(banco), dict(cfg, dlc=dict(cfg.get("dlc") or {}, so_expansoes=True)))
+    cd = cortes_dlc(con)
     fora, out, cont = collections.Counter(), [], collections.Counter()
     for l in linhas:
         a, j = l["a"], jogos[l["a"]]
@@ -189,14 +302,29 @@ def main():
             m.append("Menor já visto: %s na %s (%s)" % (brl(l["mb"]), l["mbl"], l["mbq"][5:] + "/" + l["mbq"][:4]))
         if not m:
             m.append("Sem histórico de inverno")
+        # as 4 caixas: o preco provavel e cada cenario contra o menor do regime (qualquer loja oficial) e o de 24 meses
+        rec, rec_l, rec_q = (l["mn"], l["ml"], l["mq"]) if l["mn"] else (None, "", "")
+        d24 = max(x["ini"] or pw.dt(2000, 1, 1), pw.AGORA - timedelta(days=730))
+        m24 = pw.menor_ate(a, pw.AGORA, ctx["S"], ctx["H"], d24)
+        tem_promo = l["p1"] is None
+        mk = marca(win, rec, rec_q, m24 and m24[0], tem_promo)
+        cen = [marca(w * f, rec, rec_q, m24 and m24[0], tem_promo) for w in o["W"]]
+        chance = {t: round(100 * sum(1 for c in cen if c and TIPOS.index(c) <= TIPOS.index(t)) / len(cen)) for t in TIPOS}
+        comp = completo(cx, a, win, ch, o["cm"], cd)
+        alem = None
+        if ap and o["v"] == "alem":
+            alem = dict(k=ap["k"], med=ap["med"], idade=round(rw.idade_em(j["lanc"], pw.AGORA) / rw.DIA / 30.4))
         out.append({kk: vv for kk, vv in dict(
             a=a, n=j["nome"], v=v, ch=ch, h=h, hc=hc or None, of=of[0], ol=of[1], k=k, ag=agora, on=onde,
             w=win, wb=bom if bom < win else None, wl=wl, eco=max(agora - win, 0), pc=round(o["p_cai"] * 100),
-            m=m[:2], pri=l["pri"] or None, rp=j["rp"], hd=rw.curta(l["hd"], a, "header.jpg"),
+            mk=mk, cn=chance, rec=rec, recl=rec_l, recq=rec_q, m24=m24 and m24[0], fr=l["f"], cp=comp, al=alem,
+            mag=marca(of[0], rec, rec_q, m24 and m24[0], tem_promo) if hc or of[1] != "Steam" else None,
+            m=m[:2], pri=l["pri"] or None, rp=j["rp"], rc=j["rc"], hd=rw.curta(l["hd"], a, "header.jpg"),
             cv=rw.curta(l["cv"], a, "library_600x900_2x.jpg")).items() if vv is not None and vv != ""})
     teste = teste_2025(ctx, HL)
+    qq = meta["cal_qq"].get(2025) or {}
     meta = dict(gerado=meta["gerado"], inicio=meta["inicio"], fim=meta["fim"], cont=dict(cont), fora=dict(fora),
-                sem=meta["sem"], teste=teste, n=len(out))
+                sem=meta["sem"], teste=teste, n=len(out), ap=apresentacao(out), rec25=dict(prev=qq.get("esp"), real=qq.get("real")))
     modelo = open(os.path.join(pw.RAIZ, "tools", "winter_sale_desejos.html"), encoding="utf-8").read()
     html = modelo.replace("/*DADOS*/", "const L=%s, M=%s;" % (json.dumps(out, ensure_ascii=False, separators=(",", ":")),
                                                             json.dumps(meta, ensure_ascii=False, separators=(",", ":"))))

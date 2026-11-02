@@ -13,124 +13,277 @@ button,input,select{font:inherit;color:inherit}
 a{color:var(--azul);text-decoration:none}a:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--sinal);outline-offset:2px}
 main{max-width:1200px;margin:0 auto;padding:0 16px 80px}
-header{padding:26px 0 6px}
-h1{margin:0;font-size:28px;font-weight:300;color:#fff}h1 b{color:var(--sinal);font-weight:400}
-header p{margin:6px 0 0;color:var(--fraco)}
-.abas{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 10px}
-.aba{background:var(--pan2);border:0;padding:8px 14px;cursor:pointer;color:var(--fraco)}
+[data-calor="0"]{background:#1a1a1a;color:#888}[data-calor="1"]{background:#2a1a1a;color:#e8b4b4}[data-calor="2"]{background:var(--vbg);color:var(--vtx)}[data-calor="3"]{background:#8a1520;color:#fff}[data-calor="4"]{background:var(--acao);color:#fff}[data-calor="5"]{background:var(--sinal);color:#000}
+.ch{font-size:12.5px;padding:1px 6px;white-space:nowrap}
+.mk{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;white-space:nowrap}
+.mk small{font-size:11px;opacity:.8;text-transform:none;letter-spacing:0;margin-left:4px}
+/* ---------- apresentação */
+.apres{margin:18px 0 6px;background:#0b0b0bd9;border:1px solid var(--borda);position:relative}
+.slide{display:none;padding:26px 28px 70px;min-height:min(78vh,700px)}
+.slide.on{display:block;animation:entra .25s ease}
+@keyframes entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.slide .kick{color:var(--sinal);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+.slide h2{margin:4px 0 6px;font-size:30px;font-weight:300;color:#fff;line-height:1.15}
+.slide h2 b{color:var(--sinal);font-weight:400}
+.slide .lead{color:var(--fraco);margin:0 0 18px;max-width:820px;font-size:15px}
+.slide .lead b{color:#fff;font-weight:400}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:26px 0}
+.num{background:var(--pan2);padding:16px 18px;box-shadow:inset 3px 0 0 var(--c,var(--acao))}
+.num b{display:block;color:#fff;font-size:32px;font-weight:300}
+.num span{color:var(--fraco);font-size:13.5px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{display:grid;grid-template-columns:132px minmax(0,1fr);gap:10px;background:var(--pan);padding:6px;align-items:center;min-width:0;color:inherit}
+.tile:hover{background:var(--pan2);text-decoration:none}
+.tile .cap{aspect-ratio:460/215;background:#151515;overflow:hidden;position:relative}
+.tile .cap img{width:100%;height:100%;object-fit:cover;display:block}
+.tile .tn{color:#fff;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .tp{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px}
+.tile .tp b{color:#fff;font-weight:400;font-size:16px}
+.tile .tx{color:var(--dim);font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frs{display:flex;flex-direction:column;gap:8px}
+.fr{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--pan);padding:10px 12px}
+.fr .fn{color:#fff;font-size:16px}.fr .fn small{display:block;color:var(--dim);font-size:12px}
+.fr .caps{display:flex;gap:4px;overflow:hidden}
+.fr .caps img{height:44px;aspect-ratio:460/215;object-fit:cover;flex:none;background:#151515}
+.fr .tot{text-align:right;white-space:nowrap}.fr .tot s{color:var(--dim);font-size:12.5px}.fr .tot b{display:block;color:#fff;font-size:19px;font-weight:400}
+.conf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.conf div{background:var(--pan);padding:14px 16px}
+.conf b{color:#fff;font-size:26px;font-weight:300;display:block}
+.conf p{margin:4px 0 0;color:var(--fraco)}
+.conf table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
+.conf td{padding:4px 0;border-top:1px solid var(--borda)}.conf td:last-child{text-align:right;color:#fff}
+.nav{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid var(--borda);background:#0b0b0b}
+.nav button{background:var(--pan2);border:0;padding:7px 14px;cursor:pointer}
+.nav button.prox{background:var(--acao);color:#fff}
+.nav button:disabled{opacity:.35;cursor:default}
+.pontos{display:flex;gap:6px;flex:1;justify-content:center;flex-wrap:wrap}
+.pontos i{width:9px;height:9px;background:#333;cursor:pointer;display:block}
+.pontos i.on{background:var(--sinal)}
+.nav .pag{color:var(--dim);font-size:12.5px;min-width:44px;text-align:right}
+/* ---------- catálogo */
+.cat h2{margin:34px 0 0;font-size:22px;font-weight:300;color:#fff}
+.abas{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 8px}
+.aba,.chip{background:var(--pan2);border:0;padding:7px 12px;cursor:pointer;color:var(--fraco)}
 .aba b{color:#fff;font-weight:400;margin-left:6px}
 .aba[aria-pressed=true]{background:var(--acao);color:#fff}.aba[aria-pressed=true] b{color:#fff}
+.chip[aria-pressed=true]{box-shadow:inset 0 0 0 1px var(--sinal);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.chips span{color:var(--dim);font-size:12.5px;margin-right:2px}
 .barra{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:0;z-index:5;background:#050505ee;padding:8px 0;border-bottom:1px solid var(--borda)}
 .barra input,.barra select{background:var(--pan2);border:1px solid var(--borda);padding:7px 10px}
 .barra input{flex:1;min-width:160px}
 .barra .n{color:var(--dim);font-size:12.5px}
 .grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:14px}
+.grupo{margin-top:22px}.grupo h3{margin:0;color:#fff;font-weight:400;font-size:17px}.grupo h3 small{color:var(--fraco);font-size:13px;margin-left:8px;font-weight:400}
+.grupo .grade{margin-top:8px}
 .card{background:var(--pan);display:flex;flex-direction:column;position:relative;min-width:0}
 .card .cap{display:block;aspect-ratio:460/215;background:#141414;overflow:hidden;position:relative}
 .card .cap img{width:100%;height:100%;object-fit:cover;display:block}
-.card .cap .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:#fff;font-size:15px;background:linear-gradient(135deg,#1a1a1a,#3a0d12)}
-.card .cap img+.ph{display:none}
+.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;color:#fff;font-size:13px;background:linear-gradient(135deg,#1a1a1a,#3a0d12)}
+.cap img+.ph{display:none}
 .tenho{position:absolute;top:6px;right:6px;background:#000c;border:0;color:#ccc;font-size:11.5px;padding:3px 7px;cursor:pointer;opacity:0;transition:opacity .15s}
 .card:hover .tenho,.tenho:focus-visible{opacity:1}
 .corpo{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
 .nome{color:#fff;font-size:15px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nome a{color:#fff}
-.v{display:inline-block;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;align-self:flex-start}
-.v.espere{background:var(--vbg);color:var(--vtx)}.v.compre{background:var(--acao);color:#fff}.v.tanto{background:#262626;color:#bbb}.v.nao{background:#1a1a1a;color:#888}
+.selos{display:flex;gap:6px;flex-wrap:wrap}
+.v{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px}
+.v.espere{background:#262626;color:#fff;box-shadow:inset 0 0 0 1px var(--acao)}.v.compre{background:var(--acao);color:#fff}.v.tanto{background:#262626;color:#bbb}.v.nao{background:#1a1a1a;color:#888}
 .inv{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .inv .rot{color:var(--dim);font-size:12px;width:100%}
 .inv b{color:#fff;font-size:24px;font-weight:400}
-.ch{font-size:13px;padding:1px 6px}
-[data-calor="0"]{background:#1a1a1a;color:#888}[data-calor="1"]{background:#2a1a1a;color:#e8b4b4}[data-calor="2"]{background:var(--vbg);color:var(--vtx)}[data-calor="3"]{background:#8a1520;color:#fff}[data-calor="4"]{background:var(--acao);color:#fff}[data-calor="5"]{background:var(--sinal);color:#000}
 .inv small{color:var(--fraco)}
+.rec{font-size:12.5px;color:var(--fraco)}.rec b{color:var(--vtx);font-weight:400}
 .hoje{display:flex;justify-content:space-between;gap:8px;color:var(--fraco);font-size:13px;border-top:1px solid var(--borda);padding-top:6px}
 .hoje b{color:#ddd;font-weight:400}
-.eco{color:var(--vtx)}
+.eco{color:var(--vtx);white-space:nowrap}
+.cp{font-size:12.5px;color:var(--fraco);background:#141414;padding:5px 7px}.cp b{color:#fff;font-weight:400}
 .mot{margin:0;padding:0;list-style:none;color:var(--dim);font-size:12.5px}
 .mot li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 footer{margin-top:28px;color:var(--dim);font-size:12.5px;line-height:1.6}
 footer button{background:none;border:0;color:var(--azul);cursor:pointer;padding:0}
 .vazio{color:var(--fraco);padding:30px 0}
-@media (max-width:560px){h1{font-size:22px}.grade{grid-template-columns:1fr}.tenho{opacity:1}}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.fr{grid-template-columns:minmax(0,1fr) auto}.fr .caps{display:none}}
+@media (max-width:600px){.slide{padding:18px 14px 70px}.slide h2{font-size:23px}.nums,.tiles,.conf{grid-template-columns:1fr}.tile{grid-template-columns:104px minmax(0,1fr)}
+  .grade{grid-template-columns:1fr}.tenho{opacity:1}.nav{padding:10px 12px}.nav button{padding:7px 10px}}
 </style>
 </head>
 <body>
 <main>
-<header>
-  <h1>Winter Sale <b>2026</b> na sua lista de desejos</h1>
-  <p id="sub"></p>
-</header>
-<div class="abas" id="abas"></div>
-<div class="barra">
-  <input id="busca" type="search" placeholder="Buscar jogo" aria-label="Buscar jogo">
-  <select id="teto" aria-label="Preço no inverno">
-    <option value="0">Qualquer preço</option><option value="3000">Até R$ 30</option><option value="5000">Até R$ 50</option>
-    <option value="10000">Até R$ 100</option><option value="20000">Até R$ 200</option>
-  </select>
-  <select id="ordem" aria-label="Ordem">
-    <option value="eco">Maior economia</option><option value="w">Mais barato no inverno</option>
-    <option value="pct">Maior desconto</option><option value="pri">Ordem da lista</option><option value="n">Nome</option>
-  </select>
-  <span class="n" id="n"></span>
-</div>
-<div class="grade" id="grade"></div>
-<footer id="rodape"></footer>
+<div class="apres" id="apres" tabindex="-1" aria-roledescription="apresentação"></div>
+<section class="cat" id="cat">
+  <h2>Todos os jogos</h2>
+  <div class="abas" id="abas"></div>
+  <div class="chips" id="marcas"></div>
+  <div class="barra">
+    <input id="busca" type="search" placeholder="Buscar jogo ou franquia" aria-label="Buscar jogo ou franquia">
+    <select id="teto" aria-label="Preço no inverno">
+      <option value="0">Qualquer preço</option><option value="3000">Até R$ 30</option><option value="5000">Até R$ 50</option>
+      <option value="10000">Até R$ 100</option><option value="20000">Até R$ 200</option>
+    </select>
+    <select id="ordem" aria-label="Ordem">
+      <option value="eco">Maior economia</option><option value="rec">Mais abaixo do menor histórico</option><option value="w">Mais barato no inverno</option>
+      <option value="pct">Maior desconto</option><option value="nota">Mais bem avaliados</option><option value="pri">Ordem da lista</option><option value="n">Nome</option>
+    </select>
+    <select id="vista" aria-label="Agrupar"><option value="">Sem agrupar</option><option value="fr">Por franquia</option></select>
+    <span class="n" id="n"></span>
+  </div>
+  <div id="grade"></div>
+  <footer id="rodape"></footer>
+</section>
 </main>
 <script>
 /*DADOS*/
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const brl=c=>'R$ '+(c/100).toFixed(2).replace('.',',');
+const brl0=c=>'R$ '+Math.round(c/100).toLocaleString('pt-BR');
 const calor=p=>p>=80?5:p>=65?4:p>=50?3:p>=30?2:p>0?1:0;
 const corte=(l,p)=>Math.max(0,Math.round(100*(1-p/l.ch)));
+const chip=(l,p)=>{const c=corte(l,p);return `<span class="ch" data-calor="${calor(c)}">${c?'-'+c+'%':'cheio'}</span>`};
+const mesAno=s=>s?s.slice(5,7)+'/'+s.slice(0,4):'';
+const folga=x=>Math.max(10,x*.01);
 const V={espere:'Espere o inverno',compre:'Já está no preço',tanto:'Tanto faz',nao:'Não deve cair'};
 const ORD=['espere','compre','tanto','nao'];
+const TIPOS=['selo','novo','igual','24m'];
+const NT={selo:'Selo Kurokami',novo:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
+const CT={selo:5,novo:4,igual:3,'24m':2};
+const marca=(t,ch)=>t?`<span class="mk" data-calor="${CT[t]}">${NT[t]}${ch!=null?`<small>${ch}%</small>`:''}</span>`:'';
 const CDN='https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/',CL='https://cdn.cloudflare.steamstatic.com/steam/apps/';
 const url=(l,x,pad)=>x==null?null:typeof x==='string'&&/^https?:/.test(x)?x:CDN+(x===1?l.a+'/'+pad:x[0]==='/'?x.slice(1):l.a+'/'+x);
 const capas=l=>[url(l,l.hd,'header.jpg'),CL+l.a+'/header.jpg',url(l,l.cv,'library_600x900_2x.jpg')].filter(Boolean);
 const LA=new Map(L.map(l=>[l.a,l]));
 function cf(img){const c=capas(LA.get(+img.dataset.a)),i=(+img.dataset.s||0)+1;if(i>=c.length){img.remove();return;}img.dataset.s=i;img.src=c[i];}
-// "já tenho": fica só neste navegador
+const img=l=>`<img loading="lazy" data-a="${l.a}" src="${capas(l)[0]}" alt="" onerror="cf(this)"><span class="ph">${esc(l.n)}</span>`;
+const loja=l=>'https://store.steampowered.com/app/'+l.a;
+// diferença do preço provável para o menor histórico (regime do preço cheio de hoje, lojas oficiais)
+function vsRec(l,p){
+  if(!l.rec)return '';
+  const d=p-l.rec,onde=`${brl(l.rec)} na ${esc(l.recl)}, ${mesAno(l.recq)}`;
+  if(Math.abs(d)<=folga(l.rec))return `No menor histórico (${onde})`;
+  return d<0?`<b>${brl(-d)} abaixo</b> do menor histórico (${onde})`:`${brl(d)} acima do menor histórico (${onde})`;
+}
+const melhor=l=>TIPOS.find(t=>l.cn&&l.cn[t]>=50);
+// ===================================================== apresentação
+const A=M.ap, P=A.picks.map(a=>LA.get(a)), J=A.ja.map(a=>LA.get(a));
+function tile(l,p,linha,extra,semChip){
+  return `<a class="tile" href="${loja(l)}" target="_blank" rel="noopener"><span class="cap">${img(l)}</span><span style="min-width:0">
+    <div class="tn" title="${esc(l.n)}">${esc(l.n)}</div>
+    <div class="tp"><b>${brl(p)}</b>${semChip?'':chip(l,p)}${extra||''}</div><div class="tx" title="${esc(linha.replace(/<[^>]+>/g,''))}">${linha}</div></span></a>`;
+}
+const soma=(ls,f)=>ls.reduce((s,l)=>s+f(l),0);
+const slides=[];
+{ // 1. capa
+  const tw=soma(P,l=>l.w),tj=soma(J,l=>l.ag),tc=soma(P,l=>l.ch)+soma(J,l=>l.ch),ec=soma(P,l=>l.ag-l.w);
+  const nrec=P.filter(l=>l.mk&&l.mk!=='24m').length;
+  slides.push(`<div class="kick">Winter Sale 2026 · ${M.inicio} a ${M.fim}</div>
+  <h2>Da sua lista de desejos, eu compraria <b>${P.length+J.length} jogos</b> por <b>${brl0(tw+tj)}</b>.</h2>
+  <p class="lead">Preço cheio deles: <b>${brl0(tc)}</b>. São ${J.length} agora, porque já estão no preço do inverno, e ${P.length} na Winter Sale, quando ${nrec} deles devem voltar ao menor histórico ou bater um novo. Só entraram jogos bem avaliados (80%+ e 300+ análises na Steam). Daqui para frente, cada página explica o motivo.</p>
+  <div class="nums">
+    <div class="num"><b>${brl0(tj)}</b><span>${J.length} jogos para comprar já: hoje já custam o que custariam no inverno</span></div>
+    <div class="num" style="--c:var(--sinal)"><b>${brl0(tw)}</b><span>${P.length} jogos para comprar entre ${M.inicio} e ${M.fim}</span></div>
+    <div class="num" style="--c:#8a1520"><b>${brl0(ec)}</b><span>é quanto você economiza esperando, em vez de comprar esses ${P.length} hoje</span></div>
+  </div>
+  <p class="lead">O resto da lista também foi analisado (${M.n} jogos): está no catálogo abaixo, com filtros pelas 4 caixas do Hunter e por franquia.</p>`);
+}
+slides.push(`<div class="kick">1 · A lista curta do inverno</div><h2>Espere a Winter Sale para estes ${P.length}</h2>
+  <p class="lead">Cada um deve cair a um preço que o Hunter avisaria: <b>Selo Kurokami</b>, <b>novo recorde</b>, <b>igual ao recorde</b> ou <b>menor em 2 anos</b>. A porcentagem é a chance de chegar lá, tirada da distribuição dos invernos passados.</p>
+  <div class="tiles">${P.map(l=>tile(l,l.w,vsRec(l,l.w)||'hoje '+brl(l.ag),' '+marca(l.mk,l.cn[l.mk]))).join('')}</div>`);
+slides.push(`<div class="kick">2 · Não espere</div><h2>Estes ${J.length} já estão no preço do inverno: <b>compre agora</b></h2>
+  <p class="lead">Hoje o preço já está numa das caixas, ou a keyshop já está abaixo do que a loja oficial deve cobrar no inverno. Esperar daria no mesmo, ou sairia mais caro.</p>
+  <div class="tiles">${J.map(l=>tile(l,l.ag,(l.on==='keyshop'?'na keyshop · ':'na '+esc(l.on)+' · ')+'inverno ~'+brl(l.w),' '+marca(l.mag))).join('')}</div>`);
+{ const R=A.rec.map(a=>LA.get(a));
+slides.push(`<div class="kick">3 · Recordes à vista</div><h2>Os que devem bater o <b>menor preço da história</b></h2>
+  <p class="lead">No inverno de 2025, o modelo previu ${M.rec25.prev} recordes nas lojas oficiais e aconteceram ${M.rec25.real}. Para estes ${R.length}, a chance de novo recorde está acima de 50%:</p>
+  <div class="tiles">${R.map(l=>tile(l,l.w,vsRec(l,l.w),' '+marca(l.cn.selo>=50?'selo':'novo',l.cn[l.cn.selo>=50?'selo':'novo']))).join('')}</div>`);}
+slides.push(`<div class="kick">4 · Franquias</div><h2>Fechar uma franquia sai barato no inverno</h2>
+  <p class="lead">${A.nfr} franquias da lista têm 2 ou mais jogos para esperar ou comprar já. Estas são as que mais economizam (o preço de cada jogo é o menor entre o de hoje e o do inverno):</p>
+  <div class="frs">${A.fr.map(g=>{const ls=g.itens.map(a=>LA.get(a));return `<div class="fr"><div class="fn">${esc(g.nome)}<small>${ls.length} jogos · cheio ${brl0(g.ch)}</small></div>
+    <div class="caps">${ls.slice(0,8).map(l=>`<img loading="lazy" data-a="${l.a}" src="${capas(l)[0]}" alt="${esc(l.n)}" title="${esc(l.n)}" onerror="cf(this)">`).join('')}</div>
+    <div class="tot"><s>hoje ${brl0(g.hoje)}</s><b>${brl0(g.inv)}</b></div></div>`}).join('')}</div>`);
+{ const D=A.dlc.map(a=>LA.get(a));
+slides.push(`<div class="kick">5 · Com as expansões</div><h2>Quando o jogo só faz sentido <b>com as DLCs</b></h2>
+  <p class="lead">Aqui o preço é o do jogo com as expansões de história e os pacotes que você não tem. Hoje vale o jeito mais barato de comprar tudo (edição, bundle ou avulso); no inverno, o jogo pelo preço provável e cada DLC pelo maior corte que ela teve no último ano. Exemplo: HITMAN sai a ${(()=>{const h=L.find(l=>/HITMAN World/.test(l.n));return h&&h.cp?brl(h.cp.hoje)+' completo hoje e ~'+brl(h.cp.inv)+' no inverno':'—'})()}.</p>
+  <div class="tiles">${D.map(l=>tile(l,l.cp.inv,`hoje ${brl(l.cp.hoje)}${l.cp.como?' ('+esc(l.cp.como)+')':''} · ${l.cp.n} DLC${l.cp.n>1?'s':''}`,`<span class="ch" data-calor="${calor(Math.round(100*(1-l.cp.inv/l.cp.cheio)))}">-${Math.round(100*(1-l.cp.inv/l.cp.cheio))}%</span>`,1)).join('')}</div>`);}
+{ const N=A.nao.map(a=>LA.get(a));
+slides.push(`<div class="kick">6 · Não compre agora</div><h2>Estes valem a espera <b>além do inverno</b></h2>
+  <p class="lead">Lançamento recente demora para chegar ao desconto típico da faixa de preço. A curva foi feita com uns 6 mil lançamentos desde 2021. E tem jogo que quase nunca entra em promoção: aí o inverno não muda nada.</p>
+  <div class="tiles">${N.map(l=>tile(l,l.w,l.al?`tem ${l.al.idade} meses; -${l.al.k}% costuma vir com ~${l.al.med||24} meses`:'quase nunca entra em promoção · hoje '+brl(l.ag))).join('')}</div>`);}
+{ const t=M.teste;
+slides.push(`<div class="kick">7 · Por que confiar</div><h2>Testado com o inverno que <b>já aconteceu</b></h2>
+  <p class="lead">Rodei a mesma conta para o inverno de 2025, usando só o que se sabia em 2 de novembro de 2025, e comparei com o que realmente aconteceu.</p>
+  <div class="conf">
+    <div><b>${t.espere_ok}%</b><p>dos ${t.espere} jogos que a página mandaria esperar ficaram mais baratos no inverno.</p></div>
+    <div><b>${t.mediana}%</b><p>de erro mediano no preço; em ${t.perto}% dos ${t.n} jogos, o preço previsto ficou a até 15% do menor preço real.</p></div>
+    <div><b>${M.rec25.prev} × ${M.rec25.real}</b><p>novos recordes previstos × os que aconteceram nas lojas oficiais em 2025.</p></div>
+    <div><p style="margin:0">As 4 caixas no histórico (backtest do Hunter, 2022–2025): parte que não ficou mais barata nos 12 meses seguintes</p>
+      <table><tr><td>Selo Kurokami</td><td>7 em 10</td></tr><tr><td>Menor em 2 anos</td><td>7 em 10</td></tr><tr><td>Igual ao recorde</td><td>6 em 10</td></tr><tr><td>Novo recorde (≥ 50%)</td><td>5 em 10</td></tr><tr><td>Qualquer promoção</td><td>4 em 10</td></tr></table></div>
+  </div>
+  <p class="lead" style="margin-top:16px">Limites: cupom de loja (como os da Nuuvem) não aparece no histórico. A keyshop só tem preço desde outubro de 2026, por isso entra com o preço de hoje. <a href="#cat">Ver todos os ${M.n} jogos ↓</a></p>`);}
+let s=0;
+function mostrar(i){s=Math.max(0,Math.min(slides.length-1,i));
+  $('#apres').innerHTML=slides.map((h,k)=>`<section class="slide${k===s?' on':''}" aria-label="${k+1} de ${slides.length}">${k===s?h:''}</section>`).join('')+
+  `<div class="nav"><button class="ant" ${s?'':'disabled'}>← Anterior</button><div class="pontos">${slides.map((_,k)=>`<i class="${k===s?'on':''}" data-k="${k}" title="Página ${k+1}"></i>`).join('')}</div>
+   <span class="pag">${s+1}/${slides.length}</span><button class="prox">${s<slides.length-1?'Próxima →':'Ver todos ↓'}</button></div>`;}
+$('#apres').addEventListener('click',e=>{
+  if(e.target.closest('.ant'))mostrar(s-1);
+  else if(e.target.closest('.prox')){if(s<slides.length-1)mostrar(s+1);else $('#cat').scrollIntoView({behavior:'smooth'});}
+  else if(e.target.dataset.k)mostrar(+e.target.dataset.k);});
+document.addEventListener('keydown',e=>{if(e.target.matches('input,select'))return;if(e.key==='ArrowRight')mostrar(s+1);if(e.key==='ArrowLeft')mostrar(s-1);});
+mostrar(0);
+// ===================================================== catálogo
 let oculto=new Set();try{oculto=new Set(JSON.parse(localStorage.getItem('kh-ws-tenho')||'[]'))}catch(e){}
 const salvar=()=>{try{localStorage.setItem('kh-ws-tenho',JSON.stringify([...oculto]))}catch(e){}};
-let aba='espere';
+let aba='todos';const so=new Set();
 function card(l){
-  const c=corte(l,l.w), ondeHoje=l.on==='keyshop'?'keyshop':l.on;
-  const eco=l.v==='espere'&&l.eco?`<span class="eco">economiza ${brl(l.eco)}</span>`:'';
-  const key=l.k&&l.on!=='keyshop'?` · keyshop ${brl(l.k)}`:'';
+  const t=melhor(l),key=l.k&&l.on!=='keyshop'?` · keyshop ${brl(l.k)}`:'';
+  const eco=l.v==='espere'&&l.eco?`<span class="eco">−${brl(l.eco)}</span>`:'';
+  const cp=l.cp?`<div class="cp">Com ${l.cp.n} ${l.cp.n>1?'expansões':'expansão'}: <b>~${brl(l.cp.inv)}</b> no inverno · hoje ${brl(l.cp.hoje)}</div>`:'';
+  const al=l.al?`<li>Lançado há ${l.al.idade} meses: -${l.al.k}% costuma vir com ~${l.al.med||24} meses</li>`:'';
   return `<article class="card">
-  <a class="cap" href="https://store.steampowered.com/app/${l.a}" target="_blank" rel="noopener"><img loading="lazy" data-a="${l.a}" src="${capas(l)[0]}" alt="" onerror="cf(this)"><span class="ph">${esc(l.n)}</span></a>
+  <a class="cap" href="${loja(l)}" target="_blank" rel="noopener">${img(l)}</a>
   <button class="tenho" data-a="${l.a}" title="Esconder: já tenho este jogo">já tenho ✕</button>
   <div class="corpo">
-    <div class="nome" title="${esc(l.n)}"><a href="https://store.steampowered.com/app/${l.a}" target="_blank" rel="noopener">${esc(l.n)}</a></div>
-    <span class="v ${l.v}">${V[l.v]}</span>
+    <div class="nome" title="${esc(l.n)}"><a href="${loja(l)}" target="_blank" rel="noopener">${esc(l.n)}</a></div>
+    <div class="selos"><span class="v ${l.v}">${V[l.v]}</span>${marca(t,t&&l.cn[t])}</div>
     <div class="inv"><span class="rot">${l.v==='nao'?'No inverno':'Provável no inverno'+(l.wl&&l.wl!=='Steam'?' (melhor loja: '+esc(l.wl)+')':'')}</span>
-      <b>${brl(l.w)}</b><span class="ch" data-calor="${calor(c)}">${c?'-'+c+'%':'cheio'}</span>${l.wb?`<small>pode ir a ${brl(l.wb)}</small>`:''}</div>
-    <div class="hoje"><span>Hoje <b>${brl(l.ag)}</b> ${l.on==='keyshop'?'na keyshop':'na '+esc(ondeHoje)}${key}</span>${eco}</div>
-    <ul class="mot">${l.m.map(t=>`<li title="${esc(t)}">${esc(t)}</li>`).join('')}</ul>
+      <b>${brl(l.w)}</b>${chip(l,l.w)}${l.wb?`<small>pode ir a ${brl(l.wb)}</small>`:''}</div>
+    <div class="rec">${vsRec(l,l.w)}</div>
+    ${cp}
+    <div class="hoje"><span>Hoje <b>${brl(l.ag)}</b> ${l.on==='keyshop'?'na keyshop':'na '+esc(l.on)}${key}</span>${eco}</div>
+    <ul class="mot">${al}${l.m.slice(0,al?1:2).map(t=>`<li title="${esc(t)}">${esc(t)}</li>`).join('')}</ul>
   </div></article>`;
 }
 function desenhar(){
-  const q=$('#busca').value.trim().toLowerCase(),teto=+$('#teto').value,o=$('#ordem').value;
+  const q=$('#busca').value.trim().toLowerCase(),teto=+$('#teto').value,o=$('#ordem').value,vista=$('#vista').value;
   const vis=L.filter(l=>!oculto.has(l.a));
   const cont={};vis.forEach(l=>cont[l.v]=(cont[l.v]||0)+1);
-  $('#abas').innerHTML=[...ORD,'todos'].map(k=>`<button class="aba" data-k="${k}" aria-pressed="${aba===k}">${k==='todos'?'Todos':V[k]}<b>${k==='todos'?vis.length:cont[k]||0}</b></button>`).join('');
-  let r=vis.filter(l=>(aba==='todos'||l.v===aba)&&(!q||l.n.toLowerCase().includes(q))&&(!teto||l.w<=teto));
-  const f={eco:(a,b)=>(b.eco||0)-(a.eco||0)||a.w-b.w,w:(a,b)=>a.w-b.w,pct:(a,b)=>corte(b,b.w)-corte(a,a.w),
-    pri:(a,b)=>(a.pri||1e9)-(b.pri||1e9),n:(a,b)=>a.n.localeCompare(b.n)}[o];
+  $('#abas').innerHTML=['todos',...ORD].map(k=>`<button class="aba" data-k="${k}" aria-pressed="${aba===k}">${k==='todos'?'Todos':V[k]}<b>${k==='todos'?vis.length:cont[k]||0}</b></button>`).join('');
+  $('#marcas').innerHTML='<span>No inverno, mostrar só:</span>'+TIPOS.map(t=>`<button class="chip" data-t="${t}" aria-pressed="${so.has(t)}">${NT[t]}</button>`).join('');
+  let r=vis.filter(l=>(aba==='todos'||l.v===aba)&&(!q||l.n.toLowerCase().includes(q)||(l.fr||'').toLowerCase().includes(q))&&(!teto||l.w<=teto)&&(!so.size||so.has(melhor(l))));
+  const nota=l=>(l.rp||0)*(l.rc>=300?1:.8);
+  const f={eco:(a,b)=>(b.eco||0)-(a.eco||0)||a.w-b.w,rec:(a,b)=>((a.w-(a.rec||1e9))-(b.w-(b.rec||1e9))),w:(a,b)=>a.w-b.w,
+    pct:(a,b)=>corte(b,b.w)-corte(a,a.w),nota:(a,b)=>nota(b)-nota(a),pri:(a,b)=>(a.pri||1e9)-(b.pri||1e9),n:(a,b)=>a.n.localeCompare(b.n)}[o];
   r.sort(f);
   $('#n').textContent=r.length+' jogo'+(r.length===1?'':'s');
-  $('#grade').innerHTML=r.length?r.map(card).join(''):'<p class="vazio">Nenhum jogo aqui.</p>';
+  if(!r.length)$('#grade').innerHTML='<p class="vazio">Nenhum jogo aqui.</p>';
+  else if(vista==='fr'){
+    const SF='Outros jogos (sem franquia na lista)',g=new Map(),n=new Map();r.forEach(l=>n.set(l.fr,(n.get(l.fr)||0)+1));
+    r.forEach(l=>{const k=l.fr&&n.get(l.fr)>1?l.fr:SF;if(!g.has(k))g.set(k,[]);g.get(k).push(l)});
+    const gs=[...g].sort((a,b)=>(a[0]===SF)-(b[0]===SF)||b[1].length-a[1].length||a[0].localeCompare(b[0]));
+    $('#grade').innerHTML=gs.map(([k,ls])=>`<div class="grupo"><h3>${esc(k)}<small>${ls.length} jogo${ls.length>1?'s':''} · inverno ${brl0(soma(ls,l=>Math.min(l.w,l.ag)))} · hoje ${brl0(soma(ls,l=>l.ag))}</small></h3>
+      <div class="grade">${ls.map(card).join('')}</div></div>`).join('');
+  } else $('#grade').innerHTML=`<div class="grade">${r.map(card).join('')}</div>`;
   const t=M.teste;
-  $('#rodape').innerHTML=`<p><b>Como ler:</b> “provável no inverno” é o preço mais provável na loja oficial mais barata (Steam, Nuuvem, GMG, Fanatical…), pelo corte que a Steam deve dar e por quanto as outras lojas ficaram abaixo dela no último inverno com o mesmo preço cheio. “Pode ir a” é o cenário bom (1 em 6). Keyshop entra com o preço de hoje (sem histórico de inverno ainda). Cupom de loja não aparece no histórico.</p>
-  <p><b>Teste no inverno 2025</b> (previsto em 2/11/2025): em ${t.perto}% de ${t.n} jogos o preço previsto ficou a até 15% do menor preço real (erro mediano ${t.mediana}%); dos ${t.espere} que seriam “espere”, ${t.espere_ok}% ficaram mais baratos no inverno.</p>
+  $('#rodape').innerHTML=`<p><b>Como ler:</b> “provável no inverno” é o preço mais provável na loja oficial mais barata (Steam, Nuuvem, GMG, Fanatical…). Ele vem do corte que a Steam deve dar e de quanto as outras lojas ficaram abaixo dela no último inverno com o mesmo preço cheio. “Pode ir a” é o cenário bom (1 em 6). As caixas comparam esse preço com o menor histórico do preço cheio de hoje nas lojas oficiais, do jeito que o Hunter avisa: Selo Kurokami, novo recorde, igual ao recorde e menor em 2 anos. A porcentagem é a chance de chegar lá. A keyshop entra com o preço de hoje.</p>
+  <p><b>Teste no inverno de 2025</b> (previsto em 2/11/2025): em ${t.perto}% dos ${t.n} jogos, o preço previsto ficou a até 15% do menor preço real, com erro mediano de ${t.mediana}%. Dos ${t.espere} jogos que a página mandaria esperar, ${t.espere_ok}% ficaram mais baratos no inverno.</p>
   <p>Fora da página: ${Object.entries(M.fora).map(([k,v])=>v+' '+k).join(', ')}${Object.keys(M.sem).length?', '+Object.entries(M.sem).map(([k,v])=>v+' '+k).join(', '):''}.${oculto.size?` Escondidos por “já tenho”: ${oculto.size} (<button id="mostrar">mostrar de novo</button>).`:''} Gerado em ${M.gerado}.</p>`;
 }
 $('#abas').addEventListener('click',e=>{const b=e.target.closest('.aba');if(b){aba=b.dataset.k;desenhar();}});
+$('#marcas').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b){const t=b.dataset.t;so.has(t)?so.delete(t):so.add(t);desenhar();}});
 $('#grade').addEventListener('click',e=>{const b=e.target.closest('.tenho');if(b){oculto.add(+b.dataset.a);salvar();desenhar();}});
 $('#rodape').addEventListener('click',e=>{if(e.target.id==='mostrar'){oculto.clear();salvar();desenhar();}});
-['busca','teto','ordem'].forEach(id=>$('#'+id).addEventListener('input',desenhar));
-$('#sub').textContent=`Venda de ${M.inicio} a ${M.fim}. ${M.n} jogos da sua lista, sem DLC e sem o que você já tem.`;
+['busca','teto','ordem','vista'].forEach(id=>$('#'+id).addEventListener('input',desenhar));
 desenhar();
 </script>
 </body>
