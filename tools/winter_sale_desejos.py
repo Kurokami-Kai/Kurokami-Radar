@@ -111,13 +111,7 @@ def teste_2025(ctx, HL):
                 espere=cai_n, espere_ok=round(100 * cai_ok / cai_n) if cai_n else None)
 
 
-def brl(c):
-    return "R$ " + ("%.2f" % (c / 100)).replace(".", ",")
-
-
 TIPOS = ("selo", "novo", "igual", "24m")              # as 4 caixas do Hunter (analise.TIPOS), da mais forte para a mais fraca
-NOME_TIPO = {"selo": "Selo Kurokami", "novo": "Novo recorde", "igual": "Igual ao recorde", "24m": "Menor em 2 anos"}
-PESO_TIPO = {"selo": 1.0, "novo": .85, "igual": .7, "24m": .55, None: .3}
 
 
 def folga(x):
@@ -187,40 +181,42 @@ def completo(cx, a, w, ch, cm, cd):
                 como=mc["nome"] if mc.get("partes") else "")
 
 
-def apresentacao(out):
-    """O que a apresentacao mostra (listas de appids, na ordem): so jogos bem avaliados (80%+ e 300+ analises).
-    picks = espere com caixa provavel (Selo/recorde/igual/2 anos), pela forca da caixa x corte x avaliacao;
-    ja = o preco de hoje ja e o do inverno e esta numa caixa (ou keyshop abaixo do inverno); recordes = maior chance
-    de novo recorde; fr = franquias com 2+ jogos para comprar; dlc = jogo + expansoes; nao = jogos novos longe do
-    desconto tipico ou sem promocao prevista."""
-    bom = [l for l in out if (l.get("rp") or 0) >= 80 and (l.get("rc") or 0) >= 300]
-    q = {l["a"]: qualidade(l.get("rp"), l.get("rc")) for l in out}
-    corte = lambda l, p: max(0, 1 - p / l["ch"])                                         # noqa: E731
-    picks = sorted((l for l in bom if l["v"] == "espere" and l.get("mk")),     # forca da caixa x avaliacao x desconto x economia
-                   key=lambda l: -PESO_TIPO[l["mk"]] * q[l["a"]] * (.5 + corte(l, l["w"])) * (min(l["eco"], 15000) / 15000) ** .5)[:15]
-    ja = sorted((l for l in bom if l["v"] == "compre" and (l.get("mag") or (l["on"] == "keyshop" and l["ag"] <= l["w"]))),
-                key=lambda l: -corte(l, l["ag"]) * q[l["a"]])[:9]
-    rec = sorted((l for l in bom if l["v"] in ("espere", "tanto") and l["cn"]["novo"] >= 50),
-                 key=lambda l: -l["cn"]["novo"] * q[l["a"]])[:9]
-    grupos = collections.defaultdict(list)
-    for l in out:
-        if l.get("fr") and l["v"] in ("espere", "compre"):
-            grupos[l["fr"]].append(l)
-    fr = []
-    for nome, ls in grupos.items():
-        if len(ls) < 2:
-            continue
-        hoje, inv = sum(l["ag"] for l in ls), sum(min(l["w"], l["ag"]) for l in ls)
-        nota = sum(q[l["a"]] for l in ls) / len(ls)
-        fr.append(dict(nome=nome, itens=[l["a"] for l in sorted(ls, key=lambda l: -q[l["a"]])], hoje=hoje, inv=inv,
-                       ch=sum(l["ch"] for l in ls), s=(hoje - inv) * nota))
-    fr.sort(key=lambda g: -g["s"])
-    dlc = sorted((l for l in bom if l.get("cp") and l["cp"]["n"] <= 8 and l["v"] != "nao"),
-                 key=lambda l: -(l["cp"]["cheio"] - min(l["cp"]["hoje"], l["cp"]["inv"])) * q[l["a"]])[:6]
-    nao = sorted((l for l in bom if l.get("al") or l["v"] == "nao"), key=lambda l: -(l.get("rc") or 0))[:8]
-    return dict(picks=[l["a"] for l in picks], ja=[l["a"] for l in ja], rec=[l["a"] for l in rec],
-                fr=[{k: v for k, v in g.items() if k != "s"} for g in fr[:6]], nfr=len(fr),
-                dlc=[l["a"] for l in dlc], nao=[l["a"] for l in nao])
+def extra_recorde(rec_corte, p_novo, novo, meses_rec):
+    """Quanto o novo recorde fica abaixo do atual (5 a 20%), por jogo. Pedido do dono: assumir que todo jogo bate o
+    recorde no inverno; o tamanho do passo vem de 4 sinais (0 a 1 cada):
+    folga = o recorde ainda e um desconto raso (-35% ou menos = 1; -85% = 0), chance = a do modelo de bater o recorde,
+    novo = lancamento ainda longe do desconto tipico da faixa, velho = o recorde tem 24+ meses."""
+    folga_ = max(0.0, min(1.0, (85 - rec_corte) / 50))
+    velho = min(1.0, meses_rec / 24) if meses_rec is not None else .5
+    nota = .35 * folga_ + .30 * p_novo + .20 * novo + .15 * velho
+    return round(5 + 15 * nota), [round(folga_ * 100), round(p_novo * 100), novo, round(velho * 100)]
+
+
+def mensal(rows, meses=36):
+    """Menor preco da Steam em cada um dos ultimos `meses` meses, em reais inteiros (None = sem registro)."""
+    out = []
+    y, m = pw.AGORA.year, pw.AGORA.month
+    for i in range(meses - 1, -1, -1):
+        mm, yy = m - i, y
+        while mm <= 0:
+            mm, yy = mm + 12, yy - 1
+        ini = pw.dt(yy, mm, 1)
+        fim = pw.dt(yy + (mm == 12), mm % 12 + 1, 1)
+        js = [r[1] for r in pw.janela(rows, ini, min(fim, pw.AGORA)) if r[1] > 0] if ini <= pw.AGORA else []
+        out.append(round(min(js) / 100) if js else None)
+    return out
+
+
+def resumo(out):
+    """Totais por veredito e a ordem das fichas (compre ja, inverno pela economia x avaliacao, espere mais, nao compre)."""
+    ordem = {"ja": 0, "inverno": 1, "mais": 2, "nao": 3}
+    q = lambda g: qualidade(g.get("rp"), g.get("rc"))                                    # noqa: E731
+    out.sort(key=lambda g: (ordem[g["vd"]], -(g["eco"] * q(g)) if g["vd"] == "inverno" else -q(g) * (g.get("rc") or 0) ** .3))
+    t = {}
+    for v in ordem:
+        gs = [g for g in out if g["vd"] == v]
+        t[v] = dict(n=len(gs), hoje=sum(g["ag"] for g in gs), inv=sum(min(g["wn"], g["ag"]) for g in gs), ch=sum(g["ch"] for g in gs))
+    return t
 
 
 def main():
@@ -270,68 +266,51 @@ def main():
         iv = invernos(x["rows"], a, HL, ch, pw.ANO, j["lanc"])
         f = fator(iv)
         win = round(o["mediana"] * f)
-        bom = round(o["bom"] * f)
-        wl = iv[-1][3] if iv and f < .99 else "Steam"
         of = min(oficial.get(a) or [(h, "Steam")])
         k = key.get(a)
         agora, onde = (k, "keyshop") if k and k < of[0] else of
-        # veredito em 4 cestas, so com numeros que a pessoa ve na tela
-        if o["p_promo"] < .4 and not hc and agora >= ch * .97:
-            v = "nao"
-        elif win < agora - max(300, agora * .08) and o["p_cai"] >= .5:
-            v = "espere"
-        elif agora <= win + max(200, win * .03):
-            v = "compre"
-        else:
-            v = "tanto"
-        cont[v] += 1
-        # motivos: no maximo 2, os que explicam o numero do inverno
-        m = []
-        if iv:
-            y, st, qq, lj = iv[-1]
-            m.append("Inverno %d: %s na %s (-%d%%)" % (y, brl(qq), lj, round(100 * (1 - qq / ch))))
-        elif l["p1"] is not None:
-            m.append("Nunca teve promoção neste preço: no inverno seria a 1ª")
-        if l["rc0"]:
-            m.append("Preço cheio mudou de %s para %s: o histórico antigo não vale" % (brl(l["rc0"]), brl(ch)))
         ap = o["ap"]
-        if ap and o["v"] == "alem" and len(m) < 2:
-            m.append("Lançado há %d meses: costuma chegar a -%d%% só em ~%d meses" % (
-                round(rw.idade_em(j["lanc"], pw.AGORA) / rw.DIA / 30.4), ap["k"], ap["med"] or 24))
-        if l["mb"] and len(m) < 2 and not (iv and l["mb"] >= iv[-1][2]):
-            m.append("Menor já visto: %s na %s (%s)" % (brl(l["mb"]), l["mbl"], l["mbq"][5:] + "/" + l["mbq"][:4]))
-        if not m:
-            m.append("Sem histórico de inverno")
         # as 4 caixas: o preco provavel e cada cenario contra o menor do regime (qualquer loja oficial) e o de 24 meses
         rec, rec_l, rec_q = (l["mn"], l["ml"], l["mq"]) if l["mn"] else (None, "", "")
         d24 = max(x["ini"] or pw.dt(2000, 1, 1), pw.AGORA - timedelta(days=730))
         m24 = pw.menor_ate(a, pw.AGORA, ctx["S"], ctx["H"], d24)
         tem_promo = l["p1"] is None
-        mk = marca(win, rec, rec_q, m24 and m24[0], tem_promo)
         cen = [marca(w * f, rec, rec_q, m24 and m24[0], tem_promo) for w in o["W"]]
         chance = {t: round(100 * sum(1 for c in cen if c and TIPOS.index(c) <= TIPOS.index(t)) / len(cen)) for t in TIPOS}
-        comp = completo(cx, a, win, ch, o["cm"], cd)
         alem = None
         if ap and o["v"] == "alem":
             alem = dict(k=ap["k"], med=ap["med"], idade=round(rw.idade_em(j["lanc"], pw.AGORA) / rw.DIA / 30.4))
-        out.append({kk: vv for kk, vv in dict(
-            a=a, n=j["nome"], v=v, ch=ch, h=h, hc=hc or None, of=of[0], ol=of[1], k=k, ag=agora, on=onde,
-            w=win, wb=bom if bom < win else None, wl=wl, eco=max(agora - win, 0), pc=round(o["p_cai"] * 100),
-            mk=mk, cn=chance, rec=rec, recl=rec_l, recq=rec_q, m24=m24 and m24[0], fr=l["f"], cp=comp, al=alem,
-            mag=marca(of[0], rec, rec_q, m24 and m24[0], tem_promo) if hc or of[1] != "Steam" else None,
-            m=m[:2], pri=l["pri"] or None, rp=j["rp"], rc=j["rc"], hd=rw.curta(l["hd"], a, "header.jpg"),
-            cv=rw.curta(l["cv"], a, "library_600x900_2x.jpg")).items() if vv is not None and vv != ""})
+        # pedido do dono: todo jogo faz novo recorde no inverno, de 5 a 20% abaixo do atual (o modelo so baixa mais)
+        rec_corte = 100 * (1 - rec / ch) if rec else 0
+        xp, xm = extra_recorde(rec_corte, chance["novo"] / 100, 1 if alem else 0, meses_desde(rec_q) if rec_q else None)
+        wn = min(win, round((rec or ch) * (100 - xp) / 100))
+        comp = completo(cx, a, wn, ch, o["cm"], cd)
+        if (j["rp"] or 100) < 70:
+            vd = "nao"
+        elif agora <= wn * 1.03:
+            vd = "ja"
+        elif alem:
+            vd = "mais"
+        else:
+            vd = "inverno"
+        cont[vd] += 1
+        g = dict(a=a, n=j["nome"], vd=vd, ch=ch, ag=agora, on=onde, k=k, wn=wn, x=xp, xm=xm, eco=max(agora - wn, 0),
+                 rec=rec, recl=rec_l, recq=rec_q, pn=chance["novo"], fr=l["f"], cp=comp, al=alem, rp=j["rp"], rc=j["rc"],
+                 ano=datetime.fromtimestamp(j["lanc"], pw.UTC).year if j["lanc"] else None,
+                 iv=[[y, qq_, lj] for y, st, qq_, lj in iv], h36=mensal(x["rows"]),
+                 hd=rw.curta(l["hd"], a, "header.jpg"), cv=rw.curta(l["cv"], a, "library_600x900_2x.jpg"))
+        out.append({kk: vv for kk, vv in g.items() if vv is not None and vv != "" and vv != []})
     teste = teste_2025(ctx, HL)
     qq = meta["cal_qq"].get(2025) or {}
-    meta = dict(gerado=meta["gerado"], inicio=meta["inicio"], fim=meta["fim"], cont=dict(cont), fora=dict(fora),
-                sem=meta["sem"], teste=teste, n=len(out), ap=apresentacao(out), rec25=dict(prev=qq.get("esp"), real=qq.get("real")))
+    meta = dict(gerado=meta["gerado"], inicio=meta["inicio"], fim=meta["fim"], fora=dict(fora), sem=meta["sem"], teste=teste,
+                n=len(out), tot=resumo(out), rec25=dict(n=qq.get("n"), real=qq.get("real")), mes=pw.AGORA.strftime("%Y-%m"))
     modelo = open(os.path.join(pw.RAIZ, "tools", "winter_sale_desejos.html"), encoding="utf-8").read()
     html = modelo.replace("/*DADOS*/", "const L=%s, M=%s;" % (json.dumps(out, ensure_ascii=False, separators=(",", ":")),
                                                             json.dumps(meta, ensure_ascii=False, separators=(",", ":"))))
     os.makedirs(os.path.dirname(saida), exist_ok=True)
     open(saida, "w", encoding="utf-8").write(html)
     print("ok:", saida, "%d KB" % (len(html) // 1024))
-    print("cestas:", dict(cont), "fora:", dict(fora), "sem previsão:", meta["sem"])
+    print("vereditos:", dict(cont), "totais:", meta["tot"], "fora:", dict(fora), "sem previsão:", meta["sem"])
     print("teste inverno 2025:", teste)
 
 
