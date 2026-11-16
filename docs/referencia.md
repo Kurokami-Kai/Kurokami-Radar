@@ -39,10 +39,11 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
 - `linha_do_tempo(linhas, agora_)` — Mesma lista de `linhas` e mesmo `agora_` em seguida (analisar, prever e hist no mesmo jogo) devolvem o resultado
 - `_linha_do_tempo(linhas, agora_)` — Junta o historico das lojas marcadas numa linha so: [(ini, fim, menor_preco, corte_do_menor, maior_corte)].
 - `episodios(segs, folga)` — Promocoes como episodios: [(ini, fim, maior_corte)]. Um intervalo sem desconto menor que `folga`
-- `analisar(linhas, preco, corte, agora_, cfg_alerta)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
-- `tipos_de(an)` — Tipos de preco da oferta (nao exclusivos): selo, novo (inclui "raro" sem Selo), igual, 24m.
+- `analisar(linhas, preco, corte, agora_, cfg_alerta, ppp)` — Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais), Promocao rara e Selo Kurokami.
+- `_selo_ppp(out, preco, corte, segs, agora_, ppp, minimo)` — Selo Kurokami (0.19): preco <= piso PPP (preco regional x (1 - teto esperado)) ou o desconto chegou pela 1a vez
+- `tipos_de(an)` — Tipos de preco da oferta (nao exclusivos): selo, rara, novo (inclui "raro" sem Promocao rara), igual, 24m.
 - `tipos_ligados(cfg_alerta)` — Tipos que avisam, pelo config (alerta.tipos). Sem a chave (config antigo): so o Selo.
-- `avisa_por(tipos, corte, cfg_alerta)` — Tipos ligados que fazem a oferta avisar: o Selo sempre (o selo_corte_minimo ja esta nele); os outros so com
+- `avisa_por(tipos, corte, cfg_alerta)` — Tipos ligados que fazem a oferta avisar: Selo e Promocao rara sempre (o selo_corte_minimo ja esta neles); os
 - `tipo_oferta(tipos)` — O tipo exclusivo (o mais importante) ou None.
 - `costuma_voltar(an, corte)` — Coluna "Costuma voltar" (so informa; spec 04): (texto, ordem). ordem menor = mais raro; None = fim da lista
 - `dica_volta(an, corte)` — A linha da dica (e da ficha): "Nos últimos 2 anos: N vezes com -Y% ou mais (última em mm/aaaa) · maior
@@ -64,7 +65,7 @@ Score, custo completo, bundles com desconto do que voce ja tem e regras de alert
   - `_opcoes_das_dlcs(appid)` — Bundles/edicoes ligados as DLCs do jogo (alem dos ligados ao proprio jogo).
 - `avaliar(ctx, ofertas_itad, gg, lojas_marcadas)` — Devolve a lista de alertas que dispararia agora. ofertas_itad: {appid: [oferta]}.
 - `ordem_tipo(t)`
-- `chave_aviso(a)` — Ordem dos avisos (e do max_por_rodada): selo, novo, igual, 24m (keyshop e completo depois); maior corte primeiro.
+- `chave_aviso(a)` — Ordem dos avisos (e do max_por_rodada): selo, rara, novo, igual, 24m (keyshop e completo depois); maior corte primeiro.
 
 ## `radar/aovivo.py`
 Jogo rodando agora, em tempo real, para as metas de jogar (radar/metas.py).
@@ -89,6 +90,7 @@ Atualizacao pelo GitHub Releases: verifica, baixa o instalador novo e instala po
 ## `radar/banco.py`
 SQLite local. Precos sao gravados so quando mudam, entao o historico
 
+- `lojas_com_drm(nomes, cfg)` — Os nomes de loja sem as que nunca vendem chave Steam, quando `somente_drm_steam` esta ligado (para `promo_hist`,
 - `agora()`
 - `utc(ts)` — Tudo em UTC no mesmo formato, para a ordenacao por texto funcionar.
 - **class `Banco`** — 
@@ -248,7 +250,7 @@ Janela de primeiro uso para as chaves. Campo de texto do Windows: Ctrl+V e o bot
 ## `radar/jogados.py`
 Aba Status > Progresso: o que voce realmente jogou. Junta o tempo jogado (tempo_jogo, do GetOwnedGames) com as
 
-- `estado(minutos, feitas, total)`
+- `estado(minutos, feitas, total, marcado)`
 - `farmados(b)` — Jogos que, com `farm_cartas` ligado, contam como nao jogados: horas, nenhuma conquista feita (zero ou sem) e o dono
 - `resumo(b)`
 
@@ -278,7 +280,6 @@ Decide QUAIS alertas viram notificacao:
   - `_vitrine_url()`
   - `processar(alertas)`
   - `_enviar(a)`
-  - `steam_inteira(ctx)` — Avisa jogos da Steam inteira FORA da sua lista (a lista tem o caminho de `processar`): so os tipos ligados em
   - `_acao(acao, appid)`
   - `terminando(candidatos)` — candidatos: [{"appid","nome","preco","corte","loja","fim"(epoch)}]. Avisa 1x por promocao.
 
@@ -299,6 +300,7 @@ Dados das páginas novas de Ofertas e Biblioteca (spec 09, amostra 8 de Ofertas 
 - `_linhas_de(b, tabela, lojas, appids, so_drm)` — so_drm (somente_drm_steam): em `preco` sem o histórico que não ativa na Steam; `promo_hist` não guarda DRM,
 - `_todas(q)` — Todos os itens de /api/promocoes com o pedido q (no próprio processo), filtrados e ordenados uma vez só:
 - `_dict(o)`
+- `_tipo_prev(tipos)` — Tipo para a previsão: o Selo Kurokami (piso PPP, 0.19) não tem backtest próprio; vale o tipo de recorde.
 - `_linha(o, cv, fr, hist, prev, an)` — Uma linha no formato da amostra (os índices são lidos pela função M() da página).
 - `_montar_ofertas()`
 - `dados_ofertas()`
@@ -399,6 +401,19 @@ Painel local: servidor HTTP so em 127.0.0.1, com API JSON lendo o banco e a pagi
 - `reiniciar()` — Troca entre so-este-PC e rede local sem fechar o Hunter.
 - `url()`
 
+## `radar/ppp.py`
+Preco regional (PPP) e teto de desconto esperado: base do Selo Kurokami (0.19).
+
+- `_agora()`
+- `baixar_fator(pais)` — (valor, ano, indicador) do Banco Mundial ou None. Moeda local por dolar internacional.
+- `fator(cfg, banco)` — Moeda local por dolar pelo poder de compra: o de Configuracoes, senao o baixado, senao o padrao do pais.
+- `_lanc_ts(v)`
+- `tetos_franquia(banco, cfg, agora_)` — {appid da lista: (teto %, nome da franquia, n jogos)} pelo maior desconto dos OUTROS jogos da franquia com 2 anos
+- `mapa(banco, cfg)` — {appid da lista: {"usd", "fator", "teto_fr", "fr"}} para analise.analisar(ppp=...). Guardado por 10 min.
+- `invalidar()`
+- `coletar(cfg, banco, k_steam, k_itad, log)` — Pista lenta, 1x por dia: preco cheio em dolar da lista, fator do Banco Mundial e teto de quem nao tem historico.
+- `_tetos_itad(cfg, banco, k_itad, log)` — Maior desconto (storelow das lojas marcadas) dos jogos de franquia da lista que o Hunter nao acompanha
+
 ## `radar/previsao.py`
 Previsão de Ofertas (spec 09): "se eu não comprar agora, esse preço volta?", o piso de 24 meses e "quando e por
 
@@ -478,7 +493,7 @@ O ciclo que roda sozinho: coleta -> avalia -> notifica, no intervalo do config.
 
 - `criar_log(eco)`
 - `_fim_iso(v)`
-- `candidatos_fim(b, alertas, cfg)` — O que esta no carrinho ou "vale a pena" e tem data de fim conhecida (ITAD ou Steam).
+- `candidatos_fim(b, alertas, cfg)` — O que esta no carrinho ou "vale a pena", esta na lista de desejos e tem data de fim conhecida (ITAD ou Steam).
 - `ciclo(log, forcar, sem_limite, steam_agora, faixa)` — Uma rodada. forcar+sem_limite = verificacao completa. Devolve (alertas, novos).
 - `_espera_historico(b, horas)` — Ainda vale esperar o historico da 1a instalacao? Teto de `horas` desde a 1a espera (nao fica sem aviso para sempre).
 - `ciclo_lento(log, forcar)` — Uma rodada da pista lenta (thread propria). forcar = a parte lenta da verificacao completa (sem orcamento de chamadas;
