@@ -164,20 +164,23 @@ def episodios(segs, folga=DIA):
     return eps
 
 
-def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
-    """Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais) e Selo Kurokami.
+def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None, ppp=None):
+    """Raridade v2 (frequencia do corte), piso (eixo 2), pilula de piso (reais), Promocao rara e Selo Kurokami.
     Devolve dict com: nivel, texto, por_ano, eps_nivel, ultima, corte_max, meses, curto, inicio,
-    no_piso, selo, selo_motivo, piso_tipo, piso_ref, score, anteriores. nivel/piso_tipo sao None se nao ha promocao.
-    Selo Kurokami = "o menor preco em muito tempo": Recorde raro (o recorde anterior tem 1,5 ano ou mais, ou o
-    preco caiu pela metade) com >= 1 promocao anterior e corte >= alerta.selo_corte_minimo.
-    A raridade (nivel) continua calculada, mas so alimenta a coluna "Costuma voltar" (costuma_voltar)."""
+    no_piso, rara, rara_motivo, selo, selo_motivo, ppp, piso_tipo, piso_ref, score, anteriores. nivel/piso_tipo sao
+    None se nao ha promocao.
+    Promocao rara (o Selo ate a 0.18) = "o menor preco em muito tempo": Recorde raro (o recorde anterior tem 1,5 ano ou
+    mais, ou o preco caiu pela metade) com >= 1 promocao anterior. Selo Kurokami (0.19) = o preco chegou ao piso PPP
+    (preco regional x o teto de desconto esperado) pela 1a vez ou o desconto chegou pela 1a vez ao teto da franquia; so com
+    `ppp` = {"usd", "fator", "teto_fr", "fr"} (ppp.mapa; so a lista de desejos). Os dois exigem corte >=
+    alerta.selo_corte_minimo. A raridade (nivel) so alimenta a coluna "Costuma voltar" (costuma_voltar)."""
     import time
     agora_ = agora_ or time.time()
     segs = linha_do_tempo(linhas, agora_)
     corte = corte or 0
     out = {"nivel": None, "texto": None, "por_ano": None, "eps_nivel": 0, "ultima": None, "corte_max": corte,
            "meses": 0, "curto": True, "inicio": None, "no_piso": False, "selo": False, "selo_motivo": None,
-           "piso_tipo": None, "piso_ref": None, "score": 0, "anteriores": 0}
+           "rara": False, "rara_motivo": None, "ppp": None, "piso_tipo": None, "piso_ref": None, "score": 0, "anteriores": 0}
     if not segs:
         if corte > 0:
             out.update(nivel="comum", texto="sem histórico nas lojas marcadas", score=_score_v2(corte, "comum", False))
@@ -226,6 +229,7 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
                 out["piso_tipo"] = "24m"
 
     if corte <= 0:
+        _selo_ppp(out, preco, corte, segs, agora_, ppp, 0)   # fora de promocao: so o piso PPP para a ficha
         return out
 
     # ---- eixo 1: raridade pela frequencia de episodios no mesmo nivel de corte
@@ -265,30 +269,66 @@ def analisar(linhas, preco, corte, agora_=None, cfg_alerta=None):
     menor24_tudo = min(jan_p, default=None)
     out["no_piso"] = corte >= corte_max - TOL_NIVEL or (preco is not None and menor24_tudo is not None
                                                         and preco <= menor24_tudo * 1.01)
-    # Selo (spec 04, 04/10) = so o "rare deal" (G): Recorde raro com >= 1 promocao anterior. O Lendario (F, maior
-    # desconto da historia) saiu: na escada de descontos cada degrau novo virava Selo (backtest: F 67,5% x G 84,3%).
-    # Sem promocao anterior nas lojas marcadas o "recorde anterior" e o preco cheio (buraco nos dados, ex.: ARK).
+    # Promocao rara (o Selo da 0.15 a 0.18; spec 04) = o "rare deal" (G) da SteamDB: Recorde raro com >= 1 promocao
+    # anterior. Sem promocao anterior nas lojas marcadas o "recorde anterior" e o preco cheio (buraco nos dados, ex.: ARK).
     minimo_selo = ((cfg_alerta or {}).get("selo_corte_minimo") or 0)
     ref = out["piso_ref"]
     if corte >= minimo_selo and out["piso_tipo"] == "raro" and anteriores and ref:
         quando = time.strftime("%m/%Y", time.gmtime(_ts(ref["quando_preco"])))
         if _metade(preco, ref["preco"]):
-            out["selo_motivo"] = "preço caiu pela metade ou mais (o menor anterior era %s, %s)" % (_brl(ref["preco"]), quando)
+            out["rara_motivo"] = "preço caiu pela metade ou mais (o menor anterior era %s, %s)" % (_brl(ref["preco"]), quando)
         else:
             meses = int((agora_ - _ts(ref["quando"])) / (30.44 * DIA))
-            out["selo_motivo"] = "o menor preço anterior (%s) foi há %d meses" % (_brl(ref["preco"]), meses)
-    out["selo"] = out["selo_motivo"] is not None
+            out["rara_motivo"] = "o menor preço anterior (%s) foi há %d meses" % (_brl(ref["preco"]), meses)
+    out["rara"] = out["rara_motivo"] is not None
+    _selo_ppp(out, preco, corte, segs, agora_, ppp, minimo_selo)
     out["score"] = _score_v2(corte, nivel, out["no_piso"])
     return out
 
 
-TIPOS = ["selo", "novo", "igual", "24m"]  # ordem de importancia (vitrine, avisos, "Mostrar so")
-NOME_TIPO = {"selo": "Selo Kurokami", "novo": "Novo recorde", "igual": "Igual ao recorde", "24m": "Menor em 2 anos"}
+def _selo_ppp(out, preco, corte, segs, agora_, ppp, minimo):
+    """Selo Kurokami (0.19): preco <= piso PPP (preco regional x (1 - teto esperado)) ou o desconto chegou pela 1a vez
+    ao teto da franquia. Teto esperado = o maior desconto antes do trecho de agora ou o da franquia, o que for maior.
+    Por trecho, nao por episodio: com muitas lojas marcadas sempre ha alguma em promocao e o historico vira um episodio so."""
+    if not ppp or not ppp.get("usd") or not ppp.get("fator"):
+        return
+    preco_ppp = int(round(ppp["usd"] * ppp["fator"]))
+    teto_jogo = max((s[4] or 0 for s in segs if s[1] < agora_ - 1), default=0)   # s[4] = maior corte do trecho
+    teto_fr = ppp.get("teto_fr") or 0
+    teto = max(teto_jogo, teto_fr)
+    piso = int(round(preco_ppp * (1 - teto / 100)))
+    da_fr = teto_fr > teto_jogo
+    out["ppp"] = {"preco": preco_ppp, "usd": ppp["usd"], "fator": ppp["fator"], "teto": teto, "piso": piso,
+                  "origem": "franquia" if da_fr else "jogo", "fr": ppp.get("fr") if da_fr else None}
+    if preco is None or corte <= 0 or corte < minimo:
+        return   # fora de promocao: so a informacao do piso PPP (ficha)
+    de_onde = (", com o teto de -%d%% da franquia %s" % (teto, ppp.get("fr")) if da_fr else
+               ", com o maior desconto que ele já teve, -%d%%" % teto if teto else "")
+    tol = max(10, piso * 0.01)
+    ref = out.get("piso_ref")
+    # so a 1a vez no piso PPP: o menor preco antes desta promocao ainda estava acima dele. Sem isso, quem ja custa o
+    # preco regional ganhava Selo em toda promocao (backtest de 15/11/2026: 8,5 Selos por semana, como "Igual ao
+    # recorde"; com a 1a vez, 86 em 3 anos, ~0,4 por semana e ~1 em grandes promocoes)
+    if preco <= piso + tol and ref and ref["preco"] > piso + tol:
+        out["selo_motivo"] = "chegou ao piso PPP pela primeira vez: %s (US$ %s pelo poder de compra = %s%s)" % (
+            _brl(piso), ("%.2f" % (ppp["usd"] / 100)).replace(".", ","), _brl(preco_ppp), de_onde)
+    elif da_fr and corte >= teto_fr:
+        out["selo_motivo"] = "chegou ao teto de desconto da franquia %s (-%d%%): os jogos dela costumam parar aí" % (
+            ppp.get("fr"), teto_fr)
+    out["selo"] = out["selo_motivo"] is not None
+
+
+TIPOS = ["selo", "rara", "novo", "igual", "24m"]  # ordem de importancia (vitrine, avisos, "Mostrar so")
+NOME_TIPO = {"selo": "Selo Kurokami", "rara": "Promoção rara", "novo": "Novo recorde", "igual": "Igual ao recorde",
+             "24m": "Menor em 2 anos"}
+SEM_MINIMO = ("selo", "rara")   # avisam com qualquer corte (o selo_corte_minimo ja esta neles)
 
 
 def tipos_de(an):
-    """Tipos de preco da oferta (nao exclusivos): selo, novo (inclui "raro" sem Selo), igual, 24m."""
+    """Tipos de preco da oferta (nao exclusivos): selo, rara, novo (inclui "raro" sem Promocao rara), igual, 24m."""
     t = ["selo"] if an.get("selo") else []
+    if an.get("rara"):
+        t.append("rara")
     pt = an.get("piso_tipo")
     if pt in ("novo", "raro"):
         t.append("novo")
@@ -304,11 +344,11 @@ def tipos_ligados(cfg_alerta):
 
 
 def avisa_por(tipos, corte, cfg_alerta):
-    """Tipos ligados que fazem a oferta avisar: o Selo sempre (o selo_corte_minimo ja esta nele); os outros so com
-    corte >= desconto_minimo."""
+    """Tipos ligados que fazem a oferta avisar: Selo e Promocao rara sempre (o selo_corte_minimo ja esta neles); os
+    outros so com corte >= desconto_minimo."""
     lig = tipos_ligados(cfg_alerta)
     dmin = (cfg_alerta or {}).get("desconto_minimo", 0) or 0
-    return [t for t in tipos if t in lig and (t == "selo" or (corte or 0) >= dmin)]
+    return [t for t in tipos if t in lig and (t in SEM_MINIMO or (corte or 0) >= dmin)]
 
 
 def tipo_oferta(tipos):
@@ -361,6 +401,8 @@ def motivo_tipo(an, tipo):
     quando = ("%s/%s" % (q[5:7], q[:4])) if q else "?"
     if tipo == "selo":
         return "Selo Kurokami: " + (an.get("selo_motivo") or "")
+    if tipo == "rara":
+        return "Promoção rara: " + (an.get("rara_motivo") or "")
     if tipo == "novo":
         return "menor preço já registrado (antes %s em %s)" % (_brl(ref.get("preco")), quando)
     if tipo == "igual":
@@ -386,18 +428,18 @@ def menor_anterior(linhas, ref):
 def regua_steam(linhas, preco, corte, linhas_steam, preco_s, corte_s, agora_=None, cfg_alerta=None):
     """Regua so da Steam ("Steam (direto)" + Steam da ITAD) x lojas marcadas. Informativo, nunca avisa.
     Devolve {"steam": tipo, "radar": tipo, "loja", "preco", "quando", "texto"} quando a Steam sozinha da Novo recorde
-    ou Selo e as lojas marcadas nao (ou dao um tipo menor); senao None. loja/preco/quando = o registro das lojas
+    ou Promocao rara e as lojas marcadas nao (ou dao um tipo menor); senao None. loja/preco/quando = o registro das lojas
     marcadas que impediu (ex.: Street Fighter 6 em 04/10/2026: Novo recorde na Steam; a Nuuvem teve R$ 68,99 em 08/2026).
     Usa analisar nas duas reguas, entao a folga de centavos da "metade" (_metade) vale nas duas."""
     if preco_s is None or not corte_s:
         return None
     an_s = analisar(linhas_steam, preco_s, corte_s, agora_=agora_, cfg_alerta=cfg_alerta)
-    t_s = "selo" if an_s["selo"] else "novo" if an_s["piso_tipo"] in ("novo", "raro") else None
+    t_s = "rara" if an_s["rara"] else "novo" if an_s["piso_tipo"] in ("novo", "raro") else None
     if not t_s:
         return None
     an_m = analisar(linhas, preco, corte, agora_=agora_, cfg_alerta=cfg_alerta) if preco is not None else {}
-    t_m = "selo" if an_m.get("selo") else "novo" if an_m.get("piso_tipo") in ("novo", "raro") else None
-    if t_m == "selo" or t_m == t_s:
+    t_m = "rara" if an_m.get("rara") else "novo" if an_m.get("piso_tipo") in ("novo", "raro") else None
+    if t_m == "rara" or t_m == t_s:
         return None
     imp = menor_anterior(linhas, an_m.get("piso_ref"))
     if not imp:
@@ -441,6 +483,8 @@ class Contexto:
         self.jogos = {r["appid"]: dict(r) for r in banco.q("SELECT * FROM jogo")}
         self.possuidos = {a for a, j in self.jogos.items() if j.get("possuido")}
         self.lista = {a for a, j in self.jogos.items() if j.get("na_lista")}
+        from . import ppp
+        self.ppp = ppp.mapa(banco, cfg)   # {appid da lista: dados do piso PPP} (Selo Kurokami, 0.19)
         self.dlcs = {}
         for r in banco.q("SELECT * FROM dlc"):
             self.dlcs.setdefault(r["pai"], []).append(dict(r))
@@ -647,7 +691,7 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
                 linhas = ctx.b.linhas_lote(lojas_p, [appid], so_drm=cfg.get("somente_drm_steam")).get(appid, [])
                 pisos = ctx.b._pisos_de(linhas, (90, 180, 270, 365)) if linhas else {}
             tag, texto, acima = etiqueta(o["preco"], o.get("cheio"), pisos, al, o.get("flag"))
-            an = analisar(linhas, o["preco"], o["corte"], cfg_alerta=al)
+            an = analisar(linhas, o["preco"], o["corte"], cfg_alerta=al, ppp=ctx.ppp.get(appid))
             if not an["nivel"]:
                 continue
             # spec 04 (0.15): so os tipos de preco decidem aviso; raridade e favoritos nao (raridade_minima e
@@ -660,7 +704,8 @@ def avaliar(ctx, ofertas_itad, gg, lojas_marcadas):
             alertas.append({"appid": appid, "nome": nome, "loja": o["loja"], "preco": o["preco"], "corte": o["corte"],
                             "score": an["score"], "url": o.get("url"), "tag": tag, "acima": acima,
                             "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"],
-                            "selo_motivo": an["selo_motivo"], "piso_tipo": an["piso_tipo"], "menor_sempre": pisos.get(0),
+                            "selo_motivo": an["selo_motivo"], "rara": an["rara"], "rara_motivo": an["rara_motivo"],
+                            "piso_tipo": an["piso_tipo"], "menor_sempre": pisos.get(0),
                             "tipos": tipos, "tipo_oferta": t_of, "avisa_por": por, "motivo": motivo_tipo(an, t_of)})
 
         # ---- keyshops, so quando muito barato
@@ -696,5 +741,5 @@ def ordem_tipo(t):
 
 
 def chave_aviso(a):
-    """Ordem dos avisos (e do max_por_rodada): selo, novo, igual, 24m (keyshop e completo depois); maior corte primeiro."""
+    """Ordem dos avisos (e do max_por_rodada): selo, rara, novo, igual, 24m (keyshop e completo depois); maior corte primeiro."""
     return (ordem_tipo(a.get("tipo_oferta")), -(a.get("corte") or 0), a.get("nome") or "")

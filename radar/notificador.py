@@ -14,6 +14,9 @@ ESQUEMA = """CREATE TABLE IF NOT EXISTS notificado(
   appid INTEGER PRIMARY KEY, loja TEXT, preco INTEGER, quando TEXT, ativo INTEGER DEFAULT 1)"""
 
 
+REGISTRO = {"selo": "selo_ppp"}   # nome do tipo em meta.tipos_ligados quando a regra muda (ver processar)
+
+
 ESQUEMA_PROMO = "CREATE TABLE IF NOT EXISTS notificado_promo(appid INTEGER PRIMARY KEY, entrou TEXT)"
 # texto de cada tipo de preco na Steam inteira (as mesmas frases da lista; a aba Notificacoes as reconhece pelo comeco)
 
@@ -78,7 +81,9 @@ class Notificador:
         from .analise import NOME_TIPO, chave_aviso, tipos_ligados
         lig = tipos_ligados(self.cfg.get("alerta"))
         ant = self.b.meta("tipos_ligados")
-        self.b.meta("tipos_ligados", lig)
+        # 0.19: o Selo mudou de regra (piso PPP); guardado com outro nome, conta como recem-ligado uma vez (resumo, sem
+        # um aviso por jogo que ja estava assim)
+        self.b.meta("tipos_ligados", [REGISTRO.get(t, t) for t in lig])
         if not self.b.meta("linha_de_base"):
             self.b.meta("linha_de_base", agora())
             self.b.commit()
@@ -90,7 +95,10 @@ class Notificador:
 
         # tipo que acabou de ser ligado: quem ja estava assim (e so avisaria por ele) entra sem toast; sai 1 resumo.
         # Sem meta.tipos_ligados (1a rodada da 0.15) nada e "recem-ligado".
-        ligou = [t for t in lig if ant is not None and t not in ant]
+        ant_ef = set(ant) if ant is not None else None
+        if ant_ef is not None and "selo" in ant_ef and "selo_ppp" not in ant_ef:
+            ant_ef = (ant_ef - {"selo"}) | {"rara"}   # ate a 0.18 o "selo" era a Promocao rara: ela continua, so o Selo e novo
+        ligou = [t for t in lig if ant_ef is not None and REGISTRO.get(t, t) not in ant_ef]
         resumos = []
         if ligou:
             so_por = [a for a in novos if a.get("avisa_por") and set(a["avisa_por"]) <= set(ligou)]
@@ -156,8 +164,9 @@ class Notificador:
         linha1 = "%s%s na %s" % (brl(a["preco"]), desc, a["loja"])
         from .analise import texto_outras
         motivo = a["motivo"]
-        if motivo.startswith("Selo Kurokami: "):
-            motivo = motivo[len("Selo Kurokami: "):]  # o titulo ja diz SELO KUROKAMI
+        for pre in ("Selo Kurokami: ", "Promoção rara: "):
+            if motivo.startswith(pre):
+                motivo = motivo[len(pre):]  # o titulo ja diz o tipo
         linha2 = motivo[0].upper() + motivo[1:]
         rodape = texto_outras(a) or None
         botoes = [("Abrir oferta", oferta), ("Não avisar mais", self._acao("silenciar", a["appid"]))]
@@ -165,6 +174,8 @@ class Notificador:
         t = a.get("tipo_oferta")  # o titulo nunca usa raridade (spec 04)
         if t == "selo":
             titulo = "SELO KUROKAMI · %s" % a["nome"]
+        elif t == "rara":
+            titulo = "PROMOÇÃO RARA · %s" % a["nome"]
         elif t in NOME_TIPO:
             titulo = "%s · %s" % (NOME_TIPO[t], a["nome"])
         else:

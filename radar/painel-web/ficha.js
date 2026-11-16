@@ -1,11 +1,18 @@
 /* ================= modal do jogo ================= */
 function porqueVolta(m){const o=IDX.get(m.jogo.appid)||{};
-  const selo=m.selo?`<div style="margin-bottom:6px">${seloBadge(m)} <b>${esc((m.selo_motivo||'').replace(/^./,c=>c.toUpperCase()))}</b><br>
-    O menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade. Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes.</div>`:'';
+  const selo=(m.selo?`<div style="margin-bottom:6px">${seloBadge(m)} <b>${esc((m.selo_motivo||'').replace(/^./,c=>c.toUpperCase()))}</b><br>
+    O preço chegou ao que seria justo com preço regional de verdade, ou ao desconto em que a franquia costuma parar.</div>`:'')
+   +((m.tipos||[]).includes('rara')?`<div style="margin-bottom:6px"><b>Promoção rara: ${esc(m.rara_motivo||'')}</b><br>
+    O menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade. Nos dados de 2022–2025, em cerca de 7 de 10 casos assim o jogo não ficou mais barato nos 12 meses seguintes.</div>`:'')
+   +pppTxt(m.ppp);
   const volta=m.volta_texto?`<b>Costuma voltar: ${esc(m.volta_texto)}</b>${m.volta_dica?`<br>${esc(m.volta_dica)}`:''}`:'';
   const ref=m.piso_ref&&m.corte>0?`${volta?'<br>':''}Menor preço antes desta promoção: <b>${esc(pisoRefTxt(m.piso_ref))}</b>`:'';
   const regua=m.regua_steam?`<div class="regua">${esc(m.regua_steam.texto)}</div>`:'';
   return selo||volta||ref?`<div class="porque">${selo}${volta}${ref}</div>${regua}`:regua;}
+/* Selo Kurokami (0.19): de onde vem o piso PPP */
+function pppTxt(p){if(!p)return '';
+  const de=p.origem==='franquia'?`o teto da franquia ${esc(p.fr||'')}`:p.teto?'o maior desconto que ele já teve':'sem desconto';
+  return `<div style="margin-bottom:6px">Preço regional (PPP): <b>${brl(p.preco)}</b> (US$ ${(p.usd/100).toFixed(2).replace('.',',')} × ${String(p.fator).replace('.',',')} pelo poder de compra) · piso PPP <b>${brl(p.piso)}</b>${p.teto?` com -${p.teto}% (${de})`:''}</div>`;}
 let MJ=null, MRANGE=365, MVISTA='steam';   // MVISTA: o gráfico da ficha, 'steam' (como o SteamDB) ou 'todas' (tecla T)
 let MSEQ=0;
 async function abrirJogo(appid,op){

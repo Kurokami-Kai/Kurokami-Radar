@@ -20,12 +20,15 @@ PADRAO = {
         "modo": "menor_historico",
         "tolerancia_pct": 0,          # 5 = aceita ate 5% acima do menor historico
         # O que avisa (0.15, spec 04): tipos de preco em reais nas lojas marcadas.
-        #   selo  = Selo Kurokami: o menor preco em muito tempo (recorde anterior de 1,5 ano ou mais, ou preco pela metade)
+        #   selo  = Selo Kurokami (0.19): o preco chegou ao piso PPP (preco regional pelo poder de compra x o maior desconto
+        #           esperado, do jogo ou da franquia) ou o desconto chegou pela 1a vez ao teto da franquia (radar/ppp.py)
+        #   rara  = Promocao rara (o Selo ate a 0.18): o menor preco em muito tempo (recorde anterior de 1,5 ano ou mais,
+        #           ou preco pela metade)
         #   novo  = novo recorde (nunca esteve tao barato) · igual = igual ao recorde · 24m = menor preco em 2 anos
-        # O Selo avisa a partir de selo_corte_minimo; os outros, a partir de desconto_minimo.
-        "tipos": {"selo": True, "novo": False, "igual": False, "24m": False},
+        # Selo e Promocao rara avisam a partir de selo_corte_minimo; os outros, a partir de desconto_minimo.
+        "tipos": {"selo": True, "rara": True, "novo": False, "igual": False, "24m": False},
         "raridade_minima": "raro",    # (ignorado desde a 0.15: a raridade so informa, na coluna "Costuma voltar")
-        "selo_corte_minimo": 0,       # so ganha Selo a partir deste corte (%)
+        "selo_corte_minimo": 0,       # so ganha Selo ou Promocao rara a partir deste corte (%)
         # (informativo) piso por janela: 90 (3 meses), 180, 270, 365 (1 ano) ou 0 (so o de todos os tempos).
         # Cada jogo ganha a etiqueta do maior piso que atinge (sempre > 1 ano > 9m > 6m > 3m).
         "janela_dias": 90,
@@ -94,9 +97,12 @@ PADRAO = {
     # jogos monitorados que nao estao na lista de desejos da Steam (adicionados pelo painel)
     "extras": [],
 
+    # Selo Kurokami (0.19): moeda local por dolar pelo poder de compra. None = Banco Mundial (ppp.coletar, 1x por dia)
+    "ppp": {"fator": None},
+
     # Promocoes da Steam inteira na aba Promocoes (spec 07): ~1 MB por consulta num dia comum, ~16 MB em grande promocao
     "steam_inteira": True,
-    # avisos da Steam inteira (jogos FORA da sua lista): so o que o alerta.tipos liga (padrao: Selo), de jogo (nao DLC) com
+    # (sem uso desde a 0.18.8: nao ha mais aviso da Steam inteira) avisos de jogos FORA da sua lista, de jogo (nao DLC) com
     # pelo menos analises_minimas, que entrou em promocao ha pouco; maximo por rodada (o resto vira um resumo)
     # historico (para Selo, Menor em 2 anos, Costuma voltar) de quem esta perto do recorde: N jogos por rodada
     # (a ITAD aceita ~100 chamadas a cada 5 min, e a lista tambem usa)
@@ -125,6 +131,8 @@ PADRAO = {
 MIGRACOES = {
     "keyshop_alerta_off": lambda cfg: cfg["keyshops"].update(ativo=False),
     # 0.19: checagem de promocoes a cada 15 min (quem ficou nos antigos 30/60 passa para 15; valor escolhido a mao fica)
+    # 0.19: a Promocao rara e o Selo de ate a 0.18; quem tinha o Selo desligado nao passa a receber a Promocao rara
+    "rara_herda_selo": lambda cfg: cfg["alerta"]["tipos"].update(rara=bool(cfg["alerta"]["tipos"].get("selo", True))),
     "intervalos_15min": lambda cfg: [cfg["intervalos_minutos"].update({k: 15}) for k, v in (("itad", 30), ("steam_inteira", 60))
                                      if cfg["intervalos_minutos"].get(k) == v],
 }

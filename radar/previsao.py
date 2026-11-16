@@ -76,6 +76,8 @@ def grupo(tipo, k):
     """Taxas do grupo (tipo × vezes nesse preço em 24 meses). Grupo com menos de 30 casos: na 1ª vez, junta todas as
     1ª vezes fora o Selo; senão, o tipo inteiro."""
     G = TABELA["grupos"]
+    if tipo == 'rara':
+        tipo = 'selo'   # a tabela e de quando a Promocao rara se chamava Selo (0.15 a 0.18)
     g = G.get('%s|%s' % (tipo, kc(k)))
     if g and g['n'] >= 30:
         return g

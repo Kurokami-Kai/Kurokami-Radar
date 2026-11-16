@@ -233,7 +233,7 @@ def _montar_linhas(cfg, conta):
         tag, texto, acima = (analise.etiqueta(melhor["preco"], melhor.get("cheio"), ps, cfg["alerta"])
                              if melhor and melhor["corte"] else (None, None, None))
         an = analise.analisar(linhas.get(a, []), melhor["preco"] if melhor else None,
-                              melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"])
+                              melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"], ppp=ctx.ppp.get(a))
         preco = melhor["preco"] if melhor else j.get("preco_steam")
         cheio = (melhor or {}).get("cheio") or j.get("cheio_steam")
         g = gg.get(a) or {}
@@ -250,7 +250,8 @@ def _montar_linhas(cfg, conta):
             "pisos": {"3m": ps.get(90), "6m": ps.get(180), "9m": ps.get(270), "1a": ps.get(365), "sempre": ps.get(0)},
             "tag": tag, "tag_texto": texto, "acima": acima,
             "raridade": an["nivel"], "raridade_texto": an["texto"], "no_piso": an["no_piso"], "selo": an["selo"],
-            "selo_motivo": an["selo_motivo"], "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
+            "selo_motivo": an["selo_motivo"], "rara": an["rara"], "rara_motivo": an["rara_motivo"], "ppp": an["ppp"],
+            "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
             "score": an["score"],
             "keyshop": g.get("keyshop"), "hist_keyshop": g.get("hist_keyshop"), "gg_url": g.get("url"),
             "vale": a in vale, "novo": a in novos, "motivo": (vale.get(a) or {}).get("motivo"),
@@ -286,7 +287,8 @@ class LinhaSteam:
     """Linha leve da Steam inteira: o["campo"] como nas linhas da lista; o que ela nao tem vale None (False na relacao)."""
     __slots__ = ("appid", "nome", "tipo", "capa", "rpos", "rcount", "rotulo", "lancamento", "preco", "cheio", "corte", "fim", "adulto",
                  # avaliacao (steam_promo.aval): a mesma da lista com historico; so a marca da ITAD sem ele
-                 "tipos", "tipo_oferta", "selo", "selo_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio")
+                 "tipos", "tipo_oferta", "selo", "selo_motivo", "rara_motivo", "piso_ref", "volta_texto", "volta_ordem",
+                 "volta_dica", "inicio")
     COLUNAS = __slots__[:13]
 
     def __getitem__(self, k):
@@ -310,9 +312,13 @@ def _aplicar_aval(o, aval):
     """steam_promo.aval (JSON) -> campos da avaliacao da LinhaSteam."""
     av = json.loads(aval) if aval else {}
     o.tipos = av.get("tipos") or []
+    if "selo" in o.tipos and "rara_motivo" not in av:   # avaliado ate a 0.18: o Selo de entao e a Promocao rara
+        o.tipos = ["rara" if t == "selo" else t for t in o.tipos]
+        av["rara_motivo"] = av.get("selo_motivo")
     o.tipo_oferta = analise.tipo_oferta(o.tipos)
-    o.selo = "selo" in o.tipos
-    for k in ("selo_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio"):
+    o.selo = "selo" in o.tipos   # fora da lista nao ha preco em dolar: sempre False
+    o.selo_motivo = None
+    for k in ("rara_motivo", "piso_ref", "volta_texto", "volta_ordem", "volta_dica", "inicio"):
         setattr(o, k, av.get(k))
 
 
@@ -527,8 +533,9 @@ def api_vitrine(_q):
     dmin = al.get("desconto_minimo", 0) or 0
     lig = analise.tipos_ligados(al)
     out = {"avisa": {t: t in lig for t in analise.TIPOS}, "desconto_minimo": dmin}
-    for t, n in (("selo", 10), ("novo", 8), ("igual", 8), ("24m", 8)):
-        bl = [o for o in itens if o["tipo_oferta"] == t and o["tipo"] == "jogo" and not o["tenho"] and (t == "selo" or o["corte"] >= dmin)]
+    for t, n in (("selo", 10), ("rara", 10), ("novo", 8), ("igual", 8), ("24m", 8)):
+        bl = [o for o in itens if o["tipo_oferta"] == t and o["tipo"] == "jogo" and not o["tenho"]
+              and (t in analise.SEM_MINIMO or o["corte"] >= dmin)]
         bl.sort(key=lambda o: (-(o["corte"] or 0), o["preco"] if o["preco"] is not None else 10**12, o["appid"]))
         out[t] = {"total": len(bl), "itens": bl[:n]}
     out["na_lista"] = sum(1 for o in itens if o["na_lista"])
@@ -598,7 +605,8 @@ def api_jogo(q):
     ofs_m = [o for o in atuais.values() if o["loja"].lower() in marc]
     melhor = min(ofs_m, key=lambda o: o["preco"]) if ofs_m else None
     lin_m = b.linhas_lote(lojas_m, [a], so_drm=cfg.get("somente_drm_steam")).get(a, []) if lojas_m else []
-    an = analise.analisar(lin_m, melhor["preco"] if melhor else None, melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"])
+    an = analise.analisar(lin_m, melhor["preco"] if melhor else None, melhor["corte"] if melhor else 0, cfg_alerta=cfg["alerta"],
+                          ppp=ctx.ppp.get(a) if a in ctx.lista else None)
     corte_m = melhor["corte"] if melhor else 0
     tipos = analise.tipos_de(an)
     volta, _ordem = analise.costuma_voltar(an, corte_m)
@@ -612,7 +620,7 @@ def api_jogo(q):
          "historico": hist, "lojas": lojas, "dlcs": dl, "dlcs_estado": None if dl else _estado_dlcs(b, a, j),
          "caminhos": cam, "combo": combo,
          "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"], "selo_motivo": an["selo_motivo"], "no_piso": an["no_piso"],
-         "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an), "score": an["score"],
+         "rara": an["rara"], "rara_motivo": an["rara_motivo"], "ppp": an["ppp"], "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an), "score": an["score"],
          "tipos": tipos, "tipo_oferta": analise.tipo_oferta(tipos), "volta_texto": volta,
          "volta_dica": analise.dica_volta(an, corte_m), "regua_steam": regua,
          "fim": _fim(melhor, j), "corte": corte_m,
@@ -724,7 +732,7 @@ def _jogo_steam(b, cfg, ctx, a):
                      "cheio_steam": sp["cheio"], "desconto_steam": sp["corte"], "pai": None},
             "historico": hist, "lojas": lojas, "dlcs": [], "dlcs_estado": None, "caminhos": [], "combo": None,
             "raridade": an["nivel"], "raridade_texto": an["texto"], "selo": an["selo"], "selo_motivo": an["selo_motivo"],
-            "no_piso": an["no_piso"], "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
+            "rara": an["rara"], "rara_motivo": an["rara_motivo"], "ppp": None, "no_piso": an["no_piso"], "piso_tipo": an["piso_tipo"], "piso_ref": an["piso_ref"], "rar_info": _rar_info(an),
             "score": an["score"], "tipos": tipos, "tipo_oferta": analise.tipo_oferta(tipos), "volta_texto": volta,
             "volta_dica": analise.dica_volta(an, sp["corte"]), "regua_steam": None, "fim": sp["fim"], "corte": sp["corte"],
             "gg": None, "modo": "base", "classes": dlcmod.CLASSES, "tenho": tenho,
@@ -734,7 +742,7 @@ def _jogo_steam(b, cfg, ctx, a):
             # o que a ficha da lista le da linha da tabela (IDX): melhor preco, pisos e marcas
             "item": {"appid": a, "preco": sp["preco"], "loja": "Steam", "corte": sp["corte"], "fim": sp["fim"],
                      "piso": ps.get(0), "piso_geral": None, "selo": an["selo"], "selo_motivo": an["selo_motivo"],
-                     "tipo_oferta": analise.tipo_oferta(tipos), "piso_ref": an["piso_ref"], "piso_tipo": an["piso_tipo"],
+                     "rara_motivo": an["rara_motivo"], "tipo_oferta": analise.tipo_oferta(tipos), "piso_ref": an["piso_ref"], "piso_tipo": an["piso_tipo"],
                      "pisos": {"3m": ps.get(90), "6m": ps.get(180), "9m": ps.get(270), "1a": ps.get(365), "sempre": ps.get(0)}
                      if ps else None}}
 
@@ -807,7 +815,7 @@ def api_carrinho(_q):
         tag, texto, acima = analise.etiqueta(escolhida["preco"], escolhida.get("cheio"), ps, cfg["alerta"]) \
             if escolhida and escolhida.get("corte") else (None, None, None)
         an = analise.analisar(b.linhas_lote(lojas_m, [a], so_drm=cfg.get("somente_drm_steam")).get(a, []), escolhida["preco"], escolhida.get("corte"),
-                              cfg_alerta=cfg["alerta"]) if escolhida and escolhida.get("corte") and lojas_m else {}
+                              cfg_alerta=cfg["alerta"], ppp=ctx.ppp.get(a)) if escolhida and escolhida.get("corte") and lojas_m else {}
         out.append({"appid": a, "modo": modos[("a", a)], "nome": j.get("nome") or str(a), "capa": j.get("capa"), "tipo": j.get("tipo"),
                     "possuido": a in ctx.possuidos, "lojas": [{k: o.get(k) for k in ("loja", "preco", "cheio", "corte", "url")} for o in ofs],
                     "loja": "Steam", "pedida": "Steam", "sumiu": sumiu,
@@ -815,7 +823,7 @@ def api_carrinho(_q):
                     "piso": ps.get(0), "fim": _fim(escolhida, j),
                     "tag": tag, "tag_texto": texto, "acima": acima, "em_bundle": cobertos.get(a, []),
                     "raridade": an.get("nivel"), "raridade_texto": an.get("texto"), "selo": an.get("selo", False), "selo_motivo": an.get("selo_motivo"),
-                    "piso_tipo": an.get("piso_tipo"), "piso_ref": an.get("piso_ref"),
+                    "rara_motivo": an.get("rara_motivo"), "piso_tipo": an.get("piso_tipo"), "piso_ref": an.get("piso_ref"),
                     "tipo_oferta": analise.tipo_oferta(analise.tipos_de(an)) if an else None, "corte": (escolhida or {}).get("corte") or 0,
                     "rpos": j.get("rpos") or 0, "rcount": j.get("rcount") or 0})
     # sugestoes: bundles da Steam com pelo menos 1 item do carrinho

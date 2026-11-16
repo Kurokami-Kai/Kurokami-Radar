@@ -28,8 +28,8 @@ async function renderCfg(){
     return `${tgGuia(false)}${swRow('notificacoes.telegram.ativo',t.ativo,'Avisar também no Telegram','Mesmos avisos, mesmo horário de silêncio. Os botões só levam a links da internet (o painel do seu PC não abre no celular).')}
       ${row('Conexão','Bot conectado e conversa vinculada.',`<button class="btn-ghost" data-tg="testar" type="button">Enviar teste</button><button class="btn-ghost" data-tg="remover" type="button">Desconectar</button>`)}`;};
   const sec=(id,t,p,corpo)=>`<section class="cfg-sec" data-sec="${id}" hidden><header><h3>${t}</h3>${p?`<p>${p}</p>`:''}</header>${corpo}</section>`;
-  const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true};
-  const FREQ={selo:'~0,2 avisos por semana (0,7 em grandes promoções)',novo:'~2 avisos por semana (6 em grandes promoções)',
+  const a=c.alerta,k=c.keyshops,dl=c.dlc,n=c.notificacoes||{},si=(n.silencio||{}),iv=c.intervalos_minutos,tp=a.tipos||{selo:true,rara:true};
+  const FREQ={selo:'~0,4 aviso por semana (~1 em grandes promoções)',rara:'~0,2 avisos por semana (0,7 em grandes promoções)',novo:'~2 avisos por semana (6 em grandes promoções)',
     igual:'~14 avisos por semana (34 em grandes promoções)','24m':'~2 avisos por semana (3 em grandes promoções)'};
   const atual=ls.get('cfgSec','avisos');
   $('#cfgForm').innerHTML=`<div class="cfgx">
@@ -37,10 +37,10 @@ async function renderCfg(){
      `<button type="button" role="tab" data-sec="${id}" aria-selected="${id===atual}">${t}<small>${sub}</small></button>`).join('')}</nav>
    <div class="cfg-main">
    ${sec('avisos','Avisos','Que tipo de preço vira notificação. Ligar um tipo não dispara avisos de tudo o que já está assim: você recebe um resumo e, daí em diante, só os próximos.',
-     `<div class="cfg-card"><h4>Tipos de aviso</h4>${['selo','novo','igual','24m'].map(t=>swRow('alerta.tipos.'+t,!!tp[t],TIPO_NOME[t],`${esc(TIPO_DESC[t])} · ${FREQ[t]}`)).join('')}</div>
+     `<div class="cfg-card"><h4>Tipos de aviso</h4>${['selo','rara','novo','igual','24m'].map(t=>swRow('alerta.tipos.'+t,!!tp[t],TIPO_NOME[t],`${esc(TIPO_DESC[t])} · ${FREQ[t]}`)).join('')}</div>
      <div class="cfg-card"><h4>Limites</h4>
       ${row('Desconto mínimo','Vale para Novo recorde, Igual e Menor em 2 anos.',num('alerta.desconto_minimo',a.desconto_minimo,5,0,100,'%'))}
-      ${row('Selo Kurokami: desconto mínimo','Corte só para o Selo.',num('alerta.selo_corte_minimo',a.selo_corte_minimo??0,5,0,100,'%'))}
+      ${row('Selo e Promoção rara: desconto mínimo','Corte só para o Selo Kurokami e a Promoção rara.',num('alerta.selo_corte_minimo',a.selo_corte_minimo??0,5,0,100,'%'))}
       ${row('Tolerância acima do menor histórico','',num('alerta.tolerancia_pct',a.tolerancia_pct,1,0,50,'%'))}
       ${row('Modo completo: dias de observação','',num('alerta.dias_minimos_completo',a.dias_minimos_completo??14,1,0,365,'dias'))}
       <div class="cfg-nota">Análises da Steam não decidem avisos.</div></div>`)}

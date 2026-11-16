@@ -1,7 +1,7 @@
 /* ================= notificações ================= */
 let NOTIF=[];
 // etiqueta pelo começo do motivo (analise.motivo_tipo); o 4º item diz se o texto fica inteiro
-const NF_TIPOS=[[/^Selo Kurokami:\s*/i,'Selo Kurokami','#ff4757'],[/^menor preço já registrado/i,'Novo recorde','#ff4757',1],
+const NF_TIPOS=[[/^Selo Kurokami:\s*/i,'Selo Kurokami','#ff4757'],[/^Promoção rara:\s*/i,'Promoção rara','#e8303c'],[/^menor preço já registrado/i,'Novo recorde','#ff4757',1],
   [/^mesmo preço do menor/i,'Igual ao recorde','#ff8a94',1],[/^menor preço em 2 anos/i,'Menor em 2 anos','#979797',1],
   [/^keyshop\s*/i,'Keyshop','#979797'],[/^versão completa/i,'Versão completa','#d2d2d2',1]];
 const nfKey=n=>/keyshop/i.test(n.loja||'');

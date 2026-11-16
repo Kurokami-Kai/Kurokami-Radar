@@ -6,7 +6,7 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 
 | Tabela | Conteúdo |
 |---|---|
-| `jogo` | todo app conhecido (lista, DLCs, itens de bundle, biblioteca): nome, tipo, pai (DLC), capa, capa_v, análises, preço Steam (pacote base), `pacote` (subid), `fim_desconto`, `franquia`, `menor_itad`, `prioridade` (ordem na wishlist), flags `na_lista`/`possuido` |
+| `jogo` | todo app conhecido (lista, DLCs, itens de bundle, biblioteca): nome, tipo, pai (DLC), capa, capa_v, análises, preço Steam (pacote base), `pacote` (subid), `fim_desconto`, `franquia`, `menor_itad`, `prioridade` (ordem na wishlist), `cheio_usd` (preço cheio nos EUA, centavos de dólar; só lista de desejos, `ppp.coletar` 1x por dia; base do Selo Kurokami, 0.19), flags `na_lista`/`possuido` |
 | `dlc` | appid da DLC → pai, `classe` (historia/conteudo/cosmetico/atalho/extra/pacote), `origem` (auto/usuario) |
 | `opcao` | bundles (`bundle:<id>`) e edições (`edicao:<packageid>`): preços, `desconto_bundle`, `itens` (JSON de appids), `papel` (parcial/completa/outra) |
 | `jogo_opcao` | ligação jogo ↔ opção |
@@ -24,6 +24,7 @@ Valores de dinheiro são **centavos (int)**. Datas no banco são **ISO 8601 em U
 | `terminado` | `appid, quando`: jogo que passou a ter todas as conquistas (`Banco.salvar_conquistas` vê a mudança entre duas leituras; o que já estava platinado não entra) |
 | `conquista_jogo` | aba Status → Progresso: `appid, feitas, total, minutos, quando`; `total` 0 = jogo sem conquistas, -1 = a consulta falhou (tenta de novo em 7 dias). Preenchida pela pista lenta (`coleta.coletar_conquistas`, `conquistas_por_rodada` jogos por rodada, `GetPlayerAchievements`); só consulta de novo quando o tempo jogado mudou (ou após 60 dias) |
 | `ficha_cache` | spec 09: o que a ficha busca ao abrir (`appid, fonte` = `loja`/`aug`/`conq`, `dados` JSON, `quando`); validade 30 dias (loja, aug) e 6 h (conq); falha guardada como `{falhou}` por 1 h |
+| `teto_jogo` | 0.19: `appid, corte, quando` = maior desconto (storelow da ITAD nas lojas marcadas) de jogo de franquia da lista que o Hunter não acompanha (biblioteca); refeito a cada 30 dias; `corte` 0 = a ITAD não conhece. Alimenta o teto da franquia (`ppp.tetos_franquia`) |
 | `franquia_manual` | spec 09: `appid, nome, quando` = franquia trocada à mão na ficha; vence a automática (`series.franquias`) |
 | `consulta_lenta` | cache das consultas lentas da loja (`pacote`, `dlcs`; `dlcs_falha` = última falha do plano B, não conta como consultado) com data |
 | `alerta` | notificações enviadas |
@@ -36,13 +37,16 @@ Migrações: colunas novas entram por `ALTER TABLE` tolerante em `Banco.__init__
 
 ## Chaves de `meta`
 
+Selo Kurokami (0.19, `radar/ppp.py`): `ppp_fator` (`{valor, ano, indicador, quando}`: moeda local por dólar pelo poder de compra, Banco Mundial `PA.NUS.PRVT.PP`, senão `PA.NUS.PPP`), `ppp_quando` (última coleta do PPP), `ult_ppp` (a pista lenta refaz 1x por dia). `tipos_ligados` guarda o Selo como `selo_ppp` (a regra mudou na 0.19: conta como recém-ligado uma vez, com resumo).
+
 `steamid`, `steamid_perfil`, `replay_<ano>` (`{quando, dado}`: o Steam Replay do ano, compacto, `radar/replay.py`; `dado` null = a Steam não tem; ano passado com dado nunca vence, o resto vence em 1 dia), `itad_ids` (cache appid→id ITAD), `lojas_itad`, `ult_steam`, `ult_itad`, `ult_gg`, `ult_biblioteca`, `biblioteca_falhou` (`{erro, quando, mantida}` se a biblioteca pela API falhou na última coleta, `{}` quando deu certo; sem `userdata.json` fica a biblioteca anterior), `ult_steam_inteira`, `steam_inteira_resumo` (`itens, chamadas, segundos`), `promo_avaliado` (última avaliação da Steam inteira; o painel recarrega as linhas), `promo_lojas` (`{ids, nomes}` das lojas do histórico da Steam inteira; mudou = baixa de novo), `perfil_info` (`{nome, avatar, steamid}` do perfil, para o avatar no topo), `ult_completa`, `ultimos_alertas` (para o painel; itens com `tipos`, `tipo_oferta`, `avisa_por`), `linha_de_base`, `tipos_ligados` (tipos de aviso da última rodada; ligar um tipo novo registra quem já estava assim sem toast), `pausado`, `pendentes` (silêncio), `avisos_fim`, `carrinho` (da Steam, via userdata), `dlcforapps_bloqueado`, `edicoes_manuais`, `esquema` (restos antigos: `ponte_vista`, `ponte_ultimo_envio` e a tabela `fila_lista`, da ponte removida na 0.16, não são mais lidos nem criados).
 
 ## `config.json` (padrões em `config.PADRAO`)
 
 - `perfil_steam`, `pais`, `userdata_json`, `pasta_kurokami_precos`
 - `lojas` (alertam e entram nos preços do painel; desde a 0.18.2 o padrão é **todas** as lojas da ITAD: a primeira coleta marca todas, uma vez só, migração `todas_as_lojas` em `migracoes`), `somente_drm_steam` (esconde de todo o painel a oferta que não ativa na Steam e o histórico dela; o histórico `preco` não guarda DRM: usa `oferta_atual.drm_steam=0` + `banco.LOJAS_SEM_STEAM`)
-- `alerta`: `tipos{selo,novo,igual,24m}` (o que avisa; padrão só `selo`), `desconto_minimo` (vale para novo, igual e 24m), `selo_corte_minimo` (Selo só a partir desse corte; padrão 0), `dias_minimos_completo`, `tolerancia_pct`, `janela_dias`/`perto` (informativos). Ignorados, ficam por compatibilidade: `raridade_minima` e `favoritos_top` (desde a 0.15), `score_minimo`, `avaliacao_minima` e `ignorar_sem_avaliacoes` (desde a 0.14)
+- `alerta`: `tipos{selo,rara,novo,igual,24m}` (o que avisa; padrão `selo` e `rara`; `rara` = Promoção rara, o Selo até a 0.18), `desconto_minimo` (vale para novo, igual e 24m), `selo_corte_minimo` (Selo e Promoção rara só a partir desse corte; padrão 0), `dias_minimos_completo`, `tolerancia_pct`, `janela_dias`/`perto` (informativos). Ignorados, ficam por compatibilidade: `raridade_minima` e `favoritos_top` (desde a 0.15), `score_minimo`, `avaliacao_minima` e `ignorar_sem_avaliacoes` (desde a 0.14)
+- `ppp`: `fator` (moeda local por dólar pelo poder de compra; `null` = Banco Mundial, baixado 1x por dia; padrão do Brasil se nunca baixou: 2,58; refeito a cada 30 dias)
 - `keyshops`: `ativo` (padrão `false` desde a 0.16), `preco_maximo`, `pct_do_menor_oficial`
 - `migracoes[]`: mudanças de padrão já aplicadas a este arquivo (`config.MIGRACOES`, cada uma roda uma vez em `carregar()`; depois vale a escolha do usuário). Hoje: `keyshop_alerta_off`
 - `dlc`: `ignorar_cosmeticos|extras|atalhos|pacotes|gratis|itens` (0.18.2, padrão ligado), `preco_minimo` (reais, 0 = off), `so_expansoes` (só classe história/pacote conta). `dlc.ignorada(classe, preco, cfg, tenho=)` vale para o "falta", o custo completo e, desde a 0.18.2, para as DLCs que você tem na Biblioteca (contagem e valor). Classes: + `item`; `dlc.classificar(nome, nome_do_jogo)` tira o título do jogo do começo do nome antes das regras

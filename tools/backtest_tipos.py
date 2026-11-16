@@ -33,16 +33,25 @@ from radar.analise import episodios, linha_do_tempo  # noqa: E402
 from radar.banco import Banco  # noqa: E402
 from tools.backtest_selo import ANO, DIA, achar_banco, grande_promo, ler_config  # noqa: E402
 
-# selo = so a regra G (emenda de 04/10; = r["selo"] desde a 0.15): piso_tipo "raro" com >= 1 promocao anterior;
-# "selo_fg" = Selo antigo da 0.14 (F Lendario ou G)
-TIPOS = {"selo": lambda r: r["piso_tipo"] == "raro" and r["_anteriores"], "selo_fg": lambda r: r["nivel"] == "lendario" or (r["piso_tipo"] == "raro" and r["_anteriores"]), "novo": lambda r: r["piso_tipo"] in ("novo", "raro"),
+# rara = Promocao rara (o Selo da 0.15 a 0.18, so a regra G): piso_tipo "raro" com >= 1 promocao anterior;
+# "selo_fg" = Selo antigo da 0.14 (F Lendario ou G); "ppp*" = Selo Kurokami da 0.19 (piso PPP ou teto da franquia;
+# so jogos com preco em dolar, ppp.mapa; o teto da franquia e o de hoje, um pouco de olhar o futuro)
+TIPOS = {"rara": lambda r: r["piso_tipo"] == "raro" and r["_anteriores"],
+         "ppp": lambda r: r["selo"],
+         "ppp_piso": lambda r: (r["selo_motivo"] or "").startswith("chegou ao piso"),
+         "ppp_fr": lambda r: (r["selo_motivo"] or "").startswith("chegou ao teto"),
+         "ppp_rec": lambda r: r["selo"] and r["piso_tipo"] in ("novo", "raro"),
+         "ppp_1a": lambda r: r["selo"] and ((r["selo_motivo"] or "").startswith("chegou ao teto") or (
+             r["piso_ref"] and r["ppp"] and r["piso_ref"]["preco"] > r["ppp"]["piso"] + max(10, r["ppp"]["piso"] * 0.01))),
+         "selo_fg": lambda r: r["nivel"] == "lendario" or (r["piso_tipo"] == "raro" and r["_anteriores"]), "novo": lambda r: r["piso_tipo"] in ("novo", "raro"),
          "igual": lambda r: r["piso_tipo"] == "igual", "24m": lambda r: r["piso_tipo"] == "24m",
          "todas": lambda r: True}
 
 
 def variantes(dmin):
     """[(nome, tipo, corte minimo)]: selo so com selo_corte_minimo (ja dentro de r["selo"])."""
-    out = [("selo", "selo", 0), ("selo antigo (F ou G)", "selo_fg", 0)]
+    out = [("selo PPP", "ppp", 0), ("  so piso PPP", "ppp_piso", 0), ("  so teto franquia", "ppp_fr", 0),
+           ("  PPP + recorde", "ppp_rec", 0), ("  PPP 1a vez", "ppp_1a", 0), ("promocao rara", "rara", 0), ("selo antigo (F ou G)", "selo_fg", 0)]
     for t in ("novo", "igual", "24m"):
         out += [("%s >=0" % t, t, 0), ("%s >=%d" % (t, dmin), t, dmin)]
     return out + [("base: toda promocao", "todas", 0)]
@@ -70,6 +79,9 @@ def rodar(b, marc, dmin, args):
     lojas_m = [l for l in {r["loja"] for r in b.q("SELECT DISTINCT loja FROM preco WHERE fonte LIKE 'itad%'")}
                if l.lower() in marc] + (["Steam (direto)"] if "steam" in marc else [])
     jogos = {r["appid"] for r in b.q("SELECT appid FROM jogo WHERE na_lista=1 AND possuido=0")}
+    from radar import ppp
+    pm = ppp.mapa(b, {"lojas": [l for l in lojas_m if l != "Steam (direto)"], "pais": "BR"})
+    print("(preco em dolar em %d jogos da lista; fator %s)" % (len(pm), next(iter(pm.values()))["fator"] if pm else "-"))
     linhas = {a: rs for a, rs in b.linhas_lote(lojas_m).items() if a in jogos}
     b.con.close()
     quandos = {a: [r["quando"] for r in rs] for a, rs in linhas.items()}
@@ -105,7 +117,7 @@ def rodar(b, marc, dmin, args):
             if not segs or segs[-1][2] is None or segs[-1][1] < ts - 1 or not segs[-1][3]:
                 continue
             preco, corte = segs[-1][2], segs[-1][3]
-            r = analise.analisar(sub, preco, corte, agora_=ts)
+            r = analise.analisar(sub, preco, corte, agora_=ts, ppp=pm.get(a))
             eps = episodios(segs)  # promocao anterior = algum episodio antes do atual (como em analisar)
             r["_anteriores"] = bool(eps[:-1] if eps and eps[-1][1] >= ts - 1 else eps)
             chave = (a, r["inicio"] or lim)

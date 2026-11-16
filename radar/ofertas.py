@@ -19,7 +19,7 @@ _GER = [0]              # geração: invalidar() muda, e o que foi montado antes
 _MEMO = {}              # 'p': (contexto, {appid: (assinatura, linha, historico, quando, dia)}); troca inteira por atribuição (a rápida, a lenta e o aquecer rodam juntas)
 VALIDADE_MEMO = 7200    # segundos (como steam_inteira.VALIDADE_AVAL): a análise depende da data; cada jogo vence em um ponto de 0 a 30 min depois, para não refazer todos juntos
 # o que alimenta a linha de um jogo da Steam inteira (_linha e analise.analisar); com `baixado` e a capa/franquia, é a assinatura dele
-_CAMPOS_P = ('nome', 'capa', 'preco', 'cheio', 'corte', 'tipo_oferta', 'selo', 'piso_ref', 'volta_texto', 'volta_dica', 'selo_motivo',
+_CAMPOS_P = ('nome', 'capa', 'preco', 'cheio', 'corte', 'tipo_oferta', 'selo', 'piso_ref', 'volta_texto', 'volta_dica', 'selo_motivo', 'rara_motivo',
              'rpos', 'rcount', 'fim', 'lancamento', 'em_breve', 'loja', 'na_lista', 'no_carrinho', 'piso_geral', 'inicio', 'tipo', 'tenho')
 _TRAVAS = {'ofertas': threading.Lock(), 'biblioteca': threading.Lock(), 'timer': threading.Lock()}
 
@@ -72,6 +72,11 @@ def _dict(o):
     return o if isinstance(o, dict) else o.como_dict()
 
 
+def _tipo_prev(tipos):
+    """Tipo para a previsão: o Selo Kurokami (piso PPP, 0.19) não tem backtest próprio; vale o tipo de recorde."""
+    return analise.tipo_oferta([x for x in (tipos or []) if x != 'selo']) or 'nenhum'
+
+
 def _linha(o, cv, fr, hist, prev, an=None):
     """Uma linha no formato da amostra (os índices são lidos pela função M() da página)."""
     if an:
@@ -83,7 +88,8 @@ def _linha(o, cv, fr, hist, prev, an=None):
             o.get('rpos') or 0, o.get('rcount') or 0, o.get('fim') or 0, o.get('lancamento') or 0,
             1 if o.get('em_breve') else 0, o.get('loja') or '', 1 if o.get('na_lista') else 0,
             1 if o.get('no_carrinho') else 0, None, fr.get(o['appid'], ''), 0,
-            o.get('piso_geral'), (o.get('inicio') or '')[:10], o.get('selo_motivo') or '', o.get('volta_dica') or '',
+            o.get('piso_geral'), (o.get('inicio') or '')[:10],
+            (o.get('selo_motivo') if t == 'selo' else o.get('rara_motivo') if t == 'rara' else '') or '', o.get('volta_dica') or '',
             o.get('tipo') or 'jogo', 1 if o.get('tenho') else 0, 1 if hist else 0, prev]
 
 
@@ -119,7 +125,7 @@ def _montar_ofertas():
         for o in lista:
             em = (o.get('corte') or 0) > 0 and o.get('preco') is not None
             lin = lh.get(o['appid'], [])
-            t = ('selo' if o.get('selo') else o.get('tipo_oferta')) or 'nenhum'
+            t = _tipo_prev(o.get('tipos'))
             prev = pv.prever(lin, o.get('preco'), o.get('corte') or 0, t, em, o.get('fim')) if lin else None
             if lin:
                 h = pv.hist(lin)
@@ -160,10 +166,10 @@ def _montar_ofertas():
                 x = analise.analisar(lin, o['preco'], o.get('corte') or 0, agora_=agora, cfg_alerta={})
                 tipos = analise.tipos_de(x)
                 volta, _ = analise.costuma_voltar(x, o.get('corte') or 0)
-                an = {'selo': x['selo'], 'selo_motivo': x['selo_motivo'], 'piso_ref': x['piso_ref'],
-                      'tipo_oferta': analise.tipo_oferta(tipos), 'volta_texto': volta,
+                an = {'selo': x['selo'], 'selo_motivo': x['selo_motivo'], 'rara_motivo': x['rara_motivo'],
+                      'piso_ref': x['piso_ref'], 'tipo_oferta': analise.tipo_oferta(tipos), 'volta_texto': volta,
                       'volta_dica': analise.dica_volta(x, o.get('corte') or 0)}
-                t = 'selo' if x['selo'] else (analise.tipo_oferta(tipos) or 'nenhum')
+                t = _tipo_prev(tipos)
                 prev = pv.prever(lin, o['preco'], o.get('corte') or 0, t, True, o.get('fim'))
                 h = pv.hist(lin)
                 if h:

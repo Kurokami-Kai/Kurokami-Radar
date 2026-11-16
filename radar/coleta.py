@@ -348,6 +348,14 @@ def atualizar_lenta(cfg, banco, forcar=False, sem_limite=False, log=print):
             banco.commit()
         except Exception as e:
             log("   biblioteca falhou (%s), tento na proxima" % e)
+    if forcar or _min_desde(banco, "ult_ppp") >= 24 * 60:
+        try:   # Selo Kurokami (0.19): preco em dolar, fator PPP e teto das franquias
+            from . import ppp
+            ppp.coletar(cfg, banco, k_steam, k_itad, log)
+            banco.meta("ult_ppp", agora())
+            banco.commit()
+        except Exception as e:
+            log("   preco regional (PPP) falhou (%s), tento na proxima" % rede.explicar(e))
     try:
         if coletar_conquistas(cfg, banco, k_steam, sid, log):
             restante = True

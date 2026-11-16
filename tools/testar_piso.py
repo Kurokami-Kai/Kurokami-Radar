@@ -1,4 +1,5 @@
-"""Testes sinteticos (sem rede, sem banco) da pilula de piso, do Lendario, do Selo (so G) e de "Costuma voltar".
+"""Testes sinteticos (sem rede, sem banco) da pilula de piso, do Lendario, da Promocao rara (so G, o Selo ate a 0.18),
+do Selo Kurokami (piso PPP e teto da franquia, 0.19) e de "Costuma voltar".
 Uso: py tools/testar_piso.py  -> imprime so as falhas e o total; sai com 1 se algo falhou."""
 import os
 import sys
@@ -22,10 +23,10 @@ def promo(meses_atras, preco, corte, dur=10):
             dict(loja="Steam", preco=CHEIO, corte=0, quando=iso(meses_atras, -dur))]
 
 
-def rodar_caso(hist, preco, corte, inicio_meses=40, cfg_alerta=None):
+def rodar_caso(hist, preco, corte, inicio_meses=40, cfg_alerta=None, ppp=None):
     linhas = [dict(loja="Steam", preco=CHEIO, corte=0, quando=iso(inicio_meses))] + hist + \
              [dict(loja="Steam", preco=preco, corte=corte, quando=iso(0, 1))]
-    r = analisar(linhas, preco, corte, agora_=AGORA.timestamp(), cfg_alerta=cfg_alerta)
+    r = analisar(linhas, preco, corte, agora_=AGORA.timestamp(), cfg_alerta=cfg_alerta, ppp=ppp)
     r["volta"] = costuma_voltar(r, corte)[0]
     r["tipos"] = tipos_de(r)
     return r
@@ -53,8 +54,8 @@ CASOS = [
     ("preco atual = 51% do recorde", promo(2, 5000, 50), 2550, 74, "piso_tipo", "novo", 40),
     # folga de centavos na metade (R$ 0,10 ou 1% da metade), como no "igual": caso real WRC 7 (04/10/2026)
     ("WRC 7: R$ 2,39 com recorde R$ 4,74 (metade R$ 2,37) -> raro", promo(2, 474, 90), 239, 95, "piso_tipo", "raro", 40),
-    ("WRC 7: R$ 2,39 com recorde R$ 4,74 -> Selo", promo(2, 474, 90), 239, 95, "selo", True, 40),
-    ("WRC 7: R$ 2,40 ainda e metade", promo(2, 474, 90), 240, 95, "selo", True, 40),
+    ("WRC 7: R$ 2,39 com recorde R$ 4,74 -> Selo", promo(2, 474, 90), 239, 95, "rara", True, 40),
+    ("WRC 7: R$ 2,40 ainda e metade", promo(2, 474, 90), 240, 95, "rara", True, 40),
     ("metade + R$ 0,11 nao e metade", promo(2, 474, 90), 248, 95, "piso_tipo", "novo", 40),
     ("folga de 1% da metade (R$ 45,00 + 0,45): R$ 45,40 e metade", promo(2, 9000, 10), 4540, 55, "piso_tipo", "raro", 40),
     ("folga de 1% da metade: R$ 45,50 nao e", promo(2, 9000, 10), 4550, 55, "piso_tipo", "novo", 40),
@@ -68,20 +69,20 @@ CASOS = [
     ("nunca chegou, sem promo anterior -> Incomum", [], 3000, 70, "nivel", "incomum", 30),
     # 1a promocao <= 50% do preco cheio: a pilula diz Recorde raro, mas sem promocao anterior nao ha Selo (como o ARK)
     ("1a promo a -70%: pilula Recorde raro", [], 3000, 70, "piso_tipo", "raro", 30),
-    ("1a promo a -70%: sem Selo", [], 3000, 70, "selo", False, 30),
+    ("1a promo a -70%: sem Selo", [], 3000, 70, "rara", False, 30),
     ("mesmo nivel todo mes -> Comum", mensal50(30), 5000, 50, "nivel", "comum", 30),
     # Selo Kurokami = so G (Recorde raro com promocao anterior; spec 04, 04/10). F (Lendario) nao da mais Selo.
-    ("maior desconto da historia sem recorde raro -> sem Selo", mensal50(30), 3000, 70, "selo", False, 30),
-    ("escada 40% -> 50% com 30 meses -> sem Selo", promo(24, 6000, 40) + promo(12, 6000, 40), 5000, 50, "selo", False, 30),
+    ("maior desconto da historia sem recorde raro -> sem Selo", mensal50(30), 3000, 70, "rara", False, 30),
+    ("escada 40% -> 50% com 30 meses -> sem Selo", promo(24, 6000, 40) + promo(12, 6000, 40), 5000, 50, "rara", False, 30),
     ("escada 40% -> 50%: Lendario continua calculado", promo(24, 6000, 40) + promo(12, 6000, 40), 5000, 50, "nivel", "lendario", 30),
-    ("recorde raro com promocao anterior -> Selo", promo(20, 5000, 50), 4500, 55, "selo", True, 40),
-    ("Selo G (19 meses): motivo", promo(19, 5000, 50), 4500, 55, "selo_motivo", "o menor preço anterior (R$ 50,00) foi há 18 meses", 40),
-    ("Selo G (50%): motivo", promo(2, 5000, 50), 2500, 75, "selo_motivo",
+    ("recorde raro com promocao anterior -> Selo", promo(20, 5000, 50), 4500, 55, "rara", True, 40),
+    ("Selo G (19 meses): motivo", promo(19, 5000, 50), 4500, 55, "rara_motivo", "o menor preço anterior (R$ 50,00) foi há 18 meses", 40),
+    ("Selo G (50%): motivo", promo(2, 5000, 50), 2500, 75, "rara_motivo",
      "preço caiu pela metade ou mais (o menor anterior era R$ 50,00, %s)" % mes_ano(2), 40),
     # a data do texto e a do preco do recorde, nao a da ultima vez no nivel (WRC 7: R$ 4,74 em 07/2025, R$ 4,79 em 10/2026)
-    ("metade: data do recorde, nao do nivel", promo(15, 474, 90) + promo(1, 479, 90), 239, 95, "selo_motivo",
+    ("metade: data do recorde, nao do nivel", promo(15, 474, 90) + promo(1, 479, 90), 239, 95, "rara_motivo",
      "preço caiu pela metade ou mais (o menor anterior era R$ 4,74, %s)" % mes_ano(15), 40),
-    ("Selo + novo recorde: tipos", promo(20, 5000, 50), 4500, 55, "tipos", ["selo", "novo"], 40),
+    ("Selo + novo recorde: tipos", promo(20, 5000, 50), 4500, 55, "tipos", ["rara", "novo"], 40),
     ("recorde raro sem promo anterior conta como novo", [], 3000, 70, "tipos", ["novo"], 30),
     # "Costuma voltar" (so informa)
     ("volta: promo a cada 2 meses", mensal50(30), 5000, 50, "volta", "a cada ~2 meses", 30),
@@ -90,17 +91,30 @@ CASOS = [
     ("volta: teve so antes dos 24 meses", promo(30, 3000, 70) + promo(10, 5000, 50), 3000, 70, "volta", "não teve nos últimos 2 anos", 40),
     ("volta: primeira promocao", [], 3000, 70, "volta", "primeira promoção", 30),
     ("volta: historico curto", [], 3000, 70, "volta", "histórico curto", 3),
-    ("novo recorde comum nao ganha Selo", promo(17, 5000, 50), 4500, 55, "selo", False, 40),
-    ("Ultrarraro (18 meses, sem recorde em R$) nao ganha Selo", mensal50(18) + promo(1, 2900, 71), 3000, 70, "selo", False, 18),
-    ("Raro sozinho nao ganha Selo", promo(20, 5000, 50) + promo(8, 5000, 50), 5000, 50, "selo", False, 30),
-    ("selo_corte_minimo 80 barra Selo de -70%", mensal50(30), 3000, 70, "selo", False, 30, {"selo_corte_minimo": 80}),
+    ("novo recorde comum nao ganha Selo", promo(17, 5000, 50), 4500, 55, "rara", False, 40),
+    ("Ultrarraro (18 meses, sem recorde em R$) nao ganha Selo", mensal50(18) + promo(1, 2900, 71), 3000, 70, "rara", False, 18),
+    ("Raro sozinho nao ganha Selo", promo(20, 5000, 50) + promo(8, 5000, 50), 5000, 50, "rara", False, 30),
+    ("selo_corte_minimo 80 barra Selo de -70%", mensal50(30), 3000, 70, "rara", False, 30, {"selo_corte_minimo": 80}),
+    # Selo Kurokami (0.19): US$ 29,99 x 2 = R$ 59,98 de preco regional; R$ 100 de preco cheio no Brasil
+    ("PPP: 1a vez no piso (-50% antes; -70% agora = R$ 30 <= R$ 29,99) -> Selo", promo(12, 5000, 50), 3000, 70, "selo", True, 30,
+     None, {"usd": 2999, "fator": 2.0}),
+    ("PPP: piso de novo (-70% ja aconteceu) -> sem Selo", promo(12, 5000, 50) + promo(4, 3000, 70), 3000, 70, "selo", False, 30,
+     None, {"usd": 2999, "fator": 2.0}),
+    ("PPP: teto da franquia (-50%) pela 1a vez, acima do piso -> Selo", promo(12, 8000, 20), 5000, 50, "selo", True, 30,
+     None, {"usd": 2999, "fator": 2.0, "teto_fr": 50, "fr": "Forza"}),
+    ("PPP: teto da franquia: motivo", promo(12, 8000, 20), 5000, 50, "selo_motivo",
+     "chegou ao teto de desconto da franquia Forza (-50%): os jogos dela costumam parar aí", 30,
+     None, {"usd": 2999, "fator": 2.0, "teto_fr": 50, "fr": "Forza"}),
+    ("PPP: abaixo do teto da franquia e acima do piso -> sem Selo", promo(12, 8000, 20), 6000, 40, "selo", False, 30,
+     None, {"usd": 2999, "fator": 2.0, "teto_fr": 50, "fr": "Forza"}),
+    ("sem preco em dolar nao ha Selo", promo(12, 5000, 50), 3000, 70, "selo", False, 30),
 ]
 
 
 def rodar():
     falhas = []
-    for nome, hist, preco, corte, campo, esperado, inicio, *cfg in CASOS:
-        r = rodar_caso(hist, preco, corte, inicio, cfg[0] if cfg else None)
+    for nome, hist, preco, corte, campo, esperado, inicio, *ext in CASOS:
+        r = rodar_caso(hist, preco, corte, inicio, ext[0] if ext else None, ext[1] if len(ext) > 1 else None)
         if r[campo] != esperado:
             falhas.append("%s: %s=%r (esperado %r)" % (nome, campo, r[campo], esperado))
     return falhas

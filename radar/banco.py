@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS promo_hist(
 CREATE TABLE IF NOT EXISTS tempo_jogo(appid INTEGER PRIMARY KEY, minutos INTEGER, ultima INTEGER);
 CREATE TABLE IF NOT EXISTS ficha_cache(appid INTEGER, fonte TEXT, dados TEXT, quando TEXT, PRIMARY KEY(appid, fonte));
 CREATE TABLE IF NOT EXISTS franquia_manual(appid INTEGER PRIMARY KEY, nome TEXT, quando TEXT);
+-- maior desconto (storelow da ITAD, lojas marcadas) de jogo de franquia sem historico no Hunter (ppp.py, 0.19)
+CREATE TABLE IF NOT EXISTS teto_jogo(appid INTEGER PRIMARY KEY, corte INTEGER, quando TEXT);
 -- aba Status > Progresso: conquistas de cada jogo jogado (feitas/total; total 0 = sem conquistas, -1 = a consulta falhou);
 -- minutos = tempo jogado na hora da consulta (so consulta de novo quando o tempo muda)
 -- jogos sem conquista feita que o dono marcou como jogados de verdade (so vale com `farm_cartas` ligado)
@@ -132,7 +134,9 @@ class Banco:
                     # quando o item entrou em promocao (aviso da Steam inteira so de quem entrou ha pouco)
                     "ALTER TABLE steam_promo ADD COLUMN entrou TEXT",
                     # minutos jogados nas ultimas 2 semanas (GetOwnedGames)
-                    "ALTER TABLE tempo_jogo ADD COLUMN min_2sem INTEGER"):
+                    "ALTER TABLE tempo_jogo ADD COLUMN min_2sem INTEGER",
+                    # preco cheio nos EUA, em centavos de dolar (ppp.coletar; base do Selo Kurokami, 0.19)
+                    "ALTER TABLE jogo ADD COLUMN cheio_usd INTEGER"):
             try:
                 self.con.execute(sql)
             except sqlite3.OperationalError:

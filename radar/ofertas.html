@@ -480,8 +480,9 @@ body.pg-dest .full{margin-left:-32px;margin-right:-32px}
 .az{right:10px}
 .topbar{border-bottom:1px solid var(--borda)}
 .tri{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tri.duo{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:1700px){.tri{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:900px){.tri{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.tri,.tri.duo{grid-template-columns:minmax(0,1fr)}}
 .lane .lh .lnum{background:none;border:0;padding:0;cursor:pointer;color:var(--c);font-size:34px;font-weight:400;line-height:1}
 .lh>div{min-width:0}.lh>div>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ---------- oitava rodada: recortes, orçamento, ficha curta ---------- */
@@ -610,10 +611,10 @@ const PS=P.filter(o=>!o.lista);
 const OB=new Map([...L,...PS].map(o=>[o.appid,o]));   // appid → linha (a loja do preço, para o carrinho)
 const em=o=>o.corte>0&&o.preco!=null;
 const gratis=o=>o.preco===0&&o.cheio>0;
-const REC=['selo','novo','igual','24m'];
+const REC=['selo','rara','novo','igual','24m'];
 /* ---------- a métrica: chance de perder (o preço não voltar em 3 meses), medida no backtest ---------- */
 [...L,...PS].forEach(o=>{const v=o.pv;o.risco=em(o)?v.risco??null:null;o.espera=v.espera??null;o.k24=v.k24;o.eco=em(o)?(o.cheio||0)-o.preco:0;
-  o.vale=o.risco!=null&&REC.includes(o.t)&&o.risco>=.2&&(o.corte>=40||o.t==='selo');o.eleg=o.vale&&!!o.hist&&o.eco>=1000;});
+  o.vale=o.risco!=null&&REC.includes(o.t)&&o.risco>=.2&&(o.corte>=40||o.t==='selo'||o.t==='rara');o.eleg=o.vale&&!!o.hist&&o.eco>=1000;});
 const fimK=o=>o.fim&&o.fim>AGORA?o.fim:9e12;
 const proxK=o=>o.pv.prox_t||9e12;
 const SORT={melhor:(a,b)=>(b.risco??-1)-(a.risco??-1)||b.corte-a.corte||b.eco-a.eco,desc:(a,b)=>b.corte-a.corte||b.eco-a.eco,
@@ -623,13 +624,13 @@ const tempo=d=>d<10?'poucos dias':d<45?`~${Math.max(2,Math.round(d/7))} semanas`
 
 /* ---------- etiquetas ---------- */
 /* calor: Selo (brasa, texto preto) > Novo recorde (vermelho cheio) > Igual ao recorde > o resto em cinza */
-const ET={selo:['Selo Kurokami','#ff4757','#000000'],novo:['Novo recorde','#d63031','#ffffff'],igual:['Igual ao recorde','#8a1520','#ffd6d9'],'24m':['Menor em 2 anos','#262626','#c8c8c8'],
-  gratis:['Grátis para resgatar','#262626','#f0f0f0'],fim:['','#4a1016','#ff8a94'],rara:['','#4a1016','#ff8a94'],volta:['','#1c1c1c','#979797'],info:['','#1c1c1c','#979797']};
+const ET={selo:['Selo Kurokami','#ff4757','#000000'],rara:['Promoção rara','#e8303c','#ffffff'],novo:['Novo recorde','#d63031','#ffffff'],igual:['Igual ao recorde','#8a1520','#ffd6d9'],'24m':['Menor em 2 anos','#262626','#c8c8c8'],
+  gratis:['Grátis para resgatar','#262626','#f0f0f0'],fim:['','#4a1016','#ff8a94'],risco:['','#4a1016','#ff8a94'],volta:['','#1c1c1c','#979797'],info:['','#1c1c1c','#979797']};
 const etqP=o=>gratis(o)?['Grátis para resgatar','gratis']:em(o)&&ET[o.t]?[ET[o.t][0],o.t]:null;
 function etqC(o){if(!em(o)||o.risco==null)return null;
   if(o.vale&&o.fim>AGORA&&o.fim-AGORA<=48*3600){const h=(o.fim-AGORA)/3600;return [new Date(o.fim*1000).toDateString()===new Date().toDateString()?'Termina hoje':`Termina em ${Math.max(1,Math.round(h))} h`,'fim'];}
-  if(o.risco>=.4)return ['Pode não voltar tão cedo','rara'];
-  if(!o.k24&&o.risco>=.2)return ['1ª vez nesse preço em 2 anos','rara'];
+  if(o.risco>=.4)return ['Pode não voltar tão cedo','risco'];
+  if(!o.k24&&o.risco>=.2)return ['1ª vez nesse preço em 2 anos','risco'];
   return o.espera?['Volta em '+tempo(o.espera),'volta']:null;}
 const pill=(e,cls='')=>e?`<span class="et ${cls}" style="--eb:${ET[e[1]][1]};--ec:${ET[e[1]][2]}">${esc(e[0])}</span>`:'';
 function etqFicha(o){const p=etqP(o),c=VD[verd(o)[0]];return (p?pill(p,'chip'):'')+`<span class="et chip" style="--eb:${c[1]};--ec:${c[3]}">${c[0]}</span>`;}
@@ -725,7 +726,7 @@ function caixas(o){const v=o.pv,[k,sv]=verd(o),c=VD[k],f=fatos(o);let h='';
      ${f.length?`<div class="fts">${f.map(([a,b,n])=>`<div><span class="k">${a}</span><b>${esc(b)}</b>${n?`<small>${esc(n)}</small>`:''}</div>`).join('')}</div>`:''}
      ${lg.length?`<details><summary>por quê</summary>${lg.map(x=>`<p>${esc(x)}</p>`).join('')}</details>`:''}</div>`;}
   else if(!em(o)&&o.preco==null)h+=`<div class="caixa" style="--c:#666666"><div class="l1" style="font-size:14px">Fora de venda nas suas lojas.</div></div>`;
-  if(o.t==='selo'&&o.motivo)h+=`<div class="caixa" style="--c:#ff4757"><div class="k">Selo Kurokami</div><div class="l2">${esc(o.motivo.replace(/^./,c=>c.toUpperCase()))}.</div></div>`;
+  if((o.t==='selo'||o.t==='rara')&&o.motivo)h+=`<div class="caixa" style="--c:${ET[o.t][1]}"><div class="k">${ET[o.t][0]}</div><div class="l2">${esc(o.motivo.replace(/^./,c=>c.toUpperCase()))}.</div></div>`;
   if(S.nota&&o.risco!=null)h+=`<div class="caixa" style="--c:#979797"><div class="k">Números (só na amostra)</div><div class="l2">Chance de o preço não voltar em 3 meses: ${Math.round(o.risco*100)}% · espera prevista: ${o.espera} dias</div></div>`;
   return h;}
 /* as 2 frases: quando vem a próxima (e por quanto) e, se está em promoção, se esse preço costuma voltar */
@@ -944,6 +945,7 @@ const GANHO_MIN=500,GANHO_PCT=.15;   /* imperdível: abaixo do piso por R$ 5 e 1
 function verd(o){if(o._v)return o._v;const v=o.pv;let r;
   if(em(o)){const z=v.piso;
     if(o.t==='selo')r=['imperdivel','Selo Kurokami'];
+    else if(o.t==='rara')r=['imperdivel','Promoção rara'];
     else if(!o.hist)r=['sem','histórico ainda não baixado · compare pelo desconto'];
     else if(!z)r=['sem','nenhuma promoção anterior em 2 anos · compare pelo desconto'];
     else{const [pz,n]=z,g=pz-o.preco,abaixo=o.preco<pz-tolP(pz);
@@ -1047,7 +1049,7 @@ function agCol(x,c){return `<div class="agc" style="--c:${c}"><div class="agh"><
 
 /* ---------- capas e linhas de cada modelo ---------- */
 function rowV(o,nome){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k];
-  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:${nome||o.t==='selo'?c[2]:'var(--fraco)'}">${nome?c[0]+(s?' · ':''):''}${esc(s)}</small></span>${em(o)?`<span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span>`:''}</button>`;}
+  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:${nome||o.t==='selo'||o.t==='rara'?c[2]:'var(--fraco)'}">${nome?c[0]+(s?' · ':''):''}${esc(s)}</small></span>${em(o)?`<span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span>`:''}</button>`;}
 function lane(cor,tit,exp,l,go,nome,row,extra){row=row||(o=>rowV(o,nome));
   return `<section class="lane" style="--c:${cor}"><div class="lh"><button class="lnum" data-go="${go}" title="Ver todos">${fmtN(l.length)}</button><div><h3><button class="lt" data-go="${go}" title="Ver todos">${tit}<i>›</i></button></h3><span>${exp}</span></div></div><div class="lr">${l.slice(0,8).map(row).join('')||'<p class="vazio">Nenhum hoje.</p>'}</div><div class="lfoot">${extra||'<span></span>'}${go.startsWith('baratos')?`<button class="vt" data-go="${go}">ver todos ${(TETOS.find(t=>'baratos:'+t[0]===go)||[0,''])[1]} ›</button>`:l.length>8?`<button class="vt" data-go="${go}">ver os ${fmtN(l.length)} ›</button>`:''}</div></section>`;}
 /* capa no molde da Biblioteca: % no canto (cor do veredito), barra embaixo = do preço cheio ao menor em 2 anos */
@@ -1083,7 +1085,9 @@ function pagDestA(){const st=PS.filter(o=>em(o)&&o.hist&&fl(o)),vk=k=>st.filter(
   const fim=[...li,...st].filter(o=>breve(o)&&['imperdivel','menor'].includes(verd(o)[0])).sort(SORT.fim);
   const bb=BB(),tt=S.teto,bt=bb.filter(o=>o.preco<=tt);
   const tetos=`<div class="tetos">${TETOS.map(([v,t])=>`<button data-teto="${v}" aria-pressed="${v===tt}">${t} <small>${fmtN(bb.filter(o=>o.preco<=v).length)}</small></button>`).join('')}</div>`;
-  return faixaEv()+banner()+`<div class="pcab" style="margin-top:24px"><h2>Hoje</h2><span class="res">o piso é o menor preço dos últimos 2 anos: abaixo dele por R$ 5 e 15% ou mais é <b style="color:#ff4757">imperdível</b>; nele, <b style="color:#ff8a94">não fica mais barato</b></span></div>
+  const sl=L.filter(o=>em(o)&&o.t==='selo').sort(ordV),ra=[...L.filter(o=>em(o)&&o.t==='rara').sort(ordV),...PS.filter(o=>em(o)&&o.t==='rara'&&o.tipo==='jogo'&&!o.tenho&&(o.rcount||0)>=1000).sort((a,b)=>(b.rcount||0)-(a.rcount||0))];
+  return faixaEv()+banner()+`<div class="tri duo" style="margin-top:24px">${lane('#ff4757','Selo Kurokami','da sua lista · no piso PPP pela 1ª vez ou no teto de desconto da franquia',sl,'lista:agora',true)}${lane('#e8303c','Promoções raras','o menor preço em muito tempo (anterior de 1,5 ano ou mais, ou pela metade) · sua lista (♥) e, fora dela, jogos com 1.000+ análises',ra,'promo:imperdivel',true)}</div>`
+   +`<div class="pcab" style="margin-top:24px"><h2>Hoje</h2><span class="res">o piso é o menor preço dos últimos 2 anos: abaixo dele por R$ 5 e 15% ou mais é <b style="color:#ff4757">imperdível</b>; nele, <b style="color:#ff8a94">não fica mais barato</b></span></div>
    <div class="tri">${lane('#ff4757','Melhores ofertas','fora da lista · abaixo do menor preço em 2 anos · pelo ganho',mo,'promo:imperdivel')}${lane('#ff4757','Menores históricos','fora da lista · no menor preço em 2 anos · pela economia',mh,'promo:menor')}${lane('#ff4757','Bons e baratos','fora da lista · baratos e bem avaliados · pelas análises',bt,'baratos:'+tt,false,rowB,tetos)}${lane('#ff4757','Lista de desejos','em promoção · as melhores primeiro',li,'lista:imperdivel',true)}</div>`
    +pratsLinha([{nome:'Acabam em até 3 dias',c:'#ff4757',desc:'Imperdíveis e no menor preço que terminam logo (♥ = da sua lista)',l:fim}]);}
 function pagDestB(){const pm=L.filter(em),fo=L.filter(o=>!em(o)&&!o.breve&&o.pv.prox_t),sp=L.filter(o=>!em(o)&&!o.breve&&!o.pv.prox_t).length;

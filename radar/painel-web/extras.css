@@ -6,7 +6,7 @@
 
 .pp-ref{background:none;color:var(--dim);font-weight:400;padding:2px 0;white-space:normal;text-align:right;max-width:170px}
 @media(max-width:720px){.pp-ref{max-width:118px;font-size:10px}}
-.pp-novo{background:var(--acao);color:#fff}.pp-raro,.pp-igual{background:#8a1520;color:#ffd6d9}.pp-24m{background:#262626;color:#c8c8c8}
+.pp-novo,.pp-rara{background:var(--acao);color:#fff}.pp-raro,.pp-igual{background:#8a1520;color:#ffd6d9}.pp-24m{background:#262626;color:#c8c8c8}
 .ppwrap{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .porque{background:rgba(0,0,0,.25);padding:8px 10px;font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
 .porque b{color:var(--text);font-weight:400}

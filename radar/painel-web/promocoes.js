@@ -44,10 +44,11 @@ function paginas(pg,max){if(max<=1)return '';const ns=new Set([1,max,pg-2,pg-1,p
 function relTempo(t,futuro){if(!t)return '';const ms=futuro?t*1000-Date.now():Date.now()-Date.parse(t);if(isNaN(ms))return '';const h=ms/36e5;
   if(futuro&&h<=0)return 'acabou';const d=Math.round(h/24);
   const txt=h<1?'menos de 1h':h<24?`${Math.round(h)}h`:`${d} dia${d>1?'s':''}`;return futuro?'em '+txt:'há '+txt;}
-function recPill(o){const t=o.tipo_oferta;if(!t||t==='selo'||!(o.corte>0))return '';const r=o.piso_ref;
+function recPill(o){const t=o.tipo_oferta;if(!t||t==='selo'||!(o.corte>0))return '';
+  if(t==='rara')return `<span class="pp pp-rara" title="${esc('Promoção rara: '+(o.rara_motivo||''))}">${TIPO_NOME[t]}</span>`;const r=o.piso_ref;
   return `<span class="pp pp-${t}" title="${esc(r?((t==='novo'?'recorde anterior: ':'menor de sempre: ')+pisoRefTxt(r)):'')}">${TIPO_NOME[t]}</span>`;}
 /* calor da linha e das colunas da tabela de Promoções */
-const rq=o=>o.selo?' class="rq3"':o.tipo_oferta==='novo'?' class="rq2"':o.tipo_oferta==='igual'?' class="rq1"':'';
+const rq=o=>o.selo||o.tipo_oferta==='rara'?' class="rq3"':o.tipo_oferta==='novo'?' class="rq2"':o.tipo_oferta==='igual'?' class="rq1"':'';
 const voltaQ=v=>v==null?'':v<2?' v3':v<=3.15?' v2':v<=5?' v1':' v0';   /* volta_ordem: 0-1 nunca/não em 2 anos; 2+promoções por ano */
 function icones(o){return `${o.no_carrinho?'<span class="ico ico-carr" title="No carrinho">🛒</span>':''}${o.na_lista?'<span class="ico ico-lista" title="Na sua lista (desejos ou monitorado)">☰</span>':''}`;}
 function tabelaPromo(it){const ord=P.ordem||[['corte','desc'],['nome','asc']];
@@ -85,7 +86,7 @@ function renderSide(){const r=PR||{contagens:{mostrar_so:{},tipo:{}},conta:{tem_
       ${sem?`<div class="hint">Seguido e Ignorado vêm da sua conta Steam: ${temExt()&&parseFloat(document.documentElement.dataset.kurokamiExt)>=1.1?'abra qualquer página da loja da Steam (logado) e volte aqui':'precisa da extensão do Hunter 1.1 ou mais nova (instale, ou recarregue-a em chrome://extensions) e de uma visita à loja da Steam logado'}.</div>`:''}</div></div>
     <div class="blk"><h4>Conteúdo adulto (+18)</h4><div class="in"><span class="seg" role="group" aria-label="Conteúdo adulto">${[['','Ocultar'],['mostrar','Mostrar'],['so','Só +18']].map(([v,t])=>`<button data-adulto="${v}" aria-pressed="${(P.adulto||'')===v}">${t}</button>`).join('')}</span>
       <div class="hint">Pela classificação da Steam (conteúdo sexual). Jogos da sua lista nunca são ocultados.</div></div></div>
-    <div class="blk"><h4>Mostrar só</h4><div class="in">${['selo','novo','igual','24m'].map(t=>caixa('mostrar_so',t,TIPO_NOME[t],ct.mostrar_so[t],TIPO_COR[t])).join('')}</div></div>
+    <div class="blk"><h4>Mostrar só</h4><div class="in">${['selo','rara','novo','igual','24m'].map(t=>caixa('mostrar_so',t,TIPO_NOME[t],ct.mostrar_so[t],TIPO_COR[t])).join('')}</div></div>
     <details class="blk"${aberto('tipo')} data-ab="tipo"><summary><h4>Tipo${marca('tipo')}</h4></summary><div class="in">${caixa('tipo','jogo','Jogo',ct.tipo.jogo)}${caixa('tipo','dlc','DLC',ct.tipo.dlc)}</div></details>
     <details class="blk"${aberto('outros')} data-ab="outros"><summary><h4>Outros${marca('outros')}</h4></summary><div class="in">${Object.entries(OUTROS_TXT).map(([k,l])=>caixa('outros',k,l)).join('')}</div></details>
     <div class="blk"><h4>Faixas</h4><div class="in pfx">

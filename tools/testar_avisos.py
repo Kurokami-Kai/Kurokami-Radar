@@ -61,25 +61,25 @@ def testar():
 
     def cfg_com(**tipos):
         c = copy.deepcopy(base)
-        c["alerta"]["tipos"] = {"selo": False, "novo": False, "igual": False, "24m": False, **tipos}
+        c["alerta"]["tipos"] = {"selo": False, "rara": False, "novo": False, "igual": False, "24m": False, **tipos}
         return c
 
-    print("== Aceite 2: só o Selo ligado (banco de hoje)")
-    so_selo = rodada(b, cfg_com(selo=True))
+    print("== Aceite 2: só a Promoção rara ligada (banco de hoje; era o Selo até a 0.18)")
+    so_selo = rodada(b, cfg_com(rara=True))
     oficiais = [x for x in so_selo if x.get("tag") not in ("keyshop", "completo")]
     print("  %d aviso(s): %s" % (len(so_selo), ", ".join("%s (%s, -%s%%)" % (x["nome"], x.get("tipo_oferta") or x.get("tag"),
                                                                             x.get("corte")) for x in so_selo) or "nenhum"))
-    confere(all(x["selo"] and x["avisa_por"] == ["selo"] for x in oficiais), "todo aviso de loja oficial é Selo (G)")
+    confere(all(x["rara"] and x["avisa_por"] == ["rara"] for x in oficiais), "todo aviso de loja oficial é Promoção rara (G)")
     confere(all("favorito" not in x["motivo"] and "Raro" not in x["motivo"] for x in so_selo), "nenhum por raridade ou favorito")
 
     print("== Aceite 3: ligar/desligar Novo recorde")
-    com_novo = rodada(b, cfg_com(selo=True, novo=True))
+    com_novo = rodada(b, cfg_com(rara=True, novo=True))
     novos = [x for x in com_novo if "novo" in (x.get("avisa_por") or [])]
     print("  com Novo recorde ligado: %d aviso(s), %d por novo recorde" % (len(com_novo), len(novos)))
     confere(bool(novos) and all(x["corte"] >= dmin and x["piso_tipo"] in ("novo", "raro") for x in novos),
             "Novo recorde ligado avisa novo com corte >= %d%%" % dmin)
-    confere({x["appid"] for x in so_selo} == {x["appid"] for x in rodada(b, cfg_com(selo=True))}, "desligar volta ao que era")
-    todos = rodada(b, cfg_com(selo=True, novo=True, igual=True, **{"24m": True}))
+    confere({x["appid"] for x in so_selo} == {x["appid"] for x in rodada(b, cfg_com(rara=True))}, "desligar volta ao que era")
+    todos = rodada(b, cfg_com(rara=True, novo=True, igual=True, **{"24m": True}))
     confere(not any("24m" in x["avisa_por"] and x["corte"] < dmin for x in todos), "24m com corte < mínimo não avisa")
     al = {"tipos": {"novo": True}, "desconto_minimo": dmin}
     confere(analise.avisa_por(["selo", "novo"], dmin, al) == ["novo"], "Selo + novo recorde avisa com só Novo recorde ligado")
@@ -109,7 +109,9 @@ def testar():
     confere(len(toasts) == (1 if n_novo else 0) and not enviados, "1 toast de resumo e nenhum aviso individual")
     # alguem entra depois: tira um jogo do notificado (como se a promocao tivesse acabado e voltado)
     if n_novo:
-        x = next(x for x in al2 if x.get("avisa_por") == ["novo"])
+        # o titulo e o do tipo mais importante: um jogo que tambem e Promocao rara sai como "PROMOÇÃO RARA · "
+        x = next((x for x in al2 if x.get("avisa_por") == ["novo"] and x.get("tipo_oferta") == "novo"),
+                 next(x for x in al2 if x.get("avisa_por") == ["novo"]))
         b.con.execute("UPDATE notificado SET ativo=0 WHERE appid=?", (x["appid"],))
         toasts.clear()
         env = Notificador(b, c2, log=lambda *_: None).processar(rodada(b, c2))

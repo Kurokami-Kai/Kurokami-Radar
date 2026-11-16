@@ -150,7 +150,7 @@ def _aval(linhas, preco, corte, al):
     except Exception:
         return None
     volta, ordem = analise.costuma_voltar(an, corte)
-    return json.dumps({"tipos": analise.tipos_de(an), "selo_motivo": an["selo_motivo"], "piso_ref": an["piso_ref"],
+    return json.dumps({"tipos": analise.tipos_de(an), "rara_motivo": an["rara_motivo"], "piso_ref": an["piso_ref"],
                        "volta_texto": volta, "volta_ordem": ordem, "volta_dica": analise.dica_volta(an, corte),
                        "inicio": an["inicio"]}, separators=(",", ":"))
 

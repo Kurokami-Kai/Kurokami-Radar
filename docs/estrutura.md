@@ -20,7 +20,7 @@ Kurokami Hunter/
 │   ├── dlc.py               # classificação de DLCs por nome
 │   ├── series.py            # agrupa jogos da mesma série pelo nome (aba Biblioteca) e decide a franquia de cada jogo (ficha)
 │   ├── ficha.py             # spec 09: o que só a ficha usa (appdetails, Augmented Steam, conquistas, com cache), fileira da franquia e tempo jogado
-│   ├── analise.py           # raridade v2 (episódios), piso, Selo, score, etiquetas, caminhos/combinação de compra, avaliar()
+│   ├── analise.py           # raridade v2 (episódios), piso, Promoção rara, Selo (piso PPP), score, etiquetas, caminhos/combinação de compra, avaliar()
 │   ├── notificar.py         # toast do Windows via PowerShell; capa do jogo
 │   ├── telegram.py          # bot do Telegram: enviar aviso (https), conectar token, achar a conversa
 │   ├── notificador.py       # regras de envio (linha de base, tipo recém-ligado vira resumo, rearme, silêncio, fim de promoção)
@@ -39,6 +39,7 @@ Kurokami Hunter/
 │   ├── ofertas.html         # aba Ofertas (Destaques, Promoções, Lista; spec 09, amostra 8), aberta num iframe; dados em /*DADOS*/{}
 │   ├── biblioteca.html      # aba Biblioteca (Coleção/Franquias, Completar; spec 09, H2), aberta num iframe
 │   ├── ofertas.py           # monta os dados das duas páginas (cache; aquecido depois de cada coleta)
+│   ├── ppp.py               # Selo Kurokami (0.19): preço em dólar da lista, fator PPP do Banco Mundial, teto de desconto da franquia (ITAD storelow) e ppp.mapa para analisar
 │   ├── previsao.py          # piso de 24 meses, "se não comprar agora" e a próxima promoção (tabela do backtest embutida)
 │   ├── bandeja.py           # ícone, menu, threads, verificação de versão
 │   ├── inicio.py            # iniciar com o Windows (versão pelo código)
@@ -56,7 +57,7 @@ Kurokami Hunter/
 │   ├── mapa.py              # mapa de seções/funções com linhas (ler só o trecho)
 │   ├── exportar_docs.py/.bat # reserva: docs → Área de Trabalho\kurokami-docs (o Projeto do claude.ai já lê do GitHub)
 │   ├── backtest_selo.py     # backtest do Selo e variantes sobre uma cópia temporária do banco (só números agregados)
-│   ├── backtest_tipos.py    # spec 04: backtest por tipo de recorde (Selo, novo, igual, 24m), métrica "não ficou mais barato em 12 meses"
+│   ├── backtest_tipos.py    # spec 04: backtest por tipo de recorde (Selo PPP e variantes, Promoção rara, novo, igual, 24m), métrica "não ficou mais barato em 12 meses"
 │   ├── backtest_previsao.py # spec 09: "esse preço volta?" (por grupo, em 1/3/6/12 meses) e data/preço da próxima promoção
 │   ├── prever_winter_sale.py (+ .html) # chances de preço de cada item da lista na Winter Sale (escada de cenários e chance de bater o menor histórico, calibrada deixando 1 ano de fora), por franquia no estilo da Biblioteca; gera dados/previsao-winter-sale-AAAA.html (só leitura). Recorde = menor da Steam desde que vale o preço cheio de hoje (±10%)
 │   ├── recomendar_winter_sale.py (+ .html) # página principal da Winter Sale: veredito por jogo (compre agora / espere o inverno / espere além / sem promoção), curva de desconto por idade (Kaplan-Meier com os lançamentos do banco) e backtest dos vereditos; gera dados/recomendacoes-winter-sale-AAAA.html e refaz a de franquias (só leitura)
@@ -65,7 +66,7 @@ Kurokami Hunter/
 │   ├── testar_openid.py     # testes sem rede da validação do OpenID (recusas: state, endereço, assinatura, nonce); entra no checar.py
 │   ├── teste_promocoes_steam.py  # spec 04: viabilidade de "Steam inteira" (ITAD deals, IStoreQueryService, busca da loja); só lê; --retrato grava os preços
 │   ├── regua_steam.py       # spec 04 (1c): o Hunter × "só a Steam" nos recordes raros, storeLow da ITAD e custo do histórico da Steam inteira
-│   ├── testar_piso.py       # testes sintéticos do piso, Lendário, Selo (só G), tipos e "Costuma voltar", sem rede nem banco
+│   ├── testar_piso.py       # testes sintéticos do piso, Lendário, Promoção rara (só G), Selo PPP, tipos e "Costuma voltar", sem rede nem banco
 │   ├── testar_avisos.py     # regra de aviso da 0.15 numa cópia do banco (só Selo, ligar/desligar tipos, resumo ao ligar)
 │   ├── testar_promocoes.py  # /api/promocoes e /api/vitrine numa cópia do banco (tempos, filtros, ordenação, 400)
 │   ├── rodar_instalado.py   # roda um comando do radar.py pelo código com os dados da instalação (%LOCALAPPDATA%)

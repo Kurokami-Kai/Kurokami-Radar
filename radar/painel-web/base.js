@@ -47,11 +47,11 @@ function priceBlock(o,lg){
 }
 const ksBarata=o=>o.keyshop!=null&&o.preco!=null&&o.keyshop<o.preco*0.6;
 const SELO_SVG='<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#000" stroke="#000" stroke-width="5"/><path d="M22 38a11 11 0 0 1 20 0" stroke="#ff4757" stroke-width="4" fill="none"/><path d="M32 32 50 16" stroke="#ff4757" stroke-width="5"/><circle cx="32" cy="32" r="7" fill="#ff4757"/></svg>';
-function seloBadge(o){return o.selo?`<span class="selo" title="${esc('Selo Kurokami: '+(o.selo_motivo||'o menor preço em muito tempo: o recorde anterior tem 1,5 ano ou mais, ou o preço caiu pela metade'))}">${SELO_SVG}SELO KUROKAMI</span>`:'';}
+function seloBadge(o){return o.selo?`<span class="selo" title="${esc('Selo Kurokami: '+(o.selo_motivo||'o preço chegou ao piso PPP ou ao teto de desconto da franquia'))}">${SELO_SVG}SELO KUROKAMI</span>`:'';}
 function mesAno(iso){if(!iso)return '';const d=new Date(iso);return String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
 function pisoRefTxt(r){return r?`${brl(r.preco)}${r.corte?' a -'+r.corte+'%':''} (${mesAno(r.quando_preco||r.quando)})`:'';}
 function pisoPill(o){const p=recPill(o);if(p)return p;const r=o.piso_ref;
-  return o.corte>0&&r&&o.tipo_oferta!=='selo'?`<span class="pp pp-ref">menor: ${esc(pisoRefTxt(r))}</span>`:'';}
+  return o.corte>0&&r&&o.tipo_oferta!=='rara'?`<span class="pp pp-ref">menor: ${esc(pisoRefTxt(r))}</span>`:'';}
 function precoComPiso(o){const p=pisoPill(o);return p?`<span class="ppwrap">${priceBlock(o)}${p}</span>`:priceBlock(o);}
 function fimTxt(t){if(!t)return '';const h=(t*1000-Date.now())/36e5;if(h<=0||h>72)return '';return h<1?'termina em minutos':h<24?`termina em ${Math.round(h)}h`:`termina em ${Math.round(h/24)}d`;}
 function flags(o){
@@ -88,7 +88,7 @@ function capCard(o){return `<a class="cap" href="#" ${abre(o)}>${art(o.appid,o.n
 /* ================= hover ================= */
 const HV=$('#hv');let hvT=null,hvEl=null;
 function hvHTML(id){const o=IDX.get(+id);if(!o)return '';
-  const tags=[];if(o.vale)tags.push('<span class="g">Avisa</span>');if(o.selo)tags.push('<span class="g">Selo Kurokami</span>');
+  const tags=[];if(o.vale)tags.push('<span class="g">Avisa</span>');if(o.selo)tags.push('<span class="g">Selo Kurokami</span>');if((o.tipos||[]).includes('rara'))tags.push('<span class="g">Promoção rara</span>');
   if(o.base_tenho)tags.push('<span>Você tem o jogo base</span>');if(o.modo==='completo')tags.push('<span class="v">Modo completo</span>');
   if(o.bundles)tags.push(`<span class="v">Em ${o.bundles} bundle(s)</span>`);
   return `<h4>${esc(o.nome)}</h4><div class="rel">${o.lancamento?'Lançamento: '+fmtUnix(o.lancamento):'Na sua lista de desejos'}</div>
@@ -134,7 +134,8 @@ $('.nav').addEventListener('click',e=>{if(e.target.closest('[data-dlcpromo]')){K
 
 /* ================= tipos de recorde (Configurações e a tabela de Promoções) ================= */
 let VIT=null;   // /api/vitrine: só para o "N na vitrine" do topo
-const TIPO_NOME={selo:'Selo Kurokami',novo:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
-const TIPO_DESC={selo:'O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade',novo:'Nunca esteve tão barato',
+const TIPO_NOME={selo:'Selo Kurokami',rara:'Promoção rara',novo:'Novo recorde',igual:'Igual ao recorde','24m':'Menor em 2 anos'};
+const TIPO_DESC={selo:'O preço chegou ao piso PPP (o preço em dólar pelo poder de compra, com o maior desconto esperado do jogo ou da franquia) ou o desconto chegou ao teto da franquia',
+  rara:'O menor preço anterior foi há 1,5 ano ou mais, ou o preço caiu pela metade',novo:'Nunca esteve tão barato',
   igual:'No mesmo preço do menor já registrado','24m':'No menor preço dos últimos 2 anos'};
-const TIPO_COR={selo:'#ff4757',novo:'#d63031',igual:'#8a1520','24m':'#5c5c5c'};
+const TIPO_COR={selo:'#ff4757',rara:'#e8303c',novo:'#d63031',igual:'#8a1520','24m':'#5c5c5c'};
