@@ -168,6 +168,8 @@ class Previsor:
             pz = min(q for _e, q in p24)
             vz = [e for e, q in p24 if q <= pz + tol(pz)]
             out['piso'] = [pz, len(vz), mm(vz[-1][0])]
+            if len(p24) >= 2:   # "preço de sempre": a mediana do menor preço de cada promoção dos 24 meses (um preço que existiu)
+                out['rec'] = [statistics.median_low(q for _e, q in p24), len(p24)]
             gz = [(b[0] - a[0]) / DIA for a, b in zip(vz, vz[1:])]
             if gz:
                 g = statistics.median(gz[-6:])

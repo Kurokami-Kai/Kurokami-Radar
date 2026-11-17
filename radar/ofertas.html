@@ -458,12 +458,11 @@ body.pg-dest .full{width:auto;margin-left:-24px;margin-right:-24px}
 .acoes2{display:flex;flex-direction:column;gap:6px;margin-top:12px}
 .acoes2 .btn{height:32px;font-size:13px;width:100%;padding:0 8px}
 .capa.ofp .ok{top:6px;left:6px;font-size:12px;padding:1px 6px;z-index:2}
-.capa .pb3{position:absolute;z-index:2;left:0;right:0;bottom:0;height:4px;background:#000a}
-.capa .pb3 i{display:block;height:100%}
 .capa .mais.mp{position:absolute;right:6px;bottom:10px;z-index:3;opacity:0;transition:opacity .12s}
 .it:hover .mais.mp,.capa:focus-visible .mais.mp{opacity:1}
 .it .sub .pg{color:var(--vtx);font-weight:400}.it .sub s{color:var(--dim);font-size:11.5px}
-.it .sub.vs{font-size:11.5px}
+.it .rsp{font-size:12.5px;margin-top:5px;line-height:1.35;color:var(--fraco);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.it .rsp b{font-weight:700;margin-right:4px}
 .pcab .tabs{margin-left:auto;display:flex;gap:2px}
 .pcab .tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--fraco);padding:4px 8px;cursor:pointer;font-size:13px}
 .pcab .tabs button small{color:var(--dim)}
@@ -633,7 +632,7 @@ function etqC(o){if(!em(o)||o.risco==null)return null;
   if(!o.k24&&o.risco>=.2)return ['1ª vez nesse preço em 2 anos','risco'];
   return o.espera?['Volta em '+tempo(o.espera),'volta']:null;}
 const pill=(e,cls='')=>e?`<span class="et ${cls}" style="--eb:${ET[e[1]][1]};--ec:${ET[e[1]][2]}">${esc(e[0])}</span>`:'';
-function etqFicha(o){const p=etqP(o),c=VD[verd(o)[0]];return (p?pill(p,'chip'):'')+`<span class="et chip" style="--eb:${c[1]};--ec:${c[3]}">${c[0]}</span>`;}
+function etqFicha(o){const c=RS[resp(o)[0]];return `<span class="et chip" style="--eb:${c[1]};--ec:${c[3]}">${c[0]}</span>`;}
 const fimTxt=t=>{if(!t)return '';const h=(t-AGORA)/3600;if(h<=0)return '';const d=Math.round(h/24);return h<24?`termina em ${Math.max(1,Math.round(h))} h`:`termina em ${d} dia${d>1?'s':''}`;};
 const breve=o=>o.fim&&o.fim-AGORA<3*86400&&o.fim>AGORA;
 const EV=(()=>{const c={},dia=t=>new Date(t*1000).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});P.forEach(o=>{if(o.fim)c[dia(o.fim)]=(c[dia(o.fim)]||0)+1;});
@@ -675,7 +674,7 @@ function barraFiltros(pg){const f=S.f[pg],at=[];
    <div class="grupos">${g('Desconto','desc',[[0,'Todos'],[50,'-50%'],[75,'-75%'],[90,'-90%']])}${g('Análises','an',[[0,'Todas'],[500,'500+'],[5000,'5 mil+'],[50000,'50 mil+']])}
     ${g('Tipo','tipo',[['','Tudo'],['jogo','Jogos'],['dlc','DLCs'],['outros','Outros']])}${g('Você tem','tenho',[['mostrar','Mostrar'],['esconder','Esconder']])}
     ${pg==='promo'?g('Lista','lista',[['','Tanto faz'],['so','♥ Só da lista'],['sem','Fora da lista']])+g('Preço','ate',[[0,'Todos'],[1000,'até R$ 10'],[2500,'até R$ 25'],[5000,'até R$ 50']])+g('Avaliação','nota',[[0,'Todas'],[85,'85%+'],[95,'95%+']]):''}
-    <div class="chips"><span>Etiquetas</span>${[...REC,'gratis'].map(t=>`<button data-tp="${t}" style="--eb:${ET[t][1]};--ec:${ET[t][2]}" aria-pressed="${f.tp.has(t)}">${ET[t][0]}</button>`).join('')}</div></div></div>`;}
+    </div></div>`;}
 
 /* ---------- peças ---------- */
 const imgV=o=>`<img src="${esc(o.cv||CDN+o.appid+'/library_600x900_2x.jpg')}" alt="" loading="lazy" data-n="${esc(o.nome)}" data-i="${o.appid}"${o.cap?` data-alt="${esc(o.cap)}"`:''}>`;
@@ -690,11 +689,9 @@ const lojaTag=o=>foraSteam(o)?`<i class="lj" title="Este preço é na ${esc(o.lo
 const maisT=o=>foraSteam(o)?`Abrir na ${esc(o.loja)} (o carrinho é só da Steam)`:'Pôr no carrinho da Steam';
 const mg=o=>foraSteam(o)?'↗':'+';   // o carrinho é só da Steam: melhor preço em outra loja abre a página dela
 const precoTxt=o=>o.preco==null?(o.breve?'em breve':'sem preço'):brl(o.preco)+lojaTag(o);
-function ctxLin(o){const c=etqC(o);if(c)return pill(c);
-  if(!em(o))return o.pv.prox_curto?`<span>próxima: ${esc(o.pv.prox_curto)}</span>`:`<span class="dim">${o.breve?'em breve':'sem previsão'}</span>`;
-  return o.hist?'':'<span class="dim">sem histórico ainda</span>';}
-const subLin=o=>em(o)?[o.eco>0?'economia '+brl0(o.eco):'',(etqC(o)||[])[1]!=='fim'?fimTxt(o.fim):''].filter(Boolean).join(' · '):o.pv.menor?'menor que já teve: '+brl(o.pv.menor[0]):'';
-function capaV(o,j,op={}){const p=etqP(o);
+function ctxLin(o){const [k]=resp(o),c=RS[k];return `<span style="color:${c[2]};font-weight:700">${c[0]}</span>`;}
+const subLin=o=>resp(o)[1];
+function capaV(o,j,op={}){const p=gratis(o)?etqP(o):null;
   return `<button class="capa ofc${S.nota&&o.risco!=null?' nbon':''}" data-nav data-j="${j}" title="${esc(o.nome)}">${imgV(o)}${p?pill(p,'tp'):''}${o.lista&&!op.semLista?'<span class="cor">♥</span>':''}${nbx(o)}
     <span class="pr"><span>${em(o)&&!gratis(o)?`<span class="c">-${o.corte}%</span>`:''}${em(o)?precoTxt(o):o.pv.menor?'<span style="color:var(--fraco)">menor </span>'+brl(o.pv.menor[0]):precoTxt(o)}</span>${o.preco!=null&&!gratis(o)?`<span class="mais" data-mais title="${maisT(o)}">${mg(o)}</span>`:''}</span></button>`;}
 function itV(o,op={}){const j=reg({k:'jogo',o}),s2=subLin(o),c=ctxLin(o);
@@ -835,7 +832,7 @@ document.addEventListener('pointerup',()=>{if(!arr)return;if(arr.mov){semClique=
 document.addEventListener('click',e=>{if(semClique){e.stopPropagation();e.preventDefault();semClique=false;}},true);
 document.addEventListener('dragstart',e=>{if(e.target.closest('.trilho'))e.preventDefault();});
 function kb(){$('#kb').innerHTML=$('#ov .ov')?'<span><kbd>← →</kbd>anterior / próximo</span><span><kbd>Esc</kbd>fechar</span><span><kbd>Tab</kbd>andar pelos botões</span>'
-  :'<span><kbd>← → ↑ ↓</kbd>andar</span><span><kbd>Enter</kbd>abrir em tela cheia</span><span><kbd>letra</kbd>ou <kbd>/</kbd> buscar</span><span><kbd>1</kbd>–<kbd>4</kbd>Ofertas / Biblioteca / Configurações / Carrinho</span><span><kbd>⇧1</kbd><kbd>⇧2</kbd><kbd>⇧3</kbd>Destaques / Promoções / Lista</span><span><kbd>⇧T</kbd>Jogos / Franquias</span><span><kbd>Backspace</kbd>tira o último filtro</span>';}
+  :'<span><kbd>← → ↑ ↓</kbd>andar</span><span><kbd>Enter</kbd>abrir</span><span><kbd>letra</kbd>buscar um jogo</span>';}
 let OV=[];
 function abre(j){const x=S.lista[j];if(!x)return;if(PAI&&ehJogo(x)){fichaPai(S.lista,j);return;}OV=S.lista.slice();S.aberto=j;pinta();}
 function pinta(){const x=OV[S.aberto],keep=S.lista;S.lista=OV;const h=x.k==='prat'?fichaPrat(x.x):x.k==='fr'?fichaFR(x):fichaJ(x.k==='jogo'&&x.m?x.m[0]:x.o);
@@ -847,7 +844,7 @@ function passo(d){const n=OV.length,ab=OV[S.aberto],k0=kind(ab);let i=S.aberto;
   for(let c=0;c<n;c++){i=(i+d+n)%n;const y=OV[i];if(kind(y)===k0&&(k0!=='jogo'||y.o!==ab.o))break;}
   S.aberto=i;pinta();}
 function vai(go){if(S.aberto!=null)fecha();S.q='';S.busca=false;S.lim=120;const [g,sec]=go.split(':');
-  if(g==='lista'){S.sub='lista';S.rec.lista='promo';S.ord.lista='melhor';S.modo.lista='jogos';desenha();scrollTo(0,0);return;}
+  if(g==='lista'){S.sub='lista';S.rec.lista=sec==='agora'?'agora':'promo';S.ord.lista='melhor';S.modo.lista='jogos';desenha();scrollTo(0,0);return;}
   else if(g==='fim'){S.sub='promo';S.ord.promo='fim';}
   else if(g==='baratos'){S.sub='promo';S.ord.promo='melhor';S.f.promo=novoF('promo');S.f.promo.lista='sem';S.teto=+sec;S.rec.promo='baratos';desenha();scrollTo(0,0);return;}
   else{S.sub='promo';S.ord.promo='melhor';S.f.promo.lista='sem';S.rec.promo=REC_P.some(x=>x[0]===sec)?sec:'tudo';desenha();scrollTo(0,0);return;}
@@ -958,7 +955,31 @@ function verd(o){if(o._v)return o._v;const v=o.pv;let r;
   else if(v.prox_t&&v.prox_t-T0<=30*DIA&&v.prox_c>=4&&v.menor&&v.prox_p<=v.menor[0]+tolP(v.menor[0]))r=['vem',parteMes(v.prox_t)+' · '+brl(v.prox_p)+', o menor que já teve'];
   else r=['fora',v.prox_t?'próxima: '+v.prox_curto:'sem previsão'];
   return o._v=r;}
-const vdPill=o=>{const [k,s]=verd(o),c=VD[k];return `<span class="vd" style="--eb:${c[1]};--ec:${c[3]}"><b>${c[0]}</b>${s?' · '+esc(s):''}</span>`;};
+/* ---------- a resposta simples (para quem não entende de promoção): uma de três, com uma frase sem termos técnicos.
+   Por baixo é o veredito acima (verd) mais o "preço de sempre" (pv.rec: a mediana do menor preço de cada promoção em 2 anos) ---------- */
+const RS={compre:['Vale comprar','#d63031','#ff4757','#ffffff'],espere:['Espere','#262626','#c8c8c8','#d2d2d2'],nsei:['Ainda não dá pra saber','#1c1c1c','#979797','#979797']};
+const RRANK={compre:0,espere:1,nsei:2};
+const vezes=n=>n===1?'uma vez':n+' vezes';
+const mesDe=t=>MESN[new Date(t*1000).getMonth()];
+function resp(o){if(o._r)return o._r;const v=o.pv,[k]=verd(o),z=v.piso,rc=v.rec;let r;
+  if(!em(o)){
+    if(o.breve)r=['espere','Ainda não foi lançado.'];
+    else if(o.preco==null)r=['espere','Não está à venda nas lojas que você acompanha.'];
+    else if(v.prox_t){const p=v.prox_c>=4?brl(v.prox_p):'';
+      r=['espere',`Sem promoção agora. A próxima deve vir em ${mesDe(v.prox_t)}${k==='vem'?', no menor preço que já teve':p?', por volta de '+p:''}.`];}
+    else r=['espere','Sem promoção agora.'];}
+  else if(gratis(o))r=['compre','Está de graça por tempo limitado: é só resgatar.'];
+  else if(k==='imperdivel'||k==='menor'){const nunca=v.menor&&o.preco<v.menor[0]-tolP(v.menor[0]);
+    r=['compre',nunca||o.t==='selo'||o.t==='rara'?'Nunca esteve tão barato.':z&&z[1]>1?`É o mais barato dos últimos 2 anos (já chegou nisso ${vezes(z[1])}). Não costuma baixar mais.`:'É o mais barato dos últimos 2 anos.'];}
+  else if(k==='sem')r=['nsei',!o.hist?'O Hunter ainda está juntando o histórico de preços deste jogo.':`É a primeira promoção dele em 2 anos: não há com o que comparar.${o.corte>=75?` Mas -${o.corte}% é um desconto grande.`:''}`];
+  else if(rc&&o.preco<=rc[0]+tolP(rc[0])){const g=o.preco-z[0];
+    r=k==='espera'&&g>=Math.max(500,.15*o.preco)?['espere',`Costuma cair para ${brl(z[0])}, e deve voltar a esse preço em ${tempo(v.piso_volta)}.`]
+      :['compre',`É o preço de sempre nas promoções. Mais barato que isso, só ${z[1]===1?'uma vez':'às vezes'} (${brl(z[0])}).`];}
+  else if(rc)r=['espere',`Nas promoções, costuma sair por ${brl(rc[0])}. Dá para esperar.`];
+  else r=['espere',`Na última promoção, saiu por ${brl(z[0])}. Dá para esperar.`];
+  return o._r=r;}
+const vdPill=o=>{const [k,s]=resp(o),c=RS[k];return `<span class="vd" style="--eb:${c[1]};--ec:${c[3]}"><b>${c[0]}</b> · ${esc(s)}</span>`;};
+const ordR=(a,b)=>RRANK[resp(a)[0]]-RRANK[resp(b)[0]]||ordV(a,b);
 const ganho=o=>em(o)&&o.pv.piso?o.pv.piso[0]-o.preco:-1e9;
 const ordV=(a,b)=>RANK[verd(a)[0]]-RANK[verd(b)[0]]||ganho(b)-ganho(a)||b.eco-a.eco||b.corte-a.corte;
 
@@ -999,18 +1020,16 @@ function grafBox(o){const g=grafico(o);if(!g)return '';
 function fechaPop(){S.pop=false;const p=$('.fpop');if(p)p.hidden=true;const a=$('[data-pop]');if(a)a.setAttribute('aria-expanded','false');}
 const faixaEv=(full=true)=>EV?`<div class="${full?'full ':''}fev"><b><i class="st">★</i> ${esc(EVN)} até ${EV.d}</b><span>${fmtN(EV.n)} promoções terminam juntas · ${fmtN(D.steam)} em promoção na Steam</span><button class="vt" data-go="promo">ver as promoções ›</button></div>`:'';
 /* banner: as 10 melhores da lista (com o filtro escondido do Destaques) */
-const BAN=(()=>{let c=null;return ()=>c||(c=[L.filter(o=>em(o)&&o.hist&&!gratis(o)&&fl(o)).sort(ordV).slice(0,10),[]]);})();
+const BAN=(()=>{let c=null;return ()=>c||(c=[L.filter(o=>em(o)&&o.hist&&!gratis(o)&&fl(o)).sort(ordR).slice(0,10),[]]);})();
 function banner(){const [a,b]=BAN(),H=[...a,...b];if(!H.length)return '';S.h=(S.h+H.length)%H.length;
-  const o=H[S.h],j=reg({k:'jogo',o}),v=o.pv,[k,sv]=verd(o),c=VD[k],pop=S.h>=a.length;
-  const mini=(x,i)=>`<div><button data-h="${i}" aria-current="${i===S.h}" title="${esc(x.nome)}">${imgH(x)}<span class="mh"><span class="et" style="--eb:${VD[verd(x)[0]][1]};--ec:${VD[verd(x)[0]][3]}">-${x.corte}%</span></span></button></div>`;
+  const o=H[S.h],j=reg({k:'jogo',o}),[k,sv]=resp(o),c=RS[k],pop=S.h>=a.length;
+  const mini=(x,i)=>`<div><button data-h="${i}" aria-current="${i===S.h}" title="${esc(x.nome)}">${imgH(x)}<span class="mh"><span class="et" style="--eb:${RS[resp(x)[0]][1]};--ec:${RS[resp(x)[0]][3]}">-${x.corte}%</span></span></button></div>`;
   return `<div class="full ban3" data-ban><div class="bg" style="background-image:url('${CDN+o.appid}/library_hero.jpg')"></div>
    <button class="bnav e" data-hp="-1" title="Anterior">‹</button><button class="bnav d" data-hp="1" title="Próximo">›</button><div class="w3 anim">
     <div class="top3"><button data-nav data-j="${j}" style="border:0;padding:0;background:none;cursor:pointer" title="${esc(o.nome)}">${imgH(o,'hcap')}</button>
      <div style="min-width:0"><div><span class="chip" style="background:#0009">${pop?'Popular nas lojas':'♥ Da sua lista'} · ${S.h%10+1} de ${pop?b.length:a.length}</span>${etqFicha(o)}</div><h1>${esc(o.nome)}</h1>
-     ${k==='sem'?`<div class="se" style="--c:#ff4757"><b>Popular: ${fmtN(o.rcount)} análises na Steam</b><span>-${o.corte}% · economia de ${brl0(o.eco)}${fimTxt(o.fim)?' · '+fimTxt(o.fim):''}. O Hunter ainda não tem as promoções antigas deste jogo para comparar.</span></div>`
-      :`<div class="se" style="--c:${c[2]}"><b>${c[0]}${sv?': '+esc(sv):''}</b><span>${fatos(o).map(([a,b])=>esc(a+': '+b)).join(' · ')}</span></div>`}
+     <div class="se" style="--c:${c[2]}"><b>${c[0]}</b><span>${esc(sv)} De ${brl(o.cheio)} por ${brl(o.preco)}${fimTxt(o.fim)?', '+fimTxt(o.fim):''}.</span></div>
      <div class="acoes"><button class="btn verde" data-mais="${o.appid}">${foraSteam(o)?'Abrir na '+esc(lojaCurta(o.loja))+' ↗ · '+brl(o.preco):'Pôr no carrinho · '+brl(o.preco)}</button><button class="btn" data-j="${j}">Abrir a ficha</button><button class="btn" data-loja="${o.appid}">Abrir na Steam</button></div></div></div>
-    ${tilesJ(o)}
     <div class="minis2"><div class="fil"><div class="trilho arr">${a.map(mini).join('')}${b.length?`<div class="mlab">Populares<br>nas lojas ›</div>`:''}${b.map((x,i)=>mini(x,i+a.length)).join('')}</div></div></div></div></div>`;}
 function ajustaMinis(){const t=$('.minis2 .trilho'),e=t&&t.querySelector('[aria-current=true]');if(e)t.scrollLeft=e.parentNode.offsetLeft-t.clientWidth/2+e.offsetWidth/2;}
 let banX=null;
@@ -1048,16 +1067,15 @@ const agr=(l,c)=>{l=l.filter(x=>x.l.length);return `<div class="agr" style="grid
 function agCol(x,c){return `<div class="agc" style="--c:${c}"><div class="agh"><b>${esc(x.curto)}</b><span>${fmtN(x.l.length)}</span></div>${x.l.slice(0,5).map(miniB).join('')||'<p class="vazio" style="margin:0">nenhum</p>'}${x.l.length>5?`<button class="vt" data-go="lista:${x.id}">+ ${fmtN(x.l.length-5)} ›</button>`:''}</div>`;}
 
 /* ---------- capas e linhas de cada modelo ---------- */
-function rowV(o,nome){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k];
-  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:${nome||o.t==='selo'||o.t==='rara'?c[2]:'var(--fraco)'}">${nome?c[0]+(s?' · ':''):''}${esc(s)}</small></span>${em(o)?`<span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span>`:''}</button>`;}
+function rowV(o){const j=reg({k:'jogo',o}),s=resp(o)[1];
+  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:var(--fraco)">${esc(s)}</small></span>${em(o)?`<span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span>`:''}</button>`;}
 function lane(cor,tit,exp,l,go,nome,row,extra){row=row||(o=>rowV(o,nome));
   return `<section class="lane" style="--c:${cor}"><div class="lh"><button class="lnum" data-go="${go}" title="Ver todos">${fmtN(l.length)}</button><div><h3><button class="lt" data-go="${go}" title="Ver todos">${tit}<i>›</i></button></h3><span>${exp}</span></div></div><div class="lr">${l.slice(0,8).map(row).join('')||'<p class="vazio">Nenhum hoje.</p>'}</div><div class="lfoot">${extra||'<span></span>'}${go.startsWith('baratos')?`<button class="vt" data-go="${go}">ver todos ${(TETOS.find(t=>'baratos:'+t[0]===go)||[0,''])[1]} ›</button>`:l.length>8?`<button class="vt" data-go="${go}">ver os ${fmtN(l.length)} ›</button>`:''}</div></section>`;}
 /* capa no molde da Biblioteca: % no canto (cor do veredito), barra embaixo = do preço cheio ao menor em 2 anos */
-function itP(o){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k],z=o.pv.piso,
-    pos=em(o)&&z&&o.cheio>z[0]?Math.max(0,Math.min(1,(o.cheio-o.preco)/(o.cheio-z[0]))):em(o)&&z?1:0;
-  return `<div class="it" data-L="${o.L}"><button class="capa ofp" data-nav data-j="${j}" title="${esc(o.nome)}">${imgV(o)}${em(o)?`<span class="ok" style="background:${c[1]};color:${c[3]}">${gratis(o)?'Grátis':'-'+o.corte+'%'}</span>`:''}${o.lista&&S.sub!=='lista'?'<span class="cor">♥</span>':''}${o.preco!=null&&!gratis(o)?`<span class="mais mp" data-mais title="${maisT(o)}">${mg(o)}</span>`:''}${em(o)&&z?`<span class="pb3" title="Do preço cheio (esquerda) ao menor em 2 anos (direita)"><i style="width:${Math.round(pos*100)}%;background:${c[2]}"></i></span>`:''}</button>
-   <div class="nm">${esc(o.nome)}</div><div class="sub">${em(o)?`<b class="pg">${precoTxt(o)}</b> <s>${brl(o.cheio)}</s>`:o.pv.menor?'menor que já teve: '+brl(o.pv.menor[0]):precoTxt(o)}</div>
-   <div class="sub vs" style="color:${c[2]}" title="${esc(c[0]+(s?' · '+s:''))}">${c[0]}${s?' · '+esc(s):''}</div></div>`;}
+function itP(o){const j=reg({k:'jogo',o}),[k,s]=resp(o),c=RS[k];
+  return `<div class="it" data-L="${o.L}"><button class="capa ofp" data-nav data-j="${j}" title="${esc(o.nome)}">${imgV(o)}${em(o)?`<span class="ok" style="background:${c[1]};color:${c[3]}">${gratis(o)?'Grátis':'-'+o.corte+'%'}</span>`:''}${o.lista&&S.sub!=='lista'?'<span class="cor">♥</span>':''}${o.preco!=null&&!gratis(o)?`<span class="mais mp" data-mais title="${maisT(o)}">${mg(o)}</span>`:''}</button>
+   <div class="nm">${esc(o.nome)}</div><div class="sub">${em(o)?`<b class="pg">${precoTxt(o)}</b> <s>${brl(o.cheio)}</s>`:precoTxt(o)}</div>
+   <div class="rsp" title="${esc(c[0]+' · '+s)}"><b style="color:${c[2]}">${c[0]}</b>${esc(s)}</div></div>`;}
 const itA=o=>{const j=reg({k:'jogo',o});return `<div class="it" data-L="${o.L}">${capaV(o,j,{semLista:true})}<div class="nm">${esc(o.nome)}</div>${vdPill(o)}</div>`;};
 function itB(o){const j=reg({k:'jogo',o}),v=o.pv,prev=!em(o)&&!o.breve&&v.prox_t;
   const band=prev?`<span class="vd" style="--eb:#4a1016;--ec:#ff8a94"><b>${esc(parteMes(v.prox_t))}</b> · ${esc(v.prox_c>=4?brl(v.prox_p):(v.prox_curto||'').split(' · ')[1]||'')}</span>`:vdPill(o);
@@ -1076,20 +1094,18 @@ const TETOS=[[1000,'até R$ 10'],[2500,'até R$ 25'],[5000,'até R$ 50']],AF=D.A
 const QUAL=o=>o.rpos>=95?'Extremamente positivas':o.rpos>=80?'Muito positivas':'Positivas';
 /* nota de "bem avaliado": a % de positivas, com um peso para quantas análises (99% de 600 não vale mais que 95% de 36 mil) */
 const notaB=o=>(o.rpos||0)/100+.03*Math.log10(Math.max(1,o.rcount||1));
-const BB=(()=>{let c=null;return ()=>c||(c=PS.filter(o=>em(o)&&fl(o)&&!gratis(o)&&(o.rpos||0)>=85&&(o.cheio||0)>=3000&&o.preco<=5000&&!['imperdivel','menor'].includes(verd(o)[0]))
+const BB=(()=>{let c=null;return ()=>c||(c=PS.filter(o=>em(o)&&fl(o)&&!gratis(o)&&(o.rpos||0)>=85&&(o.cheio||0)>=3000&&o.preco<=5000&&resp(o)[0]!=='compre')
   .sort((a,b)=>(AF[b.appid]?1:0)-(AF[a.appid]?1:0)||notaB(b)-notaB(a)));})();
-function rowB(o){const j=reg({k:'jogo',o}),[k,s]=verd(o),c=VD[k],af=AF[o.appid];
-  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:var(--txt)">${af?`<span style="color:var(--lista)">série que você tem: ${esc(af)}</span> · `:''}${o.rpos}% de ${fmtN(o.rcount)} análises${k==='espera'?` · <span style="color:${c[2]}">${esc(s)}</span>`:''}</small></span><span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span></button>`;}
-function pagDestA(){const st=PS.filter(o=>em(o)&&o.hist&&fl(o)),vk=k=>st.filter(o=>verd(o)[0]===k),
-    mo=vk('imperdivel').sort((a,b)=>ganho(b)-ganho(a)),mh=vk('menor').sort((a,b)=>b.eco-a.eco),li=L.filter(o=>em(o)&&fl(o)).sort(ordV);
-  const fim=[...li,...st].filter(o=>breve(o)&&['imperdivel','menor'].includes(verd(o)[0])).sort(SORT.fim);
+function rowB(o){const j=reg({k:'jogo',o}),[k,s]=resp(o),c=RS[k],af=AF[o.appid];
+  return `<button class="rv" data-nav data-j="${j}" data-L="${o.L}" title="${esc(o.nome)}">${imgH(o)}<span class="n">${esc(o.nome)}<small style="color:var(--txt)">${af?`<span style="color:var(--lista)">série que você tem: ${esc(af)}</span> · `:''}${o.rpos}% de ${fmtN(o.rcount)} análises${k==='espere'?` · <span style="color:${c[2]}">espere</span>`:''}</small></span><span class="pb"><span class="pc">-${o.corte}%</span><span class="pv">${precoTxt(o)}</span></span></button>`;}
+function pagDestA(){const st=PS.filter(o=>em(o)&&o.hist&&fl(o)),
+    li=L.filter(o=>em(o)&&fl(o)).sort(ordV);
+  const fim=[...li,...st].filter(o=>breve(o)&&resp(o)[0]==='compre').sort(SORT.fim);
   const bb=BB(),tt=S.teto,bt=bb.filter(o=>o.preco<=tt);
   const tetos=`<div class="tetos">${TETOS.map(([v,t])=>`<button data-teto="${v}" aria-pressed="${v===tt}">${t} <small>${fmtN(bb.filter(o=>o.preco<=v).length)}</small></button>`).join('')}</div>`;
-  const sl=L.filter(o=>em(o)&&o.t==='selo').sort(ordV),ra=[...L.filter(o=>em(o)&&o.t==='rara').sort(ordV),...PS.filter(o=>em(o)&&o.t==='rara'&&o.tipo==='jogo'&&!o.tenho&&(o.rcount||0)>=1000).sort((a,b)=>(b.rcount||0)-(a.rcount||0))];
-  return faixaEv()+banner()+`<div class="tri duo" style="margin-top:24px">${lane('#ff4757','Selo Kurokami','da sua lista · no piso PPP pela 1ª vez ou no teto de desconto da franquia',sl,'lista:agora',true)}${lane('#e8303c','Promoções raras','o menor preço em muito tempo (anterior de 1,5 ano ou mais, ou pela metade) · sua lista (♥) e, fora dela, jogos com 1.000+ análises',ra,'promo:imperdivel',true)}</div>`
-   +`<div class="pcab" style="margin-top:24px"><h2>Hoje</h2><span class="res">o piso é o menor preço dos últimos 2 anos: abaixo dele por R$ 5 e 15% ou mais é <b style="color:#ff4757">imperdível</b>; nele, <b style="color:#ff8a94">não fica mais barato</b></span></div>
-   <div class="tri">${lane('#ff4757','Melhores ofertas','fora da lista · abaixo do menor preço em 2 anos · pelo ganho',mo,'promo:imperdivel')}${lane('#ff4757','Menores históricos','fora da lista · no menor preço em 2 anos · pela economia',mh,'promo:menor')}${lane('#ff4757','Bons e baratos','fora da lista · baratos e bem avaliados · pelas análises',bt,'baratos:'+tt,false,rowB,tetos)}${lane('#ff4757','Lista de desejos','em promoção · as melhores primeiro',li,'lista:imperdivel',true)}</div>`
-   +pratsLinha([{nome:'Acabam em até 3 dias',c:'#ff4757',desc:'Imperdíveis e no menor preço que terminam logo (♥ = da sua lista)',l:fim}]);}
+  const lc=li.filter(o=>resp(o)[0]==='compre'),oc=st.filter(o=>resp(o)[0]==='compre').sort((a,b)=>ganho(b)-ganho(a));
+  return faixaEv()+banner()+`<div class="tri" style="margin-top:24px">${lane('#ff4757','Da sua lista: vale comprar','jogos que você quer, num preço bom agora',lc,'lista:agora')}${lane('#ff4757','Outros jogos: vale comprar','fora da sua lista, num preço bom agora',oc,'promo:compre')}${lane('#ff4757','Bons e baratos','baratos e bem avaliados',bt,'baratos:'+tt,false,rowB,tetos)}</div>`
+   +pratsLinha([{nome:'Acabam em até 3 dias',c:'#ff4757',desc:'Valem comprar e terminam logo (♥ = da sua lista)',l:fim}]);}
 function pagDestB(){const pm=L.filter(em),fo=L.filter(o=>!em(o)&&!o.breve&&o.pv.prox_t),sp=L.filter(o=>!em(o)&&!o.breve&&!o.pv.prox_t).length;
   const A=agrupa(pm,bucketsFim(),o=>o).map(x=>(x.l.sort(SORT.melhor),x)),F=agrupa(fo,bucketsMes(),o=>o.pv.prox_t).map(x=>(x.l.sort(SORT.prox),x));
   return faixaEv()+banner(destaque())+`<div class="pcab" style="margin-top:24px"><h2>Agenda da sua lista</h2><span class="res">à esquerda, o que acaba (os que pedem pressa primeiro); à direita, quando deve vir a próxima promoção de quem está fora</span></div>
@@ -1109,9 +1125,8 @@ function btnF(pg){const f=S.f[pg],n=['desc','an','tipo','tenho','lista','ate','n
 const vazioF='<p class="vazio">Nenhum jogo com esses filtros. Abra “Filtros” e tire algum.</p>';
 /* recortes: cada um é um jeito de olhar as promoções (com os seus filtros); o cartão mostra a capa do melhor dele */
 const tetoTxt=()=>'até '+brl0(S.teto);
-const REC_P=[['tudo','Todas','pelo veredito','#ff4757',o=>true,null],
-  ['imperdivel','Imperdíveis','abaixo do menor preço em 2 anos','#ff4757',o=>verd(o)[0]==='imperdivel',(a,b)=>ganho(b)-ganho(a)],
-  ['menor','Menores históricos','no menor preço em 2 anos','#ff4757',o=>verd(o)[0]==='menor',(a,b)=>b.eco-a.eco],
+const REC_P=[['tudo','Todas','as melhores primeiro','#ff4757',o=>true,null],
+  ['compre','Vale comprar','num preço bom agora','#ff4757',o=>resp(o)[0]==='compre',ordV],
   ['baratos','Bons e baratos',()=>tetoTxt()+' · 85%+ positivas','#ff4757',o=>o.preco<=S.teto&&(o.rpos||0)>=85&&(o.cheio||0)>=3000,(a,b)=>(AF[b.appid]?1:0)-(AF[a.appid]?1:0)||notaB(b)-notaB(a)],
   ['grandes','Grandes por pouco','eram R$ 150+, hoje até R$ 50','#ff4757',o=>(o.cheio||0)>=15000&&o.preco<=5000,(a,b)=>b.eco-a.eco],
   ['fim','Acabam em 3 dias','as melhores primeiro','#ff4757',o=>o.fim>AGORA&&o.fim-AGORA<=3*DIA,ordV],
@@ -1128,19 +1143,13 @@ function pagPromoM(){const f=S.f.promo,base=P.filter(o=>passa(o,f,'promo')),o=or
    ${l.length?blocos(bl,rend):vazioF}`;}
 
 /* ---------- Lista de desejos ---------- */
-const SECS=[['imperdivel','Imperdíveis','abaixo do menor preço em 2 anos por R$ 5 e 15% ou mais · pelo ganho',(a,b)=>ganho(b)-ganho(a)],
-  ['menor','No menor preço','o menor em 2 anos: não costuma ficar mais barato · pela economia',(a,b)=>b.eco-a.eco],
-  ['espera','Pode esperar','o menor preço volta logo · vale esperar',(a,b)=>(a.pv.piso_volta||999)-(b.pv.piso_volta||999)],
-  ['comum','Preço de costume','acima do menor, que é raro ou demora · pelo desconto',SORT.desc],
-  ['sem','Sem histórico','o Hunter ainda não tem as promoções antigas · pelo desconto',SORT.desc],
-  ['vem','Vem aí','fora de promoção; deve voltar em até 30 dias no menor preço',SORT.prox],
-  ['fora','Fora de promoção','pela próxima promoção prevista',SORT.prox],['breve','Em breve','ainda não lançados',SORT.az]];
-const secVerd=l=>SECS.map(([k,t,s,so])=>{const g=l.filter(o=>verd(o)[0]===k).sort(so);return [t,`${fmtN(g.length)} · ${s}`,g,'p',k];}).filter(b=>b[2].length);
-const REC_L=[['agora','Compre agora','imperdíveis e no menor preço','#ff4757',o=>em(o)&&['imperdivel','menor'].includes(verd(o)[0]),ordV],
-  ['fim','Acabam em 3 dias','as melhores primeiro','#ff4757',o=>em(o)&&o.fim>AGORA&&o.fim-AGORA<=3*DIA,ordV],
-  ['espera','Pode esperar','o menor preço volta logo','#ff4757',o=>em(o)&&verd(o)[0]==='espera',ordV],
-  ['vem','Vem aí','fora de promoção; deve entrar em 30 dias','#ff4757',o=>verd(o)[0]==='vem',SORT.prox],
-  ['baratos','Até R$ 25','em promoção, os melhores primeiro','#ff4757',o=>em(o)&&!gratis(o)&&o.preco<=2500,ordV]];
+const SECS=[['compre','Vale comprar','o preço de agora é bom para este jogo',ordV],
+  ['espere','Espere','costuma ficar mais barato, ou não está em promoção',(a,b)=>em(b)-em(a)||ordV(a,b)||SORT.prox(a,b)],
+  ['nsei','Ainda não dá pra saber','falta histórico de preços para comparar',SORT.desc]];
+const secVerd=l=>SECS.map(([k,t,s,so])=>{const g=l.filter(o=>resp(o)[0]===k).sort(so);return [t,`${fmtN(g.length)} · ${s}`,g,'p',k];}).filter(b=>b[2].length);
+const REC_L=[['agora','Vale comprar','num preço bom agora','#ff4757',o=>em(o)&&resp(o)[0]==='compre',ordV],
+  ['fim','Acabam em 3 dias','as melhores primeiro','#ff4757',o=>em(o)&&o.fim>AGORA&&o.fim-AGORA<=3*DIA,ordR],
+  ['baratos','Até R$ 25','em promoção, os melhores primeiro','#ff4757',o=>em(o)&&!gratis(o)&&o.preco<=2500,ordR]];
 const VER_L=[['todos','Todos',o=>true],['promo','Em promoção',em],['fora','Fora de promoção',o=>!em(o)&&!o.breve],['breve','Em breve',o=>!!o.breve]];
 /* orçamento: entre os melhores negócios da lista (imperdíveis e no menor preço), a combinação que cabe no valor e
    rende a maior economia (mochila em reais inteiros; imperdível vale 1,3× a economia) */
@@ -1149,22 +1158,22 @@ function mochila(c,B){const W=Math.floor(B/100),w=c.map(o=>Math.ceil(o.preco/100
   c.forEach((o,i)=>{for(let x=W;x>=w[i];x--)if(best[x-w[i]]+v[i]>best[x]){best[x]=best[x-w[i]]+v[i];pega[i][x]=1;}});
   const out=[];let x=W;for(let i=c.length-1;i>=0;i--)if(pega[i][x]){out.push(c[i]);x-=w[i];}
   return out.sort(ordV);}
-function orcamento(base){const B=S.orc,c=base.filter(o=>em(o)&&!gratis(o)&&['imperdivel','menor'].includes(verd(o)[0])).sort(ordV);
+function orcamento(base){const B=S.orc,c=base.filter(o=>em(o)&&!gratis(o)&&resp(o)[0]==='compre').sort(ordV);
   const p=mochila(c,B),tot=p.reduce((a,o)=>a+o.preco,0);
   const eco=p.reduce((a,o)=>a+o.eco,0),ch=p.reduce((a,o)=>a+(o.cheio||0),0),bg=p[0];
   return `<div class="orc">${bg?`<div class="obg" style="background-image:url('${CDN+bg.appid}/library_hero.jpg')"></div>`:''}<div class="oin">
-   <div class="oesq"><div class="k">Sua lista hoje · ${fmtN(c.length)} valem comprar agora</div>
+   <div class="oesq"><div class="k">Sua lista hoje · ${fmtN(c.length)} jogos valem comprar agora</div>
     <div class="ot">Com <span class="seg2">${[5000,10000,20000,50000].map(v=>`<button data-orc="${v}" aria-pressed="${v===B}">${brl0(v)}</button>`).join('')}</span></div>
     <div class="ob">você leva <b>${p.length}</b> jogo${p.length===1?'':'s'} por <b class="g">${brl(tot)}</b></div>
-    <div class="os">${p.length?`eram ${brl0(ch)} · economia de <b>${brl0(eco)}</b> · a maior economia que cabe`:'nenhum dos melhores negócios cabe nesse valor'}</div>
+    <div class="os">${p.length?`sem promoção, custariam ${brl0(ch)}: você economiza <b>${brl0(eco)}</b>`:'nenhum dos jogos que valem comprar cabe nesse valor'}</div>
     ${p.length?`<button class="btn verde" data-mais="${p.map(o=>o.appid)}">Pôr os ${p.length} no carrinho</button>`:''}</div>
-   <div class="fil ocap" style="--cw:112px"><div class="trilho arr">${p.map(o=>{const j=reg({k:'jogo',o}),c2=VD[verd(o)[0]];
+   <div class="fil ocap" style="--cw:112px"><div class="trilho arr">${p.map(o=>{const j=reg({k:'jogo',o}),c2=RS.compre;
      return `<div><button class="capa ofp" data-nav data-j="${j}" title="${esc(o.nome)}">${imgV(o)}<span class="ok" style="background:${c2[1]};color:${c2[3]}">-${o.corte}%</span></button><div class="op">${brl(o.preco)}${lojaTag(o)}</div></div>`;}).join('')}</div></div></div></div>`;}
 function pagListaM(){const m=modo(),f=S.f.lista,o=ordem(),base=L.filter(x=>passa(x,f,'lista')),k=S.rec.lista;
   const d=REC_L.find(x=>x[0]===k),vv=VER_L.find(x=>x[0]===k)||VER_L[0],l=base.filter(d?d[4]:vv[2]);
   const top=orcamento(base)+cardsRec(base,REC_L,'lista')
    +`<div class="tool"><div class="l1"><span class="vers">${VER_L.filter(([w,t,fn])=>w===k||base.some(fn)).map(([w,t,fn])=>`<button data-rec="${w}" aria-pressed="${k===w}">${t} <small>${fmtN(base.filter(fn).length)}</small></button>`).join('')}</span><span class="sp"></span>${chipsOrd()}${btnF('lista')}${qIn()}<span class="views">${[['jogos','▦ Jogos'],['franquias','▦ Franquias']].map(([x,t])=>`<button data-modo="${x}" aria-pressed="${m===x}">${t}</button>`).join('')}</span></div>${barraFiltros('lista')}</div>`;
-  if(m==='franquias'){const best=x=>Math.min(...x.m.map(y=>RANK[verd(y)[0]])),ok=new Set(l),
+  if(m==='franquias'){const best=x=>Math.min(...x.m.map(y=>RRANK[resp(y)[0]])),ok=new Set(l),
       fl2=FRL.filter(x=>x.m.some(y=>ok.has(y))).sort((a,b)=>best(a)-best(b)||b.pm.length-a.pm.length||a.kk.localeCompare(b.kk,'pt-BR')),tudo=fl2.slice(0,S.lim);
     return top+`<div class="vit">${tudo.map(pilhaFR).join('')}</div>${maisL(tudo.length,fl2.length)}`;}
   const bl=o==='melhor'?(d&&d[0]!=='agora'?[['','',l.sort(d[5]),'p']]:secVerd(l)):[['','',l.sort(SORT[o]),'p']];
@@ -1184,9 +1193,10 @@ const pedeCarr=(ids,mon)=>{ids=[...new Set(ids.filter(Boolean).map(Number))];if(
 const ehJogo=x=>x.k==='jogo'||(x.k==='fr'&&x.m&&x.m.length===1);
 const jogoDe=x=>x.o||x.m[0];
 /* o que a ficha do painel mostra no lugar da caixa antiga: o veredito, as 2 frases e o "por quê" */
-function vered(o){const v=o.pv,[k,sv]=verd(o),c=VD[k],p=etqP(o);
-  return {rot:c[0],bg:c[1],cor:c[2],sub:sv||'',fatos:fatos(o),porque:[v.se1,v.se2,v.prox1,v.prox2].filter(Boolean),
-    etq:p?[p[0],ET[p[1]][1],ET[p[1]][2]]:null,selo:o.t==='selo'&&o.motivo?o.motivo:'',fora:!em(o)&&o.preco==null};}
+function vered(o){const v=o.pv,[k,sv]=resp(o),c=RS[k],p=etqP(o);
+  const det=[...fatos(o).map(([a,b,n])=>`${a}: ${b}${n?' ('+n+')':''}.`),v.se1,v.se2,v.prox1,v.prox2,
+    p&&o.t!=='24m'?`${p[0]}${o.motivo?': '+o.motivo:''}.`:''].filter(Boolean);
+  return {rot:c[0],bg:c[1],cor:c[2],sub:sv,fatos:[],porque:det,etq:null,selo:'',fora:false};}
 function fichaPai(lst,j){const gs=[],vis=new Set();
   lst.forEach(x=>{if(!ehJogo(x))return;const g=jogoDe(x);if(!vis.has(g.appid)){vis.add(g.appid);gs.push(g);}});
   const alvo=jogoDe(lst[j]);let i=Math.max(0,gs.findIndex(g=>g.appid===alvo.appid));

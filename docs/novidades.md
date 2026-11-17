@@ -2,6 +2,12 @@
 
 Texto para a descrição do release (aparece na janela de atualização). A seção de cima é a próxima versão.
 
+## 0.20.0
+- **Ofertas fala na lata:** cada jogo tem uma de três respostas, **Vale comprar**, **Espere** ou **Ainda não dá pra saber**, com uma frase curta e sem termos técnicos ("É o preço de sempre nas promoções", "Nas promoções, costuma sair por R$ 30. Dá para esperar.", "Sem promoção agora. A próxima deve vir em dezembro."). Selo, recorde, piso e chance de voltar ficam em **por quê**, na ficha.
+- **Menos coisa na tela:** Destaques com três faixas (Da sua lista: vale comprar · Outros jogos: vale comprar · Bons e baratos) e as que acabam em 3 dias; Lista de desejos separada pela resposta, com três recortes; Promoções sem as etiquetas técnicas nos filtros; o carrossel sem os cinco números; a ficha aberta pelas Ofertas mostra só a resposta (o menor preço antes desta promoção continua no Histórico de preços); a barra de teclas ficou com três dicas.
+- **"Preço de sempre":** um preço que já foi o mais baixo de metade das promoções dos últimos 2 anos agora conta como bom; antes ficava como "Preço de costume", junto com os que estavam acima do que o jogo costuma custar.
+- **Tutorial do primeiro uso:** cinco passos curtos explicam as respostas, onde olhar, a ficha, o carrinho e os avisos. Abre sozinho na primeira vez e pelo botão **?** no alto da página.
+
 ## 0.19.0
 - **Selo Kurokami novo: o preço justo com preço regional de verdade.** O Hunter pega o preço do jogo em dólar e converte pelo poder de compra (dado público do Banco Mundial, hoje ~R$ 2,58 por dólar; dá para trocar em Configurações). Com o maior desconto esperado, isso vira o **piso PPP**. O desconto esperado é o maior que o jogo já teve ou aquele em que a franquia costuma parar, o que for maior: Forza Horizon 6 teve no máximo -20%, mas os Forza param em -60%, então o piso dele é R$ 72,27. O Selo sai quando o preço chega no piso PPP **pela primeira vez** ou quando o desconto chega pela primeira vez no teto da franquia. A ficha mostra o preço regional e o piso PPP de cada jogo da lista, mesmo fora de promoção.
 - **Promoção rara** é o nome novo do Selo antigo (o menor preço em muito tempo: o anterior tem 1,5 ano ou mais, ou o preço caiu pela metade, como o "rare deal" da SteamDB). Continua avisando, como um tipo próprio em Configurações → Avisos.

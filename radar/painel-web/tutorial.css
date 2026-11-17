@@ -1,0 +1,17 @@
+/* ================= tutorial do primeiro uso ================= */
+.tut-ov{position:fixed;inset:0;z-index:10000;background:#000000c0;display:flex;align-items:center;justify-content:center;padding:16px}
+.tut-anel{position:fixed;border:2px solid var(--sinal);border-radius:6px;box-shadow:0 0 0 4px #ff475733,0 0 24px #ff475788;pointer-events:none;animation:tutPulso 1.6s ease-in-out infinite}
+@keyframes tutPulso{50%{box-shadow:0 0 0 8px #ff475722,0 0 32px #ff4757aa}}
+@media (prefers-reduced-motion:reduce){.tut-anel{animation:none}}
+.tut-cx{background:#111;border:1px solid #2a2a2a;border-top:3px solid var(--sinal);border-radius:6px;max-width:460px;width:100%;padding:22px 24px 18px;color:var(--txt,#d2d2d2);box-shadow:0 20px 60px #000}
+.tut-cx h2{margin:4px 0 12px;font-size:22px;color:#fff}
+.tut-cx p{margin:0 0 9px;font-size:14.5px;line-height:1.5}
+.tut-cx b{color:#fff}
+.tut-n{font-size:12px;color:var(--dim)}
+.tut-r{display:inline-block;background:var(--b);color:var(--c);font-weight:700;font-size:12.5px;padding:3px 8px;border-radius:2px;margin-right:6px}
+.tut-pts{display:flex;gap:6px;justify-content:center;margin:14px 0 4px}
+.tut-pts i{width:7px;height:7px;border-radius:50%;background:#333}.tut-pts i.on{background:var(--sinal)}
+.tut-ac{display:flex;align-items:center;gap:8px;margin-top:12px}.tut-ac span{flex:1}
+.tut-pula{background:none;border:0;color:var(--dim);cursor:pointer;font-size:13px;padding:6px 0}.tut-pula:hover{color:var(--txt,#d2d2d2)}
+.tut-dica{font-size:12.5px;color:var(--dim);margin-top:10px;text-align:center}
+.btn-tut{width:30px;height:30px;border-radius:50%;padding:0;font-weight:700}

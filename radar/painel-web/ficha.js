@@ -161,7 +161,7 @@ function fxVale(){
     const pv=porqueVolta(MJ),t=!MJ.selo&&MJ.corte>0&&TITULO_TIPO[MJ.tipo_oferta];
     if(MOP.vered)s+=fxVered(MOP.vered);
     else if(pv||t)s+=`<div class="fx-cx fx-vered">${t?`<div class="t">${recPill({tipo_oferta:MJ.tipo_oferta,corte:MJ.corte,piso_ref:MJ.piso_ref})}${t}</div>`:''}${pv}</div>`;
-    s+=fxPisos(o);
+    if(!MOP.vered)s+=fxPisos(o);   // das páginas novas: só a resposta (os pisos ficam no Histórico de preços)
   }
   return s||`<div class="fx-vazio">${MJ.corte>0?'Ainda sem histórico para dizer se vale a pena.':'Sem promoção agora: o Hunter avisa quando o preço cair.'}</div>`;
 }
